@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package token_service;
+
+service TokenService {
+    rpc IssueJWT(IssueJWTRequest) returns (IssueJWTResponse) {}
+    rpc ValidateJWT(ValidateJWTRequest) returns (ValidateJWTResponse) {} 
+}
+
+
+// JWTRequest holds the user data the token should
+// be issued for
+message IssueJWTRequest {
+    AuthenticatedUser user = 1;    
+}
+
+// JWTResponse returns the issued JWT
+message IssueJWTResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    string jwt_token = 3;
+}
+
+// AuthenticatedUser's data is used in the encoded JWT
+message AuthenticatedUser {
+    string username = 1;
+}
+
+// ValidateJWTRequest holds the JWT from the user
+message ValidateJWTRequest {
+    string jwt_token = 1;
+}
+
+// ValidateJWTResponse tells whether a user's token
+// is valid
+message ValidateJWTResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    bool is_valid = 3;
+}

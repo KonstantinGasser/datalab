@@ -1,0 +1,17 @@
+{
+    "spellright.language": [
+        "en"
+    ],
+    "spellright.documentTypes": [
+        "markdown",
+        "latex",
+        "plaintext",
+        "go",
+        "proto3"
+    ],
+    "spellright.parserByClass": {
+        "proto3": {
+            "parser": "plain"
+        }
+    }
+}

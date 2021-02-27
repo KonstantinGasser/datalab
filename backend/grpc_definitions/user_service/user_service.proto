@@ -1,0 +1,39 @@
+syntax="proto3";
+
+package user_service;
+
+service UserService {
+    rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {}
+    rpc AuthUser(AuthRequest) returns (AuthResponse) {}
+}
+
+message CreateUserRequest {
+    string username = 1; 
+    string password_hash = 2;
+}
+
+message CreateUserResponse {
+    int32 status_code = 1;
+    string msg = 2;    
+}
+
+// AuthRequest is the actual authentication request
+// coming form the API-Gateway
+message AuthRequest {
+    string username = 1;
+    string password_hash = 2; 
+}
+
+// AuthResponse represents the response when a user
+// performs a login request
+message AuthResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    bool authenticated = 3;
+    AuthenticatedUser user = 4;
+}
+
+// AuthenticatedUser's data is used in the encoded JWT
+message AuthenticatedUser {
+    string username = 1;
+}
