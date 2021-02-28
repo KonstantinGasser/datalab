@@ -3,7 +3,6 @@ package api
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 
@@ -11,6 +10,7 @@ import (
 	"github.com/KonstantinGasser/clickstream/backend/services/user_service/pkg/repository"
 	"github.com/KonstantinGasser/clickstream/backend/services/user_service/pkg/user"
 	"github.com/gofrs/uuid"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -28,8 +28,8 @@ type UserService struct {
 // dependencies
 func NewUserService() (*UserService, error) {
 	mongoC, err := repository.NewMongoClient("mongodb://userDB:secure@192.168.0.179:27017")
-	log.Printf("could not create mongoDB client: %v\n", err)
 	if err != nil {
+		logrus.Errorf("could not create mongoDB client: %v\n", err)
 		return nil, fmt.Errorf("could not create mongoDB client: %v", err)
 	}
 	return &UserService{
@@ -44,7 +44,7 @@ func (srv UserService) CreateUser(ctx context.Context, request *userSrv.CreateUs
 	// for collection in mongoDB
 	UUID, err := uuid.NewV4()
 	if err != nil {
-		log.Printf("[userService.CreateUser] could not generate UUID for user: %v", err)
+		logrus.Errorf("[userService.CreateUser] could not generate UUID for user: %v", err)
 		return &userSrv.CreateUserResponse{
 			StatusCode: http.StatusInternalServerError,
 			Msg:        fmt.Sprintf("could not generate UUID for user: %v", err),
@@ -72,15 +72,7 @@ func (srv UserService) CreateUser(ctx context.Context, request *userSrv.CreateUs
 }
 
 func (srv UserService) AuthUser(ctx context.Context, request *userSrv.AuthRequest) (*userSrv.AuthResponse, error) {
-	log.Printf("GRPC Request: %v", request)
-	return &userSrv.AuthResponse{
-		StatusCode:    http.StatusOK,
-		Msg:           "first grpc stuff I am doing",
-		Authenticated: true,
-		User: &userSrv.AuthenticatedUser{
-			Username: "KonstantinGasser",
-		},
-	}, nil
+	return nil, fmt.Errorf("[userService.AuthUser] not implemented")
 }
 
 func (srv UserService) mustEmbedUnimplementedUserServiceServer() {}

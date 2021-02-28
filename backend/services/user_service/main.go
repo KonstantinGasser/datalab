@@ -3,13 +3,13 @@ package main
 import (
 	"context"
 	"flag"
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
 	"github.com/KonstantinGasser/clickstream/backend/services/user_service/cmd/server"
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
@@ -22,10 +22,10 @@ func main() {
 	signal.Notify(done, os.Interrupt, os.Kill, syscall.SIGTERM)
 	go func() {
 		sig := <-done
-		log.Printf("Received OS signal - shutting down... SIG: %s\n", sig)
+		logrus.Warnf("Received OS signal - shutting down... SIG: %s\n", sig)
 		cancle()
 		time.Sleep(time.Second * 1)
 		os.Exit(0)
 	}()
-	log.Fatal(server.Run(ctx, *address))
+	logrus.Fatal(server.Run(ctx, *address))
 }

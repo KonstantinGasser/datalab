@@ -3,10 +3,10 @@ package api
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 
 	userSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/user_service"
+	"github.com/sirupsen/logrus"
 )
 
 // HandlerRegister receives request to create a new user
@@ -32,7 +32,7 @@ func (api API) HandlerRegister(w http.ResponseWriter, r *http.Request) {
 		api.onError(w, fmt.Errorf("could not reach UserService for request: %v", err), http.StatusInternalServerError)
 		return
 	}
-	log.Printf("[grpc.CreateUser] status: %d, msg: %s", resp.GetStatusCode(), resp.GetMsg())
+	logrus.Infof("[grpc.CreateUser] status: %d, msg: %s", resp.GetStatusCode(), resp.GetMsg())
 	// return success of register request
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(int(resp.GetStatusCode()))

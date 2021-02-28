@@ -3,9 +3,9 @@ package repository
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
+	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -33,12 +33,12 @@ func NewMongoClient(connString string) (*MongoClient, error) {
 
 	conn, err := mongo.Connect(ctx, opts)
 	if err != nil {
-		log.Printf("[mongo.Conn.Connect] could not connect to mongoDB <%s>: %v\n", connString, err)
+		logrus.Errorf("[mongo.Conn.Connect] could not connect to mongoDB <%s>: %v\n", connString, err)
 		return nil, fmt.Errorf("could not connect to mongoDB <%s>: %v", connString, err)
 	}
 	// check if connection is alive
 	if err := conn.Ping(context.TODO(), nil); err != nil {
-		log.Printf("[mongo.Conn.Ping] could not ping <%s>: %v\n", connString, err)
+		logrus.Errorf("[mongo.Conn.Ping] could not ping <%s>: %v\n", connString, err)
 		return nil, fmt.Errorf("could not ping <%s>: %v", connString, err)
 	}
 	return &MongoClient{
@@ -53,8 +53,8 @@ func (client MongoClient) InsertOne(ctx context.Context, db, collection string, 
 	coll := client.conn.Database(db).Collection(collection)
 	_, err := coll.InsertOne(ctx, data)
 	if err != nil {
-		log.Printf("[mongo.InsertOne], could not InsertOne: %v\n", err)
-		return fmt.Errorf("mongo client, could not InsertOne: %v", err)
+		logrus.Errorf("[mongo.InsertOne], could not execute InsertOne: %v\n", err)
+		return fmt.Errorf("mongo client, could not execute InsertOne: %v", err)
 	}
 	return nil
 }
@@ -71,7 +71,7 @@ func (client MongoClient) FindOne(ctx context.Context, db, collection string, da
 		if err == mongo.ErrNoDocuments {
 			return bson.M{}, nil
 		}
-		log.Printf("[mongo.FindOne], could not decode FindOne result: %v\n", err)
+		logrus.Errorf("[mongo.FindOne], could not decode FindOne result: %v\n", err)
 		return nil, fmt.Errorf("mongo client, could not decode FindOne result: %v", err)
 	}
 	return result, nil

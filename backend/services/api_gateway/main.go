@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/KonstantinGasser/clickstream/backend/services/api_gateway/cmd/server"
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
@@ -22,7 +23,7 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
 		sig := <-done
-		log.Printf("Received OS signal - shutting down... SIG: %s\n", sig)
+		logrus.Warnf("Received OS signal - shutting down... SIG: %s\n", sig)
 		cancel()
 		time.Sleep(1 * time.Second)
 		os.Exit(0)

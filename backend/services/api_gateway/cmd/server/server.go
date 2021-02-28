@@ -2,10 +2,10 @@ package server
 
 import (
 	"context"
-	"log"
 	"net/http"
 
 	"github.com/KonstantinGasser/clickstream/backend/services/api_gateway/pkg/api"
+	"github.com/sirupsen/logrus"
 )
 
 // Run acts as a run abstraction to start the HTTP-Server
@@ -27,9 +27,9 @@ func Run(ctx context.Context, address string) error {
 
 	go func() {
 		<-ctx.Done()
-		log.Println("Server cleaning up...")
+		logrus.Infof("Server cleaning up...")
 	}()
-	log.Printf("listening on %s\n", address)
+	logrus.Infof("[server.Run] listening on %s\n", address)
 	if err := http.ListenAndServe(address, nil); err != nil {
 		return err
 	}

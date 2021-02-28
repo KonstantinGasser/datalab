@@ -3,10 +3,10 @@ package user
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/KonstantinGasser/clickstream/backend/services/user_service/pkg/repository"
+	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -21,8 +21,8 @@ func (user User) Insert(ctx context.Context, db *repository.MongoClient, reqUser
 	// check if user already exists
 	resultMap, err := db.FindOne(ctx, "datalabs_user", "user", bson.M{"username": reqUser.Username})
 	if err != nil {
-		log.Printf("[user.Insert] could not FindOne: %v\n", err)
-		return http.StatusInternalServerError, fmt.Errorf("could not FindOne: %v", err)
+		logrus.Errorf("[user.Insert] could not execute FindOne: %v\n", err)
+		return http.StatusInternalServerError, fmt.Errorf("could not execute FindOne: %v", err)
 	}
 	// if not 0 then user with username in db
 	if len(resultMap) != 0 {
@@ -34,7 +34,7 @@ func (user User) Insert(ctx context.Context, db *repository.MongoClient, reqUser
 		return http.StatusInternalServerError, fmt.Errorf("could not marshal MongoUser struct: %v", err)
 	}
 	if err := db.InsertOne(ctx, "datalabs_user", "user", b); err != nil {
-		log.Printf("[user.Insert] %s", err.Error())
+		logrus.Errorf("[user.Insert] %s", err.Error())
 		return http.StatusInternalServerError, err
 	}
 	return http.StatusOK, nil

@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 
 	userSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/user_service"
 	"github.com/KonstantinGasser/clickstream/backend/services/api_gateway/pkg/grpcC"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -43,7 +43,7 @@ func New(cors CORSConfig) API {
 	return API{
 		cors: cors,
 		route: func(path string, h http.HandlerFunc) {
-			log.Printf("[set-up:route] %s\n", path)
+			logrus.Infof("[set-up:route] %s\n", path)
 			http.HandleFunc(path, h)
 		},
 		onError: func(w http.ResponseWriter, err error, status int) {
@@ -60,8 +60,8 @@ func (api API) decode(body io.ReadCloser) (map[string]interface{}, error) {
 	defer body.Close()
 
 	var data map[string]interface{}
-
 	if err := json.NewDecoder(body).Decode(&data); err != nil {
+		logrus.Errorf("[api.decode] could not decode r.Body: %v", err)
 		return nil, fmt.Errorf("cloud not decode r.Body: %v", err)
 	}
 	return data, nil
@@ -71,6 +71,7 @@ func (api API) decode(body io.ReadCloser) (map[string]interface{}, error) {
 func (api API) encode(data interface{}) ([]byte, error) {
 	b, err := json.Marshal(data)
 	if err != nil {
+		logrus.Errorf("[api.encode] could not encode data: %v", err)
 		return nil, err
 	}
 	return b, nil
@@ -78,7 +79,7 @@ func (api API) encode(data interface{}) ([]byte, error) {
 
 // SetUp maps the API routes to the service and specifies the required middleware
 func (api API) SetUp() {
-	log.Printf("Adding routes to API-Service...\n")
+	logrus.Infof("Adding routes to API-Service...\n")
 
 	// ------ ROUTES ------
 	api.route("/api/v1/user/login", api.WithCors(
