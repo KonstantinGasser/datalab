@@ -9,7 +9,8 @@ service UserService {
 
 message CreateUserRequest {
     string username = 1; 
-    string password_hash = 2;
+    string password = 2;
+    string orgn_domain = 3;
 }
 
 message CreateUserResponse {
@@ -21,7 +22,7 @@ message CreateUserResponse {
 // coming form the API-Gateway
 message AuthRequest {
     string username = 1;
-    string password_hash = 2; 
+    string password = 2; 
 }
 
 // AuthResponse represents the response when a user
@@ -36,4 +37,5 @@ message AuthResponse {
 // AuthenticatedUser's data is used in the encoded JWT
 message AuthenticatedUser {
     string username = 1;
+    string orgn_domain = 2;
 }
