@@ -5,13 +5,14 @@ import (
 	"net"
 
 	userSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/user_service"
+	"github.com/KonstantinGasser/clickstream/backend/services/user_service/pkg/api"
 	grpc "google.golang.org/grpc"
 )
 
 // Run is a run-abstraction for the main func
 func Run(addr string) error {
 	srv := grpc.NewServer()
-	userSrv.RegisterUserServiceServer(srv, userService{})
+	userSrv.RegisterUserServiceServer(srv, api.UserService{})
 	// create tcp listener
 	listener, err := net.Listen("tcp", addr)
 	if err != nil {

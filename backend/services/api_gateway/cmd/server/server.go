@@ -16,8 +16,9 @@ func Run(address string) error {
 			Header string
 			Value  string
 		}{
-			{Header: api.AccessControlAllowOrigin, Value: "*"},
+			{Header: api.AccessControlAllowOrigin, Value: "http://localhost:8081"},
 			{Header: api.AccessControlAllowMethods, Value: "POST, OPTIONS"},
+			{Header: api.AccessControllAllowHeader, Value: "*"},
 		},
 	})
 	// route and middleware setup

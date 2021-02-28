@@ -11,12 +11,12 @@ import (
 // HandlerLogin forwards the login request to the user and token service
 // in oder to check the user's auth and to issue a JWT.
 func (api API) HandlerLogin(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	// invoke grpc call
 	resp, err := api.UserSrvClient.AuthUser(context.Background(), &userSrv.AuthRequest{
-		Username:     "KonstantinGasser",
-		PasswordHash: "secure-hash",
-	},
-	)
+		Username: "KonstantinGasser",
+		Password: "secure-hash",
+	})
 	if err != nil {
 		log.Fatal(err)
 	}
