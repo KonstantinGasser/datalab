@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"log"
 	"net"
 
@@ -10,15 +11,22 @@ import (
 )
 
 // Run is a run-abstraction for the main func
-func Run(addr string) error {
+func Run(ctx context.Context, addr string) error {
 	srv := grpc.NewServer()
-	userSrv.RegisterUserServiceServer(srv, api.UserService{})
+
+	// create new UserService with all dependencies
+	userService, err := api.NewUserService()
+	if err != nil {
+		log.Fatalf("[server.Run] could not create api.UserService: %v", err)
+	}
+	// register grpc server to service
+	userSrv.RegisterUserServiceServer(srv, userService)
 	// create tcp listener
 	listener, err := net.Listen("tcp", addr)
 	if err != nil {
-		log.Fatalf("cloud not listen to %s: %v", addr, err)
+		log.Fatalf("[server.Run] cloud not listen to %s: %v", addr, err)
 	}
-	log.Printf("listening on %s...\n", addr)
+	log.Printf("[server.Run] listening on %s...\n", addr)
 
 	if err := srv.Serve(listener); err != nil {
 		return err

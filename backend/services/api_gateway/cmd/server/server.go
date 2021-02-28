@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"log"
 	"net/http"
 
@@ -10,13 +11,13 @@ import (
 // Run acts as a run abstraction to start the HTTP-Server
 // and can return an error - which is nice when called
 // from main
-func Run(address string) error {
+func Run(ctx context.Context, address string) error {
 	srv := api.New(api.CORSConfig{
 		Cfgs: []struct {
 			Header string
 			Value  string
 		}{
-			{Header: api.AccessControlAllowOrigin, Value: "http://localhost:8081"},
+			{Header: api.AccessControlAllowOrigin, Value: "http://localhost:3000"},
 			{Header: api.AccessControlAllowMethods, Value: "POST, OPTIONS"},
 			{Header: api.AccessControllAllowHeader, Value: "*"},
 		},
@@ -24,6 +25,10 @@ func Run(address string) error {
 	// route and middleware setup
 	srv.SetUp()
 
+	go func() {
+		<-ctx.Done()
+		log.Println("Server cleaning up...")
+	}()
 	log.Printf("listening on %s\n", address)
 	if err := http.ListenAndServe(address, nil); err != nil {
 		return err
