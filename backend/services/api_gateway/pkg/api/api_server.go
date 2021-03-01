@@ -2,10 +2,12 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
 
+	tokenSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/token_service"
 	userSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/user_service"
 	"github.com/KonstantinGasser/clickstream/backend/services/api_gateway/pkg/grpcC"
 	"github.com/sirupsen/logrus"
@@ -28,7 +30,8 @@ type API struct {
 	// onError response to request if an error occurs
 	onError func(w http.ResponseWriter, err error, status int)
 	// *** Client Dependencies ***
-	UserSrvClient userSrv.UserServiceClient
+	UserSrvClient  userSrv.UserServiceClient
+	TokenSrvClient tokenSrv.TokenServiceClient
 }
 
 // CORSConfig specifies it CORS policy of the API-Server
@@ -51,7 +54,8 @@ func New(cors CORSConfig) API {
 			return
 		},
 		// *** Client Dependencies ***
-		UserSrvClient: grpcC.NewUserServiceClient(":8001"),
+		UserSrvClient:  grpcC.NewUserServiceClient(":8001"),
+		TokenSrvClient: grpcC.NewTokenServiceClient(":8002"),
 	}
 }
 
@@ -77,15 +81,28 @@ func (api API) encode(data interface{}) ([]byte, error) {
 	return b, nil
 }
 
+// headerAuth parsed the Authentication-Header and its JWT value from
+// a given request
+func (api API) headerAuth(r *http.Request) (string, error) {
+	token := r.Header.Get("Authorization")
+	if token != "" {
+		return "", errors.New("[api.headerAuth] could not find any Authentication-Header in request")
+	}
+	return token, nil
+}
+
 // SetUp maps the API routes to the service and specifies the required middleware
 func (api API) SetUp() {
 	logrus.Infof("Adding routes to API-Service...\n")
 
 	// ------ ROUTES ------
-	api.route("/api/v1/user/login", api.WithCors(
-		api.HandlerLogin,
-	))
-	api.route("/api/v1/user/register", api.WithCors(
-		api.HandlerRegister,
-	))
+	api.route("/api/v1/user/register",
+		api.WithCors(
+			api.HandlerRegister,
+		))
+	api.route("/api/v1/user/login",
+		api.WithCors(
+			api.HandlerLogin,
+		))
+
 }

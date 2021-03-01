@@ -1,7 +1,18 @@
 package api
 
 import (
+	"context"
+	"errors"
+	"fmt"
 	"net/http"
+	"time"
+
+	tokenSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/token_service"
+	"github.com/sirupsen/logrus"
+)
+
+const (
+	authTimeout = time.Second * 5
 )
 
 // WithCors enables CORS by setting the 'Access-Control-Allow-Origin' and
@@ -16,6 +27,42 @@ func (api API) WithCors(next http.HandlerFunc) http.HandlerFunc {
 		// (used to do pre-flights from browser with POST request)
 		if r.Method == "OPTIONS" {
 			w.WriteHeader(http.StatusOK)
+			return
+		}
+		// serve request
+		next(w, r)
+	}
+}
+
+// WithAuth acts as middleware to authenticate a request whether the passed
+// JWT is valid or not
+func (api API) WithAuth(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		token, err := api.headerAuth(r)
+		if err != nil {
+			logrus.Warnf("[api.WithAuth] %s is not authenticated", r.Host)
+			api.onError(w, errors.New("no Authentication-Header found"), http.StatusForbidden)
+			return
+		}
+		// invoke grpc to token-service for authentication
+		ctx, cancel := context.WithTimeout(r.Context(), authTimeout)
+		defer cancel()
+		resp, err := api.TokenSrvClient.ValidateJWT(ctx, &tokenSrv.ValidateJWTRequest{
+			JwtToken: token,
+		})
+		if err != nil {
+			logrus.Errorf("[api.WithAuth] could not execute grpc.ValidateJWT: %v", err)
+			api.onError(w, errors.New("no Authentication-Header found"), http.StatusInternalServerError)
+			return
+		}
+		if resp.GetStatusCode() != http.StatusOK {
+			logrus.Errorf("[api.WithAuth] grpc.ValidateJWT returned a %d code", resp.GetStatusCode())
+			api.onError(w, fmt.Errorf("grpc received a code: %d", resp.GetStatusCode()), int(resp.GetStatusCode()))
+			return
+		}
+		if !resp.GetIsValid() {
+			logrus.Warnf("[api.WithAuth] %s is not authenticated: %v", r.Host, resp.GetMsg())
+			api.onError(w, errors.New("not authenticated"), http.StatusForbidden)
 			return
 		}
 		// serve request

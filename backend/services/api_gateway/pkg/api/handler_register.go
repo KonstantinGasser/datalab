@@ -34,6 +34,13 @@ func (api API) HandlerRegister(w http.ResponseWriter, r *http.Request) {
 	}
 	logrus.Infof("[grpc.CreateUser] status: %d, msg: %s", resp.GetStatusCode(), resp.GetMsg())
 	// return success of register request
+
+	b, err := api.encode(resp)
+	if err != nil {
+		logrus.Errorf("[api.HandlerRegister] could not encode grpc response: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(int(resp.GetStatusCode()))
+	w.Write(b)
 }
