@@ -40,7 +40,8 @@ func (api API) HandlerLogin(w http.ResponseWriter, r *http.Request) {
 		Username: data["username"].(string),
 		Password: data["password"].(string),
 	})
-	if err != nil {
+	logrus.Info(respUser)
+	if err != nil || respUser.GetStatusCode() >= http.StatusInternalServerError {
 		logrus.Errorf("[api.HandlerLogin] could not execute grpc.AuthUser: %v\n", err)
 		api.onError(w, fmt.Errorf("could execute grpc.AuthUser: %v", err), http.StatusInternalServerError)
 		return

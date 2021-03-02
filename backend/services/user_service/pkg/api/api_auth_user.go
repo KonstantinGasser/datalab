@@ -2,15 +2,15 @@ package api
 
 import (
 	"context"
-	"fmt"
 
 	userSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/user_service"
+	"github.com/sirupsen/logrus"
 )
 
 // AuthUser is a public interface of the service allowing to authenticate
 // a user by its credentials
 func (srv UserService) AuthUser(ctx context.Context, request *userSrv.AuthRequest) (*userSrv.AuthResponse, error) {
-
+	logrus.Info("[userService.AuthUser] incoming authentication request")
 	// status can be statusOK, statusInternalServerError or statusForbidden
 	status, user, err := srv.user.Authenticate(ctx, srv.mongoClient, request.GetUsername(), request.GetPassword())
 	if err != nil {
@@ -19,7 +19,7 @@ func (srv UserService) AuthUser(ctx context.Context, request *userSrv.AuthReques
 			Msg:           err.Error(),
 			User:          nil,
 			Authenticated: false,
-		}, fmt.Errorf("[userService.AuthUser] could not authenticate user: %v", err)
+		}, nil
 	}
 	return &userSrv.AuthResponse{
 		StatusCode: int32(status),

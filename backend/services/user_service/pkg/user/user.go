@@ -77,7 +77,7 @@ func (user User) Authenticate(ctx context.Context, db *repository.MongoClient, u
 	if err != nil || len(result) == 0 {
 		return http.StatusInternalServerError, bson.M{}, fmt.Errorf("could not execute findOne: %v", err)
 	}
-	if utils.CheckPasswordHash(password, result["password"].(string)) {
+	if !utils.CheckPasswordHash(password, result["password"].(string)) {
 		return http.StatusForbidden, bson.M{}, errors.New("user not authenticated")
 	}
 	// user is authenticated: returns user bson.M data
