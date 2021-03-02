@@ -1,7 +1,7 @@
 # Clickstream analysis platform for user activity data
 
 
-# Exposé
+<!-- # Exposé
 ## Problemstellung 
 Konstruieren einer Clickstream Platform für StartUps. StartUps sollen in der Lage sein, durch die Nutzung der Platform, mehr Informationen über Ihr Produkt (App) zu erfahren.
 Die Platform muss somit in der Lage sein, Daten von den Usern zu sammeln, dass kann zum Beispiel über eine Client-Library passieren, welche Event Listener an den Context hängt, und entstehende Events an einen Service weiterleitet. Neben dem Sammeln der Daten, muss das System Skalierbare sein. Eine Hochrechnung kann wie folgt aussehen:    
@@ -14,7 +14,7 @@ Bei 5 aktiven StartUps mit jeweils 10.000 aktiven Usern, muss das System 5 x 10.
 - Architektur von Micor-Services und die dazugehörige Infrastruktur
 
 Abstract: some test goes.   
-here I guess
+here I guess -->
 
 
 ## Table of Contents
