@@ -4,8 +4,7 @@ import "strings"
 
 // DBUser represents a User Object living
 // in the mongo database
-// fields are not exported - setter must be used
-// - this is done to avoid multiple strings.trim etc operation
+// Fields must be exported in order for the struct be (un-)marshaled in/to bson
 type DBUser struct {
 	UUID       string `bson:"_id"`
 	Username   string `bson:"username"`
@@ -14,7 +13,7 @@ type DBUser struct {
 }
 
 // newDBUser returns a new DBUser but calls its setter to perform sanity checks
-// on the input
+// on the input - striping of white-spaces
 func newDBUser(uuid, username, password, orgnDomain string) DBUser {
 	u := DBUser{}
 	u.setUUID(uuid)

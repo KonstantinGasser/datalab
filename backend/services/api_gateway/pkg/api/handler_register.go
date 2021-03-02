@@ -14,25 +14,28 @@ const (
 	createUserTimeout = time.Second * 5
 )
 
-// HandlerRegister receives request to create a new user
+// HandlerRegister is the entry-point if a users creates a new account.
+// It performs sanity checks on the input data and forwards the request
+// to the user-service.
+// Involved services:
+//	- User-Service
 func (api API) HandlerRegister(w http.ResponseWriter, r *http.Request) {
-	// get data from r.Body
 	data, err := api.decode(r.Body)
 	if err != nil {
 		api.onError(w, err, http.StatusBadRequest)
 		return
 	}
-	// check posted data for correctness
+	// passed data is not allowed to be empty
+	// Todo: create helper func on api to perform checks on N inputs
 	if data["username"].(string) == "" || data["password"] == "" || data["orgn_domain"] == "" {
 		api.onError(w, fmt.Errorf("missing fields in register request"), http.StatusBadRequest)
 		return
 	}
-	// invoke grpc call
-	ctx, cancel := context.WithTimeout(context.Background(), createUserTimeout)
-	defer func() {
-		cancel()
-	}()
 
+	// invoke grpc call to user-service to create the user
+	// Response holds only a status-code and a msg (could be an error message)
+	ctx, cancel := context.WithTimeout(context.Background(), createUserTimeout)
+	defer cancel()
 	resp, err := api.UserSrvClient.CreateUser(ctx, &userSrv.CreateUserRequest{
 		Username:   data["username"].(string),
 		Password:   data["password"].(string),
@@ -43,16 +46,7 @@ func (api API) HandlerRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	logrus.Infof("[grpc.CreateUser] status: %d, msg: %s", resp.GetStatusCode(), resp.GetMsg())
-	// return success of register request
 
-	b, err := api.encode(resp)
-	if err != nil {
-		logrus.Errorf("[api.HandlerRegister] could not encode grpc response: %v", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("could not process register request"))
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
+	// on success write to response
 	w.WriteHeader(int(resp.GetStatusCode()))
-	w.Write(b)
 }

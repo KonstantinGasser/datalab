@@ -34,8 +34,8 @@ func (api API) WithCors(next http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-// WithAuth acts as middleware to authenticate a request whether the passed
-// JWT is valid or not
+// WithAuth acts as middleware before route endpoints. It checks if a user is authenticated or not
+// returns a new http.HandlerFunc to allow multiple other middleware to be wrapped around/after
 func (api API) WithAuth(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		token, err := api.headerAuth(r)
@@ -44,7 +44,7 @@ func (api API) WithAuth(next http.HandlerFunc) http.HandlerFunc {
 			api.onError(w, errors.New("no Authentication-Header found"), http.StatusForbidden)
 			return
 		}
-		// invoke grpc to token-service for authentication
+		// invoke grpc call to token-service to validate a JWT
 		ctx, cancel := context.WithTimeout(r.Context(), authTimeout)
 		defer cancel()
 		resp, err := api.TokenSrvClient.ValidateJWT(ctx, &tokenSrv.ValidateJWTRequest{

@@ -9,6 +9,7 @@ type TokenService struct {
 	// ** Service Dependencies ***
 }
 
+// NewTokenService creates and returns a new TokenService
 func NewTokenService() TokenService {
 	srv := TokenService{}
 	return srv

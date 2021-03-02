@@ -14,9 +14,12 @@ import (
 )
 
 const (
-	AccessControlAllowOrigin  = "Access-Control-Allow-Origin"
+	// AccessControlAllowOrigin describes the allowed request origins
+	AccessControlAllowOrigin = "Access-Control-Allow-Origin"
+	// AccessControlAllowMethods describes the methods allowed by this API
 	AccessControlAllowMethods = "Access-Control-Allow-Methods"
-	AccessControllAllowHeader = "Access-Control-Allow-Headers"
+	// AccessControlAllowHeader describes a header -> ???
+	AccessControlAllowHeader = "Access-Control-Allow-Headers"
 )
 
 // API represents the handler functions and middleware
@@ -44,11 +47,17 @@ type CORSConfig struct {
 // New create and returns a new API struct
 func New(cors CORSConfig) API {
 	return API{
+		// CORS specification
 		cors: cors,
+		// route is a custom function allowing to set path and request handler
+		// for a given route (similar to the http.HandlerFunc). However having it
+		// customs allows to do middleware in a nicer way
 		route: func(path string, h http.HandlerFunc) {
 			logrus.Infof("[set-up:route] %s\n", path)
 			http.HandleFunc(path, h)
 		},
+		// onError is a custom function returning a given error back as response.
+		// This way code duplication can be avoided
 		onError: func(w http.ResponseWriter, err error, status int) {
 			http.Error(w, err.Error(), status)
 			return
@@ -59,7 +68,8 @@ func New(cors CORSConfig) API {
 	}
 }
 
-// decode takes an io.ReadCloser (r.Body) and unmarshals the body
+// decode is a custom wrapper to decode the request.Body if in JSON.
+// Allows to avoid code duplication. Data is decoded into a map[string]interface{}
 func (api API) decode(body io.ReadCloser) (map[string]interface{}, error) {
 	defer body.Close()
 
@@ -71,7 +81,8 @@ func (api API) decode(body io.ReadCloser) (map[string]interface{}, error) {
 	return data, nil
 }
 
-// encode takes in a interface and marshals the data for the response
+// encode is a custom wrapper to encode any data to a byte slice in order
+// for it to be returned to in the response. Allows to avoid code duplication
 func (api API) encode(data interface{}) ([]byte, error) {
 	b, err := json.Marshal(data)
 	if err != nil {
@@ -81,8 +92,8 @@ func (api API) encode(data interface{}) ([]byte, error) {
 	return b, nil
 }
 
-// headerAuth parsed the Authentication-Header and its JWT value from
-// a given request
+// headerAuth is a wrapper to parse the authentication header from a request.
+// Function is primarily called from the middleware.WithAuth to get the JWT token.
 func (api API) headerAuth(r *http.Request) (string, error) {
 	token := r.Header.Get("Authorization")
 	if token != "" {
@@ -91,7 +102,8 @@ func (api API) headerAuth(r *http.Request) (string, error) {
 	return token, nil
 }
 
-// SetUp maps the API routes to the service and specifies the required middleware
+// SetUp sets up all the routes the API has along with all the middleware
+// each request required to have
 func (api API) SetUp() {
 	logrus.Infof("Adding routes to API-Service...\n")
 

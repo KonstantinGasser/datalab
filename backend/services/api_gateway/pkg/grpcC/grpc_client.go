@@ -22,7 +22,7 @@ func NewUserServiceClient(listenOn string) userSrv.UserServiceClient {
 // NewTokenServiceClient is a grpc client
 func NewTokenServiceClient(listenOn string) tokenSrv.TokenServiceClient {
 	conn, err := grpc.Dial(listenOn, grpc.WithInsecure())
-	if err != nil {
+	if err != nil { // change not good !!!
 		logrus.Errorf("[NewTokenServiceClient] could not connect: %v", err)
 		return nil
 	}

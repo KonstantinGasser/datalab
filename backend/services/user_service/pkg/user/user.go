@@ -12,25 +12,38 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
+const (
+	// dbUser is the name of user database in mongoDB
+	dbUser = "datalabs_user"
+	// collUser is the name of the collection used in dbUser
+	// to store the user document
+	collUser = "user"
+)
+
 type User struct{}
 
-// Insert inserts a new user into the mongo database
+// Insert handles inserts of newly registered user into the mongo db.
+// it checks if the username is already taken else calls the mongoClient.InsertOne to
+// persist the user. It hashes the users password and assigns the user a UUID used as pk (_id)
+// in MongoDB
 func (user User) Insert(ctx context.Context, db *repository.MongoClient, username, password, orgnD string) (int, error) {
 	// sanity check for user struct
 	if username == "" || password == "" || orgnD == "" {
 		return http.StatusBadRequest, fmt.Errorf("user information are missing")
 	}
 	// check if user already exists
-	resultMap, err := db.FindOne(ctx, "datalabs_user", "user", bson.M{"username": username})
+	// errors of type mongo.ErrNoDocuments are excluded since they mean that no match
+	// was found. an error here means the query failed
+	resultMap, err := db.FindOne(ctx, dbUser, collUser, bson.M{"username": username})
 	if err != nil {
 		logrus.Errorf("[user.Insert] could not execute FindOne: %v\n", err)
 		return http.StatusInternalServerError, fmt.Errorf("could not execute FindOne: %v", err)
 	}
-	// if not 0 then user with username in db
+	// mongos findOne query can return an empty bson.M struct if not found
 	if len(resultMap) != 0 {
 		return http.StatusBadRequest, fmt.Errorf("username already exists in system")
 	}
-
+	// primary-key (_id) for mongoDB document of user
 	uuid, err := utils.UUID()
 	if err != nil {
 		return http.StatusInternalServerError, err
@@ -48,23 +61,25 @@ func (user User) Insert(ctx context.Context, db *repository.MongoClient, usernam
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("could not marshal MongoUser struct: %v", err)
 	}
-	if err := db.InsertOne(ctx, "datalabs_user", "user", b); err != nil {
+	// forward user byte slice to be persisted in DB/collection
+	if err := db.InsertOne(ctx, dbUser, collUser, b); err != nil {
 		logrus.Errorf("[user.Insert] %s", err.Error())
 		return http.StatusInternalServerError, err
 	}
 	return http.StatusOK, nil
 }
 
-func (user User) Authenticate(ctx context.Context, db *repository.MongoClient, username, password string) (bson.M, error) {
+// Authenticate checks whether passed credentials match records in the database in order to
+// authenticate a user at login
+func (user User) Authenticate(ctx context.Context, db *repository.MongoClient, username, password string) (int, bson.M, error) {
 
 	result, err := db.FindOne(ctx, "datalabs_user", "user", bson.M{"username": username})
 	if err != nil || len(result) == 0 {
-		return bson.M{}, fmt.Errorf("could not execute findOne: %v", err)
+		return http.StatusInternalServerError, bson.M{}, fmt.Errorf("could not execute findOne: %v", err)
 	}
-
 	if utils.CheckPasswordHash(password, result["password"].(string)) {
-		return bson.M{}, errors.New("user not authenticated")
+		return http.StatusForbidden, bson.M{}, errors.New("user not authenticated")
 	}
-	// user is authenticated: returns user map
-	return result, nil
+	// user is authenticated: returns user bson.M data
+	return http.StatusOK, result, nil
 }

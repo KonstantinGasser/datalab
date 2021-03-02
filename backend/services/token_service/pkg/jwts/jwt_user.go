@@ -18,8 +18,9 @@ const (
 // IssueUser takes in arguments for the token of the user
 // returning a JWT with exp set to expTime and the data passed in
 func IssueUser(uuid, username, orgnDomain string) (string, error) {
+	// calims holds all the data which will be
+	// encoded in the JWT
 	claims := jwt.MapClaims{}
-
 	claims["uuid"] = uuid
 	claims["username"] = username
 	claims["orgnDomain"] = orgnDomain

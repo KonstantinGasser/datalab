@@ -10,8 +10,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// IssueJWT issues a new JWT for a authenticated user only
 func (srv TokenService) IssueJWT(ctx context.Context, request *tokenSrv.IssueJWTRequest) (*tokenSrv.IssueJWTResponse, error) {
-
 	user := request.GetUser()
 	token, err := jwts.IssueUser(user.GetUuid(), user.GetUsername(), user.GetOrgnDomain())
 	if err != nil {

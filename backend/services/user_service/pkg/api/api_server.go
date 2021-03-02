@@ -12,6 +12,8 @@ const (
 	queryTimeout = time.Second * 5
 )
 
+// UserService implements all the methods required by the grpc.UserServiceServer
+// and embeds all the required dependencies
 type UserService struct {
 	userSrv.UnimplementedUserServiceServer
 	user user.User
@@ -28,4 +30,6 @@ func NewUserService(mongoC *repository.MongoClient) *UserService {
 	}
 }
 
+// mustEmbedUnimplementedUserServiceServer as by the current grpc version the
+// server must implement this method in order for it to act as a grpc.UserServiceServer
 func (srv UserService) mustEmbedUnimplementedUserServiceServer() {}

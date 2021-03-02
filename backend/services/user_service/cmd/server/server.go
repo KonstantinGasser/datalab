@@ -15,14 +15,14 @@ import (
 func Run(ctx context.Context, addr string) error {
 	srv := grpc.NewServer()
 
-	// create new UserService with all dependencies
+	// create new UserService
+	// database dependency to mongoDB
 	mongoC, err := repository.NewMongoClient("mongodb://userDB:secure@192.168.0.179:27017")
-	errorFatal(err)
+	errorFatal(err) // fail fatally if client dependency creation fails
 	userService := api.NewUserService(mongoC)
 
 	// register grpc server to service
 	userSrv.RegisterUserServiceServer(srv, userService)
-	// create tcp listener
 	listener, err := net.Listen("tcp", addr)
 	if err != nil {
 		logrus.Fatalf("[server.Run] cloud not listen to %s: %v", addr, err)
@@ -37,7 +37,7 @@ func Run(ctx context.Context, addr string) error {
 
 // errorFatal is used to reduce the if err != nil statements and will
 // fail fatally if error is not nil
-// only used for dependencies
+// *** only used for dependencies at boot-up ***
 func errorFatal(err error) {
 	if err == nil {
 		return
