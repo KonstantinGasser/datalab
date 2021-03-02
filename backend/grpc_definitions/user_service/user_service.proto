@@ -38,4 +38,5 @@ message AuthResponse {
 message AuthenticatedUser {
     string username = 1;
     string orgn_domain = 2;
+    string uuid = 3;
 }

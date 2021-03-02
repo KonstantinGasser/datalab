@@ -74,5 +74,6 @@ func (client MongoClient) FindOne(ctx context.Context, db, collection string, da
 		logrus.Errorf("[mongo.FindOne], could not decode FindOne result: %v\n", err)
 		return nil, fmt.Errorf("mongo client, could not decode FindOne result: %v", err)
 	}
+
 	return result, nil
 }

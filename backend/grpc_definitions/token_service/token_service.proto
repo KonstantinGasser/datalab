@@ -24,6 +24,8 @@ message IssueJWTResponse {
 // AuthenticatedUser's data is used in the encoded JWT
 message AuthenticatedUser {
     string username = 1;
+    string uuid = 2;
+    string orgn_domain = 3;
 }
 
 // ValidateJWTRequest holds the JWT from the user

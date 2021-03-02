@@ -4,9 +4,14 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"time"
 
 	userSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/user_service"
 	"github.com/sirupsen/logrus"
+)
+
+const (
+	createUserTimeout = time.Second * 5
 )
 
 // HandlerRegister receives request to create a new user
@@ -23,13 +28,18 @@ func (api API) HandlerRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// invoke grpc call
-	resp, err := api.UserSrvClient.CreateUser(context.Background(), &userSrv.CreateUserRequest{
+	ctx, cancel := context.WithTimeout(context.Background(), createUserTimeout)
+	defer func() {
+		cancel()
+	}()
+
+	resp, err := api.UserSrvClient.CreateUser(ctx, &userSrv.CreateUserRequest{
 		Username:   data["username"].(string),
 		Password:   data["password"].(string),
 		OrgnDomain: data["orgn_domain"].(string),
 	})
 	if err != nil {
-		api.onError(w, fmt.Errorf("could not reach UserService for request: %v", err), http.StatusInternalServerError)
+		api.onError(w, fmt.Errorf("could not execute grpc.CreateUser: %v", err), http.StatusInternalServerError)
 		return
 	}
 	logrus.Infof("[grpc.CreateUser] status: %d, msg: %s", resp.GetStatusCode(), resp.GetMsg())
@@ -39,6 +49,8 @@ func (api API) HandlerRegister(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		logrus.Errorf("[api.HandlerRegister] could not encode grpc response: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("could not process register request"))
+		return
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(int(resp.GetStatusCode()))

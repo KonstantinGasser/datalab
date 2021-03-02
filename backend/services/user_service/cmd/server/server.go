@@ -6,6 +6,7 @@ import (
 
 	userSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/user_service"
 	"github.com/KonstantinGasser/clickstream/backend/services/user_service/pkg/api"
+	"github.com/KonstantinGasser/clickstream/backend/services/user_service/pkg/repository"
 	"github.com/sirupsen/logrus"
 	grpc "google.golang.org/grpc"
 )
@@ -15,10 +16,10 @@ func Run(ctx context.Context, addr string) error {
 	srv := grpc.NewServer()
 
 	// create new UserService with all dependencies
-	userService, err := api.NewUserService()
-	if err != nil {
-		logrus.Fatalf("[server.Run] could not create api.UserService: %v", err)
-	}
+	mongoC, err := repository.NewMongoClient("mongodb://userDB:secure@192.168.0.179:27017")
+	errorFatal(err)
+	userService := api.NewUserService(mongoC)
+
 	// register grpc server to service
 	userSrv.RegisterUserServiceServer(srv, userService)
 	// create tcp listener
@@ -32,4 +33,14 @@ func Run(ctx context.Context, addr string) error {
 		return err
 	}
 	return nil
+}
+
+// errorFatal is used to reduce the if err != nil statements and will
+// fail fatally if error is not nil
+// only used for dependencies
+func errorFatal(err error) {
+	if err == nil {
+		return
+	}
+	logrus.Fatalf("%v", err)
 }
