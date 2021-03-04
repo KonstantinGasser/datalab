@@ -40,7 +40,6 @@ func (api API) HandlerLogin(w http.ResponseWriter, r *http.Request) {
 		Username: data["username"].(string),
 		Password: data["password"].(string),
 	})
-	logrus.Info(respUser)
 	if err != nil || respUser.GetStatusCode() >= http.StatusInternalServerError {
 		logrus.Errorf("[api.HandlerLogin] could not execute grpc.AuthUser: %v\n", err)
 		api.onError(w, fmt.Errorf("could execute grpc.AuthUser: %v", err), http.StatusInternalServerError)
@@ -49,7 +48,7 @@ func (api API) HandlerLogin(w http.ResponseWriter, r *http.Request) {
 	// return the resp.StatusCode to response if user is not authenticated
 	// or the grpc call failed (the returned status code to the user is either 403 or 500)
 	if respUser.GetStatusCode() != 200 || !respUser.GetAuthenticated() {
-		logrus.Errorf("[api.HandlerLogin] could not authenticate user: code-%d, authed:%v", respUser.GetStatusCode(), respUser.GetAuthenticated())
+		logrus.Infof("[api.HandlerLogin] could not authenticate user: code-%d, authed:%v", respUser.GetStatusCode(), respUser.GetAuthenticated())
 		api.onError(w, errors.New("could not authenticate user"), int(respUser.GetStatusCode()))
 		return
 	}

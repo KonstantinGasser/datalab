@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package app_service;
+
+service AppService {
+    rpc CreateApp(CreateAppRequest) returns (CreateAppResponse) {}
+    // rpc DeleteApp(DeleteAppRequest) returns (DeleteAppResponse) {}
+    rpc GetApps(GetAppsRequest) returns (GetAppsResponse){}
+    rpc GetByID(GetByIDRequest) returns (GetByIDResponse) {}
+    // rpc AddMember(AddMemberRequest) returns (AddMemberResponse) {}
+    // rpc RemoveMember(RemoveMemberRequest) returns (RemoveMemberResponse) {}
+}
+
+message CreateAppRequest {
+    // uuid of creator
+    string owner = 1;
+    string name = 2;
+    string organization = 3;
+}
+message CreateAppResponse {
+    int32 status_code = 1;
+    string msg = 2;
+}
+
+message GetAppsRequest {
+    string user_uuid = 1;
+}
+message GetAppsResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    repeated App apps = 3;
+}
+
+message GetByIDRequest {
+    string app_ID = 1;
+}
+
+message GetByIDResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    App app = 3;
+}
+
+
+
+
+message App {
+    string name = 1;
+    User owner = 2;
+    repeated User members = 3;
+    string app_token = 4;
+}
+message User {
+    string uuid = 1;
+    string name = 2;
+    string orgn_domain = 3;
+}
+
+

@@ -41,15 +41,18 @@ func (user User) Insert(ctx context.Context, db *repository.MongoClient, usernam
 	}
 	// mongos findOne query can return an empty bson.M struct if not found
 	if len(resultMap) != 0 {
+		logrus.Error("[user.Insert] username already taken\n")
 		return http.StatusBadRequest, fmt.Errorf("username already exists in system")
 	}
 	// primary-key (_id) for mongoDB document of user
 	uuid, err := utils.UUID()
 	if err != nil {
+		logrus.Errorf("[user.Insert] could not execute utils.UUID: %v\n", err)
 		return http.StatusInternalServerError, err
 	}
 	hashedPassword, err := utils.HashFromPassword([]byte(password))
 	if err != nil {
+		logrus.Errorf("[user.Insert] could not execute utils.HashFromPassword: %v\n", err)
 		return http.StatusInternalServerError, err
 	}
 	b, err := bson.Marshal(newDBUser(
@@ -59,6 +62,7 @@ func (user User) Insert(ctx context.Context, db *repository.MongoClient, usernam
 		orgnD,
 	))
 	if err != nil {
+		logrus.Errorf("[user.Insert] could not marshal bson.M: %v\n", err)
 		return http.StatusInternalServerError, fmt.Errorf("could not marshal MongoUser struct: %v", err)
 	}
 	// forward user byte slice to be persisted in DB/collection
@@ -73,9 +77,15 @@ func (user User) Insert(ctx context.Context, db *repository.MongoClient, usernam
 // authenticate a user at login
 func (user User) Authenticate(ctx context.Context, db *repository.MongoClient, username, password string) (int, bson.M, error) {
 
-	result, err := db.FindOne(ctx, "datalabs_user", "user", bson.M{"username": username})
-	if err != nil || len(result) == 0 {
+	result, err := db.FindOne(ctx, dbUser, collUser, bson.M{"username": username})
+	if err != nil {
+		logrus.Errorf("[user.Authenticate] could not execute mongo.FindOne: %v\n", err)
 		return http.StatusInternalServerError, bson.M{}, fmt.Errorf("could not execute findOne: %v", err)
+	}
+	// if user is not found in the database (mongo.FindOne returns an empty bson.M struct)
+	if len(result) == 0 {
+		logrus.Info("[user.Authenticate] could not find user in database\n")
+		return http.StatusForbidden, bson.M{}, errors.New("could not find user in database")
 	}
 	if !utils.CheckPasswordHash(password, result["password"].(string)) {
 		return http.StatusForbidden, bson.M{}, errors.New("user not authenticated")

@@ -70,6 +70,7 @@ func (client MongoClient) FindOne(ctx context.Context, db, collection string, da
 		// Decode will return ErrNoDocuments if the query returns no result
 		// this is less an error but similar to io.EOF and means NoRecoredFound
 		if err == mongo.ErrNoDocuments {
+			logrus.Info("[mongo.FindOne] could not find any related documents in DB")
 			return bson.M{}, nil
 		}
 		logrus.Errorf("[mongo.FindOne], could not decode FindOne result: %v\n", err)
