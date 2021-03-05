@@ -2,18 +2,22 @@ package api
 
 import (
 	appSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/app_service"
+	"github.com/KonstantinGasser/clickstream/backend/services/app_service/pkg/app"
 	"github.com/KonstantinGasser/clickstream/backend/services/app_service/pkg/storage"
 )
 
 type AppService struct {
 	appSrv.UnimplementedAppServiceServer
 	mongoC storage.Storage
+	app    app.App
 }
 
 func NewAppServiceServer() AppService {
-	mongoC := storage.New("mongodb://sdfsdfsdf")
+	mongoC := storage.New("mongodb://AppDB:secure@192.168.0.179:27018")
+	app := app.New()
 	return AppService{
 		mongoC: mongoC,
+		app:    app,
 	}
 }
 

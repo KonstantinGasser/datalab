@@ -33,7 +33,7 @@ message GetAppsRequest {
 message GetAppsResponse {
     int32 status_code = 1;
     string msg = 2;
-    repeated App apps = 3;
+    repeated LightApp apps = 3;
 }
 
 message GetByIDRequest {
@@ -50,7 +50,10 @@ message GetByIDResponse {
 }
 
 
-
+message LightApp {
+    string name = 1;
+    string uuid = 2;
+}
 
 message App {
     string name = 1;

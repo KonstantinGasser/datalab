@@ -4,6 +4,10 @@ package utils
 
 import (
 	"context"
+	"fmt"
+
+	"github.com/gofrs/uuid"
+	"github.com/sirupsen/logrus"
 )
 
 // AddValCtx is a wrapper serving to unify the why of adding meta data to a given context.
@@ -20,4 +24,15 @@ func StringValueCtx(ctx context.Context, key string) string {
 		return ""
 	}
 	return value.(string)
+}
+
+// UUID generate a new random user id as document id for the user
+// generates a NewV4 as defined in the github.com/gofrs/uuid package
+func UUID() (string, error) {
+	UUID, err := uuid.NewV4()
+	if err != nil {
+		logrus.Errorf("[userService.CreateUser] could not generate UUID for user: %v", err)
+		return "", fmt.Errorf("could not generate UUID for user: %v", err)
+	}
+	return UUID.String(), nil
 }

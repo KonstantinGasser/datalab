@@ -150,4 +150,13 @@ func (api API) SetUp() {
 			),
 		),
 	)
+	api.route("/api/v1/app/getall",
+		api.WithTracing(
+			api.WithCors(
+				api.WithAuth(
+					api.HandlerGetApps,
+				),
+			),
+		),
+	)
 }

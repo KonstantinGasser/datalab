@@ -34,6 +34,8 @@ func (api API) HandlerAppCreate(w http.ResponseWriter, r *http.Request) {
 		api.onError(w, err, http.StatusInternalServerError)
 		return
 	}
-	logrus.Info(respApp)
-	api.onScucessJSON(w, `{"msg": "worked!"}`, http.StatusOK)
+
+	api.onScucessJSON(w, map[string]string{
+		"msg": respApp.GetMsg(),
+	}, int(respApp.GetStatusCode()))
 }
