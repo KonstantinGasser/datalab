@@ -7,6 +7,7 @@ import (
 	"time"
 
 	userSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/user_service"
+	"github.com/KonstantinGasser/clickstream/backend/services/api_gateway/pkg/util"
 	"github.com/sirupsen/logrus"
 )
 
@@ -20,7 +21,7 @@ const (
 // Involved services:
 //	- User-Service
 func (api API) HandlerUserRegister(w http.ResponseWriter, r *http.Request) {
-	logrus.Infof("[api.HandlerRegister] received user-register request: %v\n", r.Host)
+	logrus.Infof("<%v>[api.HandlerRegister] received user-register request: %v\n", util.StringValueCtx(r.Context(), "tracingID"), r.Host)
 	data, err := api.decode(r.Body)
 	if err != nil {
 		api.onError(w, err, http.StatusBadRequest)
@@ -35,18 +36,19 @@ func (api API) HandlerUserRegister(w http.ResponseWriter, r *http.Request) {
 
 	// invoke grpc call to user-service to create the user
 	// Response holds only a status-code and a msg (could be an error message)
-	ctx, cancel := context.WithTimeout(context.Background(), createUserTimeout)
+	ctx, cancel := context.WithTimeout(r.Context(), createUserTimeout)
 	defer cancel()
 	resp, err := api.UserSrvClient.CreateUser(ctx, &userSrv.CreateUserRequest{
 		Username:   data["username"].(string),
 		Password:   data["password"].(string),
 		OrgnDomain: data["orgn_domain"].(string),
+		Tracing_ID: util.StringValueCtx(r.Context(), "tracingID"),
 	})
 	if err != nil {
 		api.onError(w, fmt.Errorf("could not execute grpc.CreateUser: %v", err), http.StatusInternalServerError)
 		return
 	}
-	logrus.Infof("[grpc.CreateUser] status: %d, msg: %s", resp.GetStatusCode(), resp.GetMsg())
+	logrus.Infof("<%v>[grpc.CreateUser] status: %d, msg: %s", util.StringValueCtx(r.Context(), "tracingID"), resp.GetStatusCode(), resp.GetMsg())
 
 	// on success write to response
 	w.WriteHeader(int(resp.GetStatusCode()))

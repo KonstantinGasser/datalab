@@ -9,6 +9,7 @@ import (
 
 	tokenSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/token_service"
 	userSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/user_service"
+	"github.com/KonstantinGasser/clickstream/backend/services/api_gateway/pkg/util"
 	"github.com/sirupsen/logrus"
 )
 
@@ -24,10 +25,10 @@ const (
 // 	- User-Service
 // 	- Token-Service
 func (api API) HandlerUserLogin(w http.ResponseWriter, r *http.Request) {
-	logrus.Infof("[api.HandlerUserLogin] received user-login request: %v\n", r.Host)
+	logrus.Infof("<%v>[api.HandlerUserLogin] received user-login request: %v\n", util.StringValueCtx(r.Context(), "tracingID"), r.Host)
 	data, err := api.decode(r.Body)
 	if err != nil {
-		logrus.Errorf("[api.HandlerLogin] could not decode request body: %v\n", err)
+		logrus.Errorf("*s*[api.HandlerLogin] could not decode request body: %v\n", util.StringValueCtx(r.Context(), "tracingID"), err)
 		api.onError(w, errors.New("could not decode request body"), http.StatusBadRequest)
 		return
 	}
@@ -35,27 +36,29 @@ func (api API) HandlerUserLogin(w http.ResponseWriter, r *http.Request) {
 	// in the database. Response holds the user information for the JWT as well as a bool
 	// if authenticated. If not user information will be nil. The status code further tells
 	// success of request (403 !authenticated || 500 if service crashed)
-	ctx, cancel := context.WithTimeout(context.Background(), loginCtxTimeout)
+	ctx, cancel := context.WithTimeout(r.Context(), loginCtxTimeout)
 	defer cancel()
 	respUser, err := api.UserSrvClient.AuthUser(ctx, &userSrv.AuthRequest{
-		Username: data["username"].(string),
-		Password: data["password"].(string),
+		Username:   data["username"].(string),
+		Password:   data["password"].(string),
+		Tracing_ID: util.StringValueCtx(r.Context(), "tracingID"),
 	})
 	if err != nil || respUser.GetStatusCode() >= http.StatusInternalServerError {
-		logrus.Errorf("[api.HandlerLogin] could not execute grpc.AuthUser: %v\n", err)
+		logrus.Errorf("<%v>[api.HandlerLogin] could not execute grpc.AuthUser: %v\n", util.StringValueCtx(r.Context(), "tracingID"), err)
 		api.onError(w, fmt.Errorf("could execute grpc.AuthUser: %v", err), http.StatusInternalServerError)
 		return
 	}
 	// return the resp.StatusCode to response if user is not authenticated
 	// or the grpc call failed (the returned status code to the user is either 403 or 500)
 	if respUser.GetStatusCode() != 200 || !respUser.GetAuthenticated() {
-		logrus.Infof("[api.HandlerLogin] could not authenticate user: code-%d, authed:%v", respUser.GetStatusCode(), respUser.GetAuthenticated())
+		logrus.Infof("<%v>[api.HandlerLogin] could not authenticate user: code-%d, authed:%v", util.StringValueCtx(r.Context(), "tracingID"), respUser.GetStatusCode(), respUser.GetAuthenticated())
 		api.onError(w, errors.New("could not authenticate user"), int(respUser.GetStatusCode()))
 		return
 	}
 	// invoke grpc call to token-service if user is authenticated and issue a JWT for the user
 	// token will hold {iat,exp, username, uuid, orgnDomain}
 	respToken, err := api.TokenSrvClient.IssueJWT(ctx, &tokenSrv.IssueJWTRequest{
+		Tracing_ID: util.StringValueCtx(r.Context(), "tracingID"),
 		User: &tokenSrv.AuthenticatedUser{
 			Username:   respUser.GetUser().GetUsername(),
 			Uuid:       respUser.GetUser().GetUuid(),
@@ -63,7 +66,7 @@ func (api API) HandlerUserLogin(w http.ResponseWriter, r *http.Request) {
 		},
 	})
 	if err != nil {
-		logrus.Errorf("[api.HandlerLogin] could not execute grpc.IssueJWT: %v\n", err)
+		logrus.Errorf("<%v>[api.HandlerLogin] could not execute grpc.IssueJWT: %v\n", util.StringValueCtx(r.Context(), "tracingID"), err)
 		api.onError(w, fmt.Errorf("could execute grpc.IssueJWTa: %v", err), http.StatusInternalServerError)
 		return
 	}

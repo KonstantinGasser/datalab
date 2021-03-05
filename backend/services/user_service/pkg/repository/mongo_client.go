@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/KonstantinGasser/clickstream/backend/services/user_service/pkg/utils"
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -54,7 +55,7 @@ func (client MongoClient) InsertOne(ctx context.Context, db, collection string, 
 	coll := client.conn.Database(db).Collection(collection)
 	_, err := coll.InsertOne(ctx, data)
 	if err != nil {
-		logrus.Errorf("[mongo.InsertOne], could not execute InsertOne: %v\n", err)
+		logrus.Errorf("<%v>[mongo.InsertOne], could not execute InsertOne: %v\n", utils.StringValueCtx(ctx, "tracingID"), err)
 		return fmt.Errorf("mongo client, could not execute InsertOne: %v", err)
 	}
 	return nil
@@ -70,10 +71,10 @@ func (client MongoClient) FindOne(ctx context.Context, db, collection string, da
 		// Decode will return ErrNoDocuments if the query returns no result
 		// this is less an error but similar to io.EOF and means NoRecoredFound
 		if err == mongo.ErrNoDocuments {
-			logrus.Info("[mongo.FindOne] could not find any related documents in DB")
+			logrus.Infof("<%v>[mongo.FindOne] could not find any related documents in DB", utils.StringValueCtx(ctx, "tracingID"))
 			return bson.M{}, nil
 		}
-		logrus.Errorf("[mongo.FindOne], could not decode FindOne result: %v\n", err)
+		logrus.Errorf("<%v>[mongo.FindOne], could not decode FindOne result: %v\n", utils.StringValueCtx(ctx, "tracingID"), err)
 		return nil, fmt.Errorf("mongo client, could not decode FindOne result: %v", err)
 	}
 	return result, nil
