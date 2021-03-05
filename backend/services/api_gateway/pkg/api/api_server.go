@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 
+	appSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/app_service"
 	tokenSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/token_service"
 	userSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/user_service"
 	"github.com/KonstantinGasser/clickstream/backend/services/api_gateway/pkg/grpcC"
@@ -30,15 +31,16 @@ type API struct {
 	// Route is a mapper between requested URL and handler
 	// allows to add middleware in a nice chained way
 	route func(path string, h http.HandlerFunc)
-	// onSuccessJson returns a successful response to the client
+	// onScucessJSON returns a successful response to the client
 	// marshaling the passed data allowing to avoid code duplication
 	// content-type will always be application/json
-	onSuccessJson func(w http.ResponseWriter, data interface{}, status int)
+	onScucessJSON func(w http.ResponseWriter, data interface{}, status int)
 	// onError response to request if an error occurs
 	onError func(w http.ResponseWriter, err error, status int)
 	// *** Client Dependencies ***
-	UserSrvClient  userSrv.UserServiceClient
-	TokenSrvClient tokenSrv.TokenServiceClient
+	UserSrvClient    userSrv.UserServiceClient
+	TokenSrvClient   tokenSrv.TokenServiceClient
+	AppServiceClient appSrv.AppServiceClient
 }
 
 // CORSConfig specifies it CORS policy of the API-Server
@@ -60,9 +62,9 @@ func New(cors CORSConfig) API {
 			logrus.Infof("[set-up:route] %s\n", path)
 			http.HandleFunc(path, h)
 		},
-		// onSuccessJson returns a marshaled interface{} with a given status code
+		// onScucessJSON returns a marshaled interface{} with a given status code
 		// to the client as its response
-		onSuccessJson: func(w http.ResponseWriter, data interface{}, status int) {
+		onScucessJSON: func(w http.ResponseWriter, data interface{}, status int) {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(status)
 			if err := json.NewEncoder(w).Encode(data); err != nil {
@@ -79,8 +81,9 @@ func New(cors CORSConfig) API {
 			return
 		},
 		// *** Client Dependencies ***
-		UserSrvClient:  grpcC.NewUserServiceClient(":8001"),
-		TokenSrvClient: grpcC.NewTokenServiceClient(":8002"),
+		UserSrvClient:    grpcC.NewUserServiceClient(":8001"),
+		TokenSrvClient:   grpcC.NewTokenServiceClient(":8002"),
+		AppServiceClient: grpcC.NewAppServiceClient(":8003"),
 	}
 }
 

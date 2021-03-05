@@ -1,6 +1,7 @@
 package grpcC
 
 import (
+	appSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/app_service"
 	tokenSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/token_service"
 	userSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/user_service"
 	"github.com/sirupsen/logrus"
@@ -27,6 +28,18 @@ func NewTokenServiceClient(listenOn string) tokenSrv.TokenServiceClient {
 		return nil
 	}
 	client := tokenSrv.NewTokenServiceClient(conn)
+	logrus.Infof("[NewGrpcClient] connected to TokenServiceClient on: %s", listenOn)
+	return client
+}
+
+// NewAppServiceClient is a grpc client
+func NewAppServiceClient(listenOn string) appSrv.AppServiceClient {
+	conn, err := grpc.Dial(listenOn, grpc.WithInsecure())
+	if err != nil { // change not good !!!
+		logrus.Errorf("[NewTokenServiceClient] could not connect: %v", err)
+		return nil
+	}
+	client := appSrv.NewAppServiceClient(conn)
 	logrus.Infof("[NewGrpcClient] connected to TokenServiceClient on: %s", listenOn)
 	return client
 }

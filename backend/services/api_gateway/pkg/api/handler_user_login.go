@@ -76,6 +76,6 @@ func (api API) HandlerUserLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// return response with JWT
-	api.onSuccessJson(w, map[string]interface{}{"token": respToken.GetJwtToken()}, int(respToken.GetStatusCode()))
+	api.onScucessJSON(w, map[string]interface{}{"token": respToken.GetJwtToken()}, int(respToken.GetStatusCode()))
 	return
 }

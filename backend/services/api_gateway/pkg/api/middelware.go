@@ -62,7 +62,7 @@ func (api API) WithAuth(next http.HandlerFunc) http.HandlerFunc {
 			api.onError(w, errors.New("could not execute authentication"), http.StatusInternalServerError)
 			return
 		}
-		if resp.GetStatusCode() != http.StatusOK || !resp.GetIsValid() {
+		if resp.GetStatusCode() != http.StatusOK || !resp.GetIsValid() || resp.GetUser() == nil {
 			logrus.Warnf("<%v>[api.WithAuth] %s is not authenticated: %v", util.StringValueCtx(r.Context(), "tracingID"), r.Host, resp.GetMsg())
 			api.onError(w, errors.New("not authenticated"), http.StatusForbidden)
 			return
