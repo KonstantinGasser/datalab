@@ -30,6 +30,10 @@ type API struct {
 	// Route is a mapper between requested URL and handler
 	// allows to add middleware in a nice chained way
 	route func(path string, h http.HandlerFunc)
+	// onSuccessJson returns a successful response to the client
+	// marshaling the passed data allowing to avoid code duplication
+	// content-type will always be application/json
+	onSuccessJson func(w http.ResponseWriter, data interface{}, status int)
 	// onError response to request if an error occurs
 	onError func(w http.ResponseWriter, err error, status int)
 	// *** Client Dependencies ***
@@ -55,6 +59,18 @@ func New(cors CORSConfig) API {
 		route: func(path string, h http.HandlerFunc) {
 			logrus.Infof("[set-up:route] %s\n", path)
 			http.HandleFunc(path, h)
+		},
+		// onSuccessJson returns a marshaled interface{} with a given status code
+		// to the client as its response
+		onSuccessJson: func(w http.ResponseWriter, data interface{}, status int) {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(status)
+			if err := json.NewEncoder(w).Encode(data); err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write([]byte(`{"status_code": 500, "msg": "an error occurred"}`))
+				return
+			}
+			return
 		},
 		// onError is a custom function returning a given error back as response.
 		// This way code duplication can be avoided
@@ -96,7 +112,7 @@ func (api API) encode(data interface{}) ([]byte, error) {
 // Function is primarily called from the middleware.WithAuth to get the JWT token.
 func (api API) headerAuth(r *http.Request) (string, error) {
 	token := r.Header.Get("Authorization")
-	if token != "" {
+	if token == "" {
 		return "", errors.New("[api.headerAuth] could not find any Authentication-Header in request")
 	}
 	return token, nil
@@ -105,16 +121,30 @@ func (api API) headerAuth(r *http.Request) (string, error) {
 // SetUp sets up all the routes the API has along with all the middleware
 // each request required to have
 func (api API) SetUp() {
-	logrus.Infof("Adding routes to API-Service...\n")
+	logrus.Infof("\n*** adding routes to API-Service ***\n")
 
 	// ------ ROUTES ------
 	api.route("/api/v1/user/register",
-		api.WithCors(
-			api.HandlerRegister,
-		))
+		api.WithTracing(
+			api.WithCors(
+				api.HandlerUserRegister,
+			),
+		),
+	)
 	api.route("/api/v1/user/login",
-		api.WithCors(
-			api.HandlerLogin,
-		))
-
+		api.WithTracing(
+			api.WithCors(
+				api.HandlerUserLogin,
+			),
+		),
+	)
+	api.route("/api/v1/app/create",
+		api.WithTracing(
+			api.WithCors(
+				api.WithAuth(
+					api.HandlerAppCreate,
+				),
+			),
+		),
+	)
 }

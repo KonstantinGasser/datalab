@@ -10,7 +10,7 @@ import (
 // AuthUser is a public interface of the service allowing to authenticate
 // a user by its credentials
 func (srv UserService) AuthUser(ctx context.Context, request *userSrv.AuthRequest) (*userSrv.AuthResponse, error) {
-	logrus.Info("[userService.AuthUser] incoming authentication request")
+	logrus.Info("[userService.AuthUser] received authentication request\n")
 	// status can be statusOK, statusInternalServerError or statusForbidden
 	status, user, err := srv.user.Authenticate(ctx, srv.mongoClient, request.GetUsername(), request.GetPassword())
 	if err != nil {

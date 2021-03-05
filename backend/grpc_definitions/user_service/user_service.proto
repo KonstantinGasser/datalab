@@ -11,6 +11,9 @@ message CreateUserRequest {
     string username = 1; 
     string password = 2;
     string orgn_domain = 3;
+    // light distributed tracing ID - light because it serves the propose  of developing
+    // because it is super dope what I am doing
+    string tracing_ID = 4;
 }
 
 message CreateUserResponse {
@@ -23,6 +26,9 @@ message CreateUserResponse {
 message AuthRequest {
     string username = 1;
     string password = 2; 
+    // light distributed tracing ID - light because it serves the propose  of developing
+    // because it is super dope what I am doing
+    string tracing_ID = 4;
 }
 
 // AuthResponse represents the response when a user

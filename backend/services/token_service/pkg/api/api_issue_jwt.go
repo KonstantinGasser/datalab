@@ -12,6 +12,7 @@ import (
 
 // IssueJWT issues a new JWT for a authenticated user only
 func (srv TokenService) IssueJWT(ctx context.Context, request *tokenSrv.IssueJWTRequest) (*tokenSrv.IssueJWTResponse, error) {
+	logrus.Info("[tokenService.IssueJWT] received issuing of JWT request\n")
 	user := request.GetUser()
 	token, err := jwts.IssueUser(user.GetUuid(), user.GetUsername(), user.GetOrgnDomain())
 	if err != nil {

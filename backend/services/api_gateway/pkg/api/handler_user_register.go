@@ -14,12 +14,13 @@ const (
 	createUserTimeout = time.Second * 5
 )
 
-// HandlerRegister is the entry-point if a users creates a new account.
+// HandlerUserRegister is the entry-point if a users creates a new account.
 // It performs sanity checks on the input data and forwards the request
 // to the user-service.
 // Involved services:
 //	- User-Service
-func (api API) HandlerRegister(w http.ResponseWriter, r *http.Request) {
+func (api API) HandlerUserRegister(w http.ResponseWriter, r *http.Request) {
+	logrus.Infof("[api.HandlerRegister] received user-register request: %v\n", r.Host)
 	data, err := api.decode(r.Body)
 	if err != nil {
 		api.onError(w, err, http.StatusBadRequest)

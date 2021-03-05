@@ -16,14 +16,15 @@ const (
 	loginCtxTimeout = time.Second * 2
 )
 
-// HandlerLogin is the entry-point if a users logins onto the system.
+// HandlerUserLogin is the entry-point if a users logins onto the system.
 // It calls the user-service to authenticate the users passed
 // credentials and on success calls the token-service to issue a new
 // JSON-Web-Token holding user information and meta data
 // Services involved:
 // 	- User-Service
 // 	- Token-Service
-func (api API) HandlerLogin(w http.ResponseWriter, r *http.Request) {
+func (api API) HandlerUserLogin(w http.ResponseWriter, r *http.Request) {
+	logrus.Infof("[api.HandlerUserLogin] received user-login request: %v\n", r.Host)
 	data, err := api.decode(r.Body)
 	if err != nil {
 		logrus.Errorf("[api.HandlerLogin] could not decode request body: %v\n", err)
@@ -71,14 +72,7 @@ func (api API) HandlerLogin(w http.ResponseWriter, r *http.Request) {
 		api.onError(w, errors.New("could not execute authentication request"), int(respToken.GetStatusCode()))
 		return
 	}
-	// on success encode JSON response with JWT
-	b, err := api.encode(map[string]interface{}{"token": respToken.GetJwtToken()})
-	if err != nil {
-		logrus.Errorf("[api.HandlerLogin] could not encode response: %v", err)
-		api.onError(w, errors.New("could not encode response"), http.StatusInternalServerError)
-		return
-	}
-	w.WriteHeader(int(respToken.GetStatusCode()))
-	w.Write(b)
+	// return response with JWT
+	api.onSuccessJson(w, map[string]interface{}{"token": respToken.GetJwtToken()}, int(respToken.GetStatusCode()))
 	return
 }

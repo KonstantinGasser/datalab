@@ -12,10 +12,12 @@ service AppService {
 }
 
 message CreateAppRequest {
-    // uuid of creator
-    string owner = 1;
+    string owner_uuid = 1;
     string name = 2;
     string organization = 3;
+    // light distributed tracing ID - light because it serves the propose  of developing
+    // because it is super dope what I am doing
+    string tracing_ID = 4;
 }
 message CreateAppResponse {
     int32 status_code = 1;
@@ -24,6 +26,9 @@ message CreateAppResponse {
 
 message GetAppsRequest {
     string user_uuid = 1;
+    // light distributed tracing ID - light because it serves the propose  of developing
+    // because it is super dope what I am doing
+    string tracing_ID = 4;
 }
 message GetAppsResponse {
     int32 status_code = 1;
@@ -33,6 +38,9 @@ message GetAppsResponse {
 
 message GetByIDRequest {
     string app_ID = 1;
+    // light distributed tracing ID - light because it serves the propose  of developing
+    // because it is super dope what I am doing
+    string tracing_ID = 4;
 }
 
 message GetByIDResponse {

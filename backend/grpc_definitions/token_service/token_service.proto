@@ -11,7 +11,10 @@ service TokenService {
 // JWTRequest holds the user data the token should
 // be issued for
 message IssueJWTRequest {
-    AuthenticatedUser user = 1;    
+    AuthenticatedUser user = 1; 
+    // light distributed tracing ID - light because it serves the propose  of developing
+    // because it is super dope what I am doing
+    string tracing_ID = 4;   
 }
 
 // JWTResponse returns the issued JWT
@@ -31,6 +34,9 @@ message AuthenticatedUser {
 // ValidateJWTRequest holds the JWT from the user
 message ValidateJWTRequest {
     string jwt_token = 1;
+    // light distributed tracing ID - light because it serves the propose  of developing
+    // because it is super dope what I am doing
+    string tracing_ID = 4;
 }
 
 // ValidateJWTResponse tells whether a user's token
@@ -39,4 +45,5 @@ message ValidateJWTResponse {
     int32 status_code = 1;
     string msg = 2;
     bool is_valid = 3;
+    AuthenticatedUser user = 4;
 }
