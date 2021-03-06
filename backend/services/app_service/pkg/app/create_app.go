@@ -7,12 +7,12 @@ import (
 
 	appSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/app_service"
 	"github.com/KonstantinGasser/clickstream/backend/services/app_service/pkg/storage"
-	"github.com/KonstantinGasser/clickstream/backend/services/app_service/pkg/utils"
+	"github.com/KonstantinGasser/clickstream/utils/unique"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
 // CreateApp some docs
-func (app App) CreateApp(ctx context.Context, mongo storage.Storage, req *appSrv.CreateAppRequest) (int, error) {
+func (app app) CreateApp(ctx context.Context, mongo storage.Storage, req *appSrv.CreateAppRequest) (int, error) {
 
 	// duplicate names may exists in the system but owners can only hold unique app names
 	result, err := mongo.FindOne(ctx, dbName, appCollection, bson.M{"appName": req.GetName(), "ownerUUID": req.GetOwnerUuid()})
@@ -24,7 +24,7 @@ func (app App) CreateApp(ctx context.Context, mongo storage.Storage, req *appSrv
 		return http.StatusBadRequest, errors.New("duplicated app names are not possible")
 	}
 	// insert app in db with defaults
-	uuid, err := utils.UUID()
+	uuid, err := unique.UUID()
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

@@ -1,5 +1,12 @@
 package app
 
+import (
+	"context"
+
+	appSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/app_service"
+	"github.com/KonstantinGasser/clickstream/backend/services/app_service/pkg/storage"
+)
+
 // why are they here?????? change this pls
 const (
 	// DB, Collection names
@@ -7,13 +14,16 @@ const (
 	appCollection = "app"
 )
 
-// convert to interface app!
+// App describes what you can do with the App service
+type App interface {
+	CreateApp(ctx context.Context, mongo storage.Storage, req *appSrv.CreateAppRequest) (int, error)
+	GetApps(ctx context.Context, mongo storage.Storage, req *appSrv.GetAppsRequest) ([]*appSrv.LightApp, error)
+}
+type app struct{}
 
-type App struct{}
-
-// New returns a new APP -> change to App interface!
+// New returns a new app implementing the App interface
 func New() App {
-	return App{}
+	return &app{}
 }
 
 // AppItem represents one App in the database ? do we need this? don't we have a def in the grpc already???

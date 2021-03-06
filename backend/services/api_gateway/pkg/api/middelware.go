@@ -1,14 +1,13 @@
 package api
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"net/http"
 	"time"
 
 	tokenSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/token_service"
-	"github.com/KonstantinGasser/clickstream/backend/services/api_gateway/pkg/util"
+	"github.com/KonstantinGasser/clickstream/utils/ctx_value"
 	"github.com/gofrs/uuid"
 	"github.com/sirupsen/logrus"
 )
@@ -46,7 +45,7 @@ func (api API) WithAuth(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		token, err := api.headerAuth(r)
 		if err != nil {
-			logrus.Warnf("<%v>[api.WithAuth] %s is not authenticated", util.StringValueCtx(r.Context(), "tracingID"), r.Host)
+			logrus.Warnf("<%v>[api.WithAuth] %s is not authenticated", ctx_value.GetString(r.Context(), "tracingID"), r.Host)
 			api.onError(w, errors.New("no Authentication-Header found"), http.StatusForbidden)
 			return
 		}
@@ -55,20 +54,20 @@ func (api API) WithAuth(next http.HandlerFunc) http.HandlerFunc {
 		// defer cancel()
 		resp, err := api.TokenSrvClient.ValidateJWT(r.Context(), &tokenSrv.ValidateJWTRequest{
 			JwtToken:   token,
-			Tracing_ID: r.Context().Value("tracingID").(string),
+			Tracing_ID: ctx_value.GetString(r.Context(), "tracingID"),
 		})
 		if err != nil {
-			logrus.Errorf("<%v>[api.WithAuth] could not execute grpc.ValidateJWT: %v", util.StringValueCtx(r.Context(), "tracingID"), err)
+			logrus.Errorf("<%v>[api.WithAuth] could not execute grpc.ValidateJWT: %v", ctx_value.GetString(r.Context(), "tracingID"), err)
 			api.onError(w, errors.New("could not execute authentication"), http.StatusInternalServerError)
 			return
 		}
 		if resp.GetStatusCode() != http.StatusOK || !resp.GetIsValid() || resp.GetUser() == nil {
-			logrus.Warnf("<%v>[api.WithAuth] %s is not authenticated: %v", util.StringValueCtx(r.Context(), "tracingID"), r.Host, resp.GetMsg())
+			logrus.Warnf("<%v>[api.WithAuth] %s is not authenticated: %v", ctx_value.GetString(r.Context(), "tracingID"), r.Host, resp.GetMsg())
 			api.onError(w, errors.New("not authenticated"), http.StatusForbidden)
 			return
 		}
 		// add JWT claims of user in r.Context()
-		ctxWithVal := context.WithValue(r.Context(), "user", resp.GetUser())
+		ctxWithVal := ctx_value.AddValue(r.Context(), "user", resp.GetUser())
 		// serve request with user claims in context
 		next(w, r.WithContext(ctxWithVal))
 	}
@@ -89,7 +88,7 @@ func (api API) WithTracing(next http.HandlerFunc) http.HandlerFunc {
 		}
 		// add tracing ID to request context for other function involved in the request
 		// to have access to it
-		ctx := context.WithValue(r.Context(), "tracingID", fmt.Sprintf("%x", tracingID.Bytes()[:4]))
+		ctx := ctx_value.AddValue(r.Context(), "tracingID", fmt.Sprintf("%x", tracingID.Bytes()[:4]))
 		next(w, r.WithContext(ctx))
 	}
 }

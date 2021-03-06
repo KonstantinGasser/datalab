@@ -7,8 +7,8 @@ import (
 	"net/http"
 
 	"github.com/KonstantinGasser/clickstream/backend/services/user_service/pkg/repository"
-	"github.com/KonstantinGasser/clickstream/backend/services/user_service/pkg/utils"
-	"github.com/sirupsen/logrus"
+	"github.com/KonstantinGasser/clickstream/utils/hash"
+	"github.com/KonstantinGasser/clickstream/utils/unique"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -36,23 +36,19 @@ func (user User) Insert(ctx context.Context, db *repository.MongoClient, usernam
 	// was found. an error here means the query failed
 	resultMap, err := db.FindOne(ctx, dbUser, collUser, bson.M{"username": username})
 	if err != nil {
-		logrus.Errorf("<%v>[user.Insert] could not execute FindOne: %v\n", utils.StringValueCtx(ctx, "tracingID"), err)
 		return http.StatusInternalServerError, fmt.Errorf("could not execute FindOne: %v", err)
 	}
 	// mongos findOne query can return an empty bson.M struct if not found
 	if len(resultMap) != 0 {
-		logrus.Error("<%v>[user.Insert] username already taken\n", utils.StringValueCtx(ctx, "tracingID"))
 		return http.StatusBadRequest, fmt.Errorf("username already exists in system")
 	}
 	// primary-key (_id) for mongoDB document of user
-	uuid, err := utils.UUID()
+	uuid, err := unique.UUID()
 	if err != nil {
-		logrus.Errorf("<%v>[user.Insert] could not execute utils.UUID: %v\n", utils.StringValueCtx(ctx, "tracingID"), err)
 		return http.StatusInternalServerError, err
 	}
-	hashedPassword, err := utils.HashFromPassword([]byte(password))
+	hashedPassword, err := hash.FromPassword([]byte(password))
 	if err != nil {
-		logrus.Errorf("<%v>[user.Insert] could not execute utils.HashFromPassword: %v\n", utils.StringValueCtx(ctx, "tracingID"), err)
 		return http.StatusInternalServerError, err
 	}
 	b, err := bson.Marshal(newDBUser(
@@ -62,12 +58,10 @@ func (user User) Insert(ctx context.Context, db *repository.MongoClient, usernam
 		orgnD,
 	))
 	if err != nil {
-		logrus.Errorf("<%v>[user.Insert] could not marshal bson.M: %v\n", utils.StringValueCtx(ctx, "tracingID"), err)
 		return http.StatusInternalServerError, fmt.Errorf("could not marshal MongoUser struct: %v", err)
 	}
 	// forward user byte slice to be persisted in DB/collection
 	if err := db.InsertOne(ctx, dbUser, collUser, b); err != nil {
-		logrus.Errorf("<%v>[user.Insert] %v", utils.StringValueCtx(ctx, "tracingID"), err)
 		return http.StatusInternalServerError, err
 	}
 	return http.StatusOK, nil
@@ -79,15 +73,13 @@ func (user User) Authenticate(ctx context.Context, db *repository.MongoClient, u
 
 	result, err := db.FindOne(ctx, dbUser, collUser, bson.M{"username": username})
 	if err != nil {
-		logrus.Errorf("<%v>[user.Authenticate] could not execute mongo.FindOne: %v\n", utils.StringValueCtx(ctx, "tracingID"), err)
 		return http.StatusInternalServerError, bson.M{}, fmt.Errorf("could not execute findOne: %v", err)
 	}
 	// if user is not found in the database (mongo.FindOne returns an empty bson.M struct)
 	if len(result) == 0 {
-		logrus.Info("[user.Authenticate] could not find user in database\n")
 		return http.StatusForbidden, bson.M{}, errors.New("could not find user in database")
 	}
-	if !utils.CheckPasswordHash(password, result["password"].(string)) {
+	if !hash.CheckPasswordHash(password, result["password"].(string)) {
 		return http.StatusForbidden, bson.M{}, errors.New("user not authenticated")
 	}
 	// user is authenticated: returns user bson.M data

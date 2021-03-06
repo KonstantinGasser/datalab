@@ -6,9 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/KonstantinGasser/clickstream/backend/services/token_service/pkg/utils"
 	jwt "github.com/dgrijalva/jwt-go"
-	"github.com/sirupsen/logrus"
 )
 
 // Todo: must go in env
@@ -33,7 +31,6 @@ func IssueUser(ctx context.Context, uuid, username, orgnDomain string) (string, 
 	_token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	token, err := _token.SignedString([]byte(secret))
 	if err != nil {
-		logrus.Errorf("<%v>[jwts.IssueUser] could not sign token: %v", utils.StringValueCtx(ctx, "tracingID"), err)
 		return "", fmt.Errorf("[jwts.IssueUser] could not sign token: %v", err)
 	}
 	return token, nil
@@ -42,12 +39,10 @@ func IssueUser(ctx context.Context, uuid, username, orgnDomain string) (string, 
 func GetJWTClaims(ctx context.Context, tokenString string) (map[string]interface{}, error) {
 	token, err := verifyToken(tokenString)
 	if err != nil {
-		logrus.Errorf("<%v>[jwts.GetJWTClaims] %v", utils.StringValueCtx(ctx, "tracingID"), err)
 		return nil, err
 	}
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok && !token.Valid {
-		logrus.Warnf("<%v>[jwts.ExtractTokenMetaData] token not valid or no claims found\n", utils.StringValueCtx(ctx, "tracingID"))
 		return nil, errors.New("user not authenticated")
 	}
 	user := make(map[string]interface{})
