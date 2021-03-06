@@ -4,13 +4,21 @@ package app_service;
 
 service AppService {
     rpc CreateApp(CreateAppRequest) returns (CreateAppResponse) {}
-    // rpc DeleteApp(DeleteAppRequest) returns (DeleteAppResponse) {}
+    rpc DeleteApp(DeleteAppRequest) returns (DeleteAppResponse) {}
     rpc GetApps(GetAppsRequest) returns (GetAppsResponse){}
     rpc GetByID(GetByIDRequest) returns (GetByIDResponse) {}
     // rpc AddMember(AddMemberRequest) returns (AddMemberResponse) {}
     // rpc RemoveMember(RemoveMemberRequest) returns (RemoveMemberResponse) {}
 }
+message DeleteAppRequest {
+    string app_uuid = 1;
+    string tracing_ID = 2;
+}
 
+message DeleteAppResponse {
+    int32 status_code = 1;
+    string msg = 2;
+}
 message CreateAppRequest {
     string owner_uuid = 1;
     string name = 2;

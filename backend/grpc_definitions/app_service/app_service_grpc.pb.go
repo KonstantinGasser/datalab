@@ -19,7 +19,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AppServiceClient interface {
 	CreateApp(ctx context.Context, in *CreateAppRequest, opts ...grpc.CallOption) (*CreateAppResponse, error)
-	// rpc DeleteApp(DeleteAppRequest) returns (DeleteAppResponse) {}
+	DeleteApp(ctx context.Context, in *DeleteAppRequest, opts ...grpc.CallOption) (*DeleteAppResponse, error)
 	GetApps(ctx context.Context, in *GetAppsRequest, opts ...grpc.CallOption) (*GetAppsResponse, error)
 	GetByID(ctx context.Context, in *GetByIDRequest, opts ...grpc.CallOption) (*GetByIDResponse, error)
 }
@@ -35,6 +35,15 @@ func NewAppServiceClient(cc grpc.ClientConnInterface) AppServiceClient {
 func (c *appServiceClient) CreateApp(ctx context.Context, in *CreateAppRequest, opts ...grpc.CallOption) (*CreateAppResponse, error) {
 	out := new(CreateAppResponse)
 	err := c.cc.Invoke(ctx, "/app_service.AppService/CreateApp", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *appServiceClient) DeleteApp(ctx context.Context, in *DeleteAppRequest, opts ...grpc.CallOption) (*DeleteAppResponse, error) {
+	out := new(DeleteAppResponse)
+	err := c.cc.Invoke(ctx, "/app_service.AppService/DeleteApp", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +73,7 @@ func (c *appServiceClient) GetByID(ctx context.Context, in *GetByIDRequest, opts
 // for forward compatibility
 type AppServiceServer interface {
 	CreateApp(context.Context, *CreateAppRequest) (*CreateAppResponse, error)
-	// rpc DeleteApp(DeleteAppRequest) returns (DeleteAppResponse) {}
+	DeleteApp(context.Context, *DeleteAppRequest) (*DeleteAppResponse, error)
 	GetApps(context.Context, *GetAppsRequest) (*GetAppsResponse, error)
 	GetByID(context.Context, *GetByIDRequest) (*GetByIDResponse, error)
 	mustEmbedUnimplementedAppServiceServer()
@@ -76,6 +85,9 @@ type UnimplementedAppServiceServer struct {
 
 func (UnimplementedAppServiceServer) CreateApp(context.Context, *CreateAppRequest) (*CreateAppResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateApp not implemented")
+}
+func (UnimplementedAppServiceServer) DeleteApp(context.Context, *DeleteAppRequest) (*DeleteAppResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteApp not implemented")
 }
 func (UnimplementedAppServiceServer) GetApps(context.Context, *GetAppsRequest) (*GetAppsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetApps not implemented")
@@ -110,6 +122,24 @@ func _AppService_CreateApp_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AppServiceServer).CreateApp(ctx, req.(*CreateAppRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AppService_DeleteApp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteAppRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppServiceServer).DeleteApp(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/app_service.AppService/DeleteApp",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppServiceServer).DeleteApp(ctx, req.(*DeleteAppRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -160,6 +190,10 @@ var AppService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateApp",
 			Handler:    _AppService_CreateApp_Handler,
+		},
+		{
+			MethodName: "DeleteApp",
+			Handler:    _AppService_DeleteApp_Handler,
 		},
 		{
 			MethodName: "GetApps",

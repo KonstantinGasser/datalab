@@ -21,6 +21,7 @@ type Storage interface {
 	FindAll(ctx context.Context, dbName, collName string, filter bson.D) ([]bson.M, error)
 	FindOne(ctx context.Context, dbName, collName string, filter bson.M) (bson.M, error)
 	InsertOne(ctx context.Context, dbName, collName string, data []byte) error
+	DeleteOne(ctx context.Context, dbName, collName string, filter bson.D) error
 }
 
 // New returns a new mongoDB client implementing the Storage interface

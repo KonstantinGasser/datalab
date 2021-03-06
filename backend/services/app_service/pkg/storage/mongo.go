@@ -54,3 +54,12 @@ func (client mongoC) InsertOne(ctx context.Context, db, collection string, data 
 	}
 	return nil
 }
+
+func (client mongoC) DeleteOne(ctx context.Context, db, collection string, filter bson.D) error {
+	coll := client.conn.Database(db).Collection(collection)
+
+	if _, err := coll.DeleteOne(ctx, filter); err != nil {
+		return err
+	}
+	return nil
+}
