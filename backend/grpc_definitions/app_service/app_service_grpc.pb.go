@@ -22,6 +22,8 @@ type AppServiceClient interface {
 	DeleteApp(ctx context.Context, in *DeleteAppRequest, opts ...grpc.CallOption) (*DeleteAppResponse, error)
 	GetApps(ctx context.Context, in *GetAppsRequest, opts ...grpc.CallOption) (*GetAppsResponse, error)
 	GetByID(ctx context.Context, in *GetByIDRequest, opts ...grpc.CallOption) (*GetByIDResponse, error)
+	AppendMember(ctx context.Context, in *AppendMemberRequest, opts ...grpc.CallOption) (*AppendMemberResponse, error)
+	RemoveMember(ctx context.Context, in *RemoveMemberRequest, opts ...grpc.CallOption) (*RemoveMemberResponse, error)
 }
 
 type appServiceClient struct {
@@ -68,6 +70,24 @@ func (c *appServiceClient) GetByID(ctx context.Context, in *GetByIDRequest, opts
 	return out, nil
 }
 
+func (c *appServiceClient) AppendMember(ctx context.Context, in *AppendMemberRequest, opts ...grpc.CallOption) (*AppendMemberResponse, error) {
+	out := new(AppendMemberResponse)
+	err := c.cc.Invoke(ctx, "/app_service.AppService/AppendMember", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *appServiceClient) RemoveMember(ctx context.Context, in *RemoveMemberRequest, opts ...grpc.CallOption) (*RemoveMemberResponse, error) {
+	out := new(RemoveMemberResponse)
+	err := c.cc.Invoke(ctx, "/app_service.AppService/RemoveMember", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AppServiceServer is the server API for AppService service.
 // All implementations must embed UnimplementedAppServiceServer
 // for forward compatibility
@@ -76,6 +96,8 @@ type AppServiceServer interface {
 	DeleteApp(context.Context, *DeleteAppRequest) (*DeleteAppResponse, error)
 	GetApps(context.Context, *GetAppsRequest) (*GetAppsResponse, error)
 	GetByID(context.Context, *GetByIDRequest) (*GetByIDResponse, error)
+	AppendMember(context.Context, *AppendMemberRequest) (*AppendMemberResponse, error)
+	RemoveMember(context.Context, *RemoveMemberRequest) (*RemoveMemberResponse, error)
 	mustEmbedUnimplementedAppServiceServer()
 }
 
@@ -94,6 +116,12 @@ func (UnimplementedAppServiceServer) GetApps(context.Context, *GetAppsRequest) (
 }
 func (UnimplementedAppServiceServer) GetByID(context.Context, *GetByIDRequest) (*GetByIDResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetByID not implemented")
+}
+func (UnimplementedAppServiceServer) AppendMember(context.Context, *AppendMemberRequest) (*AppendMemberResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AppendMember not implemented")
+}
+func (UnimplementedAppServiceServer) RemoveMember(context.Context, *RemoveMemberRequest) (*RemoveMemberResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemoveMember not implemented")
 }
 func (UnimplementedAppServiceServer) mustEmbedUnimplementedAppServiceServer() {}
 
@@ -180,6 +208,42 @@ func _AppService_GetByID_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AppService_AppendMember_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AppendMemberRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppServiceServer).AppendMember(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/app_service.AppService/AppendMember",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppServiceServer).AppendMember(ctx, req.(*AppendMemberRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AppService_RemoveMember_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RemoveMemberRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppServiceServer).RemoveMember(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/app_service.AppService/RemoveMember",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppServiceServer).RemoveMember(ctx, req.(*RemoveMemberRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AppService_ServiceDesc is the grpc.ServiceDesc for AppService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -202,6 +266,14 @@ var AppService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetByID",
 			Handler:    _AppService_GetByID_Handler,
+		},
+		{
+			MethodName: "AppendMember",
+			Handler:    _AppService_AppendMember_Handler,
+		},
+		{
+			MethodName: "RemoveMember",
+			Handler:    _AppService_RemoveMember_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

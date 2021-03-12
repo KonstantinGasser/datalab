@@ -17,7 +17,7 @@ func Run(ctx context.Context, addr string) error {
 
 	// create new UserService
 	// database dependency to mongoDB
-	mongoC, err := repository.NewMongoClient("mongodb://userDB:secure@192.168.0.179:27017")
+	mongoC, err := repository.NewMongoClient("mongodb://userDB:secure@192.168.178.163:27017")
 	errorFatal(err) // fail fatally if client dependency creation fails
 	userService := api.NewUserService(mongoC)
 

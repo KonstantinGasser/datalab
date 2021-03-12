@@ -26,9 +26,9 @@ type User struct{}
 // it checks if the username is already taken else calls the mongoClient.InsertOne to
 // persist the user. It hashes the users password and assigns the user a UUID used as pk (_id)
 // in MongoDB
-func (user User) Insert(ctx context.Context, db *repository.MongoClient, username, password, orgnD string) (int, error) {
-	// sanity check for user struct
-	if username == "" || password == "" || orgnD == "" {
+func (user User) Insert(ctx context.Context, db *repository.MongoClient, username, password, orgnD, firstName, lastName, orgnPosition string) (int, error) {
+	// sanity check for user struct -> create utils func for this!
+	if username == "" || password == "" || orgnD == "" || firstName == "" || lastName == "" || orgnPosition == "" {
 		return http.StatusBadRequest, fmt.Errorf("user information are missing")
 	}
 	// check if user already exists
@@ -54,8 +54,11 @@ func (user User) Insert(ctx context.Context, db *repository.MongoClient, usernam
 	b, err := bson.Marshal(newDBUser(
 		uuid,
 		username,
+		firstName,
+		lastName,
 		hashedPassword,
 		orgnD,
+		orgnPosition,
 	))
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("could not marshal MongoUser struct: %v", err)

@@ -14,6 +14,9 @@ message CreateUserRequest {
     // light distributed tracing ID - light because it serves the propose  of developing
     // because it is super dope what I am doing
     string tracing_ID = 4;
+    string first_name = 5;
+    string last_name = 6;
+    string orgn_position = 7;
 }
 
 message CreateUserResponse {
@@ -40,9 +43,23 @@ message AuthResponse {
     AuthenticatedUser user = 4;
 }
 
-// AuthenticatedUser's data is used in the encoded JWT
+// AuthenticatedUser's data is used in the user_service after a user
+// has been successfuly authenticated
+// by the token_service which uses the data as claims in the user JWT
 message AuthenticatedUser {
     string username = 1;
-    string orgn_domain = 2;
-    string uuid = 3;
+    string uuid = 2;
+    string orgn_domain = 3;
+    string first_name = 4;
+    string last_name = 5;
+    string orgn_position = 6;
+    string profile_img_url = 7;
 }
+// message AuthenticatedUser {
+//     string username = 1;
+//     string orgn_domain = 2;
+//     string uuid = 3;
+//     string first_name = 4;
+//     string last_name = 5;
+//     string profile_img_url = 6;
+// }

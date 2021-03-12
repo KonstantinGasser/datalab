@@ -16,7 +16,15 @@ func (srv UserService) CreateUser(ctx context.Context, request *userSrv.CreateUs
 	logrus.Infof("<%v>[userService.CreateUser] received  create-user request\n", ctx_value.GetString(ctx, "tracingID"))
 	ctx, cancel := context.WithTimeout(ctx, queryTimeout)
 	defer cancel()
-	status, err := srv.user.Insert(ctx, srv.mongoClient, request.GetUsername(), request.GetPassword(), request.GetOrgnDomain())
+	logrus.Info(request)
+	status, err := srv.user.Insert(ctx, srv.mongoClient,
+		request.GetUsername(),
+		request.GetPassword(),
+		request.GetOrgnDomain(),
+		request.GetFirstName(),
+		request.GetLastName(),
+		request.GetOrgnPosition(),
+	)
 	if err != nil {
 		logrus.Errorf("<%v>[userService.CreateUser] could not create user:%v\n", ctx_value.GetString(ctx, "tracingID"), err)
 		return &userSrv.CreateUserResponse{

@@ -38,11 +38,15 @@ func (api API) HandlerUserRegister(w http.ResponseWriter, r *http.Request) {
 	// Response holds only a status-code and a msg (could be an error message)
 	ctx, cancel := context.WithTimeout(r.Context(), createUserTimeout)
 	defer cancel()
+	logrus.Info(data)
 	resp, err := api.UserSrvClient.CreateUser(ctx, &userSrv.CreateUserRequest{
-		Username:   data["username"].(string),
-		Password:   data["password"].(string),
-		OrgnDomain: data["orgn_domain"].(string),
-		Tracing_ID: ctx_value.GetString(r.Context(), "tracingID"),
+		Username:     data["username"].(string),
+		Password:     data["password"].(string),
+		OrgnDomain:   data["orgn_domain"].(string),
+		FirstName:    data["first_name"].(string),
+		LastName:     data["last_name"].(string),
+		OrgnPosition: data["orgn_position"].(string),
+		Tracing_ID:   ctx_value.GetString(r.Context(), "tracingID"),
 	})
 	if err != nil {
 		api.onError(w, fmt.Errorf("could not execute grpc.CreateUser: %v", err), http.StatusInternalServerError)

@@ -19,6 +19,7 @@ type App interface {
 	CreateApp(ctx context.Context, mongo storage.Storage, req *appSrv.CreateAppRequest) (int, error)
 	GetApps(ctx context.Context, mongo storage.Storage, req *appSrv.GetAppsRequest) ([]*appSrv.LightApp, error)
 	DeleteApp(ctx context.Context, mongo storage.Storage, req *appSrv.DeleteAppRequest) (int, error)
+	AppendMember(ctx context.Context, mongo storage.Storage, req *appSrv.AppendMemberRequest) (int, error)
 }
 type app struct{}
 

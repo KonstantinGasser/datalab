@@ -13,7 +13,7 @@ type AppService struct {
 }
 
 func NewAppServiceServer() AppService {
-	mongoC := storage.New("mongodb://AppDB:secure@192.168.0.179:27018")
+	mongoC := storage.New("mongodb://AppDB:secure@192.168.178.163:27018")
 	app := app.New()
 	return AppService{
 		mongoC: mongoC,

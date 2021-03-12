@@ -168,4 +168,13 @@ func (api API) SetUp() {
 			),
 		),
 	)
+	api.route("/api/v1/app/member/append",
+		api.WithTracing(
+			api.WithCors(
+				api.WithAuth(
+					api.HandlerAppAppendMember,
+				),
+			),
+		),
+	)
 }

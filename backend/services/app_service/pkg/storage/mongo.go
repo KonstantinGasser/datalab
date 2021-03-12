@@ -63,3 +63,12 @@ func (client mongoC) DeleteOne(ctx context.Context, db, collection string, filte
 	}
 	return nil
 }
+
+func (client mongoC) UpdateByID(ctx context.Context, db, collection, appUUID string, data bson.D) error {
+	coll := client.conn.Database(db).Collection(collection)
+
+	if _, err := coll.UpdateByID(ctx, bson.D{{"_id", appUUID}}, data); err != nil {
+		return err
+	}
+	return nil
+}

@@ -16,7 +16,10 @@ func (srv UserService) AuthUser(ctx context.Context, request *userSrv.AuthReques
 
 	logrus.Infof("<%v>[userService.AuthUser] received authentication request\n", ctx_value.GetString(ctx, "tracingID"))
 	// status can be statusOK, statusInternalServerError or statusForbidden
-	status, user, err := srv.user.Authenticate(ctx, srv.mongoClient, request.GetUsername(), request.GetPassword())
+	status, user, err := srv.user.Authenticate(ctx, srv.mongoClient,
+		request.GetUsername(),
+		request.GetPassword(),
+	)
 	if err != nil {
 		logrus.Errorf("<%v>[userService.AuthUser] could not authenticate user:%v\n", ctx_value.GetString(ctx, "tracingID"), err)
 		return &userSrv.AuthResponse{
