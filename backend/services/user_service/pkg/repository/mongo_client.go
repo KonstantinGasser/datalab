@@ -75,3 +75,16 @@ func (client MongoClient) FindOne(ctx context.Context, db, collection string, da
 	}
 	return result, nil
 }
+
+// UpdateOne updates on document for a given database and collection. It searches for the given filter and updates
+// with the passed in data
+func (client MongoClient) UpdateOne(ctx context.Context, db, collection string, filter bson.M, data bson.D) error {
+	coll := client.conn.Database(db).Collection(collection)
+
+	_, err := coll.UpdateOne(ctx, filter, data)
+	if err != nil {
+		return err
+	}
+	return nil
+
+}

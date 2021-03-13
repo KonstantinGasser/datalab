@@ -15,6 +15,15 @@ const (
 	createUserTimeout = time.Second * 5
 )
 
+type DataRegister struct {
+	Username     string `json:"username"`
+	FirstName    string `json:"first_name"`
+	LastName     string `json:"last_name"`
+	Password     string `json:"password"`
+	OrgnDomain   string `json:"orgn_domain"`
+	OrgnPosition string `json:"orgn_position"`
+}
+
 // HandlerUserRegister is the entry-point if a users creates a new account.
 // It performs sanity checks on the input data and forwards the request
 // to the user-service.
@@ -22,14 +31,15 @@ const (
 //	- User-Service
 func (api API) HandlerUserRegister(w http.ResponseWriter, r *http.Request) {
 	logrus.Infof("<%v>[api.HandlerRegister] received user-register request: %v\n", ctx_value.GetString(r.Context(), "tracingID"), r.Host)
-	data, err := api.decode(r.Body)
-	if err != nil {
+
+	var payload DataRegister
+	if err := api.decode(r.Body, &payload); err != nil {
 		api.onError(w, err, http.StatusBadRequest)
 		return
 	}
 	// passed data is not allowed to be empty
 	// Todo: create helper func on api to perform checks on N inputs
-	if data["username"].(string) == "" || data["password"] == "" || data["orgn_domain"] == "" {
+	if payload.Username == "" || payload.Password == "" || payload.OrgnDomain == "" {
 		api.onError(w, fmt.Errorf("missing fields in register request"), http.StatusBadRequest)
 		return
 	}
@@ -38,14 +48,14 @@ func (api API) HandlerUserRegister(w http.ResponseWriter, r *http.Request) {
 	// Response holds only a status-code and a msg (could be an error message)
 	ctx, cancel := context.WithTimeout(r.Context(), createUserTimeout)
 	defer cancel()
-	logrus.Info(data)
+
 	resp, err := api.UserSrvClient.CreateUser(ctx, &userSrv.CreateUserRequest{
-		Username:     data["username"].(string),
-		Password:     data["password"].(string),
-		OrgnDomain:   data["orgn_domain"].(string),
-		FirstName:    data["first_name"].(string),
-		LastName:     data["last_name"].(string),
-		OrgnPosition: data["orgn_position"].(string),
+		Username:     payload.Username,
+		Password:     payload.Password,
+		OrgnDomain:   payload.OrgnDomain,
+		FirstName:    payload.FirstName,
+		LastName:     payload.LastName,
+		OrgnPosition: payload.OrgnPosition,
 		Tracing_ID:   ctx_value.GetString(r.Context(), "tracingID"),
 	})
 	if err != nil {

@@ -12,7 +12,7 @@ service TokenService {
 // JWTRequest holds the user data the token should
 // be issued for
 message IssueJWTRequest {
-    general_types.AuthenticatedUser user = 1; 
+    AuthenticatedUser user = 1; 
     // light distributed tracing ID - light because it serves the propose  of developing
     // because it is super dope what I am doing
     string tracing_ID = 4;   

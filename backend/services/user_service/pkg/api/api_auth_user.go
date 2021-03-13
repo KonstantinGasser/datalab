@@ -34,9 +34,13 @@ func (srv UserService) AuthUser(ctx context.Context, request *userSrv.AuthReques
 		StatusCode: int32(status),
 		Msg:        "user authenticated",
 		User: &userSrv.AuthenticatedUser{
-			Username:   user["username"].(string),
-			Uuid:       user["_id"].(string),
-			OrgnDomain: user["orgnDomain"].(string),
+			Username:      user["username"].(string),
+			FirstName:     user["first_name"].(string),
+			LastName:      user["last_name"].(string),
+			Uuid:          user["_id"].(string),
+			OrgnDomain:    user["orgnDomain"].(string),
+			OrgnPosition:  user["orgn_position"].(string),
+			ProfileImgUrl: "",
 		},
 		Authenticated: true,
 	}, nil

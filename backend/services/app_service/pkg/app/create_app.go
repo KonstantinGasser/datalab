@@ -33,7 +33,8 @@ func (app app) CreateApp(ctx context.Context, mongo storage.Storage, req *appSrv
 		AppName:    req.GetName(),
 		OwnerUUID:  req.GetOwnerUuid(),
 		OrgnDomain: req.GetOrganization(),
-		Member:     []string{},
+		Member:     req.GetMember(),
+		Settings:   req.GetSettings(),
 		AppToken:   "",
 	})
 	if err != nil {

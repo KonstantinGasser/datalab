@@ -37,5 +37,6 @@ type AppItem struct {
 	OrgnDomain string `bson:"orgnDomain"`
 	// Member is a list of user_uuids mapped to this app
 	Member   []string `bson:"member"`
+	Settings []string `bson:"setting"`
 	AppToken string   `bson:"appToken"`
 }

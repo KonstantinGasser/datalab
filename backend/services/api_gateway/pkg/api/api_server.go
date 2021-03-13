@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 
 	appSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/app_service"
 	tokenSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/token_service"
@@ -89,15 +90,17 @@ func New(cors CORSConfig) API {
 
 // decode is a custom wrapper to decode the request.Body if in JSON.
 // Allows to avoid code duplication. Data is decoded into a map[string]interface{}
-func (api API) decode(body io.ReadCloser) (map[string]interface{}, error) {
+func (api API) decode(body io.ReadCloser, data interface{}) error {
+	if data == nil {
+		return fmt.Errorf("passed data can not be nil")
+	}
 	defer body.Close()
 
-	var data map[string]interface{}
-	if err := json.NewDecoder(body).Decode(&data); err != nil {
+	if err := json.NewDecoder(body).Decode(data); err != nil {
 		logrus.Errorf("[api.decode] could not decode r.Body: %v", err)
-		return nil, fmt.Errorf("cloud not decode r.Body: %v", err)
+		return fmt.Errorf("cloud not decode r.Body: %v", err)
 	}
-	return data, nil
+	return nil
 }
 
 // encode is a custom wrapper to encode any data to a byte slice in order
@@ -119,6 +122,12 @@ func (api API) headerAuth(r *http.Request) (string, error) {
 		return "", errors.New("[api.headerAuth] could not find any Authentication-Header in request")
 	}
 	return token, nil
+}
+
+// getQuery looks for the passed query in the URL returns an empty string
+// if not found
+func (api API) getQuery(URL *url.URL, query string) string {
+	return URL.Query().Get(query)
 }
 
 // SetUp sets up all the routes the API has along with all the middleware
@@ -173,6 +182,24 @@ func (api API) SetUp() {
 			api.WithCors(
 				api.WithAuth(
 					api.HandlerAppAppendMember,
+				),
+			),
+		),
+	)
+	api.route("/api/v1/user/update",
+		api.WithTracing(
+			api.WithCors(
+				api.WithAuth(
+					api.HandlerUserUpadate,
+				),
+			),
+		),
+	)
+	api.route("/api/v1/user/getbyid",
+		api.WithTracing(
+			api.WithCors(
+				api.WithAuth(
+					api.HandlerUserGetByID,
 				),
 			),
 		),

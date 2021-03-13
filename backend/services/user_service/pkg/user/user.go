@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
+	userSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/user_service"
 	"github.com/KonstantinGasser/clickstream/backend/services/user_service/pkg/repository"
 	"github.com/KonstantinGasser/clickstream/utils/hash"
 	"github.com/KonstantinGasser/clickstream/utils/unique"
@@ -86,5 +87,41 @@ func (user User) Authenticate(ctx context.Context, db *repository.MongoClient, u
 		return http.StatusForbidden, bson.M{}, errors.New("user not authenticated")
 	}
 	// user is authenticated: returns user bson.M data
+	return http.StatusOK, result, nil
+}
+
+// Update calles the updateOne func on the mongo client to update the user information
+func (user User) Update(ctx context.Context, db *repository.MongoClient, req *userSrv.UpdateUserRequest) (int, error) {
+
+	if err := db.UpdateOne(
+		ctx,
+		dbUser,
+		collUser,
+		bson.M{"_id": req.GetUUID()},
+		bson.D{
+			{
+				"$set", bson.D{
+					{"first_name", req.GetFirstName()},
+					{"last_name", req.GetLastName()},
+					{"orgn_position", req.GetOrgnPosition()},
+				},
+			},
+		},
+	); err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	return http.StatusOK, nil
+}
+
+func (user User) GetByID(ctx context.Context, db *repository.MongoClient, uuid string) (int, bson.M, error) {
+
+	result, err := db.FindOne(ctx, dbUser, collUser, bson.M{"_id": uuid})
+	if err != nil {
+		return http.StatusInternalServerError, bson.M{}, err
+	}
+	if len(result) == 0 {
+		return http.StatusBadRequest, bson.M{}, errors.New("could not find any user for given UUID")
+	}
 	return http.StatusOK, result, nil
 }

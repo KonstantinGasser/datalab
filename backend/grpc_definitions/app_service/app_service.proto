@@ -47,6 +47,10 @@ message CreateAppRequest {
     // light distributed tracing ID - light because it serves the propose  of developing
     // because it is super dope what I am doing
     string tracing_ID = 4;
+    string description = 5;
+    // member == user uuid
+    repeated string member = 6;
+    repeated string settings = 7;
 }
 message CreateAppResponse {
     int32 status_code = 1;
@@ -92,7 +96,6 @@ message App {
 }
 message User {
     string uuid = 1;
-    string orgn_domain = 2;
 }
 
 

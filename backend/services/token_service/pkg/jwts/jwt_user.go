@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 
+	tokenSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/token_service"
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
@@ -18,13 +19,17 @@ const (
 
 // IssueUser takes in arguments for the token of the user
 // returning a JWT with exp set to expTime and the data passed in
-func IssueUser(ctx context.Context, uuid, username, orgnDomain string) (string, error) {
+func IssueUser(ctx context.Context, user *tokenSrv.AuthenticatedUser) (string, error) {
 	// calims holds all the data which will be
 	// encoded in the JWT
 	claims := jwt.MapClaims{}
-	claims["uuid"] = uuid
-	claims["username"] = username
-	claims["orgnDomain"] = orgnDomain
+	claims["uuid"] = user.GetUuid()
+	claims["username"] = user.GetUsername()
+	claims["orgnDomain"] = user.GetOrgnDomain()
+	claims["firstName"] = user.GetFirstName()
+	claims["lastName"] = user.GetLastName()
+	claims["porifleImgURL"] = user.GetProfileImgUrl()
+	claims["orgnPosition"] = user.GetOrgnPosition()
 	claims["iat"] = issuer
 	claims["exp"] = time.Now().Add(expTime).Unix()
 
@@ -45,11 +50,7 @@ func GetJWTClaims(ctx context.Context, tokenString string) (map[string]interface
 	if !ok && !token.Valid {
 		return nil, errors.New("user not authenticated")
 	}
-	user := make(map[string]interface{})
-	user["uuid"] = claims["uuid"]
-	user["orgnDomain"] = claims["orgnDomain"]
-	user["username"] = claims["username"]
-	return user, nil
+	return claims, nil
 }
 
 func verifyToken(tokenString string) (*jwt.Token, error) {

@@ -18,7 +18,7 @@ func (srv TokenService) IssueJWT(ctx context.Context, request *tokenSrv.IssueJWT
 
 	logrus.Infof("<%v>[tokenService.IssueJWT] received issuing of JWT request\n", ctx_value.GetString(ctx, "tracingID"))
 	user := request.GetUser()
-	token, err := jwts.IssueUser(ctx, user.GetUuid(), user.GetUsername(), user.GetOrgnDomain())
+	token, err := jwts.IssueUser(ctx, user)
 	if err != nil {
 		logrus.Errorf("<%v>[tokenService.IssueJWT] could not issue JWT for user: %v", ctx_value.GetString(ctx, "tracingID"), err)
 		return &tokenSrv.IssueJWTResponse{

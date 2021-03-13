@@ -17,6 +17,11 @@ const (
 	loginCtxTimeout = time.Second * 2
 )
 
+type DataLogin struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
 // HandlerUserLogin is the entry-point if a users logins onto the system.
 // It calls the user-service to authenticate the users passed
 // credentials and on success calls the token-service to issue a new
@@ -26,9 +31,10 @@ const (
 // 	- Token-Service
 func (api API) HandlerUserLogin(w http.ResponseWriter, r *http.Request) {
 	logrus.Infof("<%v>[api.HandlerUserLogin] received user-login request: %v\n", ctx_value.GetString(r.Context(), "tracingID"), r.Host)
-	data, err := api.decode(r.Body)
-	if err != nil {
-		logrus.Errorf("*s*[api.HandlerLogin] could not decode request body: %v\n", ctx_value.GetString(r.Context(), "tracingID"), err)
+
+	var payload DataLogin
+	if err := api.decode(r.Body, &payload); err != nil {
+		logrus.Errorf("<%v>[api.HandlerLogin] could not decode request body: %v\n", ctx_value.GetString(r.Context(), "tracingID"), err)
 		api.onError(w, errors.New("could not decode request body"), http.StatusBadRequest)
 		return
 	}
@@ -39,8 +45,8 @@ func (api API) HandlerUserLogin(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), loginCtxTimeout)
 	defer cancel()
 	respUser, err := api.UserSrvClient.AuthUser(ctx, &userSrv.AuthRequest{
-		Username:   data["username"].(string),
-		Password:   data["password"].(string),
+		Username:   payload.Username,
+		Password:   payload.Password,
 		Tracing_ID: ctx_value.GetString(r.Context(), "tracingID"),
 	})
 	if err != nil || respUser.GetStatusCode() >= http.StatusInternalServerError {
@@ -56,13 +62,17 @@ func (api API) HandlerUserLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// invoke grpc call to token-service if user is authenticated and issue a JWT for the user
-	// token will hold {iat,exp, username, uuid, orgnDomain}
+	// token will hold all passed User{} information
 	respToken, err := api.TokenSrvClient.IssueJWT(ctx, &tokenSrv.IssueJWTRequest{
 		Tracing_ID: ctx_value.GetString(r.Context(), "tracingID"),
 		User: &tokenSrv.AuthenticatedUser{
-			Username:   respUser.GetUser().GetUsername(),
-			Uuid:       respUser.GetUser().GetUuid(),
-			OrgnDomain: respUser.GetUser().GetOrgnDomain(),
+			Username:      respUser.GetUser().GetUsername(),
+			Uuid:          respUser.GetUser().GetUuid(),
+			OrgnDomain:    respUser.GetUser().GetOrgnDomain(),
+			FirstName:     respUser.GetUser().GetFirstName(),
+			LastName:      respUser.GetUser().GetLastName(),
+			OrgnPosition:  respUser.GetUser().GetOrgnPosition(),
+			ProfileImgUrl: respUser.GetUser().GetProfileImgUrl(),
 		},
 	})
 	if err != nil {
