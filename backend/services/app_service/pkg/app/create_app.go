@@ -12,37 +12,40 @@ import (
 )
 
 // CreateApp some docs
-func (app app) CreateApp(ctx context.Context, mongo storage.Storage, req *appSrv.CreateAppRequest) (int, error) {
+func (app app) CreateApp(ctx context.Context, mongo storage.Storage, req *appSrv.CreateAppRequest) (int, string, error) {
 
 	// duplicate names may exists in the system but owners can only hold unique app names
 	result, err := mongo.FindOne(ctx, dbName, appCollection, bson.M{"appName": req.GetName(), "ownerUUID": req.GetOwnerUuid()})
 	if err != nil {
-		return http.StatusInternalServerError, err
+		return http.StatusInternalServerError, "", err
 	}
 	// if result map is not empty app name already taken
 	if len(result) != 0 {
-		return http.StatusBadRequest, errors.New("duplicated app names are not possible")
+		return http.StatusBadRequest, "", errors.New("duplicated app names are not possible")
 	}
 	// insert app in db with defaults
 	uuid, err := unique.UUID()
 	if err != nil {
-		return http.StatusInternalServerError, err
+		return http.StatusInternalServerError, "", err
 	}
+	// by default app owner must be in member list
+	appMember := append(req.GetMember(), req.GetOwnerUuid())
 	data, err := bson.Marshal(AppItem{
-		UUID:       uuid,
-		AppName:    req.GetName(),
-		OwnerUUID:  req.GetOwnerUuid(),
-		OrgnDomain: req.GetOrganization(),
-		Member:     req.GetMember(),
-		Settings:   req.GetSettings(),
-		AppToken:   "",
+		UUID:        uuid,
+		AppName:     req.GetName(),
+		Description: req.GetDescription(),
+		OwnerUUID:   req.GetOwnerUuid(),
+		OrgnDomain:  req.GetOrganization(),
+		Member:      appMember,
+		Settings:    req.GetSettings(),
+		AppToken:    "",
 	})
 	if err != nil {
-		return http.StatusInternalServerError, err
+		return http.StatusInternalServerError, "", err
 	}
 	if err := mongo.InsertOne(ctx, dbName, appCollection, data); err != nil {
-		return http.StatusInternalServerError, err
+		return http.StatusInternalServerError, "", err
 	}
 
-	return http.StatusOK, nil
+	return http.StatusOK, uuid, nil
 }

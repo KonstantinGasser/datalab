@@ -9,6 +9,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// DataCreateApp represents the data which is required
+// in order to create new app
 type DataCreateApp struct {
 	Name        string   `json:"app_name"`
 	Description string   `json:"app_description"`
@@ -17,6 +19,8 @@ type DataCreateApp struct {
 }
 
 // HandlerAppCreate is the api endpoint if a logged in user wants to create a new application
+// Involved services:
+// - App-Service
 func (api API) HandlerAppCreate(w http.ResponseWriter, r *http.Request) {
 	logrus.Infof("<%v>[api.HandlerAppCreate] received create-app request: %v\n", ctx_value.GetString(r.Context(), "tracingID"), r.Host)
 
@@ -30,7 +34,7 @@ func (api API) HandlerAppCreate(w http.ResponseWriter, r *http.Request) {
 		api.onError(w, errors.New("could not find user claims"), http.StatusForbidden)
 		return
 	}
-	logrus.Info(payload)
+	// invoke grpc call to user-service to create requested app
 	respApp, err := api.AppServiceClient.CreateApp(r.Context(), &appSrv.CreateAppRequest{
 		OwnerUuid:    authedUser.GetUuid(),
 		Name:         payload.Name,
@@ -47,6 +51,7 @@ func (api API) HandlerAppCreate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	api.onScucessJSON(w, map[string]string{
-		"msg": respApp.GetMsg(),
+		"app_uuid": respApp.GetAppUuid(),
+		"msg":      respApp.GetMsg(),
 	}, int(respApp.GetStatusCode()))
 }

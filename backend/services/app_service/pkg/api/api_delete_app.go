@@ -10,7 +10,7 @@ import (
 
 func (srv AppService) DeleteApp(ctx context.Context, request *appSrv.DeleteAppRequest) (*appSrv.DeleteAppResponse, error) {
 	ctx = ctx_value.AddValue(ctx, "tracingID", request.GetTracing_ID())
-	logrus.Infof("<%v>[appService.GetApps] received get apps request\n", ctx_value.GetString(ctx, "tracingID"))
+	logrus.Infof("<%v>[appService.GetApps] received delete apps request\n", ctx_value.GetString(ctx, "tracingID"))
 
 	status, err := srv.app.DeleteApp(ctx, srv.mongoC, request)
 	if err != nil {

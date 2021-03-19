@@ -15,7 +15,10 @@ type DataUserUpdate struct {
 	OrgnPosition string `json:"orgn_position"`
 }
 
-func (api API) HandlerUserUpadate(w http.ResponseWriter, r *http.Request) {
+// HandlerUserUpdate is the entry-point to update the user account of a user
+// Involved services:
+// - User-Service
+func (api API) HandlerUserUpdate(w http.ResponseWriter, r *http.Request) {
 	logrus.Infof("<%v>[api.HandlerUserUpdate] received user update request: %v\n", ctx_value.GetString(r.Context(), "tracingID"), r.Host)
 
 	var payload DataUserUpdate

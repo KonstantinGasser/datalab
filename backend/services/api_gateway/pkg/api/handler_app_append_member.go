@@ -9,10 +9,15 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// DataAppAppendMember represents the data which is required
+// in order to add a new member to a given app
 type DataAppAppendMember struct {
 	Member []string `json:"member_list"`
 }
 
+// Todo where is the UUID of the app??? this looks wrong -> pls check on that
+// Involved services:
+// - App-Service
 func (api API) HandlerAppAppendMember(w http.ResponseWriter, r *http.Request) {
 	logrus.Infof("<%v>[api.HandlerAppAppendMember] received append-app-member request: %v\n", ctx_value.GetString(r.Context(), "tracingID"), r.Host)
 

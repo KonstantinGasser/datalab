@@ -190,7 +190,7 @@ func (api API) SetUp() {
 		api.WithTracing(
 			api.WithCors(
 				api.WithAuth(
-					api.HandlerUserUpadate,
+					api.HandlerUserUpdate,
 				),
 			),
 		),
@@ -200,6 +200,15 @@ func (api API) SetUp() {
 			api.WithCors(
 				api.WithAuth(
 					api.HandlerUserGetByID,
+				),
+			),
+		),
+	)
+	api.route("/api/v1/app/getbyid",
+		api.WithTracing(
+			api.WithCors(
+				api.WithAuth(
+					api.HandlerAppGetByID,
 				),
 			),
 		),

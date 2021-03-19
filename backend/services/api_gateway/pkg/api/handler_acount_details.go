@@ -9,12 +9,11 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// HandlerUserGetByID looks up the user information for a given UUID
-// Involved services:
-// - User-Service
-func (api API) HandlerUserGetByID(w http.ResponseWriter, r *http.Request) {
-	logrus.Infof("<%v>[api.HandlerUserGetByID] received getByID request: %v\n", ctx_value.GetString(r.Context(), "tracingID"), r.Host)
+func (api API) HandlerAccountDetails(w http.ResponseWriter, r *http.Request) {
+	logrus.Infof("<%v>[api.HandlerAccountDetails] received request\n", ctx_value.GetString(r.Context(), "tracingID"))
 
+	// build one JSON to rule them all
+	// call user-service for user information
 	// get authenticated user data to retrieve user uuid
 	user := ctx_value.GetAuthedUser(r.Context())
 	if user == nil {

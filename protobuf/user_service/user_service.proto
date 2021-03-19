@@ -92,6 +92,14 @@ message AuthenticatedUser {
     string orgn_position = 6;
     string profile_img_url = 7;
 }
+// message AuthenticatedUser {
+//     string username = 1;
+//     string orgn_domain = 2;
+//     string uuid = 3;
+//     string first_name = 4;
+//     string last_name = 5;
+//     string profile_img_url = 6;
+// }
 
 message User {
     string uuid = 1;

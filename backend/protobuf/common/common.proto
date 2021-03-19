@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package common;
+// option go_package = ".;common";
+
+// representation of a full user with all information
+message UserModel {
+    string uuid = 1;
+    string username = 2;
+    string first_name = 3;
+    string last_name = 4;
+    string orgn_domain = 5;
+    string orgn_position = 6;
+    string profile_img_url = 7;
+}
+
+// used  if only user meta data is required -> not final yet not sure which fields I need
+message LightUserModel {
+    string username = 1;
+    string uuid = 2;
+    string orgn_domain = 3;
+    string first_name = 4;
+    string last_name = 5;
+    string orgn_position = 6;
+    string profile_img_url = 7;
+}
+
+
+// representation a full app with all information
+message AppModel {
+    string uuid = 1;
+    string name = 2;
+    string description = 3;
+    string owner_uuid = 4;
+    repeated UserModel member = 6;
+    repeated string settings = 7;
+}
+
+message LightAppModel {
+    string name = 1;
+    string uuid = 2;
+}

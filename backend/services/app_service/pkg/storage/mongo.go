@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -40,6 +41,7 @@ func (client mongoC) FindOne(ctx context.Context, db, collection string, data bs
 		}
 		return nil, fmt.Errorf("mongo client, could not decode FindOne result: %v", err)
 	}
+	logrus.Infof("Result: %v", result)
 	return result, nil
 }
 

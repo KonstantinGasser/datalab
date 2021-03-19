@@ -88,3 +88,17 @@ func (client MongoClient) UpdateOne(ctx context.Context, db, collection string, 
 	return nil
 
 }
+
+func (client MongoClient) FindMany(ctx context.Context, db, collection string, filter bson.D, resultSet interface{}) error {
+	coll := client.conn.Database(db).Collection(collection)
+
+	cur, err := coll.Find(ctx, filter)
+	if err != nil {
+		return err
+	}
+
+	if err := cur.All(ctx, resultSet); err != nil {
+		return err
+	}
+	return nil
+}

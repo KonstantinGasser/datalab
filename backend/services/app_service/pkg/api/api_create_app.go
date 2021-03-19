@@ -14,7 +14,7 @@ func (srv AppService) CreateApp(ctx context.Context, request *appSrv.CreateAppRe
 	ctx = ctx_value.AddValue(ctx, "tracingID", request.GetTracing_ID())
 	logrus.Infof("<%v>[appService.CreateApp] received create app request\n", ctx_value.GetString(ctx, "tracingID"))
 
-	status, err := srv.app.CreateApp(ctx, srv.mongoC, request)
+	status, uuid, err := srv.app.CreateApp(ctx, srv.mongoC, request)
 	if err != nil {
 		logrus.Errorf("<%v>[appService.CreateApp] could not create app: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
 		return &appSrv.CreateAppResponse{
@@ -26,5 +26,6 @@ func (srv AppService) CreateApp(ctx context.Context, request *appSrv.CreateAppRe
 	return &appSrv.CreateAppResponse{
 		StatusCode: int32(status),
 		Msg:        "app has been created",
+		AppUuid:    uuid,
 	}, nil
 }

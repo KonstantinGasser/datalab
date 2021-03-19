@@ -16,10 +16,6 @@ const (
 	authTimeout = time.Second * 5
 )
 
-type ctxKey string
-
-// func (key ctxKey) String() string { return key.String() }
-
 // WithCors enables CORS by setting the 'Access-Control-Allow-Origin' and
 // 'Access-Control-Allow-Methods' header as specified by the API struct
 func (api API) WithCors(next http.HandlerFunc) http.HandlerFunc {
