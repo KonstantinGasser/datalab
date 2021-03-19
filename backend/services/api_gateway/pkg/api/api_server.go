@@ -182,9 +182,7 @@ func (api API) SetUp() {
 			),
 		),
 	)
-	// ***********************************
-
-	api.route("/api/v1/app/create",
+	api.route("/api/v2/view/app/create",
 		api.WithTracing(
 			api.WithCors(
 				api.WithAuth(
@@ -193,16 +191,7 @@ func (api API) SetUp() {
 			),
 		),
 	)
-	api.route("/api/v1/app/getall",
-		api.WithTracing(
-			api.WithCors(
-				api.WithAuth(
-					api.HandlerGetApps,
-				),
-			),
-		),
-	)
-	api.route("/api/v1/app/delete",
+	api.route("/api/v2/view/app/delete",
 		api.WithTracing(
 			api.WithCors(
 				api.WithAuth(
@@ -211,40 +200,5 @@ func (api API) SetUp() {
 			),
 		),
 	)
-	api.route("/api/v1/app/member/append",
-		api.WithTracing(
-			api.WithCors(
-				api.WithAuth(
-					api.HandlerAppAppendMember,
-				),
-			),
-		),
-	)
-	api.route("/api/v1/user/update",
-		api.WithTracing(
-			api.WithCors(
-				api.WithAuth(
-					api.HandlerAccountUpdate,
-				),
-			),
-		),
-	)
-	api.route("/api/v1/user/getbyid",
-		api.WithTracing(
-			api.WithCors(
-				api.WithAuth(
-					api.HandlerUserGetByID,
-				),
-			),
-		),
-	)
-	api.route("/api/v1/app/getbyid",
-		api.WithTracing(
-			api.WithCors(
-				api.WithAuth(
-					api.HandlerAppGetByID,
-				),
-			),
-		),
-	)
+	// ***********************************
 }
