@@ -18,7 +18,7 @@ type DataUserUpdate struct {
 // HandlerUserUpdate is the entry-point to update the user account of a user
 // Involved services:
 // - User-Service
-func (api API) HandlerUserUpdate(w http.ResponseWriter, r *http.Request) {
+func (api API) HandlerAccountUpdate(w http.ResponseWriter, r *http.Request) {
 	logrus.Infof("<%v>[api.HandlerUserUpdate] received user update request: %v\n", ctx_value.GetString(r.Context(), "tracingID"), r.Host)
 
 	var payload DataUserUpdate

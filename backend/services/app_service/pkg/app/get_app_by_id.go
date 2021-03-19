@@ -5,10 +5,17 @@ import (
 
 	appSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/app_service"
 	"github.com/KonstantinGasser/clickstream/backend/services/app_service/pkg/storage"
+	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-func (app app) GetByID(ctx context.Context, mongo storage.Storage, req *appSrv.GetByIDRequest) (bson.M, error) {
+func (app app) GetByID(ctx context.Context, mongo storage.Storage, req *appSrv.GetByIDRequest) (AppItem, error) {
 
-	return mongo.FindOne(ctx, dbName, appCollection, bson.M{"_id": req.GetAppUuid()})
+	var appDetails AppItem
+	logrus.Info(req.GetAppUuid())
+	err := mongo.FindOne(ctx, dbName, appCollection, bson.M{"_id": req.GetAppUuid()}, &appDetails)
+	if err != nil {
+		return AppItem{}, err
+	}
+	return appDetails, nil
 }

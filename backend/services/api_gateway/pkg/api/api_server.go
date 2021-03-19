@@ -136,6 +136,7 @@ func (api API) SetUp() {
 	logrus.Infof("\n*** adding routes to API-Service ***\n")
 
 	// ------ ROUTES ------
+	// ***** AUTH: REGISTER & LOGIN *****
 	api.route("/api/v1/user/register",
 		api.WithTracing(
 			api.WithCors(
@@ -150,6 +151,39 @@ func (api API) SetUp() {
 			),
 		),
 	)
+	// ***********************************
+	// ***** VIEW: ACCOUNT ***************
+	api.route("/api/v2/view/account",
+		api.WithTracing(
+			api.WithCors(
+				api.WithAuth(
+					api.HandlerAccountDetails,
+				),
+			),
+		),
+	)
+	api.route("/api/v2/view/account/update",
+		api.WithTracing(
+			api.WithCors(
+				api.WithAuth(
+					api.HandlerAccountUpdate,
+				),
+			),
+		),
+	)
+	// ***********************************
+	// ***** VIEW: APP ***************
+	api.route("/api/v2/view/app/details",
+		api.WithTracing(
+			api.WithCors(
+				api.WithAuth(
+					api.HandlerAppDetails,
+				),
+			),
+		),
+	)
+	// ***********************************
+
 	api.route("/api/v1/app/create",
 		api.WithTracing(
 			api.WithCors(
@@ -190,7 +224,7 @@ func (api API) SetUp() {
 		api.WithTracing(
 			api.WithCors(
 				api.WithAuth(
-					api.HandlerUserUpdate,
+					api.HandlerAccountUpdate,
 				),
 			),
 		),

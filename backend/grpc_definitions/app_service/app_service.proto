@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package service.app_service;
+package app_service;
 
 
 service AppService {
@@ -82,7 +82,7 @@ message GetByIDResponse {
     string name = 3;
     string description = 4;
     string owner_uuid = 5;
-    repeated public.User member = 6;
+    repeated FullUser member = 6;
     repeated string settings = 7;
 }
 

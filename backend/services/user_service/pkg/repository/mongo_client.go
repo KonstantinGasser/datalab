@@ -89,7 +89,7 @@ func (client MongoClient) UpdateOne(ctx context.Context, db, collection string, 
 
 }
 
-func (client MongoClient) FindMany(ctx context.Context, db, collection string, filter bson.D, resultSet interface{}) error {
+func (client MongoClient) FindMany(ctx context.Context, db, collection string, filter bson.M, resultSet interface{}) error {
 	coll := client.conn.Database(db).Collection(collection)
 
 	cur, err := coll.Find(ctx, filter)

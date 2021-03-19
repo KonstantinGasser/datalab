@@ -15,12 +15,12 @@ import (
 func (app app) CreateApp(ctx context.Context, mongo storage.Storage, req *appSrv.CreateAppRequest) (int, string, error) {
 
 	// duplicate names may exists in the system but owners can only hold unique app names
-	result, err := mongo.FindOne(ctx, dbName, appCollection, bson.M{"appName": req.GetName(), "ownerUUID": req.GetOwnerUuid()})
+	exists, err := mongo.Exsists(ctx, dbName, appCollection, bson.M{"appName": req.GetName(), "ownerUUID": req.GetOwnerUuid()})
 	if err != nil {
 		return http.StatusInternalServerError, "", err
 	}
 	// if result map is not empty app name already taken
-	if len(result) != 0 {
+	if exists {
 		return http.StatusBadRequest, "", errors.New("duplicated app names are not possible")
 	}
 	// insert app in db with defaults

@@ -5,7 +5,6 @@ import (
 
 	appSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/app_service"
 	"github.com/KonstantinGasser/clickstream/backend/services/app_service/pkg/storage"
-	"go.mongodb.org/mongo-driver/bson"
 )
 
 // why are they here?????? change this pls
@@ -19,7 +18,7 @@ const (
 type App interface {
 	CreateApp(ctx context.Context, mongo storage.Storage, req *appSrv.CreateAppRequest) (int, string, error)
 	GetApps(ctx context.Context, mongo storage.Storage, req *appSrv.GetAppsRequest) ([]*appSrv.LightApp, error)
-	GetByID(ctx context.Context, mongo storage.Storage, req *appSrv.GetByIDRequest) (bson.M, error)
+	GetByID(ctx context.Context, mongo storage.Storage, req *appSrv.GetByIDRequest) (AppItem, error)
 	DeleteApp(ctx context.Context, mongo storage.Storage, req *appSrv.DeleteAppRequest) (int, error)
 	AppendMember(ctx context.Context, mongo storage.Storage, req *appSrv.AppendMemberRequest) (int, error)
 }
@@ -34,12 +33,19 @@ func New() App {
 type AppItem struct {
 	// mongoDB pk (document key)
 	UUID        string `bson:"_id"`
-	AppName     string `bson:"appName"`
-	OwnerUUID   string `bson:"ownerUUID"`
-	OrgnDomain  string `bson:"orgnDomain"`
-	Description string `bson:"appDescription"`
+	AppName     string `bson:"name"`
+	OwnerUUID   string `bson:"owner_uuid"`
+	OrgnDomain  string `bson:"orgn_domain"`
+	Description string `bson:"description"`
 	// Member is a list of user_uuids mapped to this app
 	Member   []string `bson:"member"`
 	Settings []string `bson:"setting"`
-	AppToken string   `bson:"appToken"`
+	AppToken string   `bson:"app_token"`
+}
+
+// AppItemLight is a minimum representation of an application
+type AppItemLight struct {
+	// mongoDB pk (document key)
+	UUID    string `bson:"_id"`
+	AppName string `bson:"name"`
 }

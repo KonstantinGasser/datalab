@@ -9,19 +9,18 @@ import (
 )
 
 func (app app) GetApps(ctx context.Context, mongo storage.Storage, req *appSrv.GetAppsRequest) ([]*appSrv.LightApp, error) {
-	result, err := mongo.FindAll(ctx, dbName, appCollection, bson.D{
-		{"ownerUUID", req.GetUserUuid()},
-	})
-	if err != nil {
+
+	var appList []AppItemLight
+	if err := mongo.FindAll(ctx, dbName, appCollection, bson.D{{"owner_uuid", req.GetUserUuid()}}, &appList); err != nil {
 		return nil, err
 	}
-	// parse bson.M slice to slice of lightApp as defined by the GetAppsResponse in appService grpc
-	var appList []*appSrv.LightApp
-	for _, res := range result {
-		appList = append(appList, &appSrv.LightApp{
-			Name: res["appName"].(string),
-			Uuid: res["_id"].(string),
-		})
+	// convert AppItemLight to appSrv.LightApp slice
+	var resultList []*appSrv.LightApp = make([]*appSrv.LightApp, len(appList))
+	for i, item := range appList {
+		resultList[i] = &appSrv.LightApp{
+			Name: item.AppName,
+			Uuid: item.UUID,
+		}
 	}
-	return appList, nil
+	return resultList, nil
 }

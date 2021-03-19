@@ -22,6 +22,7 @@ type Storage interface {
 	// db will deserialize the found results (must be passed as pointer else no data)
 	FindAll(ctx context.Context, dbName, collName string, filter bson.D, result interface{}) error
 	FindOne(ctx context.Context, dbName, collName string, filter bson.M, result interface{}) error
+	Exsists(ctx context.Context, dbName, collName string, filter bson.M) (bool, error)
 	InsertOne(ctx context.Context, dbName, collName string, data []byte) error
 	DeleteOne(ctx context.Context, dbName, collName string, filter bson.D) error
 	UpdateByID(ctx context.Context, dbName, collName, appUUID string, data bson.D) error

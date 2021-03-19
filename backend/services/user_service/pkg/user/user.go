@@ -129,11 +129,9 @@ func (user User) GetByID(ctx context.Context, db *repository.MongoClient, uuid s
 func (user User) GetByIDs(ctx context.Context, db *repository.MongoClient, uuids []string) ([]*userSrv.User, error) {
 	// get all documents for given UUIDs
 	var resultSet []*userSrv.User
-	if err := db.FindMany(ctx, dbUser, collUser, bson.D{
-		{
-			"_id", bson.M{
-				"$in": uuids,
-			},
+	if err := db.FindMany(ctx, dbUser, collUser, bson.M{
+		"_id": bson.M{
+			"$in": uuids,
 		},
 	},
 		&resultSet,
