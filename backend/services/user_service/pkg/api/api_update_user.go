@@ -22,7 +22,7 @@ func (srv UserService) UpdateUser(ctx context.Context, request *userSrv.UpdateUs
 		FirstName:     strings.TrimSpace(request.GetFirstName()),
 		LastName:      strings.TrimSpace(request.GetLastName()),
 		OrgnPosition:  strings.TrimSpace(request.GetOrgnPosition()),
-		ProfileImgURL: "http://www.expertyou.de:8080/member/expert/266/profile/photo_266_1604926599.jpeg", // i don't care about your profile img rn ~ sry
+		ProfileImgURL: "some path", // i don't care about your profile img rn ~ sry
 	})
 	if err != nil {
 		logrus.Errorf("<%v>[userService.UpdateUser] could not update user: %v\n", err)

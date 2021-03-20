@@ -39,7 +39,7 @@ func (srv UserService) CreateUser(ctx context.Context, request *userSrv.CreateUs
 		LastName:      strings.TrimSpace(request.GetLastName()),
 		OrgnDomain:    strings.TrimSpace(request.GetOrgnDomain()),
 		OrgnPosition:  strings.TrimSpace(request.GetOrgnPosition()),
-		ProfileImgURL: "http://www.expertyou.de:8080/member/expert/266/profile/photo_266_1604926599.jpeg", // can be set to default image later
+		ProfileImgURL: "some path", // can be set to default image later
 	})
 	if err != nil {
 		logrus.Errorf("<%v>[userService.CreateUser] could not create user: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
