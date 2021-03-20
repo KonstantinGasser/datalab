@@ -152,7 +152,7 @@ func (api API) SetUp() {
 		),
 	)
 	// ***********************************
-	// ***** VIEW: ACCOUNT ***************
+	// ***** VIEW: ACCOUNT + ACTIONS ***************
 	api.route("/api/v2/view/account",
 		api.WithTracing(
 			api.WithCors(
@@ -172,7 +172,7 @@ func (api API) SetUp() {
 		),
 	)
 	// ***********************************
-	// ***** VIEW: APP ***************
+	// ***** VIEW: APP + ACTIONS ***************
 	api.route("/api/v2/view/app/details",
 		api.WithTracing(
 			api.WithCors(

@@ -4,7 +4,7 @@ import (
 	"time"
 
 	userSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/user_service"
-	"github.com/KonstantinGasser/clickstream/backend/services/user_service/pkg/repository"
+	"github.com/KonstantinGasser/clickstream/backend/services/user_service/pkg/storage"
 	"github.com/KonstantinGasser/clickstream/backend/services/user_service/pkg/user"
 )
 
@@ -16,17 +16,19 @@ const (
 // and embeds all the required dependencies
 type UserService struct {
 	userSrv.UnimplementedUserServiceServer
-	user user.User
 	// *** Service Dependencies ***
-	mongoClient *repository.MongoClient
+	storage storage.Storage
+	user    user.User
 }
 
 // NewUserService returns a pointer to a new UserService with all its
 // dependencies
-func NewUserService(mongoC *repository.MongoClient) *UserService {
+func NewUserService(storage storage.Storage) *UserService {
 	return &UserService{
-		mongoClient: mongoC,
-		user:        user.User{},
+		// *** Storage Dependencies ***
+		storage: storage,
+		// *** Service Dependencies
+		user: user.NewUser(),
 	}
 }
 

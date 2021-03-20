@@ -10,18 +10,17 @@ import (
 
 type AppService struct {
 	appSrv.UnimplementedAppServiceServer
-	mongoC storage.Storage
-	app    app.App
+	storage storage.Storage
+	app     app.App
 	// *** Service Dependencies ***
 	userService userSrv.UserServiceClient
 }
 
-func NewAppServiceServer() AppService {
-	mongoC := storage.New("mongodb://AppDB:secure@192.168.0.179:27018")
-	app := app.New()
+func NewAppServiceServer(storage storage.Storage) AppService {
+	app := app.NewApp()
 	userService := grpcC.NewUserServiceClient(":8001")
 	return AppService{
-		mongoC:      mongoC,
+		storage:     storage,
 		app:         app,
 		userService: userService,
 	}

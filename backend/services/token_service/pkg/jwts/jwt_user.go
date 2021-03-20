@@ -23,13 +23,7 @@ func IssueUser(ctx context.Context, user *tokenSrv.AuthenticatedUser) (string, e
 	// calims holds all the data which will be
 	// encoded in the JWT
 	claims := jwt.MapClaims{}
-	claims["uuid"] = user.GetUuid()
-	claims["username"] = user.GetUsername()
-	claims["orgnDomain"] = user.GetOrgnDomain()
-	claims["firstName"] = user.GetFirstName()
-	claims["lastName"] = user.GetLastName()
-	claims["porifleImgURL"] = user.GetProfileImgUrl()
-	claims["orgnPosition"] = user.GetOrgnPosition()
+	claims["sub"] = user.GetUuid()
 	claims["iat"] = issuer
 	claims["exp"] = time.Now().Add(expTime).Unix()
 

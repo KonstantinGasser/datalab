@@ -14,30 +14,26 @@ func (srv UserService) GetUserByID(ctx context.Context, request *userSrv.GetUser
 
 	logrus.Infof("<%v>[userService.GetUserByID] received get user by id request\n", ctx_value.GetString(ctx, "tracingID"))
 
-	status, user, err := srv.user.GetByID(ctx, srv.mongoClient, request.GetUuid())
+	status, user, err := srv.user.GetByID(ctx, srv.storage, request.GetUuid())
 	if err != nil {
-		return &userSrv.GetUserByIDResponse{
-			StatusCode: int32(status),
-			Msg:        err.Error(),
-			User:       nil,
-		}, nil
+		logrus.Errorf("<%v>[userService.GetUserByID] could not get user details: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
+		return &userSrv.GetUserByIDResponse{StatusCode: int32(status), Msg: err.Error(), User: nil}, nil
 	}
-	if len(user) == 0 {
-		return &userSrv.GetUserByIDResponse{
-			StatusCode: int32(status),
-			Msg:        err.Error(),
-			User:       nil,
-		}, nil
+	if status != 200 {
+		return &userSrv.GetUserByIDResponse{StatusCode: int32(status), Msg: err.Error(), User: nil}, nil
 	}
+	logrus.Warn(user.ProfileImgURL)
 	return &userSrv.GetUserByIDResponse{
 		StatusCode: int32(status),
 		Msg:        "requested user found",
-		User: &userSrv.AuthenticatedUser{
-			Username:     user["username"].(string),
-			FirstName:    user["first_name"].(string),
-			LastName:     user["last_name"].(string),
-			OrgnDomain:   user["orgnDomain"].(string), // change in db to orgn_domain mongo js style
-			OrgnPosition: user["orgn_position"].(string),
+		User: &userSrv.User{
+			Uuid:          user.UUID,
+			Username:      user.Username,
+			FirstName:     user.FirstName,
+			LastName:      user.LastName,
+			OrgnDomain:    user.OrgnDomain,
+			OrgnPosition:  user.OrgnPosition,
+			ProfileImgUrl: user.ProfileImgURL,
 		},
 	}, nil
 }

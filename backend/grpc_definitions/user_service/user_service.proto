@@ -28,7 +28,7 @@ message GetUserByIDRequest {
 message GetUserByIDResponse {
     int32 status_code = 1;
     string msg = 2;
-    AuthenticatedUser user = 3;
+    User user = 3;
 }
 
 message UpdateUserRequest {

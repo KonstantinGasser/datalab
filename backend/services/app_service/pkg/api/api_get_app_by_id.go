@@ -15,16 +15,11 @@ func (srv AppService) GetByID(ctx context.Context, request *appSrv.GetByIDReques
 	ctx = ctx_value.AddValue(ctx, "tracingID", request.GetTracing_ID())
 	logrus.Infof("<%v>[appService.GetByID] received get app by id request\n", ctx_value.GetString(ctx, "tracingID"))
 
-	app, err := srv.app.GetByID(ctx, srv.mongoC, request)
+	status, app, err := srv.app.GetByID(ctx, srv.storage, request.GetAppUuid())
 	if err != nil {
 		logrus.Errorf("<%v>[appService.GetByID] could not GetByID: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
-		return &appSrv.GetByIDResponse{
-			StatusCode: http.StatusInternalServerError,
-			Msg:        "could not get application data",
-			// rest of the fields will take default values
-		}, nil
+		return &appSrv.GetByIDResponse{StatusCode: int32(status), Msg: "could not get application data"}, nil
 	}
-	logrus.Info(app)
 	// ask user-service for some more details about each member of the app
 	respUser, err := srv.userService.GetUsersByID(ctx, &userSrv.GetUsersByIDRequest{
 		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
@@ -45,7 +40,6 @@ func (srv AppService) GetByID(ctx context.Context, request *appSrv.GetByIDReques
 	// hence I need to "type cast" them with a loop #un-cool #thisCanBeDoneBetter
 	var memberList []*appSrv.FullUser = make([]*appSrv.FullUser, len(respUser.GetUsers()))
 	for i, item := range respUser.GetUsers() {
-		logrus.Info(item)
 		memberList[i] = &appSrv.FullUser{
 			Uuid:          item.GetUuid(),
 			Username:      item.GetUsername(),

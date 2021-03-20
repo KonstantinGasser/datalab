@@ -6,7 +6,7 @@ import (
 
 	userSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/user_service"
 	"github.com/KonstantinGasser/clickstream/backend/services/user_service/pkg/api"
-	"github.com/KonstantinGasser/clickstream/backend/services/user_service/pkg/repository"
+	"github.com/KonstantinGasser/clickstream/backend/services/user_service/pkg/storage"
 	"github.com/sirupsen/logrus"
 	grpc "google.golang.org/grpc"
 )
@@ -17,8 +17,7 @@ func Run(ctx context.Context, addr string) error {
 
 	// create new UserService
 	// database dependency to mongoDB
-	mongoC, err := repository.NewMongoClient("mongodb://userDB:secure@192.168.0.179:27017")
-	errorFatal(err) // fail fatally if client dependency creation fails
+	mongoC := storage.NewMongoClient("mongodb://userDB:secure@192.168.0.179:27017")
 	userService := api.NewUserService(mongoC)
 
 	// register grpc server to service

@@ -26,14 +26,13 @@ func (srv TokenService) ValidateJWT(ctx context.Context, request *tokenSrv.Valid
 			User:       nil,
 		}, nil
 	}
+	logrus.Warn(userInfo)
 	return &tokenSrv.ValidateJWTResponse{
 		StatusCode: http.StatusOK,
 		Msg:        "user is authenticated",
 		IsValid:    true,
 		User: &tokenSrv.AuthenticatedUser{
-			Username:   userInfo["username"].(string),
-			Uuid:       userInfo["uuid"].(string),
-			OrgnDomain: userInfo["orgnDomain"].(string),
+			Uuid: userInfo["sub"].(string),
 		},
 	}, nil
 }

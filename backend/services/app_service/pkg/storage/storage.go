@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -20,12 +19,12 @@ const (
 type Storage interface {
 	// FindAll and FindOne both take in a pointer to a struct in which the mongo
 	// db will deserialize the found results (must be passed as pointer else no data)
-	FindAll(ctx context.Context, dbName, collName string, filter bson.D, result interface{}) error
-	FindOne(ctx context.Context, dbName, collName string, filter bson.M, result interface{}) error
-	Exsists(ctx context.Context, dbName, collName string, filter bson.M) (bool, error)
-	InsertOne(ctx context.Context, dbName, collName string, data []byte) error
-	DeleteOne(ctx context.Context, dbName, collName string, filter bson.D) error
-	UpdateByID(ctx context.Context, dbName, collName, appUUID string, data bson.D) error
+	FindAll(ctx context.Context, db, collection string, filter, result interface{}) error
+	FindOne(ctx context.Context, db, collection string, filter, result interface{}) error
+	Exsists(ctx context.Context, db, collection string, filter interface{}) (bool, error)
+	InsertOne(ctx context.Context, db, collection string, query interface{}) error
+	DeleteOne(ctx context.Context, db, collection string, filter interface{}) error
+	UpdateOne(ctx context.Context, db, collection string, filter, query interface{}) error
 }
 
 // New returns a new mongoDB client implementing the Storage interface
@@ -43,5 +42,5 @@ func New(connString string) Storage {
 		logrus.Errorf("[storage.New] could not ping mongoDB: %v\n", err)
 		return nil
 	}
-	return &mongoC{conn: conn}
+	return &mongoClient{conn: conn}
 }
