@@ -27,6 +27,7 @@ type Storage interface {
 	FindMany(ctx context.Context, db, collection string, filter, results interface{}) error
 	// Exists checks whether something exists in the storage based on the filter
 	Exists(ctx context.Context, db, collection string, filter interface{}) (bool, error)
+	DeleteOne(ctx context.Context, db, collection string, filter interface{}) error
 }
 
 // New returns a new mongoDB client implementing the Storage interface

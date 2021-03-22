@@ -12,7 +12,7 @@ import (
 func (app app) GetApps(ctx context.Context, mongo storage.Storage, forUUID string) (int, []AppItemLight, error) {
 
 	var appList []AppItemLight
-	if err := mongo.FindAll(ctx, appDatabase, appCollection, bson.D{{"owner_uuid", forUUID}}, &appList); err != nil {
+	if err := mongo.FindMany(ctx, appDatabase, appCollection, bson.D{{"owner_uuid", forUUID}}, &appList); err != nil {
 		return http.StatusInternalServerError, nil, err
 	}
 	return http.StatusOK, appList, nil
