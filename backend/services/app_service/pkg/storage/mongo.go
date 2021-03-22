@@ -15,7 +15,7 @@ type mongoClient struct {
 
 // FindAll takes in a query, a db and collection name
 // found results will be written in the result interface{} which MUST be a pointer else no data
-func (client mongoClient) FindAll(ctx context.Context, db, collection string, filter, result interface{}) error {
+func (client mongoClient) FindMany(ctx context.Context, db, collection string, filter, result interface{}) error {
 	coll := client.conn.Database(db).Collection(collection)
 
 	cur, err := coll.Find(ctx, filter)
@@ -99,7 +99,7 @@ func (client mongoClient) UpdateOne(ctx context.Context, db, collection string, 
 
 // Exists checks whether a recored in the given database/collection based on the given filter exists
 // if error happens bool will be zero value (false) which does not mean that the record may not exists
-func (client mongoClient) Exsists(ctx context.Context, db, collection string, filter interface{}) (bool, error) {
+func (client mongoClient) Exists(ctx context.Context, db, collection string, filter interface{}) (bool, error) {
 	coll := client.conn.Database(db).Collection(collection)
 
 	var records bson.M

@@ -36,7 +36,7 @@ func (api API) HandlerAppDetails(w http.ResponseWriter, r *http.Request) {
 	if respAppList.GetApps() == nil || len(respAppList.GetApps()) == 0 {
 		logrus.Infof("<%v>[api.HandlerAppDetails] could not find any apps mapped to authed user\n", ctx_value.GetString(r.Context(), "tracingID"))
 		api.onScucessJSON(w, map[string]interface{}{
-			"app_list":    []struct{}{}, // which data type does not matter if empty!
+			"app_list":    []struct{}{},
 			"app_details": map[string]interface{}{},
 		}, http.StatusOK)
 		return

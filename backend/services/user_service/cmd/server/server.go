@@ -28,7 +28,11 @@ func Run(ctx context.Context, addr string) error {
 	}
 	logrus.Infof("[server.Run] listening on %s\n", addr)
 
-	if err := srv.Serve(listener); err != nil {
+	err = srv.Serve(listener)
+	// if context gets canceled in main (invoked by some SIG)
+	// perform graceful shutdown of server
+	defer srv.GracefulStop()
+	if err != nil {
 		return err
 	}
 	return nil

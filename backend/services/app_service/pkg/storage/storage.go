@@ -17,14 +17,16 @@ const (
 
 // Storage is the api def to speak with the mongoDB
 type Storage interface {
-	// FindAll and FindOne both take in a pointer to a struct in which the mongo
-	// db will deserialize the found results (must be passed as pointer else no data)
-	FindAll(ctx context.Context, db, collection string, filter, result interface{}) error
-	FindOne(ctx context.Context, db, collection string, filter, result interface{}) error
-	Exsists(ctx context.Context, db, collection string, filter interface{}) (bool, error)
+	// InsertOne appends the database with the given data
 	InsertOne(ctx context.Context, db, collection string, query interface{}) error
-	DeleteOne(ctx context.Context, db, collection string, filter interface{}) error
+	// UpdateOne updates on document in the database with the given data and based on the given filter
 	UpdateOne(ctx context.Context, db, collection string, filter, query interface{}) error
+	// FindOne selects zero or one match from the filter an assigns the data in the given pointer to results
+	FindOne(ctx context.Context, db, collection string, filter, result interface{}) error
+	// FindMany select zero or many matches from the filter an assigns the data in the given pointer to results
+	FindMany(ctx context.Context, db, collection string, filter, results interface{}) error
+	// Exists checks whether something exists in the storage based on the filter
+	Exists(ctx context.Context, db, collection string, filter interface{}) (bool, error)
 }
 
 // New returns a new mongoDB client implementing the Storage interface
