@@ -1,0 +1,217 @@
+<template>
+    <div class="view_app">
+        <div class="app_list">
+            <div class="add_new_app d-flex justify-center align-center">
+                <button @click="modeCreateApp()" class="btn btn-standard">Create new App <span class="icon icon-plus"></span></button>
+            </div>
+            <div class="app_name_list">
+                <p class="info-text" v-if="app_list === null || app_list.length === 0">
+                    Mhm looks like you do not have any apps yet - <a @click="modeCreateApp()">go create one!</a>
+                </p>
+                <div class="app-name d-flex justify-between align-center" v-for="app in app_list" :key="app.uuid">
+                    <span class="dots standard-font" @click="fetchAppDetails(app.uuid)">{{ app.name }}</span>
+                    <span class="icon icon-delete hover big" @click="removeApp(app.uuid)"></span>
+                </div>
+            </div>
+        </div>
+        <div>
+            <Tabs v-if="!showCreateApp" ref="Tabs" :class="{ block: blockTabs }" :initTab="'App Token'" :tabs="[{name:'App Token'},{name:'Member'}]" @tabChange="tabChange"/>
+            <TabCreateApp v-if="showCreateApp" @createdApp="updateState" />
+            <TabAppToken v-if="activeTab === 'App Token' && !showCreateApp" :app="activeApp"/>
+            <TabMember v-if="activeTab === 'Member' && !showCreateApp" :member_list="activeApp.app_member"/>
+        </div>
+    </div>
+</template>
+
+<script>
+    import Tabs from '@/components/utils/Tabs.vue';
+    import TabAppToken from '@/components/apps/TabAppToken.vue';
+    import TabCreateApp from '@/components/apps/TabCreateApp.vue';
+    import TabMember from '@/components/apps/TabMember.vue';
+    import axios from 'axios';
+
+    export default {
+        name: 'ViewApp',
+        components: {
+            Tabs,
+            TabCreateApp,
+            TabAppToken,
+            TabMember,
+        },
+        computed: {
+            blockTabs() {
+                return this.tabsBlocked;
+            },
+            showCreateApp() {
+                console.log("From computed: ", this.isInCreateMode);
+                return this.isInCreateMode;
+            },
+            app_list() {
+                return this.apps;
+            }
+        },
+        data() {
+            return {
+                isInCreateMode: true, // change back to false once api works again. true just to check on the other views
+                activeTab: 'App Token',
+                tabsBlocked: false,
+                newApp: { name: '' },
+                apps: [],
+                activeApp: {},
+            };
+        },
+        mounted() {
+            // fetch initial data
+            this.getAppDetails().then(data => {
+                this.apps = data.app_list;
+                this.activeApp = data.app_details;
+                console.log("data: ", data);
+                console.log("APP: ", this.activeApp);
+                console.log("LIST: ", this.app_list);
+                if (this.apps == null || this.apps.length === 0) {
+                    this.isInCreateMode = true;
+                } else {
+                    this.isInCreateMode = false;
+                    // if apps call full app 
+                }
+                // if (this.app !== null && this.apps.length === 0) this.isInCreateMode = true;
+            }).catch(error => {
+                // if apps can not be loaded display panel to create a new app
+                console.log("could not get apps");
+                this.isInCreateMode = true;
+            });
+            
+        },
+        props: ['status'],
+        methods: {
+            updateState(event) {
+                switch (event.type) {
+                    case "show_app":
+                        this.isInCreateMode = false;
+                        // update app list on the left to show newly created app
+                        this.getAppDetails().then(data => {
+                            this.apps = data.app_list;
+                        }).catch(err => {
+                            console.log(err);
+                            this.$toast.error("could not refresh app list");
+                        });
+                        
+                        break;
+                    default:
+                        break;
+                }
+                this.isInCreateMode = false;
+                
+            },
+            fetchAppDetails(uuid) {
+                let options = {
+                    headers: {
+                        'Authorization': localStorage.getItem("token"),
+                    }
+                };
+                axios.get("http://localhost:8080/api/v1/app/getbyid?uuid="+uuid, options).then(resp => {
+                    console.log(resp);
+                }).catch(err => {
+                    console.log("Get By ID: ", err);
+                });
+                
+            },
+            modeCreateApp() {
+                console.log("modeCreateApp: one");
+                // this.enableDisableTabs();
+                this.isInCreateMode = true;
+            },
+            async getAppDetails() {
+                let options = {
+                    headers: {
+                        'Authorization': localStorage.getItem("token"),
+                    }
+                };
+                const res = await axios.get("http://localhost:8080/api/v2/view/app/details", options)
+                console.log(res);
+                if (res.data == null || res.status >= 400) {
+                    this.isInCreateMode = true;
+                    console.log(this.isInCreateMode);
+                    return [];
+                }
+                return res.data;
+                
+            },
+            async removeApp(id) {
+                let options = {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': localStorage.getItem("token"),
+                    }
+                };
+                await axios.post("http://localhost:8080/api/v2/view/app/delete", {
+                        app_uuid: id,
+                    }, options
+                ).then((resp) => {
+                    console.log("Resp ",resp)
+                }).catch(err => {
+                    this.$toast.warning("Sorry app could not be removed");
+                    return;
+                });
+                const al = await this.getAppList();
+                this.apps = al;
+            },
+            tabChange(tab) {
+                this.isInCreateMode = false;
+                this.activeTab = tab;
+            },
+            enableDisableTabs(toggle) {
+                this.tabsBlocked = toggle;
+                // block tab change by sending toggle to @Tabs
+                this.$refs.Tabs.block = this.tabsBlocked;
+            }
+        },
+    };
+</script>
+
+<style scoped>
+.tab-line {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.view_app {
+    display: grid;
+    grid-template-columns: 185px 1fr;
+    grid-column-gap: 15px;
+    height: 100%;
+}
+
+.app_list {
+    background: #0D1116;
+    border-radius: 8px;
+    padding: 15px;
+    height: max-content;
+    min-height: 225px;
+    max-height: 100%;
+    overflow-y: scroll;
+    border: 1px solid #30363D;
+}
+
+.app_name_list {
+    margin-top: 25px;
+    padding: 0 7px;
+}
+.app-name {
+    background:linear-gradient(135deg, #50e3c2 0%,#10d574 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent; 
+    font-size: 16px;
+    font-weight: bold;
+    padding: 5px;
+    margin: 5px 0;
+    border: 1px solid #10d574;
+    border-radius: 8px;
+    border-style: dashed;
+}
+.app-name:hover {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+</style>
