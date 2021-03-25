@@ -32,8 +32,6 @@ export default {
 <style scoped>
 
 .menu_item {
-    /* background: rgb(255, 255, 255, 1); */
-    /* background: linear-gradient(135deg, #50e3c2 20%,#10d574 10%); */
     padding: 5px;
     margin: 15px 5px;
     display: flex;
@@ -48,7 +46,7 @@ export default {
 .menu_item:hover {
     cursor: pointer;
     width: 100%;
-    background:#0D1116;
+    background:#0000001c;
     /* border: 1px solid #30363D; */
 }
 .menu_text {
@@ -63,7 +61,7 @@ export default {
 }
 
 .menu_item.active {
-    background: #0D1116;
+    background: #0000001c;
     /* border: 1px solid #30363D; */
 }
 .active .menu_text {

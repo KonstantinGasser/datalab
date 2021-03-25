@@ -59,7 +59,7 @@ func (api API) WithAuth(next http.HandlerFunc) http.HandlerFunc {
 		}
 		if resp.GetStatusCode() != http.StatusOK || !resp.GetIsValid() || resp.GetUser() == nil {
 			logrus.Warnf("<%v>[api.WithAuth] %s is not authenticated: %v", ctx_value.GetString(r.Context(), "tracingID"), r.Host, resp.GetMsg())
-			api.onError(w, errors.New("not authenticated"), http.StatusForbidden)
+			api.onError(w, errors.New("not authenticated"), http.StatusUnauthorized)
 			return
 		}
 		// add JWT claims of user in r.Context()

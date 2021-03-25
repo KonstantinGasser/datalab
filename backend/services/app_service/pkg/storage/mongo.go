@@ -5,10 +5,13 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+// mongoClient implements the Storage interface and wraps its function to serve as Mongo
+// storage option
 type mongoClient struct {
 	conn *mongo.Client
 }
@@ -78,23 +81,25 @@ func (client mongoClient) DeleteOne(ctx context.Context, db, collection string, 
 }
 
 // UpdateOne is a generic function which updates on record in the given database/collection based on the filter
-// filter and query can be any of bson.*.
-func (client mongoClient) UpdateOne(ctx context.Context, db, collection string, filter, query interface{}) error {
+// filter and query can be any of bson.*. returns the number of modified documents and an error
+func (client mongoClient) UpdateOne(ctx context.Context, db, collection string, filter, query interface{}) (int, error) {
 	// check if interface{} is a struct if so needs marshaling
 	var data interface{} = query
 	var err error
 	if reflect.ValueOf(query).Kind() == reflect.Struct {
 		data, err = bson.Marshal(query)
 		if err != nil {
-			return err
+			return 0, err
 		}
 	}
 
 	coll := client.conn.Database(db).Collection(collection)
-	if _, err := coll.UpdateByID(ctx, filter, data); err != nil {
-		return err
+	updated, err := coll.UpdateOne(ctx, filter, data)
+	if err != nil {
+		logrus.Error(err)
+		return int(updated.ModifiedCount), err
 	}
-	return nil
+	return int(updated.ModifiedCount), nil
 }
 
 // Exists checks whether a recored in the given database/collection based on the given filter exists

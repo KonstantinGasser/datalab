@@ -1,5 +1,6 @@
 package app
 
+// app implements the App interface
 type app struct{}
 
 // AppItem represents one App in the database ? do we need this? don't we have a def in the grpc already???

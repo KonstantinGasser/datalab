@@ -8,8 +8,7 @@
         <MenuItem @click="setActive('view_account')" :tabName="'view_account'" :item="'Account'" />
         <MenuItem @click="setActive('view_settings')" :tabName="'view_settings'" :item="'Settings'" />
       </div>
-      <div class="divider"></div>
-      <div class="menu">
+      <div class="menu bottom-set">
         <!-- <h4>App Settings</h4> -->
         <MenuItem @click="setActive('view_logout')" :item="'Logout 👋'" /> 
       </div>
@@ -55,15 +54,17 @@ h4 {
     /* padding: 65px 10px 10px 20px; */
     /* background: linear-gradient(0deg, #50e3c2 0%,#10d574 100%); */
     display: grid;
-    grid-template-rows: min-content 50px min-content;
+    grid-template-rows: min-content min-content;
     color: #fff;
     
     display: grid;
     justify-content: flex-start;
     height: 100%;
-    align-content: space-between;
+    align-content: space-around;
     /* background: rgba(255,255,255,1); */
     border-radius: 8px 0 0 8px;
 }
-
+/* .bottom-set {
+  margin-top: 100%;
+} */
 </style>

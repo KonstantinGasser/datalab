@@ -200,5 +200,14 @@ func (api API) SetUp() {
 			),
 		),
 	)
+	api.route("/api/v2/view/app/add/member",
+		api.WithTracing(
+			api.WithCors(
+				api.WithAuth(
+					api.HandlerAppAddMember,
+				),
+			),
+		),
+	)
 	// ***********************************
 }

@@ -34,7 +34,18 @@ h2 {
   -moz-osx-font-smoothing: grayscale;
   /* background: linear-gradient(0deg, #50e3c2 0%,#10d574 100%); */
   /* background: rgba(0,0,0,0.01); */
-  background: #05090E;
+  /* background: #50e3c2; */
+  /* background: #121212; */
+  background: #1E1E1E;
+  /* background: linear-gradient(135deg, #50e3c2 0%,#10d574 100%); */
+  /* background-image: url("assets/dash_bottom.svg"), url("assets/dash_top.svg");
+  background-repeat: no-repeat, no-repeat;
+  background-position: left bottom, right top; */
+  /* background-image: url("assets/dash_bottom_green.svg"), url("assets/dash_top_green.svg"); */
+  background-image: url("assets/dash_bottom_green.svg"), url("assets/dash_top_green.svg");
+  background-repeat: no-repeat, no-repeat;
+  background-position: left bottom, right top;
+  background-size: contain, contain;
 }
 a {
   text-decoration: underline;
@@ -53,7 +64,7 @@ a {
   font-size: 20px;
 }
 .btn-standard {
-  background: #0D1116;
+  background: transparent;
   border: 1px solid #50e3c2;
   color: #10d574;
   border-radius: 8px;
@@ -68,7 +79,7 @@ a {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background: linear-gradient(0deg, #50e3c2 0%,#10d574 100%);
-  color: #0D1116;
+  color: #121212;
 }
 
 .info-text {
@@ -83,7 +94,7 @@ a {
   padding: 3px;
   margin: 0 3px;
   background: linear-gradient(0deg, #50e3c2 0%,#10d574 100%);
-  color: #0D1116;
+  color: #121212;
   border-radius: 4px;
   width: min-content;
   font-weight: bolder;

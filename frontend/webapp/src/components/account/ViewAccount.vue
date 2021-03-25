@@ -124,7 +124,10 @@
                     this.user = resp.data.user;
                     console.log(this.user);
                 }).catch(err => {
-                    console.log(err);
+                    if (err.response.status === 401) {
+                        localStorage.removeItem('token');
+                        this.$router.replace({ name: 'login' });
+                    }
                 });
             },
         },
@@ -140,7 +143,8 @@
 .view_component {
     margin-bottom: 15px;
     padding: 15px;
-    background: #0D1116;
+    background: #1E1E1E;
+    
     border-radius: 8px;
     height: max-content;
     border: 1px solid #30363D;

@@ -40,7 +40,7 @@
   width: 250px;
   height: min-content;
   min-height: 150px;
-  background: #0D1116;
+  background: #1E1E1E;
   right: 0;
   top: 30px;
   z-index: 99;
@@ -51,7 +51,7 @@
 .notification-handle {
   width: 12px;
   height: 12px;
-  background: #0D1116;
+  background: #1E1E1E;
   transform: rotate(45deg);
   border-radius: 3px;
   margin: -5px 0 0 233px;

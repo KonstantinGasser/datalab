@@ -183,7 +183,7 @@
 }
 
 .app_list {
-    background: #0D1116;
+    background: #1E1E1E;
     border-radius: 8px;
     padding: 15px;
     height: max-content;

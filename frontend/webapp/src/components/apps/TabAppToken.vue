@@ -111,7 +111,7 @@
 .view_component {
     margin-top: 15px;
     padding: 15px;
-    background: #0D1116;
+    background: #1E1E1E;
     border-radius: 8px;
     height: max-width;
     border: 1px solid #30363D;

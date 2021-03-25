@@ -125,7 +125,7 @@ hr {
   align-content: center;
   grid-template-rows: min-content min-content;
   grid-row-gap: 25px;
-  background: #0D1116;
+  /* background: #0D1116; */
 }
 .component-fade-enter-active, .component-fade-leave-active {
   transition: opacity .3s ease;
@@ -141,7 +141,7 @@ hr {
 .context {
   display: flex;
   height: 471px;
-  background: #30363D;
+  background: #1E1E1E;
   border-radius: 20px;
   box-shadow: 0 0 16px 10px rgb(0 0 0 / 10%);
 }
@@ -188,7 +188,7 @@ hr {
   width: 150px;
   height: 35px;
   border-radius: 50px;
-  background-color: #0D1116;
+  background-color: transparent;
   border: none; 
   color: #10d574;
   font-size: 18px;
@@ -198,7 +198,7 @@ hr {
 .submit-btn button:hover {
   cursor: pointer;
   background: linear-gradient(135deg, #50e3c2 0%,#10d574 100%);
-  color: #0D1116;
+  color: #121212;
   width: 180px;
   height: 40px;
   font-size: 18px;
@@ -216,7 +216,7 @@ hr {
 .footer .ankor-text {
   font-size: 14px;
   opacity: 0.6;
-  color: #30363D;
+  color: #ccc;
   margin: 0px 5px;
 }
 

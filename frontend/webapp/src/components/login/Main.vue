@@ -43,12 +43,7 @@ h2 {
   display: flex;
   justify-content: center;
   align-items: center;
-  /* background: rgba(0, 0, 0, 0.1); */
-  /* background: linear-gradient(40deg,
-            rgba(252,104,45,1) 0%,
-            rgba(39,5,85,1) 100%,
-            rgba(242,5,87,1) 100%); */
-  background: linear-gradient(135deg, #f8f8f8 0%,#efefef 100%);
+  /* background: linear-gradient(135deg, #f8f8f8 0%,#efefef 100%); */
 }
 .component-fade-enter-active, .component-fade-leave-active {
   transition: opacity .3s ease;

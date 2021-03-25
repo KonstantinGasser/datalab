@@ -8,7 +8,7 @@ service AppService {
     rpc DeleteApp(DeleteAppRequest) returns (DeleteAppResponse) {}
     rpc GetApps(GetAppsRequest) returns (GetAppsResponse){}
     rpc GetByID(GetByIDRequest) returns (GetByIDResponse) {}
-    rpc AppendMember(AppendMemberRequest) returns (AppendMemberResponse) {}
+    rpc AddMember(AddMemberRequest) returns (AddMemberResponse) {}
     rpc RemoveMember(RemoveMemberRequest) returns (RemoveMemberResponse) {}
 }
 
@@ -22,12 +22,13 @@ message RemoveMemberResponse {
     string msg = 2;
 }
 
-message AppendMemberRequest {
+message AddMemberRequest {
     repeated string member = 1;
     string tracing_ID = 2;
     string app_uuid = 3;
+    string owner_uuid = 4;
 }
-message AppendMemberResponse {
+message AddMemberResponse {
     int32 status_code = 1;
     string msg = 2;
 }

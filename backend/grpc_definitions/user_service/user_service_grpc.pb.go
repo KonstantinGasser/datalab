@@ -23,6 +23,9 @@ type UserServiceClient interface {
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error)
 	GetUserByID(ctx context.Context, in *GetUserByIDRequest, opts ...grpc.CallOption) (*GetUserByIDResponse, error)
 	GetUsersByID(ctx context.Context, in *GetUsersByIDRequest, opts ...grpc.CallOption) (*GetUsersByIDResponse, error)
+	// Utils grpcs for other services
+	// AreInSameOrgn checks is passed in uuuids belong to compare_to uuuid
+	AreInSameOrgn(ctx context.Context, in *AreInSameOrgnRequest, opts ...grpc.CallOption) (*AreInSameOrgnResponse, error)
 }
 
 type userServiceClient struct {
@@ -78,6 +81,15 @@ func (c *userServiceClient) GetUsersByID(ctx context.Context, in *GetUsersByIDRe
 	return out, nil
 }
 
+func (c *userServiceClient) AreInSameOrgn(ctx context.Context, in *AreInSameOrgnRequest, opts ...grpc.CallOption) (*AreInSameOrgnResponse, error) {
+	out := new(AreInSameOrgnResponse)
+	err := c.cc.Invoke(ctx, "/user_service.UserService/AreInSameOrgn", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility
@@ -87,6 +99,9 @@ type UserServiceServer interface {
 	UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error)
 	GetUserByID(context.Context, *GetUserByIDRequest) (*GetUserByIDResponse, error)
 	GetUsersByID(context.Context, *GetUsersByIDRequest) (*GetUsersByIDResponse, error)
+	// Utils grpcs for other services
+	// AreInSameOrgn checks is passed in uuuids belong to compare_to uuuid
+	AreInSameOrgn(context.Context, *AreInSameOrgnRequest) (*AreInSameOrgnResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -108,6 +123,9 @@ func (UnimplementedUserServiceServer) GetUserByID(context.Context, *GetUserByIDR
 }
 func (UnimplementedUserServiceServer) GetUsersByID(context.Context, *GetUsersByIDRequest) (*GetUsersByIDResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUsersByID not implemented")
+}
+func (UnimplementedUserServiceServer) AreInSameOrgn(context.Context, *AreInSameOrgnRequest) (*AreInSameOrgnResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AreInSameOrgn not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 
@@ -212,6 +230,24 @@ func _UserService_GetUsersByID_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_AreInSameOrgn_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AreInSameOrgnRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).AreInSameOrgn(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user_service.UserService/AreInSameOrgn",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).AreInSameOrgn(ctx, req.(*AreInSameOrgnRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -238,6 +274,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUsersByID",
 			Handler:    _UserService_GetUsersByID_Handler,
+		},
+		{
+			MethodName: "AreInSameOrgn",
+			Handler:    _UserService_AreInSameOrgn_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

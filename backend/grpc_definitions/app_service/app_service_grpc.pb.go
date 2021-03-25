@@ -22,7 +22,7 @@ type AppServiceClient interface {
 	DeleteApp(ctx context.Context, in *DeleteAppRequest, opts ...grpc.CallOption) (*DeleteAppResponse, error)
 	GetApps(ctx context.Context, in *GetAppsRequest, opts ...grpc.CallOption) (*GetAppsResponse, error)
 	GetByID(ctx context.Context, in *GetByIDRequest, opts ...grpc.CallOption) (*GetByIDResponse, error)
-	AppendMember(ctx context.Context, in *AppendMemberRequest, opts ...grpc.CallOption) (*AppendMemberResponse, error)
+	AddMember(ctx context.Context, in *AddMemberRequest, opts ...grpc.CallOption) (*AddMemberResponse, error)
 	RemoveMember(ctx context.Context, in *RemoveMemberRequest, opts ...grpc.CallOption) (*RemoveMemberResponse, error)
 }
 
@@ -70,9 +70,9 @@ func (c *appServiceClient) GetByID(ctx context.Context, in *GetByIDRequest, opts
 	return out, nil
 }
 
-func (c *appServiceClient) AppendMember(ctx context.Context, in *AppendMemberRequest, opts ...grpc.CallOption) (*AppendMemberResponse, error) {
-	out := new(AppendMemberResponse)
-	err := c.cc.Invoke(ctx, "/app_service.AppService/AppendMember", in, out, opts...)
+func (c *appServiceClient) AddMember(ctx context.Context, in *AddMemberRequest, opts ...grpc.CallOption) (*AddMemberResponse, error) {
+	out := new(AddMemberResponse)
+	err := c.cc.Invoke(ctx, "/app_service.AppService/AddMember", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +96,7 @@ type AppServiceServer interface {
 	DeleteApp(context.Context, *DeleteAppRequest) (*DeleteAppResponse, error)
 	GetApps(context.Context, *GetAppsRequest) (*GetAppsResponse, error)
 	GetByID(context.Context, *GetByIDRequest) (*GetByIDResponse, error)
-	AppendMember(context.Context, *AppendMemberRequest) (*AppendMemberResponse, error)
+	AddMember(context.Context, *AddMemberRequest) (*AddMemberResponse, error)
 	RemoveMember(context.Context, *RemoveMemberRequest) (*RemoveMemberResponse, error)
 	mustEmbedUnimplementedAppServiceServer()
 }
@@ -117,8 +117,8 @@ func (UnimplementedAppServiceServer) GetApps(context.Context, *GetAppsRequest) (
 func (UnimplementedAppServiceServer) GetByID(context.Context, *GetByIDRequest) (*GetByIDResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetByID not implemented")
 }
-func (UnimplementedAppServiceServer) AppendMember(context.Context, *AppendMemberRequest) (*AppendMemberResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AppendMember not implemented")
+func (UnimplementedAppServiceServer) AddMember(context.Context, *AddMemberRequest) (*AddMemberResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddMember not implemented")
 }
 func (UnimplementedAppServiceServer) RemoveMember(context.Context, *RemoveMemberRequest) (*RemoveMemberResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RemoveMember not implemented")
@@ -208,20 +208,20 @@ func _AppService_GetByID_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AppService_AppendMember_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AppendMemberRequest)
+func _AppService_AddMember_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddMemberRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AppServiceServer).AppendMember(ctx, in)
+		return srv.(AppServiceServer).AddMember(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/app_service.AppService/AppendMember",
+		FullMethod: "/app_service.AppService/AddMember",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AppServiceServer).AppendMember(ctx, req.(*AppendMemberRequest))
+		return srv.(AppServiceServer).AddMember(ctx, req.(*AddMemberRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -268,8 +268,8 @@ var AppService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _AppService_GetByID_Handler,
 		},
 		{
-			MethodName: "AppendMember",
-			Handler:    _AppService_AppendMember_Handler,
+			MethodName: "AddMember",
+			Handler:    _AppService_AddMember_Handler,
 		},
 		{
 			MethodName: "RemoveMember",

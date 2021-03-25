@@ -78,7 +78,7 @@
     /* box-shadow: 0px 0px 5px 2px rgb(0,0,0, 0.1); */
     border: 1px solid #30363D;
     padding: 5px;
-    background: #0D1116;
+    background: #1E1E1E;
     display: grid;
     align-content: space-between; 
 }
