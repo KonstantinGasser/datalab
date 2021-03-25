@@ -19,7 +19,9 @@
     "vue-router": "^4.0.5",
     "vue-showdown": "^3.0.0",
     "vue-unicons": "^2.3.0",
-    "vuex": "^4.0.0-0"
+    "vuex": "^4.0.0-0",
+    "ssri": ">=8.0.1",
+    "is-svg": ">=4.2.2"
   },
   "devDependencies": {
     "@babel/polyfill": "^7.11.5",
