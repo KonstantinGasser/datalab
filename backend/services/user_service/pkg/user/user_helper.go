@@ -6,16 +6,17 @@ import (
 	"net/http"
 
 	"github.com/KonstantinGasser/clickstream/backend/services/user_service/pkg/storage"
-	"go.mongodb.org/mongo-driver/bson"
 )
 
 // Comparator can be used as base model with Comparable
 type Comparator struct {
-	// Filter can be used if data for comparison must first be loaded
-	// if nil presents of data in Value is expected.
-	Filter interface{}
+	// Fetch is a injected function which can be set if data must be loaded first.
+	// for example if the data must first be collected from a data store or else
+	Fetch func() (map[string]interface{}, error)
+
 	// By tells user.Comparator which field to compare with
 	By string
+
 	// Value holds the the key:value data against which the comparison
 	// needs to be performed
 	Value map[string]interface{}
@@ -23,20 +24,23 @@ type Comparator struct {
 
 // Comparable holds N items of type ComparableItem which should be checked against the Comparator
 type Comparable struct {
-	// Filter allows to query data for all ComparableItems
-	// can be used if you only have the user uuid and need different fields to compare against
-	// if Filter is nil then ALL items must have their value already initialized else they will be skipped
-	Filter interface{}
+	// Fetch can be used if the data to compare with the Comparator must first
+	// be fetched from somewhere else (like a data store)
+	Fetch func() ([]map[string]interface{}, error)
+
 	// filterResults should be an empty slice of bson.M in which the Filter will write the results
 	// can be nil if Filter is nil
-	filterResults []bson.M
+	filterResults []map[string]interface{}
+
 	// By is the key to the value which you want to compare (must be present in the return of the filter)
 	By string
+
 	// StorageID is used to map the misses with the correlating storage id
 	// for the caller to understand which item failed the comparison
 	// example in MongoDB you will get back the object id => StorageID: "_id" in oder to map the miss to an
 	// document
 	StorageID string
+
 	// Items holds all items which will be compared against the Comparator
 	Items []ComparableItem
 }
@@ -62,8 +66,9 @@ type CompareResult struct {
 }
 
 // Compare takes a Comparator and a Comparable type to perform checks wether the items in Comparable match the criteria in
-// the base model - the Comparator. If Comparator or Comparable provide a Filter the filter to get the data will first be queried from the storage.
-// In return the call receives a *CompareResult in which all invalid/miss-matched items and a total miss-mach count can be found
+// the base model - the Comparator. In case the data for both first needs to be loaded the injected Fetch
+// func will be executed to retrieve the data.
+// In return the caller receives a *CompareResult with all hits and misses.
 func (user user) Compare(ctx context.Context, storage storage.Storage, comparator Comparator, comparable Comparable) (int, *CompareResult, error) {
 
 	// CompareResult struct
@@ -74,15 +79,20 @@ func (user user) Compare(ctx context.Context, storage storage.Storage, comparato
 		MissItems:     []string{},
 	}
 	// query for value to compare with
-	if comparator.Filter != nil {
-		var compValue bson.M
-		if err := storage.FindOne(ctx, userDatabase, userCollection, comparator.Filter, &compValue); err != nil {
+	if comparator.Fetch != nil {
+		var err error
+		comparator.Value, err = comparator.Fetch()
+		if err != nil {
 			return http.StatusInternalServerError, nil, err
 		}
-		// assign queried value to comparator
-		comparator.Value = compValue
+		// var compValue bson.M
+		// if err := storage.FindOne(ctx, userDatabase, userCollection, comparator.Filter, &compValue); err != nil {
+		// 	return http.StatusInternalServerError, nil, err
+		// }
+		// // assign queried value to comparator
+		// logrus.Info(compValue)
+		// comparator.Value = compValue
 	}
-
 	// check if comparator.By exists in Value
 	if _, ok := comparator.Value[comparator.By]; !ok {
 		return http.StatusBadRequest, nil, fmt.Errorf("could not find key: %v in Value map", comparator.By)
@@ -90,12 +100,17 @@ func (user user) Compare(ctx context.Context, storage storage.Storage, comparato
 
 	// check if ComparableItems need to be queried
 	// if nil -> Comparable.Items.Value must not be null else they are skipped
-	if comparable.Filter != nil {
+	if comparable.Fetch != nil {
 		// query for Comparable.Item data
-		if err := storage.FindMany(ctx, userDatabase, userCollection, comparable.Filter, &comparable.filterResults); err != nil {
+		// if err := storage.FindMany(ctx, userDatabase, userCollection, comparable.Filter, &comparable.filterResults); err != nil {
+		// 	return http.StatusInternalServerError, nil, err
+		// }
+		// logrus.Warn(comparable.filterResults)
+		var err error
+		comparable.filterResults, err = comparable.Fetch()
+		if err != nil {
 			return http.StatusInternalServerError, nil, err
 		}
-
 		comparable.Items = make([]ComparableItem, len(comparable.filterResults))
 		for i, item := range comparable.filterResults {
 			// if storage.result.item does not have the Comparable.By key mark as error and skip

@@ -19,17 +19,32 @@ func (srv UserService) AreInSameOrgn(ctx context.Context, request *userSrv.AreIn
 
 	// create Comparator as base to compare values with
 	comparator := user.Comparator{
-		Filter: bson.M{"_id": request.GetCompareTo()},
-		By:     "orgn_domain",
-		Value:  map[string]interface{}{}, // since the Filter is provided the Value will be assigned with the queried data
+		Fetch: func() (map[string]interface{}, error) {
+			var data map[string]interface{}
+			err := srv.storage.FindOne(ctx, "datalabs_user", "user", bson.D{{"_id", request.GetCompareTo()}}, &data)
+			if err != nil {
+				return nil, err
+			}
+			return data, nil
+		},
+		By:    "orgn_domain",
+		Value: map[string]interface{}{}, // since the Filter is provided the Value will be assigned with the queried data
 	}
 	// create Comparable from the request data
 	comparable := user.Comparable{
-		// Filter selects all users by the uuid given in the request and returns only the orgn_domain
-		Filter: bson.D{
-			{"_id", bson.M{"$in": request.GetValues()}},
-			// {"orgn_domain", 1},
+		Fetch: func() ([]map[string]interface{}, error) {
+			var data []map[string]interface{}
+			err := srv.storage.FindMany(ctx, "datalabs_user", "user", bson.D{{"_id", bson.M{"$in": request.GetValues()}}}, &data)
+			if err != nil {
+				return nil, err
+			}
+			return data, nil
 		},
+		// // Filter selects all users by the uuid given in the request and returns only the orgn_domain
+		// Filter: bson.D{
+		// 	{"_id", bson.M{"$in": request.GetValues()}},
+		// 	{"projection", bson.M{"orgn_domain": 1}},
+		// },
 		By:        "orgn_domain",
 		StorageID: "_id",
 	}
