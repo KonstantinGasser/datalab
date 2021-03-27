@@ -12,11 +12,11 @@ import (
 // GetApps serves as the grpc implementation to retrieve all apps created by the logged in user
 func (srv AppService) GetAppList(ctx context.Context, request *appSrv.GetAppListRequest) (*appSrv.GetAppListResponse, error) {
 	ctx = ctx_value.AddValue(ctx, "tracingID", request.GetTracing_ID())
-	logrus.Infof("<%v>[appService.GetApps] received get apps request\n", ctx_value.GetString(ctx, "tracingID"))
+	logrus.Infof("<%v>[appService.GetAppList] received request\n", ctx_value.GetString(ctx, "tracingID"))
 
 	status, result, err := srv.app.GetAppList(ctx, srv.storage, request.GetCallerUuid())
 	if err != nil {
-		logrus.Errorf("<%v>[appService.GetApps] could not get apps: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
+		logrus.Errorf("<%v>[appService.GetAppList] could not get apps: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
 		return &appSrv.GetAppListResponse{StatusCode: int32(status), Msg: "could not get list of apps", AppList: []*appSrv.SimpleApp{}}, nil
 	}
 

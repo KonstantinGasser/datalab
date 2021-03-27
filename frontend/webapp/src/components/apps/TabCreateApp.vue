@@ -126,9 +126,6 @@
                         this.$toast.error("Sorry app could not be created");
                         return;
                     });
-
-                    // this.$toast.success("App " + this.appName + " has been created");
-                    // this.$emit("tabChange", "App Token");
                 }
             },
         },

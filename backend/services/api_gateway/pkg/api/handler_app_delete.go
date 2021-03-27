@@ -19,7 +19,7 @@ type DataAppDelete struct {
 // Involved services:
 // - App-Service
 func (api API) HandlerAppDelete(w http.ResponseWriter, r *http.Request) {
-	logrus.Infof("<%v>[api.HandlerAppDelete] received delete app request\n", ctx_value.GetString(r.Context(), "tracingID"))
+	logrus.Infof("<%v>[api.HandlerAppDelete] received request\n", ctx_value.GetString(r.Context(), "tracingID"))
 
 	user := ctx_value.GetAuthedUser(r.Context())
 	if user == nil {

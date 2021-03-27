@@ -26,7 +26,7 @@ type User interface {
 	// GetByID collects all user details for the given UUID
 	GetByID(ctx context.Context, storage storage.Storage, UUID string) (int, UserItem, error)
 	// CompareUsers compares users based on some indicator
-	Compare(ctx context.Context, storage storage.Storage, comparator Comparator, comparable Comparable) (int, *CompareResult, error)
+	VerifySameOrgn(ctx context.Context, storage storage.Storage, baseObject string, compareWith []string) (int, bool, []string, error)
 }
 
 type user struct{}

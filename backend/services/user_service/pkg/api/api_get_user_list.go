@@ -12,11 +12,11 @@ func (srv UserService) GetUserList(ctx context.Context, request *userSrv.GetUser
 	// add tracingID to context
 	ctx = ctx_value.AddValue(ctx, "tracingID", request.GetTracing_ID())
 
-	logrus.Infof("<%v>[userService.GetUsersByID] received get users by id request\n", ctx_value.GetString(ctx, "tracingID"))
+	logrus.Infof("<%v>[userService.GetUserList] received request\n", ctx_value.GetString(ctx, "tracingID"))
 
 	status, userList, err := srv.user.GetByIDs(ctx, srv.storage, request.GetUuidList())
 	if err != nil {
-		logrus.Errorf("<%v>[userService.GetUsersByID] could not execute GetByIDs: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
+		logrus.Errorf("<%v>[userService.GetUserList] could not execute GetByIDs: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
 		return &userSrv.GetUserListResponse{StatusCode: int32(status), Msg: "Could not get users information", UserList: []*userSrv.ComplexUser{}}, nil
 	}
 

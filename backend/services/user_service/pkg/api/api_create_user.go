@@ -16,7 +16,7 @@ import (
 // CreateUser receives the grpc request and handles user registration
 func (srv UserService) CreateUser(ctx context.Context, request *userSrv.CreateUserRequest) (*userSrv.CreateUserResponse, error) {
 	ctx = ctx_value.AddValue(ctx, "tracingID", request.GetTracing_ID())
-	logrus.Infof("<%v>[userService.CreateUser] received  create-user request\n", ctx_value.GetString(ctx, "tracingID"))
+	logrus.Infof("<%v>[userService.CreateUser] received request\n", ctx_value.GetString(ctx, "tracingID"))
 
 	// create unique user UUID (also used as pk _id for mongo document) and hash password
 	uuid, err := unique.UUID()

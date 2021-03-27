@@ -15,10 +15,10 @@ func (srv TokenService) VerifyUserToken(ctx context.Context, request *tokenSrv.V
 	// add tracingID from request to context
 	ctx = ctx_value.AddValue(ctx, "tracingID", request.GetTracing_ID())
 
-	logrus.Infof("<%v>[tokenService.ValidateJWT] received validation of JWT request\n", ctx_value.GetString(ctx, "tracingID"))
+	logrus.Infof("<%v>[tokenService.VerifyUserToken] received request\n", ctx_value.GetString(ctx, "tracingID"))
 	userInfo, err := jwts.GetJWTClaims(ctx, request.GetUserToken())
 	if err != nil {
-		logrus.Errorf("<%v>[tokenService.ValidateJWT] could not get JWT claims: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
+		logrus.Errorf("<%v>[tokenService.VerifyUserToken] could not get JWT claims: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
 		return &tokenSrv.VerifyUserTokenResponse{
 			StatusCode: http.StatusForbidden,
 			Msg:        "user is not authenticated",

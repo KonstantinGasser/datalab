@@ -15,7 +15,7 @@ import (
 func (srv UserService) UpdateUser(ctx context.Context, request *userSrv.UpdateUserRequest) (*userSrv.UpdateUserResponse, error) {
 	// add tracingID to context
 	ctx = ctx_value.AddValue(ctx, "tracingID", request.GetTracing_ID())
-	logrus.Infof("<%v>[userService.UpdateUser] received update user request\n", ctx_value.GetString(ctx, "tracingID"))
+	logrus.Infof("<%v>[userService.UpdateUser] received request\n", ctx_value.GetString(ctx, "tracingID"))
 
 	status, err := srv.user.Update(ctx, srv.storage, user.UserItemUpdateable{
 		UUID:          request.GetCallerUuid(),

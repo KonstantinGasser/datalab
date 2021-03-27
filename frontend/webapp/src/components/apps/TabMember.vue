@@ -7,9 +7,10 @@
             </div>
         </div>
         <div class="d-flex flex-wrap">
-            <div v-for="dummy in latestMemberList" :key="dummy.uuid" class="user_card">
-                <div class="d-flex align-center justify-end">
-                    <div @click="removeMember(dummy.id)">
+            <div v-for="dummy in latestMemberList" :key="dummy.uuid" class="user_card" :class="(loggedIn().sub === dummy.uuid)? 'is_owner': ''">
+                <div class="d-flex align-center justify-evenly">
+                    <span class="member_name dots">Konstantin Gasser</span>
+                    <div v-if="loggedIn().sub !== dummy.uuid" @click="removeMember(dummy.uuid)">
                         <span class="icon icon-user-minus hover big"></span>
                     </div>
                 </div>
@@ -17,7 +18,9 @@
                     <img class="circle-img medium" :src="dummy.profile_img_url" alt="">
                 </div>
                 <div class="member_info">
-                    <span class="member_name dots">{{dummy.first_name}} {{dummy.last_name}}</span>
+
+                    <span class="member_name dots">@{{dummy.username}}</span>
+                    <!-- <span class="member_name dots">{{dummy.first_name}} {{dummy.last_name}}</span> -->
                     <span class="member_pos dots">{{dummy.orgn_position}}</span>
                 </div>
             </div>
@@ -47,7 +50,7 @@
         },
         computed: {
             latestMemberList() {
-                return this.latest_member_list;
+                return this.latest_member_list.reverse();
             }
         },
         methods: {
@@ -58,13 +61,23 @@
                 this.$emit('inEdit', this.isEdit);
             },
             removeMember(id) {
-                this.dummyMember = this.dummyMember.filter(item => item.id !== id);
+                this.dummyMember = this.dummyMember.filter(item => item.uuid !== id);
             },
             addMember() {
                 this.showSelectMember = !this.showSelectMember;
                 // const id = this.dummyMember.length > 0 ? this.dummyMember[this.dummyMember.length -1].id+1 : 1;
                 // this.dummyMember.push({id: id});
-            }
+            },
+            loggedIn () {
+                const token = localStorage.getItem("token");
+                var base64Url = token.split('.')[1];
+                var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+
+                return JSON.parse(jsonPayload);
+            },
         },
     };
 </script>
@@ -82,7 +95,9 @@
     display: grid;
     align-content: space-between; 
 }
-
+.user_card.is_owner {
+    border: 1px solid #10d574;
+}
 .user_card .member_info {
     display: grid;
     justify-content: center;

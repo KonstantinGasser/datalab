@@ -25,7 +25,7 @@ type DataRegister struct {
 // Involved services:
 //	- User-Service
 func (api API) HandlerUserRegister(w http.ResponseWriter, r *http.Request) {
-	logrus.Infof("<%v>[api.HandlerRegister] received user-register request: %v\n", ctx_value.GetString(r.Context(), "tracingID"), r.Host)
+	logrus.Infof("<%v>[api.HandlerRegister] received request: %v\n", ctx_value.GetString(r.Context(), "tracingID"), r.Host)
 
 	var payload DataRegister
 	if err := api.decode(r.Body, &payload); err != nil {

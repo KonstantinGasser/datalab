@@ -15,7 +15,7 @@ import (
 func (srv AppService) CreateApp(ctx context.Context, request *appSrv.CreateAppRequest) (*appSrv.CreateAppResponse, error) {
 	// add tracingID from request to context
 	ctx = ctx_value.AddValue(ctx, "tracingID", request.GetTracing_ID())
-	logrus.Infof("<%v>[appService.CreateApp] received create app request\n", ctx_value.GetString(ctx, "tracingID"))
+	logrus.Infof("<%v>[appService.CreateApp] received request\n", ctx_value.GetString(ctx, "tracingID"))
 
 	appUUID, err := unique.UUID()
 	if err != nil {

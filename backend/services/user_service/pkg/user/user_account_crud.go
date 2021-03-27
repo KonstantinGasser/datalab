@@ -85,3 +85,39 @@ func (user user) GetByID(ctx context.Context, storage storage.Storage, UUID stri
 	}
 	return http.StatusOK, userItem, nil
 }
+
+func (user user) VerifySameOrgn(ctx context.Context, storage storage.Storage, baseObject string, compareWith []string) (int, bool, []string, error) {
+	// create Comparator as base to compare values with
+	comparator := Comparator{
+		Fetch: func() (map[string]interface{}, error) {
+			var data map[string]interface{}
+			err := storage.FindOne(ctx, userDatabase, userCollection, bson.D{{"_id", baseObject}}, &data)
+			if err != nil {
+				return nil, err
+			}
+			return data, nil
+		},
+		By:    "orgn_domain",
+		Value: map[string]interface{}{}, // since the Fetch is provided the Value will be assigned with the queried data
+	}
+	// create Comparable from the request data
+	comparable := Comparable{
+		Fetch: func() ([]map[string]interface{}, error) {
+			var data []map[string]interface{}
+			err := storage.FindMany(ctx, userDatabase, userCollection, bson.D{{"_id", bson.M{"$in": compareWith}}}, &data)
+			if err != nil {
+				return nil, err
+			}
+			return data, nil
+		},
+		By:        "orgn_domain",
+		StorageID: "_id",
+		// used to cross-check if all users have been found else comparison will tell false
+		ExpectedCount: len(compareWith),
+	}
+	status, comparison, err := user.compareByField(ctx, storage, comparator, comparable)
+	if err != nil {
+		return status, false, nil, err
+	}
+	return status, comparison.TruthfulValid, comparison.MissItems, nil
+}

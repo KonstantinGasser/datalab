@@ -5,7 +5,7 @@
                 <button @click="modeCreateApp()" class="btn btn-standard">Create new App <span class="icon icon-plus"></span></button>
             </div>
             <div class="app_name_list">
-                <p class="info-text" v-if="app_list === null || app_list.length === 0">
+                <p class="info-text" v-if="app_list == null || app_list.length === 0">
                     Mhm looks like you do not have any apps yet - <a @click="modeCreateApp()">go create one!</a>
                 </p>
                 <div class="app-name d-flex justify-between align-center" v-for="app in app_list" :key="app.uuid">
@@ -43,7 +43,6 @@
                 return this.tabsBlocked;
             },
             showCreateApp() {
-                console.log("From computed: ", this.isInCreateMode);
                 return this.isInCreateMode;
             },
             app_list() {
@@ -52,7 +51,7 @@
         },
         data() {
             return {
-                isInCreateMode: true, // change back to false once api works again. true just to check on the other views
+                isInCreateMode: false, // change back to false once api works again. true just to check on the other views
                 activeTab: 'App Token',
                 tabsBlocked: false,
                 newApp: { name: '' },
@@ -60,14 +59,11 @@
                 activeApp: {},
             };
         },
-        mounted() {
+        async created() {
             // fetch initial data
             this.getAppDetails().then(data => {
                 this.apps = data.app_list;
                 this.activeApp = data.app_details;
-                console.log("data: ", data);
-                console.log("APP: ", this.activeApp);
-                console.log("LIST: ", this.app_list);
                 if (this.apps == null || this.apps.length === 0) {
                     this.isInCreateMode = true;
                 } else {
@@ -76,8 +72,10 @@
                 }
                 // if (this.app !== null && this.apps.length === 0) this.isInCreateMode = true;
             }).catch(error => {
-                // if apps can not be loaded display panel to create a new app
-                console.log("could not get apps");
+               if (err.response.status === 401) {
+                        localStorage.removeItem('token');
+                        this.$router.replace({ name: 'login' });
+                }
                 this.isInCreateMode = true;
             });
             
@@ -90,6 +88,10 @@
                         this.isInCreateMode = false;
                         // update app list on the left to show newly created app
                         this.getAppDetails().then(data => {
+                            if (err.response.status === 401) {
+                                localStorage.removeItem('token');
+                                this.$router.replace({ name: 'login' });
+                            }
                             this.apps = data.app_list;
                         }).catch(err => {
                             console.log(err);
@@ -103,22 +105,7 @@
                 this.isInCreateMode = false;
                 
             },
-            fetchAppDetails(uuid) {
-                let options = {
-                    headers: {
-                        'Authorization': localStorage.getItem("token"),
-                    }
-                };
-                axios.get("http://localhost:8080/api/v1/app/getbyid?uuid="+uuid, options).then(resp => {
-                    console.log(resp);
-                }).catch(err => {
-                    console.log("Get By ID: ", err);
-                });
-                
-            },
             modeCreateApp() {
-                console.log("modeCreateApp: one");
-                // this.enableDisableTabs();
                 this.isInCreateMode = true;
             },
             async getAppDetails() {
@@ -128,11 +115,10 @@
                     }
                 };
                 const res = await axios.get("http://localhost:8080/api/v2/view/app/details", options)
-                console.log(res);
                 if (res.data == null || res.status >= 400) {
                     this.isInCreateMode = true;
                     console.log(this.isInCreateMode);
-                    return [];
+                    return null;
                 }
                 return res.data;
                 
@@ -148,7 +134,10 @@
                         app_uuid: id,
                     }, options
                 ).then((resp) => {
-                    console.log("Resp ",resp)
+                    if (resp.status == 200) {
+                        this.$toast.success("App has been deleted");
+                        this.apps = this.apps.filter(item => item.uuid != id);
+                    }
                 }).catch(err => {
                     this.$toast.warning("Sorry app could not be removed");
                     return;

@@ -42,6 +42,12 @@ type Comparable struct {
 	// document
 	StorageID string
 
+	// ExpectedCount is used to verify the correctness for the comparison.
+	// Use-Case: query queries for 4 documents, one document is not the database
+	// len(Comparable.Item) = 3 -> comparison will evaluate to true even though
+	// one document was not found. If set to -1 check will be ignored
+	ExpectedCount int
+
 	// Items holds all items which will be compared against the Comparator
 	Items []ComparableItem
 }
@@ -70,7 +76,7 @@ type CompareResult struct {
 // the base model - the Comparator. In case the data for both first needs to be loaded the injected Fetch
 // func will be executed to retrieve the data.
 // In return the caller receives a *CompareResult with all hits and misses.
-func (user user) Compare(ctx context.Context, storage storage.Storage, comparator Comparator, comparable Comparable) (int, *CompareResult, error) {
+func (user user) compareByField(ctx context.Context, storage storage.Storage, comparator Comparator, comparable Comparable) (int, *CompareResult, error) {
 
 	// CompareResult struct
 	var resultSet CompareResult = CompareResult{
@@ -100,6 +106,14 @@ func (user user) Compare(ctx context.Context, storage storage.Storage, comparato
 		if err != nil {
 			return http.StatusInternalServerError, nil, err
 		}
+		// verify that fetched data slice is of length provided by the ExpectedCount
+		// if it is not the default value uint - zero
+		if comparable.ExpectedCount != -1 && comparable.ExpectedCount != len(comparable.fetchResults) {
+			// mark as dirty
+			resultSet.TruthfulValid = false
+			return http.StatusBadRequest, &resultSet, nil
+		}
+
 		comparable.Items = make([]ComparableItem, len(comparable.fetchResults))
 		for i, item := range comparable.fetchResults {
 			// if storage.result.item does not have the Comparable.By key mark as error and skip
