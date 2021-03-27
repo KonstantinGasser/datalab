@@ -3,7 +3,7 @@ package api
 import (
 	"context"
 
-	appSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/app_service"
+	appSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/app_service"
 	"github.com/KonstantinGasser/clickstream/utils/ctx_value"
 	"github.com/sirupsen/logrus"
 )

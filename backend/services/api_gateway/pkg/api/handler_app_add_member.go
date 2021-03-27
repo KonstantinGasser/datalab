@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 
-	appSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/app_service"
+	appSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/app_service"
 
 	"github.com/KonstantinGasser/clickstream/utils/ctx_value"
 	"github.com/sirupsen/logrus"
@@ -36,7 +36,7 @@ func (api API) HandlerAppAddMember(w http.ResponseWriter, r *http.Request) {
 	// invoke grpc to app service added new user
 	resp, err := api.AppServiceClient.AddMember(r.Context(), &appSrv.AddMemberRequest{
 		Tracing_ID: ctx_value.GetString(r.Context(), "tracingID"),
-		OwnerUuid:  user.GetUuid(),
+		CallerUuid: user.GetUuid(),
 		AppUuid:    payload.AppUUID,
 		Member:     payload.Member,
 	})

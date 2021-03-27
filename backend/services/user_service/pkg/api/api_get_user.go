@@ -3,30 +3,29 @@ package api
 import (
 	"context"
 
-	userSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/user_service"
+	userSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/user_service"
 	"github.com/KonstantinGasser/clickstream/utils/ctx_value"
 	"github.com/sirupsen/logrus"
 )
 
-func (srv UserService) GetUserByID(ctx context.Context, request *userSrv.GetUserByIDRequest) (*userSrv.GetUserByIDResponse, error) {
+func (srv UserService) GetUser(ctx context.Context, request *userSrv.GetUserRequest) (*userSrv.GetUserResponse, error) {
 	// add tracingID to context
 	ctx = ctx_value.AddValue(ctx, "tracingID", request.GetTracing_ID())
 
 	logrus.Infof("<%v>[userService.GetUserByID] received get user by id request\n", ctx_value.GetString(ctx, "tracingID"))
 
-	status, user, err := srv.user.GetByID(ctx, srv.storage, request.GetUuid())
+	status, user, err := srv.user.GetByID(ctx, srv.storage, request.GetForUuid())
 	if err != nil {
 		logrus.Errorf("<%v>[userService.GetUserByID] could not get user details: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
-		return &userSrv.GetUserByIDResponse{StatusCode: int32(status), Msg: err.Error(), User: nil}, nil
+		return &userSrv.GetUserResponse{StatusCode: int32(status), Msg: err.Error(), User: nil}, nil
 	}
 	if status != 200 {
-		return &userSrv.GetUserByIDResponse{StatusCode: int32(status), Msg: err.Error(), User: nil}, nil
+		return &userSrv.GetUserResponse{StatusCode: int32(status), Msg: err.Error(), User: nil}, nil
 	}
-	logrus.Warn(user.ProfileImgURL)
-	return &userSrv.GetUserByIDResponse{
+	return &userSrv.GetUserResponse{
 		StatusCode: int32(status),
 		Msg:        "requested user found",
-		User: &userSrv.User{
+		User: &userSrv.ComplexUser{
 			Uuid:          user.UUID,
 			Username:      user.Username,
 			FirstName:     user.FirstName,

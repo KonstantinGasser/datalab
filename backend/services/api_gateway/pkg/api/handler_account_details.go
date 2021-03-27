@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 
-	userSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/user_service"
+	userSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/user_service"
 	"github.com/KonstantinGasser/clickstream/utils/ctx_value"
 	"github.com/sirupsen/logrus"
 )
@@ -21,9 +21,10 @@ func (api API) HandlerAccountDetails(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// invoke grpc call to retrieve user information
-	resp, err := api.UserSrvClient.GetUserByID(r.Context(), &userSrv.GetUserByIDRequest{
+	resp, err := api.UserSrvClient.GetUser(r.Context(), &userSrv.GetUserRequest{
 		Tracing_ID: ctx_value.GetString(r.Context(), "tracingID"),
-		Uuid:       user.GetUuid(),
+		CallerUuid: user.GetUuid(),
+		ForUuid:    user.GetUuid(),
 	})
 	if err != nil {
 		logrus.Errorf("<%v>[api.HandlerUserGetByID] could not execute grpc.GetUserByID: %v\n", ctx_value.GetString(r.Context(), "tracingID"), err)

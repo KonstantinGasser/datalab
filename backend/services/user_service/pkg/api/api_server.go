@@ -3,7 +3,7 @@ package api
 import (
 	"time"
 
-	userSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/user_service"
+	userSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/user_service"
 	"github.com/KonstantinGasser/clickstream/backend/services/user_service/pkg/storage"
 	"github.com/KonstantinGasser/clickstream/backend/services/user_service/pkg/user"
 )

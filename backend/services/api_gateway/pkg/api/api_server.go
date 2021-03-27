@@ -8,9 +8,9 @@ import (
 	"net/http"
 	"net/url"
 
-	appSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/app_service"
-	tokenSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/token_service"
-	userSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/user_service"
+	appSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/app_service"
+	tokenSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/token_service"
+	userSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/user_service"
 	"github.com/KonstantinGasser/clickstream/backend/services/api_gateway/pkg/grpcC"
 	"github.com/sirupsen/logrus"
 )

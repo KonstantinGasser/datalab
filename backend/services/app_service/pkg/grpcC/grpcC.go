@@ -1,7 +1,7 @@
 package grpcC
 
 import (
-	userSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/user_service"
+	userSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/user_service"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )

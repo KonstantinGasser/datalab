@@ -2,55 +2,26 @@ syntax = "proto3";
 
 package app_service;
 
-import "grpc_definitions/models.proto"; 
 
 service AppService {
     rpc CreateApp(CreateAppRequest) returns (CreateAppResponse) {}
     rpc DeleteApp(DeleteAppRequest) returns (DeleteAppResponse) {}
-    rpc GetApps(GetAppsRequest) returns (GetAppsResponse){}
-    rpc GetByID(GetByIDRequest) returns (GetByIDResponse) {}
-    rpc AppendMember(AppendMemberRequest) returns (AppendMemberResponse) {}
+
+    rpc GetAppList(GetAppListRequest) returns (GetAppListResponse) {}
+    rpc GetApp(GetAppRequest) returns (GetAppResponse) {}
+
+    rpc AddMember(AddMemberRequest) returns (AddMemberResponse) {}
     rpc RemoveMember(RemoveMemberRequest) returns (RemoveMemberResponse) {}
 }
 
-message RemoveMemberRequest {
-    string member_uuid = 1;
-    string tracing_ID = 2;
-    string app_uuid = 3;
-}
-message RemoveMemberResponse {
-    int32 status_code = 1;
-    string msg = 2;
-}
 
-message AppendMemberRequest {
-    repeated string member = 1;
-    string tracing_ID = 2;
-    string app_uuid = 3;
-}
-message AppendMemberResponse {
-    int32 status_code = 1;
-    string msg = 2;
-}
-
-message DeleteAppRequest {
-    string app_uuid = 1;
-    string tracing_ID = 2;
-}
-
-message DeleteAppResponse {
-    int32 status_code = 1;
-    string msg = 2;
-}
+// RPC CREATE APP
 message CreateAppRequest {
-    string owner_uuid = 1;
-    string name = 2;
-    string organization = 3;
-    // light distributed tracing ID - light because it serves the propose  of developing
-    // because it is super dope what I am doing
-    string tracing_ID = 4;
+    string tracing_ID = 1;
+    string owner_uuid = 2;
+    string name = 3;
+    string organization = 4;
     string description = 5;
-    // member == user uuid
     repeated string member = 6;
     repeated string settings = 7;
 }
@@ -59,29 +30,105 @@ message CreateAppResponse {
     string msg = 2;
     string app_uuid = 3;
 }
+// ***************************
 
-message GetAppsRequest {
-    string user_uuid = 1;
-    // light distributed tracing ID - light because it serves the propose  of developing
-    // because it is super dope what I am doing
-    string tracing_ID = 4;
+// RPC DELETE APP
+message DeleteAppRequest {
+    string tracing_ID = 1;
+    string app_uuid = 2;
+    string caller_uuid = 3;
 }
-message GetAppsResponse {
+
+message DeleteAppResponse {
     int32 status_code = 1;
     string msg = 2;
-    repeated models.LightAppModel apps = 3;
 }
+// ***************************
 
-message GetByIDRequest {
-    string app_uuid = 1;
-    string tracing_ID = 4;
+// RPC GET APP LIST
+message GetAppListRequest {
+    string tracing_ID = 1;
+    string caller_uuid = 2;
 }
-
-message GetByIDResponse {
+message GetAppListResponse {
     int32 status_code = 1;
     string msg = 2;
-    models.AppModel data = 3;
+    repeated SimpleApp app_list = 3;
+}
+// ***************************
+
+// RPC GET APP
+message GetAppRequest {
+    string tracing_ID = 1;
+    string app_uuid = 2;
+    string caller_uuid = 3;
 }
 
+message GetAppResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    ComplexApp app = 3;
+}
+// ***************************
+
+// RPC ADD MEMBER
+message AddMemberRequest {
+    string tracing_ID = 1;
+    string app_uuid = 2;
+    string caller_uuid = 3;
+    repeated string member = 4;
+}
+message AddMemberResponse {
+    int32 status_code = 1;
+    string msg = 2;
+}
+// ***************************
+
+// RPC REMOVE MEMBER
+message RemoveMemberRequest {
+    string tracing_ID = 1;
+    string app_uuid = 2;
+    string caller_uuid = 3;
+    string member_uuid = 4;
+}
+message RemoveMemberResponse {
+    int32 status_code = 1;
+    string msg = 2;
+}
+// ***************************
+
+
+
+
+
+
+// common types
+message ComplexApp {
+    string name = 1;
+    string description = 2;
+    ComplexUser owner = 3;
+    repeated ComplexUser member = 4;
+    repeated string settings = 5;
+    string app_token = 6;
+}
+
+message SimpleApp {
+    string name = 1;
+    string uuid = 2;
+}
+
+message ComplexUser {
+    string uuid = 1;
+    string username = 2;
+    string first_name = 3;
+    string last_name = 4;
+    string orgn_domain = 5;
+    string orgn_position = 6;
+    string profile_img_url = 7;
+}
+
+message SimpleUser {
+    string uuid = 1;
+}
 
 

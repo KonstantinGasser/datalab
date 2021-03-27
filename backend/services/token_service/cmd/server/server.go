@@ -4,7 +4,7 @@ import (
 	"context"
 	"net"
 
-	tokenSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/token_service"
+	tokenSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/token_service"
 	"github.com/KonstantinGasser/clickstream/backend/services/token_service/pkg/api"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 
-	appSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/app_service"
+	appSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/app_service"
 	"github.com/KonstantinGasser/clickstream/utils/ctx_value"
 	"github.com/sirupsen/logrus"
 )
@@ -21,6 +21,12 @@ type DataAppDelete struct {
 func (api API) HandlerAppDelete(w http.ResponseWriter, r *http.Request) {
 	logrus.Infof("<%v>[api.HandlerAppDelete] received delete app request\n", ctx_value.GetString(r.Context(), "tracingID"))
 
+	user := ctx_value.GetAuthedUser(r.Context())
+	if user == nil {
+		logrus.Errorf("<%v>[api.HandlerAppDelete] could not get user-claims, they are nil\n", ctx_value.GetString(r.Context(), "tracingID"))
+		api.onError(w, errors.New("could not find user claims"), http.StatusUnauthorized)
+		return
+	}
 	var payload DataAppDelete
 	if err := api.decode(r.Body, &payload); err != nil {
 		logrus.Errorf("<%v>[api.HandlerDeleteApp] could not decode r.Body: %v\n", ctx_value.GetString(r.Context(), "tracingID"), err)
@@ -29,7 +35,9 @@ func (api API) HandlerAppDelete(w http.ResponseWriter, r *http.Request) {
 	}
 	// invoke grpc call to user-service to delete app
 	resp, err := api.AppServiceClient.DeleteApp(r.Context(), &appSrv.DeleteAppRequest{
-		AppUuid: payload.AppUUID,
+		Tracing_ID: ctx_value.GetString(r.Context(), "tracingID"),
+		AppUuid:    payload.AppUUID,
+		CallerUuid: user.GetUuid(),
 	})
 	if err != nil {
 		logrus.Errorf("<%v>[api.HandlerDeleteApp] could execute grpc.DeleteApp %v\n", ctx_value.GetString(r.Context(), "tracingID"), err)

@@ -4,7 +4,7 @@ import (
 	"context"
 	"net"
 
-	userSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/user_service"
+	userSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/user_service"
 	"github.com/KonstantinGasser/clickstream/backend/services/user_service/pkg/api"
 	"github.com/KonstantinGasser/clickstream/backend/services/user_service/pkg/storage"
 	"github.com/sirupsen/logrus"

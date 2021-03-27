@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	tokenSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/token_service"
+	tokenSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/token_service"
 	"github.com/KonstantinGasser/clickstream/utils/ctx_value"
 	"github.com/gofrs/uuid"
 	"github.com/sirupsen/logrus"
@@ -48,22 +48,22 @@ func (api API) WithAuth(next http.HandlerFunc) http.HandlerFunc {
 		// invoke grpc call to token-service to validate a JWT
 		// ctx := context.WithTimeout(r.Context(), authTimeout)
 		// defer cancel()
-		resp, err := api.TokenSrvClient.ValidateJWT(r.Context(), &tokenSrv.ValidateJWTRequest{
-			JwtToken:   token,
+		resp, err := api.TokenSrvClient.VerifyUserToken(r.Context(), &tokenSrv.VerifyUserTokenRequest{
 			Tracing_ID: ctx_value.GetString(r.Context(), "tracingID"),
+			UserToken:  token,
 		})
 		if err != nil {
 			logrus.Errorf("<%v>[api.WithAuth] could not execute grpc.ValidateJWT: %v", ctx_value.GetString(r.Context(), "tracingID"), err)
 			api.onError(w, errors.New("could not execute authentication"), http.StatusInternalServerError)
 			return
 		}
-		if resp.GetStatusCode() != http.StatusOK || !resp.GetIsValid() || resp.GetUser() == nil {
+		if resp.GetStatusCode() != http.StatusOK || resp.GetClaim() == nil {
 			logrus.Warnf("<%v>[api.WithAuth] %s is not authenticated: %v", ctx_value.GetString(r.Context(), "tracingID"), r.Host, resp.GetMsg())
 			api.onError(w, errors.New("not authenticated"), http.StatusUnauthorized)
 			return
 		}
 		// add JWT claims of user in r.Context()
-		ctxWithVal := ctx_value.AddValue(r.Context(), "user", resp.GetUser())
+		ctxWithVal := ctx_value.AddValue(r.Context(), "user", resp.GetClaim())
 		// serve request with user claims in context
 		next(w, r.WithContext(ctxWithVal))
 	}

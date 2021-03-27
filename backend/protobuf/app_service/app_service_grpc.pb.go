@@ -20,8 +20,8 @@ const _ = grpc.SupportPackageIsVersion7
 type AppServiceClient interface {
 	CreateApp(ctx context.Context, in *CreateAppRequest, opts ...grpc.CallOption) (*CreateAppResponse, error)
 	DeleteApp(ctx context.Context, in *DeleteAppRequest, opts ...grpc.CallOption) (*DeleteAppResponse, error)
-	GetApps(ctx context.Context, in *GetAppsRequest, opts ...grpc.CallOption) (*GetAppsResponse, error)
-	GetByID(ctx context.Context, in *GetByIDRequest, opts ...grpc.CallOption) (*GetByIDResponse, error)
+	GetAppList(ctx context.Context, in *GetAppListRequest, opts ...grpc.CallOption) (*GetAppListResponse, error)
+	GetApp(ctx context.Context, in *GetAppRequest, opts ...grpc.CallOption) (*GetAppResponse, error)
 	AddMember(ctx context.Context, in *AddMemberRequest, opts ...grpc.CallOption) (*AddMemberResponse, error)
 	RemoveMember(ctx context.Context, in *RemoveMemberRequest, opts ...grpc.CallOption) (*RemoveMemberResponse, error)
 }
@@ -52,18 +52,18 @@ func (c *appServiceClient) DeleteApp(ctx context.Context, in *DeleteAppRequest, 
 	return out, nil
 }
 
-func (c *appServiceClient) GetApps(ctx context.Context, in *GetAppsRequest, opts ...grpc.CallOption) (*GetAppsResponse, error) {
-	out := new(GetAppsResponse)
-	err := c.cc.Invoke(ctx, "/app_service.AppService/GetApps", in, out, opts...)
+func (c *appServiceClient) GetAppList(ctx context.Context, in *GetAppListRequest, opts ...grpc.CallOption) (*GetAppListResponse, error) {
+	out := new(GetAppListResponse)
+	err := c.cc.Invoke(ctx, "/app_service.AppService/GetAppList", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *appServiceClient) GetByID(ctx context.Context, in *GetByIDRequest, opts ...grpc.CallOption) (*GetByIDResponse, error) {
-	out := new(GetByIDResponse)
-	err := c.cc.Invoke(ctx, "/app_service.AppService/GetByID", in, out, opts...)
+func (c *appServiceClient) GetApp(ctx context.Context, in *GetAppRequest, opts ...grpc.CallOption) (*GetAppResponse, error) {
+	out := new(GetAppResponse)
+	err := c.cc.Invoke(ctx, "/app_service.AppService/GetApp", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -94,8 +94,8 @@ func (c *appServiceClient) RemoveMember(ctx context.Context, in *RemoveMemberReq
 type AppServiceServer interface {
 	CreateApp(context.Context, *CreateAppRequest) (*CreateAppResponse, error)
 	DeleteApp(context.Context, *DeleteAppRequest) (*DeleteAppResponse, error)
-	GetApps(context.Context, *GetAppsRequest) (*GetAppsResponse, error)
-	GetByID(context.Context, *GetByIDRequest) (*GetByIDResponse, error)
+	GetAppList(context.Context, *GetAppListRequest) (*GetAppListResponse, error)
+	GetApp(context.Context, *GetAppRequest) (*GetAppResponse, error)
 	AddMember(context.Context, *AddMemberRequest) (*AddMemberResponse, error)
 	RemoveMember(context.Context, *RemoveMemberRequest) (*RemoveMemberResponse, error)
 	mustEmbedUnimplementedAppServiceServer()
@@ -111,11 +111,11 @@ func (UnimplementedAppServiceServer) CreateApp(context.Context, *CreateAppReques
 func (UnimplementedAppServiceServer) DeleteApp(context.Context, *DeleteAppRequest) (*DeleteAppResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteApp not implemented")
 }
-func (UnimplementedAppServiceServer) GetApps(context.Context, *GetAppsRequest) (*GetAppsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetApps not implemented")
+func (UnimplementedAppServiceServer) GetAppList(context.Context, *GetAppListRequest) (*GetAppListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAppList not implemented")
 }
-func (UnimplementedAppServiceServer) GetByID(context.Context, *GetByIDRequest) (*GetByIDResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetByID not implemented")
+func (UnimplementedAppServiceServer) GetApp(context.Context, *GetAppRequest) (*GetAppResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetApp not implemented")
 }
 func (UnimplementedAppServiceServer) AddMember(context.Context, *AddMemberRequest) (*AddMemberResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddMember not implemented")
@@ -172,38 +172,38 @@ func _AppService_DeleteApp_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AppService_GetApps_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetAppsRequest)
+func _AppService_GetAppList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAppListRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AppServiceServer).GetApps(ctx, in)
+		return srv.(AppServiceServer).GetAppList(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/app_service.AppService/GetApps",
+		FullMethod: "/app_service.AppService/GetAppList",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AppServiceServer).GetApps(ctx, req.(*GetAppsRequest))
+		return srv.(AppServiceServer).GetAppList(ctx, req.(*GetAppListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AppService_GetByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetByIDRequest)
+func _AppService_GetApp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAppRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AppServiceServer).GetByID(ctx, in)
+		return srv.(AppServiceServer).GetApp(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/app_service.AppService/GetByID",
+		FullMethod: "/app_service.AppService/GetApp",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AppServiceServer).GetByID(ctx, req.(*GetByIDRequest))
+		return srv.(AppServiceServer).GetApp(ctx, req.(*GetAppRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -260,12 +260,12 @@ var AppService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _AppService_DeleteApp_Handler,
 		},
 		{
-			MethodName: "GetApps",
-			Handler:    _AppService_GetApps_Handler,
+			MethodName: "GetAppList",
+			Handler:    _AppService_GetAppList_Handler,
 		},
 		{
-			MethodName: "GetByID",
-			Handler:    _AppService_GetByID_Handler,
+			MethodName: "GetApp",
+			Handler:    _AppService_GetApp_Handler,
 		},
 		{
 			MethodName: "AddMember",

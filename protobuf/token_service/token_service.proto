@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package token_service;
 
+import "grpc_definitions/models.proto";
 
 service TokenService {
     rpc IssueJWT(IssueJWTRequest) returns (IssueJWTResponse) {}
@@ -12,7 +13,7 @@ service TokenService {
 // JWTRequest holds the user data the token should
 // be issued for
 message IssueJWTRequest {
-    AuthenticatedUser user = 1; 
+    models.LightUserModel user = 1; 
     // light distributed tracing ID - light because it serves the propose  of developing
     // because it is super dope what I am doing
     string tracing_ID = 4;   
@@ -25,16 +26,6 @@ message IssueJWTResponse {
     string jwt_token = 3;
 }
 
-// AuthenticatedUser's data is used in the encoded JWT
-message AuthenticatedUser {
-    string username = 1;
-    string uuid = 2;
-    string orgn_domain = 3;
-    string first_name = 4;
-    string last_name = 5;
-    string orgn_position = 6;
-    string profile_img_url = 7;
-}
 
 // ValidateJWTRequest holds the JWT from the user
 message ValidateJWTRequest {
@@ -50,5 +41,5 @@ message ValidateJWTResponse {
     int32 status_code = 1;
     string msg = 2;
     bool is_valid = 3;
-    AuthenticatedUser user = 4;
+    models.LightUserModel user = 4;
 }

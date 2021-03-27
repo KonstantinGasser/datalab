@@ -2,44 +2,41 @@ syntax = "proto3";
 
 package token_service;
 
-import "grpc_definitions/models.proto";
 
 service TokenService {
-    rpc IssueJWT(IssueJWTRequest) returns (IssueJWTResponse) {}
-    rpc ValidateJWT(ValidateJWTRequest) returns (ValidateJWTResponse) {} 
+    rpc IssueUserToken(IssueUserTokenRequest) returns (IssueUserTokenResponse) {}
+    rpc VerifyUserToken(VerifyUserTokenRequest) returns (VerifyUserTokenResponse) {}
+
 }
 
 
-// JWTRequest holds the user data the token should
-// be issued for
-message IssueJWTRequest {
-    models.LightUserModel user = 1; 
-    // light distributed tracing ID - light because it serves the propose  of developing
-    // because it is super dope what I am doing
-    string tracing_ID = 4;   
+// RPC ISSUE USER TOKEN
+message IssueUserTokenRequest {
+    string tracing_ID = 1;
+    UserClaim claim = 2;
 }
+message IssueUserTokenResponse {
+    int32 status_code = 1;
+    string msg = 2; 
+    string user_token = 3;
+}
+// ***************************
 
-// JWTResponse returns the issued JWT
-message IssueJWTResponse {
+// RPC ISSUE USER TOKEN
+message VerifyUserTokenRequest {
+    string tracing_ID = 1;
+    string user_token = 2;
+}
+message VerifyUserTokenResponse {
     int32 status_code = 1;
     string msg = 2;
-    string jwt_token = 3;
+    UserClaim claim = 3;
 }
+// ***************************
 
 
-// ValidateJWTRequest holds the JWT from the user
-message ValidateJWTRequest {
-    string jwt_token = 1;
-    // light distributed tracing ID - light because it serves the propose  of developing
-    // because it is super dope what I am doing
-    string tracing_ID = 4;
-}
-
-// ValidateJWTResponse tells whether a user's token
-// is valid
-message ValidateJWTResponse {
-    int32 status_code = 1;
-    string msg = 2;
-    bool is_valid = 3;
-    models.LightUserModel user = 4;
+// common types
+message UserClaim {
+    string uuid = 1;
+    string orgn_domain = 2;
 }

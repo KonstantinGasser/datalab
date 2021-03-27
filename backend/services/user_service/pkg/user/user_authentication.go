@@ -13,9 +13,9 @@ import (
 // UserItemAuth is a trimmed down version of the user since for authentication
 // not all of the user data must be loaded from the database
 type UserItemAuth struct {
-	UUID     string `bson:"_id"`
-	Username string `bson:"username"`
-	Password string `bson:"password"`
+	UUID       string `bson:"_id"`
+	OrgnDomain string `bson:"orgn_domain"`
+	Password   string `bson:"password"`
 }
 
 // Authenticate verifies that a user performing a login exists in the database and has provided the correct

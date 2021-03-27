@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	appSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/app_service"
+	appSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/app_service"
 	"github.com/KonstantinGasser/clickstream/backend/services/app_service/pkg/app"
 	"github.com/KonstantinGasser/clickstream/utils/ctx_value"
 	"github.com/KonstantinGasser/clickstream/utils/unique"

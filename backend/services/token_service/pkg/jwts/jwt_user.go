@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	tokenSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/token_service"
+	tokenSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/token_service"
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
@@ -19,11 +19,12 @@ const (
 
 // IssueUser takes in arguments for the token of the user
 // returning a JWT with exp set to expTime and the data passed in
-func IssueUser(ctx context.Context, user *tokenSrv.AuthenticatedUser) (string, error) {
+func IssueUser(ctx context.Context, user *tokenSrv.UserClaim) (string, error) {
 	// calims holds all the data which will be
 	// encoded in the JWT
 	claims := jwt.MapClaims{}
 	claims["sub"] = user.GetUuid()
+	claims["orgn"] = user.GetOrgnDomain()
 	claims["iat"] = issuer
 	claims["exp"] = time.Now().Add(expTime).Unix()
 

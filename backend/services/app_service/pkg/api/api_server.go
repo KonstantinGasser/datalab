@@ -1,8 +1,8 @@
 package api
 
 import (
-	appSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/app_service"
-	userSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/user_service"
+	appSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/app_service"
+	userSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/user_service"
 	"github.com/KonstantinGasser/clickstream/backend/services/api_gateway/pkg/grpcC"
 	"github.com/KonstantinGasser/clickstream/backend/services/app_service/pkg/app"
 	"github.com/KonstantinGasser/clickstream/backend/services/app_service/pkg/storage"

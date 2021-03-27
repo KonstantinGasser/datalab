@@ -4,7 +4,7 @@ import (
 	"context"
 	"net"
 
-	appSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/app_service"
+	appSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/app_service"
 	"github.com/KonstantinGasser/clickstream/backend/services/app_service/pkg/api"
 	"github.com/KonstantinGasser/clickstream/backend/services/app_service/pkg/storage"
 	"github.com/sirupsen/logrus"

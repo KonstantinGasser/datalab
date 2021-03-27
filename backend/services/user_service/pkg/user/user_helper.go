@@ -26,11 +26,12 @@ type Comparator struct {
 type Comparable struct {
 	// Fetch can be used if the data to compare with the Comparator must first
 	// be fetched from somewhere else (like a data store)
+	// the returned map[string]interface{} must include the KEY which is set in Comparable.By
+	// else the Comparison will fail
 	Fetch func() ([]map[string]interface{}, error)
 
-	// filterResults should be an empty slice of bson.M in which the Filter will write the results
-	// can be nil if Filter is nil
-	filterResults []map[string]interface{}
+	// filterResults will hold the fetched data from the Comparable.Fetch function
+	fetchResults []map[string]interface{}
 
 	// By is the key to the value which you want to compare (must be present in the return of the filter)
 	By string
@@ -78,20 +79,13 @@ func (user user) Compare(ctx context.Context, storage storage.Storage, comparato
 		TruthfulValid: true,
 		MissItems:     []string{},
 	}
-	// query for value to compare with
+	// execute func Fetch if data for comparison needs to be loaded first
 	if comparator.Fetch != nil {
 		var err error
 		comparator.Value, err = comparator.Fetch()
 		if err != nil {
 			return http.StatusInternalServerError, nil, err
 		}
-		// var compValue bson.M
-		// if err := storage.FindOne(ctx, userDatabase, userCollection, comparator.Filter, &compValue); err != nil {
-		// 	return http.StatusInternalServerError, nil, err
-		// }
-		// // assign queried value to comparator
-		// logrus.Info(compValue)
-		// comparator.Value = compValue
 	}
 	// check if comparator.By exists in Value
 	if _, ok := comparator.Value[comparator.By]; !ok {
@@ -101,18 +95,13 @@ func (user user) Compare(ctx context.Context, storage storage.Storage, comparato
 	// check if ComparableItems need to be queried
 	// if nil -> Comparable.Items.Value must not be null else they are skipped
 	if comparable.Fetch != nil {
-		// query for Comparable.Item data
-		// if err := storage.FindMany(ctx, userDatabase, userCollection, comparable.Filter, &comparable.filterResults); err != nil {
-		// 	return http.StatusInternalServerError, nil, err
-		// }
-		// logrus.Warn(comparable.filterResults)
 		var err error
-		comparable.filterResults, err = comparable.Fetch()
+		comparable.fetchResults, err = comparable.Fetch()
 		if err != nil {
 			return http.StatusInternalServerError, nil, err
 		}
-		comparable.Items = make([]ComparableItem, len(comparable.filterResults))
-		for i, item := range comparable.filterResults {
+		comparable.Items = make([]ComparableItem, len(comparable.fetchResults))
+		for i, item := range comparable.fetchResults {
 			// if storage.result.item does not have the Comparable.By key mark as error and skip
 			if _, ok := item[comparable.By]; !ok {
 				resultSet.Errors = append(resultSet.Errors, fmt.Errorf("could not find key: %v in comparable.FilterResults: %v", comparable.By, item))

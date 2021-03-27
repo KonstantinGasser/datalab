@@ -3,7 +3,7 @@ package ctx_value
 import (
 	"context"
 
-	tokenSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/token_service"
+	tokenSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/token_service"
 )
 
 type ctxKey string
@@ -28,10 +28,10 @@ func GetString(ctx context.Context, key string) string {
 // coming from the TokenService to the context. Claims of user might be needed afterwards.
 // GetAuthedUser is tide to the grpc_def of TokenService.AuthenticatedUser and if not found
 // will return nil
-func GetAuthedUser(ctx context.Context) *tokenSrv.AuthenticatedUser {
+func GetAuthedUser(ctx context.Context) *tokenSrv.UserClaim {
 	value := ctx.Value(ctxKey("user"))
 	if value == nil {
 		return nil
 	}
-	return value.(*tokenSrv.AuthenticatedUser)
+	return value.(*tokenSrv.UserClaim)
 }

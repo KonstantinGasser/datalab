@@ -18,8 +18,8 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type TokenServiceClient interface {
-	IssueJWT(ctx context.Context, in *IssueJWTRequest, opts ...grpc.CallOption) (*IssueJWTResponse, error)
-	ValidateJWT(ctx context.Context, in *ValidateJWTRequest, opts ...grpc.CallOption) (*ValidateJWTResponse, error)
+	IssueUserToken(ctx context.Context, in *IssueUserTokenRequest, opts ...grpc.CallOption) (*IssueUserTokenResponse, error)
+	VerifyUserToken(ctx context.Context, in *VerifyUserTokenRequest, opts ...grpc.CallOption) (*VerifyUserTokenResponse, error)
 }
 
 type tokenServiceClient struct {
@@ -30,18 +30,18 @@ func NewTokenServiceClient(cc grpc.ClientConnInterface) TokenServiceClient {
 	return &tokenServiceClient{cc}
 }
 
-func (c *tokenServiceClient) IssueJWT(ctx context.Context, in *IssueJWTRequest, opts ...grpc.CallOption) (*IssueJWTResponse, error) {
-	out := new(IssueJWTResponse)
-	err := c.cc.Invoke(ctx, "/token_service.TokenService/IssueJWT", in, out, opts...)
+func (c *tokenServiceClient) IssueUserToken(ctx context.Context, in *IssueUserTokenRequest, opts ...grpc.CallOption) (*IssueUserTokenResponse, error) {
+	out := new(IssueUserTokenResponse)
+	err := c.cc.Invoke(ctx, "/token_service.TokenService/IssueUserToken", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *tokenServiceClient) ValidateJWT(ctx context.Context, in *ValidateJWTRequest, opts ...grpc.CallOption) (*ValidateJWTResponse, error) {
-	out := new(ValidateJWTResponse)
-	err := c.cc.Invoke(ctx, "/token_service.TokenService/ValidateJWT", in, out, opts...)
+func (c *tokenServiceClient) VerifyUserToken(ctx context.Context, in *VerifyUserTokenRequest, opts ...grpc.CallOption) (*VerifyUserTokenResponse, error) {
+	out := new(VerifyUserTokenResponse)
+	err := c.cc.Invoke(ctx, "/token_service.TokenService/VerifyUserToken", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -52,8 +52,8 @@ func (c *tokenServiceClient) ValidateJWT(ctx context.Context, in *ValidateJWTReq
 // All implementations must embed UnimplementedTokenServiceServer
 // for forward compatibility
 type TokenServiceServer interface {
-	IssueJWT(context.Context, *IssueJWTRequest) (*IssueJWTResponse, error)
-	ValidateJWT(context.Context, *ValidateJWTRequest) (*ValidateJWTResponse, error)
+	IssueUserToken(context.Context, *IssueUserTokenRequest) (*IssueUserTokenResponse, error)
+	VerifyUserToken(context.Context, *VerifyUserTokenRequest) (*VerifyUserTokenResponse, error)
 	mustEmbedUnimplementedTokenServiceServer()
 }
 
@@ -61,11 +61,11 @@ type TokenServiceServer interface {
 type UnimplementedTokenServiceServer struct {
 }
 
-func (UnimplementedTokenServiceServer) IssueJWT(context.Context, *IssueJWTRequest) (*IssueJWTResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method IssueJWT not implemented")
+func (UnimplementedTokenServiceServer) IssueUserToken(context.Context, *IssueUserTokenRequest) (*IssueUserTokenResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method IssueUserToken not implemented")
 }
-func (UnimplementedTokenServiceServer) ValidateJWT(context.Context, *ValidateJWTRequest) (*ValidateJWTResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ValidateJWT not implemented")
+func (UnimplementedTokenServiceServer) VerifyUserToken(context.Context, *VerifyUserTokenRequest) (*VerifyUserTokenResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method VerifyUserToken not implemented")
 }
 func (UnimplementedTokenServiceServer) mustEmbedUnimplementedTokenServiceServer() {}
 
@@ -80,38 +80,38 @@ func RegisterTokenServiceServer(s grpc.ServiceRegistrar, srv TokenServiceServer)
 	s.RegisterService(&TokenService_ServiceDesc, srv)
 }
 
-func _TokenService_IssueJWT_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(IssueJWTRequest)
+func _TokenService_IssueUserToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IssueUserTokenRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TokenServiceServer).IssueJWT(ctx, in)
+		return srv.(TokenServiceServer).IssueUserToken(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/token_service.TokenService/IssueJWT",
+		FullMethod: "/token_service.TokenService/IssueUserToken",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TokenServiceServer).IssueJWT(ctx, req.(*IssueJWTRequest))
+		return srv.(TokenServiceServer).IssueUserToken(ctx, req.(*IssueUserTokenRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _TokenService_ValidateJWT_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ValidateJWTRequest)
+func _TokenService_VerifyUserToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VerifyUserTokenRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TokenServiceServer).ValidateJWT(ctx, in)
+		return srv.(TokenServiceServer).VerifyUserToken(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/token_service.TokenService/ValidateJWT",
+		FullMethod: "/token_service.TokenService/VerifyUserToken",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TokenServiceServer).ValidateJWT(ctx, req.(*ValidateJWTRequest))
+		return srv.(TokenServiceServer).VerifyUserToken(ctx, req.(*VerifyUserTokenRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -124,12 +124,12 @@ var TokenService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*TokenServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "IssueJWT",
-			Handler:    _TokenService_IssueJWT_Handler,
+			MethodName: "IssueUserToken",
+			Handler:    _TokenService_IssueUserToken_Handler,
 		},
 		{
-			MethodName: "ValidateJWT",
-			Handler:    _TokenService_ValidateJWT_Handler,
+			MethodName: "VerifyUserToken",
+			Handler:    _TokenService_VerifyUserToken_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

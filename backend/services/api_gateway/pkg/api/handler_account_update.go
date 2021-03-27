@@ -4,11 +4,12 @@ import (
 	"errors"
 	"net/http"
 
-	userSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/user_service"
+	userSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/user_service"
 	"github.com/KonstantinGasser/clickstream/utils/ctx_value"
 	"github.com/sirupsen/logrus"
 )
 
+// DataUserUpdate represents the HTTP-JSON data from the client
 type DataUserUpdate struct {
 	FirstName    string `json:"first_name"`
 	LastName     string `json:"last_name"`
@@ -19,7 +20,7 @@ type DataUserUpdate struct {
 // Involved services:
 // - User-Service
 func (api API) HandlerAccountUpdate(w http.ResponseWriter, r *http.Request) {
-	logrus.Infof("<%v>[api.HandlerUserUpdate] received user update request: %v\n", ctx_value.GetString(r.Context(), "tracingID"), r.Host)
+	logrus.Infof("<%v>[api.HandlerUserUpdate] received request: %v\n", ctx_value.GetString(r.Context(), "tracingID"), r.Host)
 
 	var payload DataUserUpdate
 	if err := api.decode(r.Body, &payload); err != nil {
@@ -35,11 +36,13 @@ func (api API) HandlerAccountUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 	// call out to user service to update authed user
 	resp, err := api.UserSrvClient.UpdateUser(r.Context(), &userSrv.UpdateUserRequest{
-		Tracing_ID:   ctx_value.GetString(r.Context(), "tracingID"),
-		UUID:         user.Uuid,
-		FirstName:    payload.FirstName,
-		LastName:     payload.LastName,
-		OrgnPosition: payload.OrgnPosition,
+		Tracing_ID: ctx_value.GetString(r.Context(), "tracingID"),
+		CallerUuid: user.GetUuid(),
+		User: &userSrv.UpdatableUser{
+			FirstName:    payload.FirstName,
+			LastName:     payload.LastName,
+			OrgnPosition: payload.OrgnPosition,
+		},
 	})
 	if err != nil {
 		logrus.Errorf("<%v>[api.HandlerUpdateUser] could not execute grpc.UpdateUser: %v", ctx_value.GetString(r.Context(), "tracingID"), err)

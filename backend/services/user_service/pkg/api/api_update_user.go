@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	userSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/user_service"
+	userSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/user_service"
 	"github.com/KonstantinGasser/clickstream/backend/services/user_service/pkg/user"
 	"github.com/KonstantinGasser/clickstream/utils/ctx_value"
 	"github.com/sirupsen/logrus"
@@ -18,11 +18,11 @@ func (srv UserService) UpdateUser(ctx context.Context, request *userSrv.UpdateUs
 	logrus.Infof("<%v>[userService.UpdateUser] received update user request\n", ctx_value.GetString(ctx, "tracingID"))
 
 	status, err := srv.user.Update(ctx, srv.storage, user.UserItemUpdateable{
-		UUID:          request.GetUUID(),
-		FirstName:     strings.TrimSpace(request.GetFirstName()),
-		LastName:      strings.TrimSpace(request.GetLastName()),
-		OrgnPosition:  strings.TrimSpace(request.GetOrgnPosition()),
-		ProfileImgURL: "some path", // i don't care about your profile img rn ~ sry
+		UUID:          request.GetCallerUuid(),
+		FirstName:     strings.TrimSpace(request.GetUser().GetFirstName()),
+		LastName:      strings.TrimSpace(request.GetUser().GetLastName()),
+		OrgnPosition:  strings.TrimSpace(request.GetUser().GetOrgnPosition()),
+		ProfileImgURL: strings.TrimSpace(request.GetUser().GetProfileImgUrl()),
 	})
 	if err != nil {
 		logrus.Errorf("<%v>[userService.UpdateUser] could not update user: %v\n", err)

@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	userSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/user_service"
+	userSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/user_service"
 	"github.com/KonstantinGasser/clickstream/backend/services/user_service/pkg/user"
 	"github.com/KonstantinGasser/clickstream/utils/ctx_value"
 	"github.com/KonstantinGasser/clickstream/utils/hash"
@@ -15,7 +15,6 @@ import (
 
 // CreateUser receives the grpc request and handles user registration
 func (srv UserService) CreateUser(ctx context.Context, request *userSrv.CreateUserRequest) (*userSrv.CreateUserResponse, error) {
-	// add tracingID from request to context
 	ctx = ctx_value.AddValue(ctx, "tracingID", request.GetTracing_ID())
 	logrus.Infof("<%v>[userService.CreateUser] received  create-user request\n", ctx_value.GetString(ctx, "tracingID"))
 
@@ -25,7 +24,7 @@ func (srv UserService) CreateUser(ctx context.Context, request *userSrv.CreateUs
 		logrus.Errorf("<%v>[userService.CreateUser] could not generate UUID for user: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
 		return &userSrv.CreateUserResponse{StatusCode: http.StatusInternalServerError, Msg: "could not create user"}, nil
 	}
-	hashedPassword, err := hash.FromPassword([]byte(request.GetPassword()))
+	hashedPassword, err := hash.FromPassword([]byte(request.GetUser().GetPassword()))
 	if err != nil {
 		logrus.Errorf("<%v>[userService.CreateUser] could not hash user password: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
 		return &userSrv.CreateUserResponse{StatusCode: http.StatusInternalServerError, Msg: "could not create user"}, nil
@@ -33,13 +32,13 @@ func (srv UserService) CreateUser(ctx context.Context, request *userSrv.CreateUs
 
 	status, err := srv.user.InsertNew(ctx, srv.storage, user.UserItem{
 		UUID:          uuid,
-		Username:      request.GetUsername(),
+		Username:      strings.TrimSpace(request.GetUser().GetUsername()),
 		Password:      hashedPassword,
-		FirstName:     strings.TrimSpace(request.GetFirstName()),
-		LastName:      strings.TrimSpace(request.GetLastName()),
-		OrgnDomain:    strings.TrimSpace(request.GetOrgnDomain()),
-		OrgnPosition:  strings.TrimSpace(request.GetOrgnPosition()),
-		ProfileImgURL: "some path", // can be set to default image later
+		FirstName:     strings.TrimSpace(request.GetUser().GetFirstName()),
+		LastName:      strings.TrimSpace(request.GetUser().GetLastName()),
+		OrgnDomain:    strings.TrimSpace(request.GetUser().GetOrgnDomain()),
+		OrgnPosition:  strings.TrimSpace(request.GetUser().GetOrgnPosition()),
+		ProfileImgURL: "https://avatars.githubusercontent.com/u/43576797?v=4", // can be set to default image later
 	})
 	if err != nil {
 		logrus.Errorf("<%v>[userService.CreateUser] could not create user: %v\n", ctx_value.GetString(ctx, "tracingID"), err)

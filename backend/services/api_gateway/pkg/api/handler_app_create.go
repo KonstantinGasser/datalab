@@ -4,13 +4,12 @@ import (
 	"errors"
 	"net/http"
 
-	appSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/app_service"
+	appSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/app_service"
 	"github.com/KonstantinGasser/clickstream/utils/ctx_value"
 	"github.com/sirupsen/logrus"
 )
 
-// DataCreateApp represents the data which is required
-// in order to create new app
+// DataCreateApp represents the HTTP-JSON data from the client
 type DataCreateApp struct {
 	Name        string   `json:"app_name"`
 	Description string   `json:"app_description"`
@@ -22,27 +21,27 @@ type DataCreateApp struct {
 // Involved services:
 // - App-Service
 func (api API) HandlerAppCreate(w http.ResponseWriter, r *http.Request) {
-	logrus.Infof("<%v>[api.HandlerAppCreate] received create-app request: %v\n", ctx_value.GetString(r.Context(), "tracingID"), r.Host)
+	logrus.Infof("<%v>[api.HandlerAppCreate] received request: %v\n", ctx_value.GetString(r.Context(), "tracingID"), r.Host)
 
 	var payload DataCreateApp
 	if err := api.decode(r.Body, &payload); err != nil {
 		logrus.Errorf("<%v>[api.HandlerAppCreate] could not decode r.Body: %v\n", ctx_value.GetString(r.Context(), "tracingID"), err)
 	}
-	authedUser := ctx_value.GetAuthedUser(r.Context())
-	if authedUser == nil {
+	user := ctx_value.GetAuthedUser(r.Context())
+	if user == nil {
 		logrus.Errorf("<%v>[api.HandlerAppCreate] could not get user-claims, they are nil\n", ctx_value.GetString(r.Context(), "tracingID"))
 		api.onError(w, errors.New("could not find user claims"), http.StatusForbidden)
 		return
 	}
 	// invoke grpc call to user-service to create requested app
 	respApp, err := api.AppServiceClient.CreateApp(r.Context(), &appSrv.CreateAppRequest{
-		OwnerUuid:    authedUser.GetUuid(),
+		Tracing_ID:   ctx_value.GetString(r.Context(), "tracingID"),
+		OwnerUuid:    user.GetUuid(),
 		Name:         payload.Name,
-		Organization: authedUser.GetOrgnDomain(),
+		Organization: user.GetOrgnDomain(),
 		Description:  payload.Description,
 		Member:       payload.Member,
 		Settings:     payload.Settings,
-		Tracing_ID:   ctx_value.GetString(r.Context(), "tracingID"),
 	})
 	if err != nil {
 		logrus.Errorf("<%v>[api.HandlerAppCreate] could not execute grpc.CreateApp: %v\n", ctx_value.GetString(r.Context(), "tracingID"), err)

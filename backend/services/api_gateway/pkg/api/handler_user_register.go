@@ -1,20 +1,15 @@
 package api
 
 import (
-	"context"
 	"fmt"
 	"net/http"
-	"time"
 
-	userSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/user_service"
+	userSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/user_service"
 	"github.com/KonstantinGasser/clickstream/utils/ctx_value"
 	"github.com/sirupsen/logrus"
 )
 
-const (
-	createUserTimeout = time.Second * 5
-)
-
+// DataRegister represents the HTTP-JSON form send by the client
 type DataRegister struct {
 	Username     string `json:"username"`
 	FirstName    string `json:"first_name"`
@@ -46,24 +41,21 @@ func (api API) HandlerUserRegister(w http.ResponseWriter, r *http.Request) {
 
 	// invoke grpc call to user-service to create the user
 	// Response holds only a status-code and a msg (could be an error message)
-	ctx, cancel := context.WithTimeout(r.Context(), createUserTimeout)
-	defer cancel()
-
-	resp, err := api.UserSrvClient.CreateUser(ctx, &userSrv.CreateUserRequest{
-		Username:     payload.Username,
-		Password:     payload.Password,
-		OrgnDomain:   payload.OrgnDomain,
-		FirstName:    payload.FirstName,
-		LastName:     payload.LastName,
-		OrgnPosition: payload.OrgnPosition,
-		Tracing_ID:   ctx_value.GetString(r.Context(), "tracingID"),
+	resp, err := api.UserSrvClient.CreateUser(r.Context(), &userSrv.CreateUserRequest{
+		Tracing_ID: ctx_value.GetString(r.Context(), "tracingID"),
+		User: &userSrv.RegisterUser{
+			Username:     payload.Username,
+			Password:     payload.Password,
+			FirstName:    payload.FirstName,
+			LastName:     payload.LastName,
+			OrgnDomain:   payload.OrgnDomain,
+			OrgnPosition: payload.OrgnPosition,
+		},
 	})
 	if err != nil {
 		api.onError(w, fmt.Errorf("could not execute grpc.CreateUser: %v", err), http.StatusInternalServerError)
 		return
 	}
-	logrus.Infof("<%v>[grpc.CreateUser] status: %d, msg: %s", ctx_value.GetString(r.Context(), "tracingID"), resp.GetStatusCode(), resp.GetMsg())
-
 	// on success write to response
 	w.WriteHeader(int(resp.GetStatusCode()))
 }

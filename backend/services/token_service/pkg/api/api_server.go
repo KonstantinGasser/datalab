@@ -1,7 +1,7 @@
 package api
 
 import (
-	tokenSrv "github.com/KonstantinGasser/clickstream/backend/grpc_definitions/token_service"
+	tokenSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/token_service"
 )
 
 type TokenService struct {
