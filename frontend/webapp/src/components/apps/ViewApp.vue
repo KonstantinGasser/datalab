@@ -17,7 +17,7 @@
         <div>
             <Tabs v-if="!showCreateApp" ref="Tabs" :class="{ block: blockTabs }" :initTab="'App Token'" :tabs="[{name:'App Token'},{name:'Member'}]" @tabChange="tabChange"/>
             <TabCreateApp v-if="showCreateApp" @createdApp="updateState" />
-            <TabAppToken v-if="activeTab === 'App Token' && !showCreateApp" :app="activeApp"/>
+            <TabAppToken v-cloak v-if="activeTab === 'App Token' && !showCreateApp" :app="activeApp"/>
             <TabMember v-if="activeTab === 'Member' && !showCreateApp" :member_list="activeApp.app_member"/>
         </div>
     </div>

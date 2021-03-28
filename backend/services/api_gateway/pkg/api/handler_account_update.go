@@ -11,9 +11,10 @@ import (
 
 // DataUserUpdate represents the HTTP-JSON data from the client
 type DataUserUpdate struct {
-	FirstName    string `json:"first_name"`
-	LastName     string `json:"last_name"`
-	OrgnPosition string `json:"orgn_position"`
+	FirstName     string `json:"first_name"`
+	LastName      string `json:"last_name"`
+	OrgnPosition  string `json:"orgn_position"`
+	ProfileImgURL string `json:"profile_img_url"`
 }
 
 // HandlerUserUpdate is the entry-point to update the user account of a user
@@ -39,9 +40,10 @@ func (api API) HandlerAccountUpdate(w http.ResponseWriter, r *http.Request) {
 		Tracing_ID: ctx_value.GetString(r.Context(), "tracingID"),
 		CallerUuid: user.GetUuid(),
 		User: &userSrv.UpdatableUser{
-			FirstName:    payload.FirstName,
-			LastName:     payload.LastName,
-			OrgnPosition: payload.OrgnPosition,
+			FirstName:     payload.FirstName,
+			LastName:      payload.LastName,
+			OrgnPosition:  payload.OrgnPosition,
+			ProfileImgUrl: payload.ProfileImgURL,
 		},
 	})
 	if err != nil {

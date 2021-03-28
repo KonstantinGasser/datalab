@@ -54,11 +54,12 @@ func (user user) Update(ctx context.Context, storage storage.Storage, userItem U
 
 	updateQuery := bson.D{
 		{
-			"$set", bson.D{
-				{"first_name", userItem.FirstName},
-				{"last_name", userItem.LastName},
-				{"orgn_position", userItem.OrgnPosition},
-			},
+			"$set", userItem,
+			// bson.D{
+			// 	{"first_name", userItem.FirstName},
+			// 	{"last_name", userItem.LastName},
+			// 	{"orgn_position", userItem.OrgnPosition},
+			// },
 		},
 	}
 	if err := storage.UpdateOne(ctx, userDatabase, userCollection, bson.M{"_id": userItem.UUID}, updateQuery); err != nil {
