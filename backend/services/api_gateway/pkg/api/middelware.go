@@ -69,10 +69,10 @@ func (api API) WithAuth(next http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-// WithTracing allows to generate a tracing ID at the entry-point of an request which gets passed
-// in the request.Context in order for it to be available in following code.
+// WithTracing allows to generate a tracing ID at the entry-point of an request which gets added
+// in the request.Context in order for it to be available through out the code.
 // The tracing ID is an straight forward approach to trace logs from multiple services
-// Tracing ID are based on the current time and the MAC-Address
+// The Tracing ID is based on the current time and the MAC-Address
 func (api API) WithTracing(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		tracingID, err := uuid.NewV1()
