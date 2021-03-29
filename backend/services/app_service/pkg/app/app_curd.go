@@ -12,6 +12,7 @@ import (
 	"github.com/KonstantinGasser/clickstream/utils/ctx_value"
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // AppItem represents one App in the database ? do we need this? don't we have a def in the grpc already???
@@ -37,10 +38,29 @@ type AppItemLight struct {
 
 // GetByID collects all the app details for a given appUUID
 // it fetches the user data for the owner and all members from the user-service
-func (app app) GetApp(ctx context.Context, mongo storage.Storage, userService userSrv.UserServiceClient, appUUID string) (int, *appSrv.ComplexApp, error) {
+func (app app) GetApp(ctx context.Context, storage storage.Storage, userService userSrv.UserServiceClient, appUUID, callerUUID string) (int, *appSrv.ComplexApp, error) {
 
+	// search for app_uuid where either owner_uuid or one of the members
+	// match the callerUUID else not permitted
+	appQuery := bson.D{
+		{"$and", bson.A{
+			bson.M{"_id": appUUID},
+			bson.D{
+				{"$or", bson.A{
+					bson.M{"owner_uuid": callerUUID},
+					bson.M{"member": callerUUID},
+				},
+				},
+			},
+		},
+		},
+	}
 	var queryData AppItem
-	err := mongo.FindOne(ctx, appDatabase, appCollection, bson.M{"_id": appUUID}, &queryData)
+	err := storage.FindOne(ctx, appDatabase, appCollection, appQuery, &queryData)
+	// check if no results have been found
+	if err == mongo.ErrNoDocuments {
+		return http.StatusBadRequest, nil, errors.New("could not find any match")
+	}
 	if err != nil {
 		return http.StatusInternalServerError, nil, err
 	}

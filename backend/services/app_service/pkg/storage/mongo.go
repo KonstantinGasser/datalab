@@ -32,7 +32,9 @@ func (client mongoClient) FindMany(ctx context.Context, db, collection string, f
 }
 
 // FindOne takes a database and collection name and a bson.M query to find a single result
-// found results will be written in the passed result interface{} which MUST be a pointer else no data lol
+// found results will be written in the passed result interface{} which MUST be a pointer else no data.
+// If no documents are found the function will return a mongo.ErrNoDocuments error indicating that the passed result
+// will be empty. Caller must check for this error
 func (client mongoClient) FindOne(ctx context.Context, db, collection string, filter, result interface{}) error {
 	coll := client.conn.Database(db).Collection(collection)
 
@@ -40,7 +42,7 @@ func (client mongoClient) FindOne(ctx context.Context, db, collection string, fi
 		// Decode will return ErrNoDocuments if the query returns no result
 		// this is less an error but similar to io.EOF and means NoRecoredFound
 		if err == mongo.ErrNoDocuments {
-			return nil
+			return err
 		}
 		return fmt.Errorf("mongo client, could not decode FindOne result: %v", err)
 	}

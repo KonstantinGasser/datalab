@@ -9,11 +9,10 @@ import (
 )
 
 func (srv AppService) GetApp(ctx context.Context, request *appSrv.GetAppRequest) (*appSrv.GetAppResponse, error) {
-	// add tracingID from request to context
 	ctx = ctx_value.AddValue(ctx, "tracingID", request.GetTracing_ID())
 	logrus.Infof("<%v>[appService.GetApp] received request\n", ctx_value.GetString(ctx, "tracingID"))
 
-	status, app, err := srv.app.GetApp(ctx, srv.storage, srv.userService, request.GetAppUuid())
+	status, app, err := srv.app.GetApp(ctx, srv.storage, srv.userService, request.GetAppUuid(), request.GetCallerUuid())
 	if err != nil {
 		logrus.Errorf("<%v>[appService.GetApp] could not GetApp: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
 		return &appSrv.GetAppResponse{StatusCode: int32(status), Msg: "could not get application data"}, nil

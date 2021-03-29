@@ -21,7 +21,7 @@ type App interface {
 	// GetApps returns all apps created by a given user (forUUID)
 	GetAppList(ctx context.Context, stroage storage.Storage, forUUID string) (int, []AppItemLight, error)
 	// GetByID returns a specific app by its app uuid
-	GetApp(ctx context.Context, stroage storage.Storage, userSrvice userSrv.UserServiceClient, appUUID string) (int, *appSrv.ComplexApp, error)
+	GetApp(ctx context.Context, stroage storage.Storage, userSrvice userSrv.UserServiceClient, appUUID, callerUUID string) (int, *appSrv.ComplexApp, error)
 	// DeleteApp hard deletes an app from the mongo db - no setbacks
 	DeleteApp(ctx context.Context, stroage storage.Storage, appUUID string) (int, error)
 	// AddMember appends the member list of an app with the given member

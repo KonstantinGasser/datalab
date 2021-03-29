@@ -10,12 +10,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// DataAddMember holds the data from the http request
-type DataAddMember struct {
-	AppUUID string   `json:"app_uuid"`
-	Member  []string `json:"member_list"`
-}
-
 func (api API) HandlerAppAddMember(w http.ResponseWriter, r *http.Request) {
 	logrus.Infof("<%v>[api.HandlerAppAddMember] received request\n", ctx_value.GetString(r.Context(), "tracingID"))
 
@@ -27,7 +21,10 @@ func (api API) HandlerAppAddMember(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var payload DataAddMember
+	var payload struct {
+		AppUUID string   `json:"app_uuid"`
+		Member  []string `json:"member_list"`
+	}
 	if err := api.decode(r.Body, &payload); err != nil {
 		logrus.Errorf("<%v>[api.HandlerAppAddMember] could not decode r.Body: %v\n", ctx_value.GetString(r.Context(), "tracingID"), err)
 		api.onError(w, errors.New("could not decode request body"), http.StatusBadRequest)

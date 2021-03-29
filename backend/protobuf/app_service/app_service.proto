@@ -98,10 +98,6 @@ message RemoveMemberResponse {
 // ***************************
 
 
-
-
-
-
 // common types
 message ComplexApp {
     string name = 1;

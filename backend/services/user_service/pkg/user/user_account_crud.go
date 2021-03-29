@@ -36,6 +36,11 @@ type UserItemUpdateable struct {
 func (user user) InsertNew(ctx context.Context, storage storage.Storage, userItem UserItem) (int, error) {
 	// check if username is taken
 	taken, err := storage.Exists(ctx, userDatabase, userCollection, bson.M{"_id": userItem.UUID})
+	// check if provided organization names match the criteria
+	ok := orgnAllowed(userItem.OrgnDomain)
+	if !ok {
+		return http.StatusBadRequest, errors.New("organization domain must not include either of (/,)")
+	}
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

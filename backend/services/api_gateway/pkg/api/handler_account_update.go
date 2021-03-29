@@ -9,21 +9,18 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// DataUserUpdate represents the HTTP-JSON data from the client
-type DataUserUpdate struct {
-	FirstName     string `json:"first_name"`
-	LastName      string `json:"last_name"`
-	OrgnPosition  string `json:"orgn_position"`
-	ProfileImgURL string `json:"profile_img_url"`
-}
-
 // HandlerUserUpdate is the entry-point to update the user account of a user
 // Involved services:
 // - User-Service
 func (api API) HandlerAccountUpdate(w http.ResponseWriter, r *http.Request) {
 	logrus.Infof("<%v>[api.HandlerUserUpdate] received request: %v\n", ctx_value.GetString(r.Context(), "tracingID"), r.Host)
 
-	var payload DataUserUpdate
+	var payload struct {
+		FirstName     string `json:"first_name"`
+		LastName      string `json:"last_name"`
+		OrgnPosition  string `json:"orgn_position"`
+		ProfileImgURL string `json:"profile_img_url"`
+	}
 	if err := api.decode(r.Body, &payload); err != nil {
 		api.onError(w, errors.New("could not decode request body"), http.StatusBadRequest)
 		return

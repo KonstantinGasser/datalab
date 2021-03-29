@@ -17,7 +17,7 @@ func Run(ctx context.Context, addr string) error {
 
 	// create new UserService
 	// database dependency to mongoDB
-	mongoC := storage.NewMongoClient("mongodb://userDB:secure@192.168.178.163:27017")
+	mongoC := storage.NewMongoClient("mongodb://userDB:secure@192.168.0.179:27017")
 	userService := api.NewUserService(mongoC)
 
 	// register grpc server to service

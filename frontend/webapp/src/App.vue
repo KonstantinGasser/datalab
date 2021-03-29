@@ -14,11 +14,11 @@ body {
   padding: 0;
 }
 hr {
-  margin: 5px 0px;
-  border-top: 1px solid #30363D !important;
+  margin: 10px 0px !important;
+  border-top: 2px solid #FFFFFF33 !important;
 }
 
-h2 {
+h2, h1 {
   color: #ccc; 
 }
 
@@ -54,6 +54,12 @@ a {
   -webkit-text-fill-color: transparent;
 }
 
+.scroll_view {
+  overflow-y: scroll;
+  height: 800px;
+  min-height: 400px;
+  max-height: 800px;
+}
 .text-capture {
   background: linear-gradient(135deg, #50e3c2 0%,#10d574 100%);
   -webkit-background-clip: text;
@@ -98,6 +104,13 @@ a {
   border-radius: 4px;
   width: min-content;
   font-weight: bolder;
+}
+
+.danger-text {
+  color: rgba(255, 0, 0, 1);
+}
+.danger-text small {
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .form-control:disabled {

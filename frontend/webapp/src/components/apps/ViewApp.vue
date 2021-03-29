@@ -9,23 +9,23 @@
                     Mhm looks like you do not have any apps yet - <a @click="modeCreateApp()">go create one!</a>
                 </p>
                 <div class="app-name d-flex justify-between align-center" v-for="app in app_list" :key="app.uuid">
-                    <span class="dots standard-font" @click="fetchAppDetails(app.uuid)">{{ app.name }}</span>
+                    <span class="dots standard-font" @click="getAppDetails(app.uuid)">{{ app.name }}</span>
                     <span class="icon icon-delete hover big" @click="removeApp(app.uuid)"></span>
                 </div>
             </div>
         </div>
         <div>
-            <Tabs v-if="!showCreateApp" ref="Tabs" :class="{ block: blockTabs }" :initTab="'App Token'" :tabs="[{name:'App Token'},{name:'Member'}]" @tabChange="tabChange"/>
+            <Tabs v-if="!showCreateApp" ref="Tabs" :class="{ block: blockTabs }" :initTab="'App Details'" :tabs="[{name:'App Details'},{name:'Member'}]" @tabChange="tabChange"/>
             <TabCreateApp v-if="showCreateApp" @createdApp="updateState" />
-            <TabAppToken v-cloak v-if="activeTab === 'App Token' && !showCreateApp" :app="activeApp"/>
-            <TabMember v-if="activeTab === 'Member' && !showCreateApp" :member_list="activeApp.app_member"/>
+            <TabAppDetails ref="tab_app_token" v-cloak v-if="activeTab === 'App Details' && !showCreateApp" :app="activeApp"/>
+            <TabMember ref="tab_member" v-if="activeTab === 'Member' && !showCreateApp" :member_list="activeApp.app_member"/>
         </div>
     </div>
 </template>
 
 <script>
     import Tabs from '@/components/utils/Tabs.vue';
-    import TabAppToken from '@/components/apps/TabAppToken.vue';
+    import TabAppDetails from '@/components/apps/TabAppDetails.vue';
     import TabCreateApp from '@/components/apps/TabCreateApp.vue';
     import TabMember from '@/components/apps/TabMember.vue';
     import axios from 'axios';
@@ -35,7 +35,7 @@
         components: {
             Tabs,
             TabCreateApp,
-            TabAppToken,
+            TabAppDetails,
             TabMember,
         },
         computed: {
@@ -52,7 +52,7 @@
         data() {
             return {
                 isInCreateMode: false, // change back to false once api works again. true just to check on the other views
-                activeTab: 'App Token',
+                activeTab: 'App Details',
                 tabsBlocked: false,
                 newApp: { name: '' },
                 apps: [],
@@ -61,7 +61,7 @@
         },
         async created() {
             // fetch initial data
-            this.getAppDetails().then(data => {
+            this.getViewApp().then(data => {
                 this.apps = data.app_list;
                 this.activeApp = data.app_details;
                 if (this.apps == null || this.apps.length === 0) {
@@ -87,14 +87,14 @@
                     case "show_app":
                         this.isInCreateMode = false;
                         // update app list on the left to show newly created app
-                        this.getAppDetails().then(data => {
-                            if (err.response.status === 401) {
+                        this.getViewApp().then(data => {
+                            this.apps = data.app_list;
+                        }).catch(error => {
+                            if (error.response.status === 401) {
                                 localStorage.removeItem('token');
                                 this.$router.replace({ name: 'login' });
                             }
-                            this.apps = data.app_list;
-                        }).catch(err => {
-                            console.log(err);
+                            console.log(error);
                             this.$toast.error("could not refresh app list");
                         });
                         
@@ -108,7 +108,7 @@
             modeCreateApp() {
                 this.isInCreateMode = true;
             },
-            async getAppDetails() {
+            async getViewApp() {
                 let options = {
                     headers: {
                         'Authorization': localStorage.getItem("token"),
@@ -122,6 +122,21 @@
                 }
                 return res.data;
                 
+            },
+            async getAppDetails(uuid) {
+                let options = {
+                    headers: {
+                        'Authorization': localStorage.getItem("token"),
+                    }
+                };
+                axios.get("http://localhost:8080/api/v2/view/app/get?uuid="+uuid, options).then(resp => {
+                    console.log(this.$refs);
+                    this.activeApp = resp.data.app;
+                    this.$refs.tab_member.updateComponent(resp.data.member);
+                    this.$refs.tab_app_token.updateComponent(resp.data);
+                }).catch(error => {
+                    console.log(error);
+                });
             },
             async removeApp(id) {
                 let options = {

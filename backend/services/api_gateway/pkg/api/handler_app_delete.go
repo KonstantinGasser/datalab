@@ -9,12 +9,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// DataAppDelete represents the data which is required
-// in order to delete an app
-type DataAppDelete struct {
-	AppUUID string `json:"app_uuid"`
-}
-
 // HandlerAppDelete is the entry-point to delete an app of a given user in the system
 // Involved services:
 // - App-Service
@@ -27,7 +21,9 @@ func (api API) HandlerAppDelete(w http.ResponseWriter, r *http.Request) {
 		api.onError(w, errors.New("could not find user claims"), http.StatusUnauthorized)
 		return
 	}
-	var payload DataAppDelete
+	var payload struct {
+		AppUUID string `json:"app_uuid"`
+	}
 	if err := api.decode(r.Body, &payload); err != nil {
 		logrus.Errorf("<%v>[api.HandlerDeleteApp] could not decode r.Body: %v\n", ctx_value.GetString(r.Context(), "tracingID"), err)
 		api.onError(w, errors.New("could not decode passed JSON"), http.StatusBadRequest)

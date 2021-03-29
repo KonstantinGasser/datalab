@@ -9,16 +9,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// DataRegister represents the HTTP-JSON form send by the client
-type DataRegister struct {
-	Username     string `json:"username"`
-	FirstName    string `json:"first_name"`
-	LastName     string `json:"last_name"`
-	Password     string `json:"password"`
-	OrgnDomain   string `json:"orgn_domain"`
-	OrgnPosition string `json:"orgn_position"`
-}
-
 // HandlerUserRegister is the entry-point if a users creates a new account.
 // It performs sanity checks on the input data and forwards the request
 // to the user-service.
@@ -27,7 +17,14 @@ type DataRegister struct {
 func (api API) HandlerUserRegister(w http.ResponseWriter, r *http.Request) {
 	logrus.Infof("<%v>[api.HandlerRegister] received request: %v\n", ctx_value.GetString(r.Context(), "tracingID"), r.Host)
 
-	var payload DataRegister
+	var payload struct {
+		Username     string `json:"username"`
+		FirstName    string `json:"first_name"`
+		LastName     string `json:"last_name"`
+		Password     string `json:"password"`
+		OrgnDomain   string `json:"orgn_domain"`
+		OrgnPosition string `json:"orgn_position"`
+	}
 	if err := api.decode(r.Body, &payload); err != nil {
 		api.onError(w, err, http.StatusBadRequest)
 		return
@@ -57,5 +54,5 @@ func (api API) HandlerUserRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// on success write to response
-	w.WriteHeader(int(resp.GetStatusCode()))
+	api.onScucessJSON(w, map[string]interface{}{}, int(resp.GetStatusCode()))
 }

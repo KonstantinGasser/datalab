@@ -182,6 +182,15 @@ func (api API) SetUp() {
 			),
 		),
 	)
+	api.route("/api/v2/view/app/get", // must passed query: uuid=app_uuid
+		api.WithTracing(
+			api.WithCors(
+				api.WithAuth(
+					api.HandlerAppGet,
+				),
+			),
+		),
+	)
 	api.route("/api/v2/view/app/create",
 		api.WithTracing(
 			api.WithCors(

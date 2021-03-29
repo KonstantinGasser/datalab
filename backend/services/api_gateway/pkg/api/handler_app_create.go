@@ -9,21 +9,18 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// DataCreateApp represents the HTTP-JSON data from the client
-type DataCreateApp struct {
-	Name        string   `json:"app_name"`
-	Description string   `json:"app_description"`
-	Member      []string `json:"app_member"`
-	Settings    []string `json:"app_settings"`
-}
-
 // HandlerAppCreate is the api endpoint if a logged in user wants to create a new application
 // Involved services:
 // - App-Service
 func (api API) HandlerAppCreate(w http.ResponseWriter, r *http.Request) {
 	logrus.Infof("<%v>[api.HandlerAppCreate] received request: %v\n", ctx_value.GetString(r.Context(), "tracingID"), r.Host)
 
-	var payload DataCreateApp
+	var payload struct {
+		Name        string   `json:"app_name"`
+		Description string   `json:"app_description"`
+		Member      []string `json:"app_member"`
+		Settings    []string `json:"app_settings"`
+	}
 	if err := api.decode(r.Body, &payload); err != nil {
 		logrus.Errorf("<%v>[api.HandlerAppCreate] could not decode r.Body: %v\n", ctx_value.GetString(r.Context(), "tracingID"), err)
 	}

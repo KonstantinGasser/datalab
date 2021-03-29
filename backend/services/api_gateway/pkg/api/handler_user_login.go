@@ -16,12 +16,6 @@ const (
 	loginCtxTimeout = time.Second * 2
 )
 
-// DataLogin represents the HTTP-JSON data from the client
-type DataLogin struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
 // HandlerUserLogin is the entry-point if a users logins onto the system.
 // It calls the user-service to authenticate the users passed
 // credentials and on success calls the token-service to issue a new
@@ -32,7 +26,10 @@ type DataLogin struct {
 func (api API) HandlerUserLogin(w http.ResponseWriter, r *http.Request) {
 	logrus.Infof("<%v>[api.HandlerUserLogin] received request: %v\n", ctx_value.GetString(r.Context(), "tracingID"), r.Host)
 
-	var payload DataLogin
+	var payload struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
 	if err := api.decode(r.Body, &payload); err != nil {
 		logrus.Errorf("<%v>[api.HandlerLogin] could not decode request body: %v\n", ctx_value.GetString(r.Context(), "tracingID"), err)
 		api.onError(w, errors.New("could not decode request body"), http.StatusBadRequest)
