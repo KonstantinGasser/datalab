@@ -12,7 +12,40 @@ service AppService {
 
     rpc AddMember(AddMemberRequest) returns (AddMemberResponse) {}
     rpc RemoveMember(RemoveMemberRequest) returns (RemoveMemberResponse) {}
+
+    rpc CanGenToken(CanGenTokenRequest) returns (CanGenTokenResponse) {}
+    rpc CanDelApp(CanDelAppRequest) returns (CanDelAppResponse) {}
 }
+
+// RPC CAN GEN TOKEN
+message CanGenTokenRequest {
+    string tracing_ID = 1;
+    string caller_uuid = 2;
+    string domain_name = 3;
+    string app_name = 4;
+}
+
+message CanGenTokenResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    bool can_gen_token = 3;
+}
+// ***************************
+
+// RPC CAN DEL APP
+message CanDelAppRequest {
+    string tracing_ID = 1;
+    string caller_uuid = 2;
+    string domain_name = 3;
+    string app_name = 4;
+}
+
+message CanDelAppResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    bool can_del_app = 3;
+}
+// ***************************
 
 
 // RPC CREATE APP

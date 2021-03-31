@@ -24,6 +24,8 @@ type AppServiceClient interface {
 	GetApp(ctx context.Context, in *GetAppRequest, opts ...grpc.CallOption) (*GetAppResponse, error)
 	AddMember(ctx context.Context, in *AddMemberRequest, opts ...grpc.CallOption) (*AddMemberResponse, error)
 	RemoveMember(ctx context.Context, in *RemoveMemberRequest, opts ...grpc.CallOption) (*RemoveMemberResponse, error)
+	CanGenToken(ctx context.Context, in *CanGenTokenRequest, opts ...grpc.CallOption) (*CanGenTokenResponse, error)
+	CanDelApp(ctx context.Context, in *CanDelAppRequest, opts ...grpc.CallOption) (*CanDelAppResponse, error)
 }
 
 type appServiceClient struct {
@@ -88,6 +90,24 @@ func (c *appServiceClient) RemoveMember(ctx context.Context, in *RemoveMemberReq
 	return out, nil
 }
 
+func (c *appServiceClient) CanGenToken(ctx context.Context, in *CanGenTokenRequest, opts ...grpc.CallOption) (*CanGenTokenResponse, error) {
+	out := new(CanGenTokenResponse)
+	err := c.cc.Invoke(ctx, "/app_service.AppService/CanGenToken", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *appServiceClient) CanDelApp(ctx context.Context, in *CanDelAppRequest, opts ...grpc.CallOption) (*CanDelAppResponse, error) {
+	out := new(CanDelAppResponse)
+	err := c.cc.Invoke(ctx, "/app_service.AppService/CanDelApp", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AppServiceServer is the server API for AppService service.
 // All implementations must embed UnimplementedAppServiceServer
 // for forward compatibility
@@ -98,6 +118,8 @@ type AppServiceServer interface {
 	GetApp(context.Context, *GetAppRequest) (*GetAppResponse, error)
 	AddMember(context.Context, *AddMemberRequest) (*AddMemberResponse, error)
 	RemoveMember(context.Context, *RemoveMemberRequest) (*RemoveMemberResponse, error)
+	CanGenToken(context.Context, *CanGenTokenRequest) (*CanGenTokenResponse, error)
+	CanDelApp(context.Context, *CanDelAppRequest) (*CanDelAppResponse, error)
 	mustEmbedUnimplementedAppServiceServer()
 }
 
@@ -122,6 +144,12 @@ func (UnimplementedAppServiceServer) AddMember(context.Context, *AddMemberReques
 }
 func (UnimplementedAppServiceServer) RemoveMember(context.Context, *RemoveMemberRequest) (*RemoveMemberResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RemoveMember not implemented")
+}
+func (UnimplementedAppServiceServer) CanGenToken(context.Context, *CanGenTokenRequest) (*CanGenTokenResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CanGenToken not implemented")
+}
+func (UnimplementedAppServiceServer) CanDelApp(context.Context, *CanDelAppRequest) (*CanDelAppResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CanDelApp not implemented")
 }
 func (UnimplementedAppServiceServer) mustEmbedUnimplementedAppServiceServer() {}
 
@@ -244,6 +272,42 @@ func _AppService_RemoveMember_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AppService_CanGenToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CanGenTokenRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppServiceServer).CanGenToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/app_service.AppService/CanGenToken",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppServiceServer).CanGenToken(ctx, req.(*CanGenTokenRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AppService_CanDelApp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CanDelAppRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppServiceServer).CanDelApp(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/app_service.AppService/CanDelApp",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppServiceServer).CanDelApp(ctx, req.(*CanDelAppRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AppService_ServiceDesc is the grpc.ServiceDesc for AppService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -274,6 +338,14 @@ var AppService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RemoveMember",
 			Handler:    _AppService_RemoveMember_Handler,
+		},
+		{
+			MethodName: "CanGenToken",
+			Handler:    _AppService_CanGenToken_Handler,
+		},
+		{
+			MethodName: "CanDelApp",
+			Handler:    _AppService_CanDelApp_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
