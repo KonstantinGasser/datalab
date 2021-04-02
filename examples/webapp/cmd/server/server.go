@@ -15,6 +15,7 @@ import (
 func Run(serverAddress string) error {
 	// create network listener listening on TCP:somePort
 	listener, err := net.Listen("tcp", serverAddress)
+	defer listener.Close()
 	if err != nil {
 		log.Fatalf("could not start listener on: %s:%v", serverAddress, err)
 		return err

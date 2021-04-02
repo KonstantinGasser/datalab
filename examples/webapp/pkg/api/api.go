@@ -62,7 +62,6 @@ func (api API) decode(body io.Reader, data interface{}) error {
 // (initializes the API). This is a responsibility of the client how's creating
 // a new API
 func (api API) SetUp() {
-
 	api.route("/", api.HandlerHome)
 	api.route("/register", api.HandlerRegister)
 	api.route("/login", api.HandlerLogin)
