@@ -14,8 +14,8 @@ The project can be structured in a hexagon fashion which increases the de-coupli
 - - - services
 - - - - user 
 - - - - - user.go
-- - - - storage
-- - - - - storage.go
+- - - storage
+- - - - storage.go
 - - main.go
 
 The interesting part here is the `pkg` directory in which the different components are described. There is a dedicated `api` folder in which everything regarding the API will be and there are `services/user` and `storage` folders again only dealing with their domain. (this is not a must an surely can be done in 100 different ways but that's how I have been doing it and some others :).
@@ -36,6 +36,7 @@ This is the part were we start dealing with all the things we need to do in orde
 - creating an API
 - initializing the API
 - and so one
+
 In the file `cmd/server/server.go` we have this function
 ```golang
 func Run(serverAddress string) error {
