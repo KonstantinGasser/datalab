@@ -12,12 +12,11 @@ import (
 )
 
 // IssueJWT issues a new JWT for a authenticated user only
-func (srv TokenService) IssueUserToken(ctx context.Context, request *tokenSrv.IssueUserTokenRequest) (*tokenSrv.IssueUserTokenResponse, error) {
-	// add tracingID from request to context
-	ctx = ctx_value.AddValue(ctx, "tracingID", request.GetTracing_ID())
-
+func (srv TokenService) IssueUserToken(ctx context.Context, in *tokenSrv.IssueUserTokenRequest) (*tokenSrv.IssueUserTokenResponse, error) {
+	ctx = ctx_value.AddValue(ctx, "tracingID", in.GetTracing_ID())
 	logrus.Infof("<%v>[tokenService.IssueUserToken] received request\n", ctx_value.GetString(ctx, "tracingID"))
-	userClaim := request.GetClaim()
+
+	userClaim := in.GetClaim()
 	token, err := jwts.IssueUser(ctx, userClaim)
 	if err != nil {
 		logrus.Errorf("<%v>[tokenService.IssueUserToken] could not issue JWT for user: %v", ctx_value.GetString(ctx, "tracingID"), err)

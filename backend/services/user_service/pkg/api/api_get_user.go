@@ -8,13 +8,11 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func (srv UserService) GetUser(ctx context.Context, request *userSrv.GetUserRequest) (*userSrv.GetUserResponse, error) {
-	// add tracingID to context
-	ctx = ctx_value.AddValue(ctx, "tracingID", request.GetTracing_ID())
-
+func (srv UserService) GetUser(ctx context.Context, in *userSrv.GetUserRequest) (*userSrv.GetUserResponse, error) {
+	ctx = ctx_value.AddValue(ctx, "tracingID", in.GetTracing_ID())
 	logrus.Infof("<%v>[userService.GetUser] received request\n", ctx_value.GetString(ctx, "tracingID"))
 
-	status, user, err := srv.user.GetByID(ctx, srv.storage, request.GetForUuid())
+	status, user, err := srv.user.GetByID(ctx, srv.storage, in.GetForUuid())
 	if err != nil {
 		logrus.Errorf("<%v>[userService.GetUser] could not get user details: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
 		return &userSrv.GetUserResponse{StatusCode: int32(status), Msg: err.Error(), User: nil}, nil

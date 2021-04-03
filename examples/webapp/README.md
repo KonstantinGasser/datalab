@@ -112,7 +112,7 @@ func New(userService user.User, storage storage.Storage) API {
 	}
 }
 ```
-### Added routes to the API
+### Adding routes to the API
 ``` golang
 func (api API) SetUp() {
 	api.route("/", api.HandlerHome)
@@ -144,7 +144,7 @@ type inMem struct {
 }
 ```
 The field `store` is the actual `map` which holds the data (maps in Go can be compared to HashMaps in Java, dictionaries in Python or Objects in JavaScript). For now the `sync.Mutex` is something we can ignore, but what it does it it ensures, that a Storage operation will block the access to the `store` and therefore makes it thread-save.
-Now that a have struct representing our storage we can add all the function in order to implement the `Storage interface`.
+Now that we have a struct representing our storage we can add all the function in order to implement the `Storage interface`.
 I will not really talk about the content of the function since this is only an example and surely will differ depending on how you want to store data (a reference for a MongoDB storage can be found here: https://github.com/KonstantinGasser/clickstream/blob/main/backend/services/user_service/pkg/storage/mongo.go). Once all functions as defined by the `Storage interface` are implemented the `type inMem` can now act as a `type Storage`.
 
 ## User-Service
@@ -155,8 +155,8 @@ type User interface {
 	Login(ctx context.Context, storage storage.Storage, in LoginRequest) (int, error)
 }
 ```
-Again we need a struct which implements all of the functions and then can act as a `type User`
-One interesting thing I want to point out is that the `User` function require to have a `storage.Storage` passed as an argument. This is referring to the `hexagonal` project-structure. The user service is not coupled to a specific Storage but rather the Storage can switch at runtime.
+Again we need a struct which implements all of the functions and then can act as a `type User`.
+One interesting thing I want to point out is that the `User` function requires to have a `storage.Storage` passed as an argument. This is referring to the `hexagonal` project-structure. The user service is not coupled to a specific Storage but rather the Storage can switch at runtime.
 As a last thing the `package user` should also define what data the functions accept. The `Register` function requires a `RegisterRequest` type.
 ``` golang
 type RegisterRequest struct {
@@ -192,7 +192,7 @@ func (api API) HandlerRegister(w http.ResponseWriter, r *http.Request) {
 	})
 }
 ```
-The first thing we do is declaring a variable (`reqData`) which will hold the request JSON. Notice that `reqData` is of type `user.RegisterRequest` and hence will bind the JSON fields. Next we use the API helper func `decode` to decode the request JSON into the `reqData` - important: notice how the `api.decode` is not returning any data? That is because we are passing in the pointer to the `reqData`. If you feel uncomfortable using pointer you could re-write the function to return the data..but make sure to learn about pointer since Go uses them in quite some places :). After we decoded the JSON data we can forward the request to the user service to perform the registration. The way I have implemented the user service functions their first return parameter will always be a status-code (200, 404, 401, 500) then optional data and lastly an error. If the operation fails I handle the error and let the client know by utilizing the `api.onError` function. If everything works the `api.onSuccess` is used to inform the client.
+The first thing we do is declaring a variable (`reqData`) which will hold the request JSON. Notice that `reqData` is of type `user.RegisterRequest` and hence will bind the JSON fields. Next we use the API helper func `decode` to decode the request JSON into the `reqData` - important: notice how the `api.decode` is not returning any data? That is because we are passing in the pointer to the `reqData`. If you feel uncomfortable using pointers you could re-write the function to return the data..but make sure to learn about pointer since Go uses them in quite some places :). After we decoded the JSON data we can forward the request to the user service to perform the registration. The way I have implemented the user service functions their first return parameter will always be a status-code (200, 404, 401, 500) then optional data and lastly an error. If the operation fails I handle the error and let the client know by utilizing the `api.onError` function. If everything works the `api.onSuccess` is used to inform the client.
 
 
 ## Example in action

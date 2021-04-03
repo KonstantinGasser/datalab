@@ -12,17 +12,16 @@ import (
 
 // AuthUser is a public interface of the service allowing to authenticate
 // a user by its credentials
-func (srv UserService) UpdateUser(ctx context.Context, request *userSrv.UpdateUserRequest) (*userSrv.UpdateUserResponse, error) {
-	// add tracingID to context
-	ctx = ctx_value.AddValue(ctx, "tracingID", request.GetTracing_ID())
+func (srv UserService) UpdateUser(ctx context.Context, in *userSrv.UpdateUserRequest) (*userSrv.UpdateUserResponse, error) {
+	ctx = ctx_value.AddValue(ctx, "tracingID", in.GetTracing_ID())
 	logrus.Infof("<%v>[userService.UpdateUser] received request\n", ctx_value.GetString(ctx, "tracingID"))
 
 	status, err := srv.user.Update(ctx, srv.storage, user.UserItemUpdateable{
-		UUID:          request.GetCallerUuid(),
-		FirstName:     strings.TrimSpace(request.GetUser().GetFirstName()),
-		LastName:      strings.TrimSpace(request.GetUser().GetLastName()),
-		OrgnPosition:  strings.TrimSpace(request.GetUser().GetOrgnPosition()),
-		ProfileImgURL: strings.TrimSpace(request.GetUser().GetProfileImgUrl()),
+		UUID:          in.GetCallerUuid(),
+		FirstName:     strings.TrimSpace(in.GetUser().GetFirstName()),
+		LastName:      strings.TrimSpace(in.GetUser().GetLastName()),
+		OrgnPosition:  strings.TrimSpace(in.GetUser().GetOrgnPosition()),
+		ProfileImgURL: strings.TrimSpace(in.GetUser().GetProfileImgUrl()),
 	})
 	if err != nil {
 		logrus.Errorf("<%v>[userService.UpdateUser] could not update user: %v\n", err)

@@ -14,8 +14,8 @@ import (
 )
 
 // CreateUser receives the grpc request and handles user registration
-func (srv UserService) CreateUser(ctx context.Context, request *userSrv.CreateUserRequest) (*userSrv.CreateUserResponse, error) {
-	ctx = ctx_value.AddValue(ctx, "tracingID", request.GetTracing_ID())
+func (srv UserService) CreateUser(ctx context.Context, in *userSrv.CreateUserRequest) (*userSrv.CreateUserResponse, error) {
+	ctx = ctx_value.AddValue(ctx, "tracingID", in.GetTracing_ID())
 	logrus.Infof("<%v>[userService.CreateUser] received request\n", ctx_value.GetString(ctx, "tracingID"))
 
 	// create unique user UUID (also used as pk _id for mongo document) and hash password
@@ -24,7 +24,7 @@ func (srv UserService) CreateUser(ctx context.Context, request *userSrv.CreateUs
 		logrus.Errorf("<%v>[userService.CreateUser] could not generate UUID for user: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
 		return &userSrv.CreateUserResponse{StatusCode: http.StatusInternalServerError, Msg: "could not create user"}, nil
 	}
-	hashedPassword, err := hash.FromPassword([]byte(request.GetUser().GetPassword()))
+	hashedPassword, err := hash.FromPassword([]byte(in.GetUser().GetPassword()))
 	if err != nil {
 		logrus.Errorf("<%v>[userService.CreateUser] could not hash user password: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
 		return &userSrv.CreateUserResponse{StatusCode: http.StatusInternalServerError, Msg: "could not create user"}, nil
@@ -32,12 +32,12 @@ func (srv UserService) CreateUser(ctx context.Context, request *userSrv.CreateUs
 
 	status, err := srv.user.InsertNew(ctx, srv.storage, user.UserItem{
 		UUID:          uuid,
-		Username:      strings.TrimSpace(request.GetUser().GetUsername()),
+		Username:      strings.TrimSpace(in.GetUser().GetUsername()),
 		Password:      hashedPassword,
-		FirstName:     strings.TrimSpace(request.GetUser().GetFirstName()),
-		LastName:      strings.TrimSpace(request.GetUser().GetLastName()),
-		OrgnDomain:    strings.TrimSpace(request.GetUser().GetOrgnDomain()),
-		OrgnPosition:  strings.TrimSpace(request.GetUser().GetOrgnPosition()),
+		FirstName:     strings.TrimSpace(in.GetUser().GetFirstName()),
+		LastName:      strings.TrimSpace(in.GetUser().GetLastName()),
+		OrgnDomain:    strings.TrimSpace(in.GetUser().GetOrgnDomain()),
+		OrgnPosition:  strings.TrimSpace(in.GetUser().GetOrgnPosition()),
 		ProfileImgURL: "https://avatars.githubusercontent.com/u/43576797?v=4", // can be set to default image later
 	})
 	if err != nil {

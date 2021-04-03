@@ -10,12 +10,11 @@ import (
 
 // AuthUser is a public interface of the service allowing to authenticate
 // a user by its credentials
-func (srv UserService) VerifySameOrgn(ctx context.Context, request *userSrv.VerifySameOrgnRequest) (*userSrv.VerifySameOrgnResposne, error) {
-	// add tracingID to context
-	ctx = ctx_value.AddValue(ctx, "tracingID", request.GetTracing_ID())
+func (srv UserService) VerifySameOrgn(ctx context.Context, in *userSrv.VerifySameOrgnRequest) (*userSrv.VerifySameOrgnResposne, error) {
+	ctx = ctx_value.AddValue(ctx, "tracingID", in.GetTracing_ID())
 	logrus.Infof("<%v>[userService.VerifySameOrgn] received request\n", ctx_value.GetString(ctx, "tracingID"))
 
-	status, areValid, missedItems, err := srv.user.VerifySameOrgn(ctx, srv.storage, request.GetBaseObject(), request.GetCompareWith())
+	status, areValid, missedItems, err := srv.user.VerifySameOrgn(ctx, srv.storage, in.GetBaseObject(), in.GetCompareWith())
 	if err != nil {
 		logrus.Errorf("<%v>[userService.VerifySameOrgn] could not compare items: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
 		return &userSrv.VerifySameOrgnResposne{StatusCode: int32(status), Msg: "could not compare items"}, nil

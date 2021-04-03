@@ -17,8 +17,6 @@ func New() User {
 	return &user{}
 }
 
-// Defined Request struct allowing for type safety
-
 // RegisterRequest represents the passed HTTP JSON by the client
 type RegisterRequest struct {
 	Username string `json:"username"`

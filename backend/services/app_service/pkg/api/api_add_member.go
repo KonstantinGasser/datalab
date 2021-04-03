@@ -10,16 +10,15 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func (srv AppService) AddMember(ctx context.Context, request *appSrv.AddMemberRequest) (*appSrv.AddMemberResponse, error) {
-	ctx = ctx_value.AddValue(ctx, "tracingID", request.GetTracing_ID())
-	logrus.Infof("<%v>[appService.AddMember] received request\n", ctx_value.GetString(ctx, "tracingID"))
+func (srv AppService) AddMember(ctx context.Context, in *appSrv.AddMemberRequest) (*appSrv.AddMemberResponse, error) {
+	ctx = ctx_value.AddValue(ctx, "tracingID", in.GetTracing_ID())
+	logrus.Infof("<%v>[appService.AddMember] received in\n", ctx_value.GetString(ctx, "tracingID"))
 
-	// verify that all passed members belong to the app_owner organization
 	resp, err := srv.userService.VerifySameOrgn(ctx, &userSrv.VerifySameOrgnRequest{
 		Tracing_ID:  ctx_value.GetString(ctx, "tracingID"),
-		CallerUuid:  request.GetCallerUuid(),
-		BaseObject:  request.GetCallerUuid(),
-		CompareWith: request.GetMember(),
+		CallerUuid:  in.GetCallerUuid(),
+		BaseObject:  in.GetCallerUuid(),
+		CompareWith: in.GetMember(),
 	})
 	if err != nil {
 		logrus.Errorf("<%v>[appService.AddMember] could not execute grpc.AreInSameOrng: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
@@ -32,7 +31,7 @@ func (srv AppService) AddMember(ctx context.Context, request *appSrv.AddMemberRe
 		return &appSrv.AddMemberResponse{StatusCode: int32(http.StatusBadRequest), Msg: "all member must be from owner orgn"}, nil
 	}
 
-	status, err := srv.app.AddMember(ctx, srv.storage, request.GetCallerUuid(), request.GetAppUuid(), request.GetMember())
+	status, err := srv.app.AddMember(ctx, srv.storage, in.GetCallerUuid(), in.GetAppUuid(), in.GetMember())
 	if err != nil {
 		logrus.Errorf("<v>[appService.AddMember] could not add member to app: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
 		return &appSrv.AddMemberResponse{StatusCode: int32(status), Msg: "could not add member(s) to app"}, nil

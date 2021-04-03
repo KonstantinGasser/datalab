@@ -11,12 +11,11 @@ import (
 )
 
 // ValidateJWT validates authenticated users JWT. Token can be invalid if they have been changes or if they have expired
-func (srv TokenService) VerifyUserToken(ctx context.Context, request *tokenSrv.VerifyUserTokenRequest) (*tokenSrv.VerifyUserTokenResponse, error) {
-	// add tracingID from request to context
-	ctx = ctx_value.AddValue(ctx, "tracingID", request.GetTracing_ID())
-
+func (srv TokenService) VerifyUserToken(ctx context.Context, in *tokenSrv.VerifyUserTokenRequest) (*tokenSrv.VerifyUserTokenResponse, error) {
+	ctx = ctx_value.AddValue(ctx, "tracingID", in.GetTracing_ID())
 	logrus.Infof("<%v>[tokenService.VerifyUserToken] received request\n", ctx_value.GetString(ctx, "tracingID"))
-	userInfo, err := jwts.GetJWTClaims(ctx, request.GetUserToken())
+
+	userInfo, err := jwts.GetJWTClaims(ctx, in.GetUserToken())
 	if err != nil {
 		logrus.Errorf("<%v>[tokenService.VerifyUserToken] could not get JWT claims: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
 		return &tokenSrv.VerifyUserTokenResponse{

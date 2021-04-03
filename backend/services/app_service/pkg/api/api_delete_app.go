@@ -9,11 +9,11 @@ import (
 )
 
 // DeleteApp is the grpc endpoint to delete an app based on a app uuid
-func (srv AppService) DeleteApp(ctx context.Context, request *appSrv.DeleteAppRequest) (*appSrv.DeleteAppResponse, error) {
-	ctx = ctx_value.AddValue(ctx, "tracingID", request.GetTracing_ID())
+func (srv AppService) DeleteApp(ctx context.Context, in *appSrv.DeleteAppRequest) (*appSrv.DeleteAppResponse, error) {
+	ctx = ctx_value.AddValue(ctx, "tracingID", in.GetTracing_ID())
 	logrus.Infof("<%v>[appService.DeleteApp] received request\n", ctx_value.GetString(ctx, "tracingID"))
 
-	status, err := srv.app.DeleteApp(ctx, srv.storage, request.GetAppUuid())
+	status, err := srv.app.DeleteApp(ctx, srv.storage, in.GetAppUuid())
 	if err != nil {
 		logrus.Errorf("<%v>[appService.DeleteApp] could not delete app: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
 		return &appSrv.DeleteAppResponse{StatusCode: int32(status), Msg: err.Error()}, nil

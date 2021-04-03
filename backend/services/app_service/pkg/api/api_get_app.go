@@ -8,11 +8,11 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func (srv AppService) GetApp(ctx context.Context, request *appSrv.GetAppRequest) (*appSrv.GetAppResponse, error) {
-	ctx = ctx_value.AddValue(ctx, "tracingID", request.GetTracing_ID())
+func (srv AppService) GetApp(ctx context.Context, in *appSrv.GetAppRequest) (*appSrv.GetAppResponse, error) {
+	ctx = ctx_value.AddValue(ctx, "tracingID", in.GetTracing_ID())
 	logrus.Infof("<%v>[appService.GetApp] received request\n", ctx_value.GetString(ctx, "tracingID"))
 
-	status, app, err := srv.app.GetApp(ctx, srv.storage, srv.userService, request.GetAppUuid(), request.GetCallerUuid())
+	status, app, err := srv.app.GetApp(ctx, srv.storage, srv.userService, in.GetAppUuid(), in.GetCallerUuid())
 	if err != nil {
 		logrus.Errorf("<%v>[appService.GetApp] could not GetApp: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
 		return &appSrv.GetAppResponse{StatusCode: int32(status), Msg: "could not get application data"}, nil
