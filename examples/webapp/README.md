@@ -36,6 +36,7 @@ This is the part were we start dealing with all the things we need to do in orde
 - creating an API
 - initializing the API
 - and so one
+
 In the file `cmd/server/server.go` we have this function
 ```golang
 func Run(serverAddress string) error {
