@@ -14,338 +14,374 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// AppServiceClient is the client API for AppService service.
+// AppClient is the client API for App service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type AppServiceClient interface {
-	CreateApp(ctx context.Context, in *CreateAppRequest, opts ...grpc.CallOption) (*CreateAppResponse, error)
-	DeleteApp(ctx context.Context, in *DeleteAppRequest, opts ...grpc.CallOption) (*DeleteAppResponse, error)
-	GetAppList(ctx context.Context, in *GetAppListRequest, opts ...grpc.CallOption) (*GetAppListResponse, error)
-	GetApp(ctx context.Context, in *GetAppRequest, opts ...grpc.CallOption) (*GetAppResponse, error)
+type AppClient interface {
+	Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateResponse, error)
+	Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
+	GetList(ctx context.Context, in *GetListRequest, opts ...grpc.CallOption) (*GetListResponse, error)
+	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
 	AddMember(ctx context.Context, in *AddMemberRequest, opts ...grpc.CallOption) (*AddMemberResponse, error)
 	RemoveMember(ctx context.Context, in *RemoveMemberRequest, opts ...grpc.CallOption) (*RemoveMemberResponse, error)
 	CanGenToken(ctx context.Context, in *CanGenTokenRequest, opts ...grpc.CallOption) (*CanGenTokenResponse, error)
 	CanDelApp(ctx context.Context, in *CanDelAppRequest, opts ...grpc.CallOption) (*CanDelAppResponse, error)
+	GenerateToken(ctx context.Context, in *GenerateTokenRequest, opts ...grpc.CallOption) (*GenerateTokenResponse, error)
 }
 
-type appServiceClient struct {
+type appClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewAppServiceClient(cc grpc.ClientConnInterface) AppServiceClient {
-	return &appServiceClient{cc}
+func NewAppClient(cc grpc.ClientConnInterface) AppClient {
+	return &appClient{cc}
 }
 
-func (c *appServiceClient) CreateApp(ctx context.Context, in *CreateAppRequest, opts ...grpc.CallOption) (*CreateAppResponse, error) {
-	out := new(CreateAppResponse)
-	err := c.cc.Invoke(ctx, "/app_service.AppService/CreateApp", in, out, opts...)
+func (c *appClient) Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateResponse, error) {
+	out := new(CreateResponse)
+	err := c.cc.Invoke(ctx, "/app_service.App/Create", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *appServiceClient) DeleteApp(ctx context.Context, in *DeleteAppRequest, opts ...grpc.CallOption) (*DeleteAppResponse, error) {
-	out := new(DeleteAppResponse)
-	err := c.cc.Invoke(ctx, "/app_service.AppService/DeleteApp", in, out, opts...)
+func (c *appClient) Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error) {
+	out := new(DeleteResponse)
+	err := c.cc.Invoke(ctx, "/app_service.App/Delete", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *appServiceClient) GetAppList(ctx context.Context, in *GetAppListRequest, opts ...grpc.CallOption) (*GetAppListResponse, error) {
-	out := new(GetAppListResponse)
-	err := c.cc.Invoke(ctx, "/app_service.AppService/GetAppList", in, out, opts...)
+func (c *appClient) GetList(ctx context.Context, in *GetListRequest, opts ...grpc.CallOption) (*GetListResponse, error) {
+	out := new(GetListResponse)
+	err := c.cc.Invoke(ctx, "/app_service.App/GetList", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *appServiceClient) GetApp(ctx context.Context, in *GetAppRequest, opts ...grpc.CallOption) (*GetAppResponse, error) {
-	out := new(GetAppResponse)
-	err := c.cc.Invoke(ctx, "/app_service.AppService/GetApp", in, out, opts...)
+func (c *appClient) Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error) {
+	out := new(GetResponse)
+	err := c.cc.Invoke(ctx, "/app_service.App/Get", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *appServiceClient) AddMember(ctx context.Context, in *AddMemberRequest, opts ...grpc.CallOption) (*AddMemberResponse, error) {
+func (c *appClient) AddMember(ctx context.Context, in *AddMemberRequest, opts ...grpc.CallOption) (*AddMemberResponse, error) {
 	out := new(AddMemberResponse)
-	err := c.cc.Invoke(ctx, "/app_service.AppService/AddMember", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/app_service.App/AddMember", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *appServiceClient) RemoveMember(ctx context.Context, in *RemoveMemberRequest, opts ...grpc.CallOption) (*RemoveMemberResponse, error) {
+func (c *appClient) RemoveMember(ctx context.Context, in *RemoveMemberRequest, opts ...grpc.CallOption) (*RemoveMemberResponse, error) {
 	out := new(RemoveMemberResponse)
-	err := c.cc.Invoke(ctx, "/app_service.AppService/RemoveMember", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/app_service.App/RemoveMember", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *appServiceClient) CanGenToken(ctx context.Context, in *CanGenTokenRequest, opts ...grpc.CallOption) (*CanGenTokenResponse, error) {
+func (c *appClient) CanGenToken(ctx context.Context, in *CanGenTokenRequest, opts ...grpc.CallOption) (*CanGenTokenResponse, error) {
 	out := new(CanGenTokenResponse)
-	err := c.cc.Invoke(ctx, "/app_service.AppService/CanGenToken", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/app_service.App/CanGenToken", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *appServiceClient) CanDelApp(ctx context.Context, in *CanDelAppRequest, opts ...grpc.CallOption) (*CanDelAppResponse, error) {
+func (c *appClient) CanDelApp(ctx context.Context, in *CanDelAppRequest, opts ...grpc.CallOption) (*CanDelAppResponse, error) {
 	out := new(CanDelAppResponse)
-	err := c.cc.Invoke(ctx, "/app_service.AppService/CanDelApp", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/app_service.App/CanDelApp", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// AppServiceServer is the server API for AppService service.
-// All implementations must embed UnimplementedAppServiceServer
+func (c *appClient) GenerateToken(ctx context.Context, in *GenerateTokenRequest, opts ...grpc.CallOption) (*GenerateTokenResponse, error) {
+	out := new(GenerateTokenResponse)
+	err := c.cc.Invoke(ctx, "/app_service.App/GenerateToken", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// AppServer is the server API for App service.
+// All implementations must embed UnimplementedAppServer
 // for forward compatibility
-type AppServiceServer interface {
-	CreateApp(context.Context, *CreateAppRequest) (*CreateAppResponse, error)
-	DeleteApp(context.Context, *DeleteAppRequest) (*DeleteAppResponse, error)
-	GetAppList(context.Context, *GetAppListRequest) (*GetAppListResponse, error)
-	GetApp(context.Context, *GetAppRequest) (*GetAppResponse, error)
+type AppServer interface {
+	Create(context.Context, *CreateRequest) (*CreateResponse, error)
+	Delete(context.Context, *DeleteRequest) (*DeleteResponse, error)
+	GetList(context.Context, *GetListRequest) (*GetListResponse, error)
+	Get(context.Context, *GetRequest) (*GetResponse, error)
 	AddMember(context.Context, *AddMemberRequest) (*AddMemberResponse, error)
 	RemoveMember(context.Context, *RemoveMemberRequest) (*RemoveMemberResponse, error)
 	CanGenToken(context.Context, *CanGenTokenRequest) (*CanGenTokenResponse, error)
 	CanDelApp(context.Context, *CanDelAppRequest) (*CanDelAppResponse, error)
-	mustEmbedUnimplementedAppServiceServer()
+	GenerateToken(context.Context, *GenerateTokenRequest) (*GenerateTokenResponse, error)
+	mustEmbedUnimplementedAppServer()
 }
 
-// UnimplementedAppServiceServer must be embedded to have forward compatible implementations.
-type UnimplementedAppServiceServer struct {
+// UnimplementedAppServer must be embedded to have forward compatible implementations.
+type UnimplementedAppServer struct {
 }
 
-func (UnimplementedAppServiceServer) CreateApp(context.Context, *CreateAppRequest) (*CreateAppResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateApp not implemented")
+func (UnimplementedAppServer) Create(context.Context, *CreateRequest) (*CreateResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
 }
-func (UnimplementedAppServiceServer) DeleteApp(context.Context, *DeleteAppRequest) (*DeleteAppResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteApp not implemented")
+func (UnimplementedAppServer) Delete(context.Context, *DeleteRequest) (*DeleteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
 }
-func (UnimplementedAppServiceServer) GetAppList(context.Context, *GetAppListRequest) (*GetAppListResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetAppList not implemented")
+func (UnimplementedAppServer) GetList(context.Context, *GetListRequest) (*GetListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetList not implemented")
 }
-func (UnimplementedAppServiceServer) GetApp(context.Context, *GetAppRequest) (*GetAppResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetApp not implemented")
+func (UnimplementedAppServer) Get(context.Context, *GetRequest) (*GetResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
 }
-func (UnimplementedAppServiceServer) AddMember(context.Context, *AddMemberRequest) (*AddMemberResponse, error) {
+func (UnimplementedAppServer) AddMember(context.Context, *AddMemberRequest) (*AddMemberResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddMember not implemented")
 }
-func (UnimplementedAppServiceServer) RemoveMember(context.Context, *RemoveMemberRequest) (*RemoveMemberResponse, error) {
+func (UnimplementedAppServer) RemoveMember(context.Context, *RemoveMemberRequest) (*RemoveMemberResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RemoveMember not implemented")
 }
-func (UnimplementedAppServiceServer) CanGenToken(context.Context, *CanGenTokenRequest) (*CanGenTokenResponse, error) {
+func (UnimplementedAppServer) CanGenToken(context.Context, *CanGenTokenRequest) (*CanGenTokenResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CanGenToken not implemented")
 }
-func (UnimplementedAppServiceServer) CanDelApp(context.Context, *CanDelAppRequest) (*CanDelAppResponse, error) {
+func (UnimplementedAppServer) CanDelApp(context.Context, *CanDelAppRequest) (*CanDelAppResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CanDelApp not implemented")
 }
-func (UnimplementedAppServiceServer) mustEmbedUnimplementedAppServiceServer() {}
+func (UnimplementedAppServer) GenerateToken(context.Context, *GenerateTokenRequest) (*GenerateTokenResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GenerateToken not implemented")
+}
+func (UnimplementedAppServer) mustEmbedUnimplementedAppServer() {}
 
-// UnsafeAppServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to AppServiceServer will
+// UnsafeAppServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to AppServer will
 // result in compilation errors.
-type UnsafeAppServiceServer interface {
-	mustEmbedUnimplementedAppServiceServer()
+type UnsafeAppServer interface {
+	mustEmbedUnimplementedAppServer()
 }
 
-func RegisterAppServiceServer(s grpc.ServiceRegistrar, srv AppServiceServer) {
-	s.RegisterService(&AppService_ServiceDesc, srv)
+func RegisterAppServer(s grpc.ServiceRegistrar, srv AppServer) {
+	s.RegisterService(&App_ServiceDesc, srv)
 }
 
-func _AppService_CreateApp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateAppRequest)
+func _App_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AppServiceServer).CreateApp(ctx, in)
+		return srv.(AppServer).Create(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/app_service.AppService/CreateApp",
+		FullMethod: "/app_service.App/Create",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AppServiceServer).CreateApp(ctx, req.(*CreateAppRequest))
+		return srv.(AppServer).Create(ctx, req.(*CreateRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AppService_DeleteApp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteAppRequest)
+func _App_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AppServiceServer).DeleteApp(ctx, in)
+		return srv.(AppServer).Delete(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/app_service.AppService/DeleteApp",
+		FullMethod: "/app_service.App/Delete",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AppServiceServer).DeleteApp(ctx, req.(*DeleteAppRequest))
+		return srv.(AppServer).Delete(ctx, req.(*DeleteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AppService_GetAppList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetAppListRequest)
+func _App_GetList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetListRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AppServiceServer).GetAppList(ctx, in)
+		return srv.(AppServer).GetList(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/app_service.AppService/GetAppList",
+		FullMethod: "/app_service.App/GetList",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AppServiceServer).GetAppList(ctx, req.(*GetAppListRequest))
+		return srv.(AppServer).GetList(ctx, req.(*GetListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AppService_GetApp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetAppRequest)
+func _App_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AppServiceServer).GetApp(ctx, in)
+		return srv.(AppServer).Get(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/app_service.AppService/GetApp",
+		FullMethod: "/app_service.App/Get",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AppServiceServer).GetApp(ctx, req.(*GetAppRequest))
+		return srv.(AppServer).Get(ctx, req.(*GetRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AppService_AddMember_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _App_AddMember_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AddMemberRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AppServiceServer).AddMember(ctx, in)
+		return srv.(AppServer).AddMember(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/app_service.AppService/AddMember",
+		FullMethod: "/app_service.App/AddMember",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AppServiceServer).AddMember(ctx, req.(*AddMemberRequest))
+		return srv.(AppServer).AddMember(ctx, req.(*AddMemberRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AppService_RemoveMember_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _App_RemoveMember_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(RemoveMemberRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AppServiceServer).RemoveMember(ctx, in)
+		return srv.(AppServer).RemoveMember(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/app_service.AppService/RemoveMember",
+		FullMethod: "/app_service.App/RemoveMember",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AppServiceServer).RemoveMember(ctx, req.(*RemoveMemberRequest))
+		return srv.(AppServer).RemoveMember(ctx, req.(*RemoveMemberRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AppService_CanGenToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _App_CanGenToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CanGenTokenRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AppServiceServer).CanGenToken(ctx, in)
+		return srv.(AppServer).CanGenToken(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/app_service.AppService/CanGenToken",
+		FullMethod: "/app_service.App/CanGenToken",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AppServiceServer).CanGenToken(ctx, req.(*CanGenTokenRequest))
+		return srv.(AppServer).CanGenToken(ctx, req.(*CanGenTokenRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AppService_CanDelApp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _App_CanDelApp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CanDelAppRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AppServiceServer).CanDelApp(ctx, in)
+		return srv.(AppServer).CanDelApp(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/app_service.AppService/CanDelApp",
+		FullMethod: "/app_service.App/CanDelApp",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AppServiceServer).CanDelApp(ctx, req.(*CanDelAppRequest))
+		return srv.(AppServer).CanDelApp(ctx, req.(*CanDelAppRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// AppService_ServiceDesc is the grpc.ServiceDesc for AppService service.
+func _App_GenerateToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GenerateTokenRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppServer).GenerateToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/app_service.App/GenerateToken",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppServer).GenerateToken(ctx, req.(*GenerateTokenRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// App_ServiceDesc is the grpc.ServiceDesc for App service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var AppService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "app_service.AppService",
-	HandlerType: (*AppServiceServer)(nil),
+var App_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "app_service.App",
+	HandlerType: (*AppServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "CreateApp",
-			Handler:    _AppService_CreateApp_Handler,
+			MethodName: "Create",
+			Handler:    _App_Create_Handler,
 		},
 		{
-			MethodName: "DeleteApp",
-			Handler:    _AppService_DeleteApp_Handler,
+			MethodName: "Delete",
+			Handler:    _App_Delete_Handler,
 		},
 		{
-			MethodName: "GetAppList",
-			Handler:    _AppService_GetAppList_Handler,
+			MethodName: "GetList",
+			Handler:    _App_GetList_Handler,
 		},
 		{
-			MethodName: "GetApp",
-			Handler:    _AppService_GetApp_Handler,
+			MethodName: "Get",
+			Handler:    _App_Get_Handler,
 		},
 		{
 			MethodName: "AddMember",
-			Handler:    _AppService_AddMember_Handler,
+			Handler:    _App_AddMember_Handler,
 		},
 		{
 			MethodName: "RemoveMember",
-			Handler:    _AppService_RemoveMember_Handler,
+			Handler:    _App_RemoveMember_Handler,
 		},
 		{
 			MethodName: "CanGenToken",
-			Handler:    _AppService_CanGenToken_Handler,
+			Handler:    _App_CanGenToken_Handler,
 		},
 		{
 			MethodName: "CanDelApp",
-			Handler:    _AppService_CanDelApp_Handler,
+			Handler:    _App_CanDelApp_Handler,
+		},
+		{
+			MethodName: "GenerateToken",
+			Handler:    _App_GenerateToken_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

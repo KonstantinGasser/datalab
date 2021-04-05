@@ -31,7 +31,7 @@ func (api API) HandlerAppCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// invoke grpc call to user-service to create requested app
-	respApp, err := api.AppServiceClient.CreateApp(r.Context(), &appSrv.CreateAppRequest{
+	respApp, err := api.AppClient.Create(r.Context(), &appSrv.CreateRequest{
 		Tracing_ID:   ctx_value.GetString(r.Context(), "tracingID"),
 		OwnerUuid:    user.GetUuid(),
 		Name:         payload.Name,

@@ -6,7 +6,8 @@
         "markdown",
         "latex",
         "plaintext",
-        "proto3"
+        "proto3",
+        "go"
     ],
     "spellright.parserByClass": {
         "proto3": {

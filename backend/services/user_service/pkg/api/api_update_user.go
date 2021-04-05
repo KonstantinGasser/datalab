@@ -12,7 +12,7 @@ import (
 
 // AuthUser is a public interface of the service allowing to authenticate
 // a user by its credentials
-func (srv UserService) UpdateUser(ctx context.Context, request *userSrv.UpdateUserRequest) (*userSrv.UpdateUserResponse, error) {
+func (srv UserService) Update(ctx context.Context, request *userSrv.UpdateRequest) (*userSrv.UpdateResponse, error) {
 	// add tracingID to context
 	ctx = ctx_value.AddValue(ctx, "tracingID", request.GetTracing_ID())
 	logrus.Infof("<%v>[userService.UpdateUser] received request\n", ctx_value.GetString(ctx, "tracingID"))
@@ -26,7 +26,7 @@ func (srv UserService) UpdateUser(ctx context.Context, request *userSrv.UpdateUs
 	})
 	if err != nil {
 		logrus.Errorf("<%v>[userService.UpdateUser] could not update user: %v\n", err)
-		return &userSrv.UpdateUserResponse{StatusCode: int32(status), Msg: "could not update user details"}, nil
+		return &userSrv.UpdateResponse{StatusCode: int32(status), Msg: "could not update user details"}, nil
 	}
-	return &userSrv.UpdateUserResponse{StatusCode: int32(status), Msg: "user details updated"}, nil
+	return &userSrv.UpdateResponse{StatusCode: int32(status), Msg: "user details updated"}, nil
 }

@@ -2,14 +2,14 @@ syntax="proto3";
 
 package user_service;
 
-service UserService {
+service User {
     rpc Authenticate(AuthenticateRequest) returns (AuthenticateResponse) {}
 
-    rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {}
-    rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {}
+    rpc Create(CreateRequest) returns (CreateResponse) {}
+    rpc Update(UpdateRequest) returns (UpdateResponse) {}
 
-    rpc GetUserList(GetUserListRequest) returns (GetUserListResponse) {}
-    rpc GetUser(GetUserRequest) returns (GetUserResponse) {}
+    rpc GetList(GetListRequest) returns (GetListResponse) {}
+    rpc Get(GetRequest) returns (GetResponse) {}
     
     rpc VerifySameOrgn(VerifySameOrgnRequest) returns (VerifySameOrgnResposne) {}
 }
@@ -29,11 +29,11 @@ message AuthenticateResponse {
 }
 
 // RPC CREATE USER
-message CreateUserRequest {
+message CreateRequest {
     string tracing_ID = 1;
     RegisterUser user = 2;
 }
-message CreateUserResponse {
+message CreateResponse {
     int32 status_code = 1;
     string msg = 2;    
 }
@@ -41,12 +41,12 @@ message CreateUserResponse {
 
 
 // RPC UPDATE USER
-message UpdateUserRequest {
+message UpdateRequest {
     string tracing_ID = 1;
     string caller_uuid = 2;
     UpdatableUser user = 3;
 }
-message UpdateUserResponse {
+message UpdateResponse {
     int32 status_code = 1; 
     string msg = 2;
 }
@@ -54,11 +54,11 @@ message UpdateUserResponse {
 
 
 // RPC GET USER LIST
-message GetUserListRequest {
+message GetListRequest {
     string tracing_ID = 1;
     repeated string uuid_list = 2;
 }
-message GetUserListResponse {
+message GetListResponse {
     int32 status_code = 1;
     string msg = 2;
     repeated ComplexUser user_list = 3;
@@ -67,13 +67,13 @@ message GetUserListResponse {
 
 
 // RPC GET USER
-message GetUserRequest {
+message GetRequest {
     string tracing_ID = 1;
     string caller_uuid = 2;
     string for_uuid = 3;
 }
 
-message GetUserResponse {
+message GetResponse {
     int32 status_code = 1;
     string msg = 2;
     ComplexUser user = 3;

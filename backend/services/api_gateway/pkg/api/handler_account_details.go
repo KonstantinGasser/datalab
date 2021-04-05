@@ -21,7 +21,7 @@ func (api API) HandlerAccountDetails(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// invoke grpc call to retrieve user information
-	resp, err := api.UserSrvClient.GetUser(r.Context(), &userSrv.GetUserRequest{
+	resp, err := api.UserClient.Get(r.Context(), &userSrv.GetRequest{
 		Tracing_ID: ctx_value.GetString(r.Context(), "tracingID"),
 		CallerUuid: user.GetUuid(),
 		ForUuid:    user.GetUuid(),

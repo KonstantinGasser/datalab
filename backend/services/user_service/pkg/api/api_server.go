@@ -15,7 +15,7 @@ const (
 // UserService implements all the methods required by the grpc.UserServiceServer
 // and embeds all the required dependencies
 type UserService struct {
-	userSrv.UnimplementedUserServiceServer
+	userSrv.UnimplementedUserServer
 	// *** Service Dependencies ***
 	storage storage.Storage
 	user    user.User

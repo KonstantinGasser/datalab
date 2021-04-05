@@ -31,7 +31,7 @@ func (api API) HandlerAppAddMember(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// invoke grpc to app service added new user
-	resp, err := api.AppServiceClient.AddMember(r.Context(), &appSrv.AddMemberRequest{
+	resp, err := api.AppClient.AddMember(r.Context(), &appSrv.AddMemberRequest{
 		Tracing_ID: ctx_value.GetString(r.Context(), "tracingID"),
 		CallerUuid: user.GetUuid(),
 		AppUuid:    payload.AppUUID,

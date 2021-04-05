@@ -21,7 +21,7 @@ func Run(ctx context.Context, addr string) error {
 	userService := api.NewUserService(mongoC)
 
 	// register grpc server to service
-	userSrv.RegisterUserServiceServer(srv, userService)
+	userSrv.RegisterUserServer(srv, userService)
 	listener, err := net.Listen("tcp", addr)
 	if err != nil {
 		logrus.Fatalf("[server.Run] cloud not listen to %s: %v", addr, err)

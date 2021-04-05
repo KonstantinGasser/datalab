@@ -9,16 +9,16 @@ import (
 )
 
 type AppService struct {
-	appSrv.UnimplementedAppServiceServer
+	appSrv.UnimplementedAppServer
 	storage storage.Storage
 	app     app.App
 	// *** Service Dependencies ***
-	userService userSrv.UserServiceClient
+	userService userSrv.UserClient
 }
 
-func NewAppServiceServer(storage storage.Storage) AppService {
+func NewAppServer(storage storage.Storage) AppService {
 	app := app.NewApp()
-	userService := grpcC.NewUserServiceClient(":8001")
+	userService := grpcC.NewUserClient(":8001")
 	return AppService{
 		storage:     storage,
 		app:         app,

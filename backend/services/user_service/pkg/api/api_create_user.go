@@ -14,7 +14,7 @@ import (
 )
 
 // CreateUser receives the grpc request and handles user registration
-func (srv UserService) CreateUser(ctx context.Context, request *userSrv.CreateUserRequest) (*userSrv.CreateUserResponse, error) {
+func (srv UserService) Create(ctx context.Context, request *userSrv.CreateRequest) (*userSrv.CreateResponse, error) {
 	ctx = ctx_value.AddValue(ctx, "tracingID", request.GetTracing_ID())
 	logrus.Infof("<%v>[userService.CreateUser] received request\n", ctx_value.GetString(ctx, "tracingID"))
 
@@ -22,12 +22,12 @@ func (srv UserService) CreateUser(ctx context.Context, request *userSrv.CreateUs
 	uuid, err := unique.UUID()
 	if err != nil {
 		logrus.Errorf("<%v>[userService.CreateUser] could not generate UUID for user: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
-		return &userSrv.CreateUserResponse{StatusCode: http.StatusInternalServerError, Msg: "could not create user"}, nil
+		return &userSrv.CreateResponse{StatusCode: http.StatusInternalServerError, Msg: "could not create user"}, nil
 	}
 	hashedPassword, err := hash.FromPassword([]byte(request.GetUser().GetPassword()))
 	if err != nil {
 		logrus.Errorf("<%v>[userService.CreateUser] could not hash user password: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
-		return &userSrv.CreateUserResponse{StatusCode: http.StatusInternalServerError, Msg: "could not create user"}, nil
+		return &userSrv.CreateResponse{StatusCode: http.StatusInternalServerError, Msg: "could not create user"}, nil
 	}
 
 	status, err := srv.user.InsertNew(ctx, srv.storage, user.UserItem{
@@ -42,7 +42,7 @@ func (srv UserService) CreateUser(ctx context.Context, request *userSrv.CreateUs
 	})
 	if err != nil {
 		logrus.Errorf("<%v>[userService.CreateUser] could not create user: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
-		return &userSrv.CreateUserResponse{StatusCode: int32(status), Msg: "could not create user"}, nil
+		return &userSrv.CreateResponse{StatusCode: int32(status), Msg: "could not create user"}, nil
 	}
-	return &userSrv.CreateUserResponse{StatusCode: int32(status), Msg: "user has been created"}, nil
+	return &userSrv.CreateResponse{StatusCode: int32(status), Msg: "user has been created"}, nil
 }

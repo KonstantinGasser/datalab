@@ -8,7 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func (srv UserService) GetUser(ctx context.Context, request *userSrv.GetUserRequest) (*userSrv.GetUserResponse, error) {
+func (srv UserService) Get(ctx context.Context, request *userSrv.GetRequest) (*userSrv.GetResponse, error) {
 	// add tracingID to context
 	ctx = ctx_value.AddValue(ctx, "tracingID", request.GetTracing_ID())
 
@@ -17,12 +17,12 @@ func (srv UserService) GetUser(ctx context.Context, request *userSrv.GetUserRequ
 	status, user, err := srv.user.GetByID(ctx, srv.storage, request.GetForUuid())
 	if err != nil {
 		logrus.Errorf("<%v>[userService.GetUser] could not get user details: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
-		return &userSrv.GetUserResponse{StatusCode: int32(status), Msg: err.Error(), User: nil}, nil
+		return &userSrv.GetResponse{StatusCode: int32(status), Msg: err.Error(), User: nil}, nil
 	}
 	if status != 200 {
-		return &userSrv.GetUserResponse{StatusCode: int32(status), Msg: err.Error(), User: nil}, nil
+		return &userSrv.GetResponse{StatusCode: int32(status), Msg: err.Error(), User: nil}, nil
 	}
-	return &userSrv.GetUserResponse{
+	return &userSrv.GetResponse{
 		StatusCode: int32(status),
 		Msg:        "requested user found",
 		User: &userSrv.ComplexUser{

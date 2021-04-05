@@ -36,7 +36,7 @@ func (api API) HandlerUserLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// invoke grpc to user-service to authenticate user
-	respUser, err := api.UserSrvClient.Authenticate(r.Context(), &userSrv.AuthenticateRequest{
+	respUser, err := api.UserClient.Authenticate(r.Context(), &userSrv.AuthenticateRequest{
 		Tracing_ID: ctx_value.GetString(r.Context(), "tracingID"),
 		Username:   payload.Username,
 		Password:   payload.Password,

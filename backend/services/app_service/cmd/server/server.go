@@ -16,8 +16,8 @@ import (
 func Run(ctx context.Context, addr string) error {
 	srv := grpc.NewServer()
 	// create app-service
-	appService := api.NewAppServiceServer(storage.New("mongodb://AppDB:secure@192.168.0.179:27018"))
-	appSrv.RegisterAppServiceServer(srv, appService)
+	appService := api.NewAppServer(storage.New("mongodb://AppDB:secure@192.168.0.179:27018"))
+	appSrv.RegisterAppServer(srv, appService)
 
 	listener, err := net.Listen("tcp", addr)
 	if err != nil {

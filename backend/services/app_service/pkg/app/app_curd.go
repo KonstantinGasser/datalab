@@ -4,29 +4,33 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"strings"
 	"sync"
 
 	appSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/app_service"
 	userSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/user_service"
 	"github.com/KonstantinGasser/clickstream/backend/services/app_service/pkg/storage"
 	"github.com/KonstantinGasser/clickstream/utils/ctx_value"
+	"github.com/KonstantinGasser/clickstream/utils/hash"
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-// AppItem represents one App in the database ? do we need this? don't we have a def in the grpc already???
+// AppItem represents one App in the database
 type AppItem struct {
 	// mongoDB pk (document key)
-	UUID        string `bson:"_id"`
-	AppName     string `bson:"name"`
-	OwnerUUID   string `bson:"owner_uuid"`
-	OrgnDomain  string `bson:"orgn_domain"`
-	Description string `bson:"description"`
-	// Member is a list of user_uuids mapped to this app
-	Member   []string `bson:"member"`
-	Settings []string `bson:"setting"`
-	AppToken string   `bson:"app_token"`
+	UUID        string   `bson:"_id"`
+	AppName     string   `bson:"name"`
+	OwnerUUID   string   `bson:"owner_uuid"`
+	OrgnDomain  string   `bson:"orgn_domain"`
+	Description string   `bson:"description"`
+	Member      []string `bson:"member"`
+	Settings    []string `bson:"setting"`
+	AppToken    string   `bson:"app_token"`
+	// OrgnAndAppHash is required to verify the generation of an app token
+	// and the deletion of an app
+	OrgnAndAppHash string `bson:"orgn_and_app_hash"`
 }
 
 // AppItemLight is a minimum representation of an application
@@ -38,21 +42,25 @@ type AppItemLight struct {
 
 // GetByID collects all the app details for a given appUUID
 // it fetches the user data for the owner and all members from the user-service
-func (app app) GetApp(ctx context.Context, storage storage.Storage, userService userSrv.UserServiceClient, appUUID, callerUUID string) (int, *appSrv.ComplexApp, error) {
+func (app app) GetApp(ctx context.Context, storage storage.Storage, userService userSrv.UserClient, appUUID, callerUUID string) (int, *appSrv.ComplexApp, error) {
 
 	// search for app_uuid where either owner_uuid or one of the members
 	// match the callerUUID else not permitted
 	appQuery := bson.D{
-		{"$and", bson.A{
-			bson.M{"_id": appUUID},
-			bson.D{
-				{"$or", bson.A{
-					bson.M{"owner_uuid": callerUUID},
-					bson.M{"member": callerUUID},
-				},
+		{
+			Key: "$and",
+			Value: bson.A{
+				bson.M{"_id": appUUID},
+				bson.D{
+					{
+						Key: "$or",
+						Value: bson.A{
+							bson.M{"owner_uuid": callerUUID},
+							bson.M{"member": callerUUID},
+						},
+					},
 				},
 			},
-		},
 		},
 	}
 	var queryData AppItem
@@ -78,10 +86,10 @@ func (app app) GetApp(ctx context.Context, storage storage.Storage, userService 
 	var wait sync.WaitGroup
 	// spin-up goroutine to get app member details
 	wait.Add(1)
-	var respUserList *userSrv.GetUserListResponse
+	var respUserList *userSrv.GetListResponse
 	var userListErr error
 	go func() {
-		respUserList, userListErr = userService.GetUserList(ctx, &userSrv.GetUserListRequest{
+		respUserList, userListErr = userService.GetList(ctx, &userSrv.GetListRequest{
 			Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
 			UuidList:   queryData.Member,
 		})
@@ -90,10 +98,10 @@ func (app app) GetApp(ctx context.Context, storage storage.Storage, userService 
 
 	// spin-up goroutine to get app owner details
 	wait.Add(1)
-	var respOwner *userSrv.GetUserResponse
+	var respOwner *userSrv.GetResponse
 	var ownerErr error
 	go func() {
-		respOwner, ownerErr = userService.GetUser(ctx, &userSrv.GetUserRequest{
+		respOwner, ownerErr = userService.Get(ctx, &userSrv.GetRequest{
 			Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
 			CallerUuid: "", //request.GetCallerUuid(),
 			ForUuid:    queryData.OwnerUUID,
@@ -169,6 +177,10 @@ func (app app) CreateApp(ctx context.Context, mongo storage.Storage, appItem App
 		return http.StatusBadRequest, errors.New("duplicated app names are not possible")
 	}
 
+	concated := strings.Join([]string{appItem.OrgnDomain, appItem.AppName}, "/")
+	orgnAppHash := hash.Sha256([]byte(concated)).String()
+	appItem.OrgnAndAppHash = orgnAppHash
+
 	if err := mongo.InsertOne(ctx, appDatabase, appCollection, appItem); err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -188,7 +200,8 @@ func (app app) AddMember(ctx context.Context, storage storage.Storage, ownerUUID
 
 	updateQuery := bson.D{
 		{
-			"$addToSet", bson.M{
+			Key: "$addToSet",
+			Value: bson.M{
 				"member": bson.M{
 					"$each": member,
 				},
@@ -206,4 +219,28 @@ func (app app) AddMember(ctx context.Context, storage storage.Storage, ownerUUID
 		// return http.StatusForbidden, errors.New("user not permitted to modify app data")
 	}
 	return http.StatusOK, nil
+}
+
+// CanGenToken verifies that the request with domain name and app name matches with the database records
+// and that the request caller is the owner of the app
+func (app app) CanGenToken(ctx context.Context, storage storage.Storage, appUUID, callerUUID, domainAndName string) (int, bool, error) {
+	query := bson.M{"_id": appUUID, "owner_uuid": callerUUID}
+
+	var appData bson.M
+	if err := storage.FindOne(ctx, appDatabase, appCollection, query, &appData); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return http.StatusBadRequest, false, errors.New("could not find any related documents for the given arguments")
+		}
+		return http.StatusInternalServerError, false, err
+	}
+
+	if _, ok := appData["orgn_and_app_hash"].(string); !ok {
+		return http.StatusBadGateway, false, errors.New("could not verify request to create app token")
+	}
+
+	requestHash := hash.Sha256([]byte(domainAndName)).String()
+	if appData["orgn_and_app_hash"] != requestHash {
+		return http.StatusForbidden, false, nil
+	}
+	return http.StatusOK, true, nil
 }

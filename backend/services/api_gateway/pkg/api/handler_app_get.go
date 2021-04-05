@@ -25,13 +25,13 @@ func (api API) HandlerAppGet(w http.ResponseWriter, r *http.Request) {
 		api.onError(w, errors.New("user not authenticated"), http.StatusUnauthorized)
 		return
 	}
-	resp, err := api.AppServiceClient.GetApp(r.Context(), &appSrv.GetAppRequest{
+	resp, err := api.AppClient.Get(r.Context(), &appSrv.GetRequest{
 		Tracing_ID: ctx_value.GetString(r.Context(), "tracingID"),
 		AppUuid:    appUUID,
 		CallerUuid: user.GetUuid(),
 	})
 	if err != nil {
-		logrus.Errorf("<%v>[api.HandlerAppGet] could not execute grpc.GetApp: %v\n", ctx_value.GetString(r.Context(), "tracingID"), err)
+		logrus.Errorf("<%v>[api.HandlerAppGet] could not execute grpc.Get: %v\n", ctx_value.GetString(r.Context(), "tracingID"), err)
 		api.onError(w, errors.New("could not get app details"), http.StatusInternalServerError)
 		return
 	}

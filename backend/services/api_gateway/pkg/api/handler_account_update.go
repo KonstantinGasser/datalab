@@ -33,7 +33,7 @@ func (api API) HandlerAccountUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// call out to user service to update authed user
-	resp, err := api.UserSrvClient.UpdateUser(r.Context(), &userSrv.UpdateUserRequest{
+	resp, err := api.UserClient.Update(r.Context(), &userSrv.UpdateRequest{
 		Tracing_ID: ctx_value.GetString(r.Context(), "tracingID"),
 		CallerUuid: user.GetUuid(),
 		User: &userSrv.UpdatableUser{
