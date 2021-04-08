@@ -1,9 +1,9 @@
 package grpcC
 
 import (
-	appSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/app_service"
-	tokenSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/token_service"
-	userSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/user_service"
+	appSrv "github.com/KonstantinGasser/datalabs/backend/protobuf/app_service"
+	tokenSrv "github.com/KonstantinGasser/datalabs/backend/protobuf/token_service"
+	userSrv "github.com/KonstantinGasser/datalabs/backend/protobuf/user_service"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )
@@ -21,13 +21,13 @@ func NewUserClient(listenOn string) userSrv.UserClient {
 }
 
 // NewTokenServiceClient is a grpc client
-func NewTokenServiceClient(listenOn string) tokenSrv.TokenServiceClient {
+func NewTokenClient(listenOn string) tokenSrv.TokenClient {
 	conn, err := grpc.Dial(listenOn, grpc.WithInsecure())
 	if err != nil { // change not good !!!
 		logrus.Errorf("[NewTokenServiceClient] could not connect: %v", err)
 		return nil
 	}
-	client := tokenSrv.NewTokenServiceClient(conn)
+	client := tokenSrv.NewTokenClient(conn)
 	logrus.Infof("[NewGrpcClient] connected to TokenServiceClient on: %s", listenOn)
 	return client
 }

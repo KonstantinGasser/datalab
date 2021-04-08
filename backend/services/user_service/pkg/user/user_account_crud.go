@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/KonstantinGasser/clickstream/backend/services/user_service/pkg/storage"
+	"github.com/KonstantinGasser/datalabs/backend/services/user_service/pkg/storage"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -61,11 +61,6 @@ func (user user) Update(ctx context.Context, storage storage.Storage, userItem U
 		{
 			Key:   "$set",
 			Value: userItem,
-			// bson.D{
-			// 	{"first_name", userItem.FirstName},
-			// 	{"last_name", userItem.LastName},
-			// 	{"orgn_position", userItem.OrgnPosition},
-			// },
 		},
 	}
 	if err := storage.UpdateOne(ctx, userDatabase, userCollection, bson.M{"_id": userItem.UUID}, updateQuery); err != nil {

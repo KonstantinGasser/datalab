@@ -3,12 +3,12 @@ package app
 import (
 	"context"
 
-	appSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/app_service"
-	userSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/user_service"
-	"github.com/KonstantinGasser/clickstream/backend/services/app_service/pkg/storage"
+	appSrv "github.com/KonstantinGasser/datalabs/backend/protobuf/app_service"
+	tokenSrv "github.com/KonstantinGasser/datalabs/backend/protobuf/token_service"
+	userSrv "github.com/KonstantinGasser/datalabs/backend/protobuf/user_service"
+	"github.com/KonstantinGasser/datalabs/backend/services/app_service/pkg/storage"
 )
 
-// why are they here?????? change this pls
 const (
 	// DB, Collection names
 	appDatabase   = "datalabs_app"
@@ -35,7 +35,10 @@ type App interface {
 
 	// CanGenToken verifies, that the caller intentionally wants to create an app token by cross checking that
 	// the correct domain/app-name was entered
-	CanGenToken(ctx context.Context, storage storage.Storage, appUUID, callerUUID, domainAndName string) (int, bool, error)
+	// CanGenToken(ctx context.Context, storage storage.Storage, appUUID, callerUUID, domainAndName string) (int, bool, error)
+
+	// GenerateToken prepares all data required in order to generate an app token for the client library
+	GetTokenClaims(ctx context.Context, storage storage.Storage, tokenSrv tokenSrv.TokenClient, sappUUID, callerUUID, orgnAndApp string) (int, string, error)
 }
 
 // app implements the App interface

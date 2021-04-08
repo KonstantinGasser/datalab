@@ -7,11 +7,11 @@ import (
 	"strings"
 	"sync"
 
-	appSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/app_service"
-	userSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/user_service"
-	"github.com/KonstantinGasser/clickstream/backend/services/app_service/pkg/storage"
-	"github.com/KonstantinGasser/clickstream/utils/ctx_value"
-	"github.com/KonstantinGasser/clickstream/utils/hash"
+	appSrv "github.com/KonstantinGasser/datalabs/backend/protobuf/app_service"
+	userSrv "github.com/KonstantinGasser/datalabs/backend/protobuf/user_service"
+	"github.com/KonstantinGasser/datalabs/backend/services/app_service/pkg/storage"
+	"github.com/KonstantinGasser/datalabs/utils/ctx_value"
+	"github.com/KonstantinGasser/datalabs/utils/hash"
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -73,8 +73,10 @@ func (app app) GetApp(ctx context.Context, storage storage.Storage, userService 
 		return http.StatusInternalServerError, nil, err
 	}
 
+	logrus.Warn(queryData)
 	// prepare data of app append with user data if calls successful
 	var appData *appSrv.ComplexApp = &appSrv.ComplexApp{
+		Uuid:        queryData.UUID,
 		Name:        queryData.AppName,
 		Description: queryData.Description,
 		Settings:    queryData.Settings,
@@ -223,24 +225,34 @@ func (app app) AddMember(ctx context.Context, storage storage.Storage, ownerUUID
 
 // CanGenToken verifies that the request with domain name and app name matches with the database records
 // and that the request caller is the owner of the app
-func (app app) CanGenToken(ctx context.Context, storage storage.Storage, appUUID, callerUUID, domainAndName string) (int, bool, error) {
+func (app app) canGenToken(ctx context.Context, storage storage.Storage, appUUID, callerUUID, domainAndName string) (bool, error) {
 	query := bson.M{"_id": appUUID, "owner_uuid": callerUUID}
 
 	var appData bson.M
 	if err := storage.FindOne(ctx, appDatabase, appCollection, query, &appData); err != nil {
 		if err == mongo.ErrNoDocuments {
-			return http.StatusBadRequest, false, errors.New("could not find any related documents for the given arguments")
+			return false, errors.New("could not find any related documents for the given arguments")
 		}
-		return http.StatusInternalServerError, false, err
+		return false, err
 	}
 
 	if _, ok := appData["orgn_and_app_hash"].(string); !ok {
-		return http.StatusBadGateway, false, errors.New("could not verify request to create app token")
+		return false, errors.New("could not verify request to create app token")
 	}
 
 	requestHash := hash.Sha256([]byte(domainAndName)).String()
 	if appData["orgn_and_app_hash"] != requestHash {
-		return http.StatusForbidden, false, nil
+		return false, nil
 	}
-	return http.StatusOK, true, nil
+	return true, nil
+}
+
+func (app app) updateToken(ctx context.Context, storage storage.Storage, appUUID, token string) (int, error) {
+	query := bson.D{
+		{
+			Key:   "$set",
+			Value: bson.M{"app_token": token},
+		},
+	}
+	return storage.UpdateOne(ctx, appDatabase, appCollection, bson.M{"_id": appUUID}, query)
 }

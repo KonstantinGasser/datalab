@@ -4,8 +4,8 @@ import (
 	"context"
 	"net"
 
-	tokenSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/token_service"
-	"github.com/KonstantinGasser/clickstream/backend/services/token_service/pkg/api"
+	tokenSrv "github.com/KonstantinGasser/datalabs/backend/protobuf/token_service"
+	"github.com/KonstantinGasser/datalabs/backend/services/token_service/pkg/api"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )
@@ -16,9 +16,9 @@ func Run(ctx context.Context, addr string) error {
 
 	srv := grpc.NewServer()
 	// create tokenService implementing the grpc.TokenServiceServer methods
-	tokenService := api.NewTokenService()
+	tokenService := api.NewTokenServer()
 
-	tokenSrv.RegisterTokenServiceServer(srv, tokenService)
+	tokenSrv.RegisterTokenServer(srv, tokenService)
 	listener, err := net.Listen("tcp", addr)
 	if err != nil {
 		logrus.Fatalf("[server.Run] cloud not listen to %s: %v", addr, err)

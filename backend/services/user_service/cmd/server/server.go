@@ -4,9 +4,9 @@ import (
 	"context"
 	"net"
 
-	userSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/user_service"
-	"github.com/KonstantinGasser/clickstream/backend/services/user_service/pkg/api"
-	"github.com/KonstantinGasser/clickstream/backend/services/user_service/pkg/storage"
+	userSrv "github.com/KonstantinGasser/datalabs/backend/protobuf/user_service"
+	"github.com/KonstantinGasser/datalabs/backend/services/user_service/pkg/api"
+	"github.com/KonstantinGasser/datalabs/backend/services/user_service/pkg/storage"
 	"github.com/sirupsen/logrus"
 	grpc "google.golang.org/grpc"
 )

@@ -4,8 +4,8 @@ import (
 	"errors"
 	"net/http"
 
-	appSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/app_service"
-	"github.com/KonstantinGasser/clickstream/utils/ctx_value"
+	appSrv "github.com/KonstantinGasser/datalabs/backend/protobuf/app_service"
+	"github.com/KonstantinGasser/datalabs/utils/ctx_value"
 	"github.com/sirupsen/logrus"
 )
 
@@ -58,11 +58,13 @@ func (api API) HandlerAppDetails(w http.ResponseWriter, r *http.Request) {
 	api.onScucessJSON(w, map[string]interface{}{
 		"app_list": respAppList.GetAppList(),
 		"app_details": map[string]interface{}{
+			"app_uuid":        respAppDetails.GetApp().GetUuid(),
 			"app_name":        respAppDetails.GetApp().GetName(),
 			"app_description": respAppDetails.GetApp().GetDescription(),
 			"app_owner":       respAppDetails.GetApp().GetOwner(),
 			"app_member":      respAppDetails.GetApp().GetMember(),
 			"app_setting":     respAppDetails.GetApp().GetSettings(),
+			"app_token":       respAppDetails.GetApp().GetAppToken(),
 		},
 	}, http.StatusOK)
 }

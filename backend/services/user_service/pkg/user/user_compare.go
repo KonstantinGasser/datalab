@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/KonstantinGasser/clickstream/backend/services/user_service/pkg/storage"
+	"github.com/KonstantinGasser/datalabs/backend/services/user_service/pkg/storage"
 )
 
 // Comparator can be used as base model with Comparable

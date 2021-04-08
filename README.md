@@ -1,4 +1,4 @@
-# Clickstream analysis platform for user activity data
+# datalabs analysis platform for user activity data
 
 ### Infrastructure cheat sheet
 

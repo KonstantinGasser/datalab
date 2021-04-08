@@ -4,7 +4,7 @@ import Login from '@/components/login/Login.vue';
 import Register from '@/components/login/Register.vue';
 import Dashboard from '@/components/dashboard/Dashboard.vue';
 import PageNotFound from '@/components/utils/PageNotFound.vue';
-
+import ClientLib from '@/components/docs/client_library/ClientLib';
 const routes = [
   {
     path: '/',
@@ -27,6 +27,18 @@ const routes = [
     path: '/register',
     name: 'register',
     component: Register,
+  },
+  {
+    path: '/docs/lib',
+    name: 'library',
+    component: ClientLib,
+    beforeEnter: (to, from, next) => {
+      if (localStorage.getItem('token') === null) {
+        next('/login');
+      } else {
+        next();
+      }
+    },
   },
   // must be last: usage of wildcard * !important!
   {

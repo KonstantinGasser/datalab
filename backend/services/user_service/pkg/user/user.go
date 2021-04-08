@@ -3,7 +3,7 @@ package user
 import (
 	"context"
 
-	"github.com/KonstantinGasser/clickstream/backend/services/user_service/pkg/storage"
+	"github.com/KonstantinGasser/datalabs/backend/services/user_service/pkg/storage"
 )
 
 const (

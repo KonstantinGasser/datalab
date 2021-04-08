@@ -64,6 +64,7 @@
             this.getViewApp().then(data => {
                 this.apps = data.app_list;
                 this.activeApp = data.app_details;
+                console.log("AC: ", this.activeApp);
                 if (this.apps == null || this.apps.length === 0) {
                     this.isInCreateMode = true;
                 } else {

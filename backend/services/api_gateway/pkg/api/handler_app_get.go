@@ -4,8 +4,8 @@ import (
 	"errors"
 	"net/http"
 
-	appSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/app_service"
-	"github.com/KonstantinGasser/clickstream/utils/ctx_value"
+	appSrv "github.com/KonstantinGasser/datalabs/backend/protobuf/app_service"
+	"github.com/KonstantinGasser/datalabs/utils/ctx_value"
 	"github.com/sirupsen/logrus"
 )
 
@@ -35,6 +35,7 @@ func (api API) HandlerAppGet(w http.ResponseWriter, r *http.Request) {
 		api.onError(w, errors.New("could not get app details"), http.StatusInternalServerError)
 		return
 	}
+	logrus.Warn(resp.GetApp())
 	api.onScucessJSON(w, map[string]interface{}{
 		"status": resp.GetStatusCode(),
 		"msg":    resp.GetMsg(),

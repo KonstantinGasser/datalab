@@ -14,122 +14,194 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// TokenServiceClient is the client API for TokenService service.
+// TokenClient is the client API for Token service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type TokenServiceClient interface {
+type TokenClient interface {
 	IssueUserToken(ctx context.Context, in *IssueUserTokenRequest, opts ...grpc.CallOption) (*IssueUserTokenResponse, error)
 	VerifyUserToken(ctx context.Context, in *VerifyUserTokenRequest, opts ...grpc.CallOption) (*VerifyUserTokenResponse, error)
+	IssueAppToken(ctx context.Context, in *IssueAppTokenRequest, opts ...grpc.CallOption) (*IssueAppTokenResponse, error)
+	VerifyAppToken(ctx context.Context, in *VerifyAppTokenRequest, opts ...grpc.CallOption) (*VerifyAppTokenResponse, error)
 }
 
-type tokenServiceClient struct {
+type tokenClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewTokenServiceClient(cc grpc.ClientConnInterface) TokenServiceClient {
-	return &tokenServiceClient{cc}
+func NewTokenClient(cc grpc.ClientConnInterface) TokenClient {
+	return &tokenClient{cc}
 }
 
-func (c *tokenServiceClient) IssueUserToken(ctx context.Context, in *IssueUserTokenRequest, opts ...grpc.CallOption) (*IssueUserTokenResponse, error) {
+func (c *tokenClient) IssueUserToken(ctx context.Context, in *IssueUserTokenRequest, opts ...grpc.CallOption) (*IssueUserTokenResponse, error) {
 	out := new(IssueUserTokenResponse)
-	err := c.cc.Invoke(ctx, "/token_service.TokenService/IssueUserToken", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/token_service.Token/IssueUserToken", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *tokenServiceClient) VerifyUserToken(ctx context.Context, in *VerifyUserTokenRequest, opts ...grpc.CallOption) (*VerifyUserTokenResponse, error) {
+func (c *tokenClient) VerifyUserToken(ctx context.Context, in *VerifyUserTokenRequest, opts ...grpc.CallOption) (*VerifyUserTokenResponse, error) {
 	out := new(VerifyUserTokenResponse)
-	err := c.cc.Invoke(ctx, "/token_service.TokenService/VerifyUserToken", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/token_service.Token/VerifyUserToken", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// TokenServiceServer is the server API for TokenService service.
-// All implementations must embed UnimplementedTokenServiceServer
+func (c *tokenClient) IssueAppToken(ctx context.Context, in *IssueAppTokenRequest, opts ...grpc.CallOption) (*IssueAppTokenResponse, error) {
+	out := new(IssueAppTokenResponse)
+	err := c.cc.Invoke(ctx, "/token_service.Token/IssueAppToken", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *tokenClient) VerifyAppToken(ctx context.Context, in *VerifyAppTokenRequest, opts ...grpc.CallOption) (*VerifyAppTokenResponse, error) {
+	out := new(VerifyAppTokenResponse)
+	err := c.cc.Invoke(ctx, "/token_service.Token/VerifyAppToken", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// TokenServer is the server API for Token service.
+// All implementations must embed UnimplementedTokenServer
 // for forward compatibility
-type TokenServiceServer interface {
+type TokenServer interface {
 	IssueUserToken(context.Context, *IssueUserTokenRequest) (*IssueUserTokenResponse, error)
 	VerifyUserToken(context.Context, *VerifyUserTokenRequest) (*VerifyUserTokenResponse, error)
-	mustEmbedUnimplementedTokenServiceServer()
+	IssueAppToken(context.Context, *IssueAppTokenRequest) (*IssueAppTokenResponse, error)
+	VerifyAppToken(context.Context, *VerifyAppTokenRequest) (*VerifyAppTokenResponse, error)
+	mustEmbedUnimplementedTokenServer()
 }
 
-// UnimplementedTokenServiceServer must be embedded to have forward compatible implementations.
-type UnimplementedTokenServiceServer struct {
+// UnimplementedTokenServer must be embedded to have forward compatible implementations.
+type UnimplementedTokenServer struct {
 }
 
-func (UnimplementedTokenServiceServer) IssueUserToken(context.Context, *IssueUserTokenRequest) (*IssueUserTokenResponse, error) {
+func (UnimplementedTokenServer) IssueUserToken(context.Context, *IssueUserTokenRequest) (*IssueUserTokenResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method IssueUserToken not implemented")
 }
-func (UnimplementedTokenServiceServer) VerifyUserToken(context.Context, *VerifyUserTokenRequest) (*VerifyUserTokenResponse, error) {
+func (UnimplementedTokenServer) VerifyUserToken(context.Context, *VerifyUserTokenRequest) (*VerifyUserTokenResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method VerifyUserToken not implemented")
 }
-func (UnimplementedTokenServiceServer) mustEmbedUnimplementedTokenServiceServer() {}
+func (UnimplementedTokenServer) IssueAppToken(context.Context, *IssueAppTokenRequest) (*IssueAppTokenResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method IssueAppToken not implemented")
+}
+func (UnimplementedTokenServer) VerifyAppToken(context.Context, *VerifyAppTokenRequest) (*VerifyAppTokenResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method VerifyAppToken not implemented")
+}
+func (UnimplementedTokenServer) mustEmbedUnimplementedTokenServer() {}
 
-// UnsafeTokenServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to TokenServiceServer will
+// UnsafeTokenServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to TokenServer will
 // result in compilation errors.
-type UnsafeTokenServiceServer interface {
-	mustEmbedUnimplementedTokenServiceServer()
+type UnsafeTokenServer interface {
+	mustEmbedUnimplementedTokenServer()
 }
 
-func RegisterTokenServiceServer(s grpc.ServiceRegistrar, srv TokenServiceServer) {
-	s.RegisterService(&TokenService_ServiceDesc, srv)
+func RegisterTokenServer(s grpc.ServiceRegistrar, srv TokenServer) {
+	s.RegisterService(&Token_ServiceDesc, srv)
 }
 
-func _TokenService_IssueUserToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Token_IssueUserToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(IssueUserTokenRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TokenServiceServer).IssueUserToken(ctx, in)
+		return srv.(TokenServer).IssueUserToken(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/token_service.TokenService/IssueUserToken",
+		FullMethod: "/token_service.Token/IssueUserToken",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TokenServiceServer).IssueUserToken(ctx, req.(*IssueUserTokenRequest))
+		return srv.(TokenServer).IssueUserToken(ctx, req.(*IssueUserTokenRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _TokenService_VerifyUserToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Token_VerifyUserToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(VerifyUserTokenRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TokenServiceServer).VerifyUserToken(ctx, in)
+		return srv.(TokenServer).VerifyUserToken(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/token_service.TokenService/VerifyUserToken",
+		FullMethod: "/token_service.Token/VerifyUserToken",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TokenServiceServer).VerifyUserToken(ctx, req.(*VerifyUserTokenRequest))
+		return srv.(TokenServer).VerifyUserToken(ctx, req.(*VerifyUserTokenRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// TokenService_ServiceDesc is the grpc.ServiceDesc for TokenService service.
+func _Token_IssueAppToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IssueAppTokenRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TokenServer).IssueAppToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/token_service.Token/IssueAppToken",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TokenServer).IssueAppToken(ctx, req.(*IssueAppTokenRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Token_VerifyAppToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VerifyAppTokenRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TokenServer).VerifyAppToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/token_service.Token/VerifyAppToken",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TokenServer).VerifyAppToken(ctx, req.(*VerifyAppTokenRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// Token_ServiceDesc is the grpc.ServiceDesc for Token service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var TokenService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "token_service.TokenService",
-	HandlerType: (*TokenServiceServer)(nil),
+var Token_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "token_service.Token",
+	HandlerType: (*TokenServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "IssueUserToken",
-			Handler:    _TokenService_IssueUserToken_Handler,
+			Handler:    _Token_IssueUserToken_Handler,
 		},
 		{
 			MethodName: "VerifyUserToken",
-			Handler:    _TokenService_VerifyUserToken_Handler,
+			Handler:    _Token_VerifyUserToken_Handler,
+		},
+		{
+			MethodName: "IssueAppToken",
+			Handler:    _Token_IssueAppToken_Handler,
+		},
+		{
+			MethodName: "VerifyAppToken",
+			Handler:    _Token_VerifyAppToken_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

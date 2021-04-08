@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"time"
 
-	tokenSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/token_service"
-	userSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/user_service"
-	"github.com/KonstantinGasser/clickstream/utils/ctx_value"
+	tokenSrv "github.com/KonstantinGasser/datalabs/backend/protobuf/token_service"
+	userSrv "github.com/KonstantinGasser/datalabs/backend/protobuf/user_service"
+	"github.com/KonstantinGasser/datalabs/utils/ctx_value"
 	"github.com/sirupsen/logrus"
 )
 
@@ -58,7 +58,8 @@ func (api API) HandlerUserLogin(w http.ResponseWriter, r *http.Request) {
 	respToken, err := api.TokenSrvClient.IssueUserToken(r.Context(), &tokenSrv.IssueUserTokenRequest{
 		Tracing_ID: ctx_value.GetString(r.Context(), "tracingID"),
 		Claim: &tokenSrv.UserClaim{
-			Uuid: respUser.GetUserClaims().GetUuid(),
+			Uuid:       respUser.GetUserClaims().GetUuid(),
+			OrgnDomain: respUser.GetUserClaims().GetOrgnDomain(),
 		},
 	})
 	if err != nil {

@@ -32,7 +32,7 @@ message GenerateTokenRequest {
 message GenerateTokenResponse {
     int32 status_code = 1;
     string msg = 2;
-    string app_tokne = 3;
+    string app_token = 3;
 }
 
 // RPC CAN GEN TOKEN
@@ -151,12 +151,13 @@ message RemoveMemberResponse {
 
 // common types
 message ComplexApp {
-    string name = 1;
-    string description = 2;
-    ComplexUser owner = 3;
-    repeated ComplexUser member = 4;
-    repeated string settings = 5;
-    string app_token = 6;
+    string uuid = 1;
+    string name = 2;
+    string description = 3;
+    ComplexUser owner = 4;
+    repeated ComplexUser member = 5;
+    repeated string settings = 6;
+    string app_token = 7;
 }
 
 message SimpleApp {
