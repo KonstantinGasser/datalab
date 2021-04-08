@@ -8,10 +8,10 @@ import (
 	"net/http"
 	"net/url"
 
-	appSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/app_service"
-	tokenSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/token_service"
-	userSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/user_service"
-	"github.com/KonstantinGasser/clickstream/backend/services/api_gateway/pkg/grpcC"
+	appSrv "github.com/KonstantinGasser/datalabs/backend/protobuf/app_service"
+	tokenSrv "github.com/KonstantinGasser/datalabs/backend/protobuf/token_service"
+	userSrv "github.com/KonstantinGasser/datalabs/backend/protobuf/user_service"
+	"github.com/KonstantinGasser/datalabs/backend/services/api_gateway/pkg/grpcC"
 	"github.com/sirupsen/logrus"
 )
 
@@ -39,9 +39,9 @@ type API struct {
 	// onError response to request if an error occurs
 	onError func(w http.ResponseWriter, err error, status int)
 	// *** Client Dependencies ***
-	UserSrvClient    userSrv.UserServiceClient
-	TokenSrvClient   tokenSrv.TokenServiceClient
-	AppServiceClient appSrv.AppServiceClient
+	UserClient     userSrv.UserClient
+	TokenSrvClient tokenSrv.TokenClient
+	AppClient      appSrv.AppClient
 }
 
 // CORSConfig specifies it CORS policy of the API-Server
@@ -82,9 +82,9 @@ func New(cors CORSConfig) API {
 			return
 		},
 		// *** Client Dependencies ***
-		UserSrvClient:    grpcC.NewUserServiceClient(":8001"),
-		TokenSrvClient:   grpcC.NewTokenServiceClient(":8002"),
-		AppServiceClient: grpcC.NewAppServiceClient(":8003"),
+		UserClient:     grpcC.NewUserClient(":8001"),
+		TokenSrvClient: grpcC.NewTokenClient(":8002"),
+		AppClient:      grpcC.NewAppClient(":8003"),
 	}
 }
 
@@ -214,6 +214,15 @@ func (api API) SetUp() {
 			api.WithCors(
 				api.WithAuth(
 					api.HandlerAppAddMember,
+				),
+			),
+		),
+	)
+	api.route("/api/v2/view/app/generate/token",
+		api.WithTracing(
+			api.WithCors(
+				api.WithAuth(
+					api.HandlerAppGenerateToken,
 				),
 			),
 		),

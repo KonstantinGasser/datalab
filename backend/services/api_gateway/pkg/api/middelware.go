@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"time"
 
-	tokenSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/token_service"
-	"github.com/KonstantinGasser/clickstream/utils/ctx_value"
+	tokenSrv "github.com/KonstantinGasser/datalabs/backend/protobuf/token_service"
+	"github.com/KonstantinGasser/datalabs/utils/ctx_value"
 	"github.com/gofrs/uuid"
 	"github.com/sirupsen/logrus"
 )

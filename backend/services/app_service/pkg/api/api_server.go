@@ -1,28 +1,32 @@
 package api
 
 import (
-	appSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/app_service"
-	userSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/user_service"
-	"github.com/KonstantinGasser/clickstream/backend/services/api_gateway/pkg/grpcC"
-	"github.com/KonstantinGasser/clickstream/backend/services/app_service/pkg/app"
-	"github.com/KonstantinGasser/clickstream/backend/services/app_service/pkg/storage"
+	appSrv "github.com/KonstantinGasser/datalabs/backend/protobuf/app_service"
+	tokenSrv "github.com/KonstantinGasser/datalabs/backend/protobuf/token_service"
+	userSrv "github.com/KonstantinGasser/datalabs/backend/protobuf/user_service"
+	"github.com/KonstantinGasser/datalabs/backend/services/app_service/pkg/app"
+	"github.com/KonstantinGasser/datalabs/backend/services/app_service/pkg/grpcC"
+	"github.com/KonstantinGasser/datalabs/backend/services/app_service/pkg/storage"
 )
 
 type AppService struct {
-	appSrv.UnimplementedAppServiceServer
+	appSrv.UnimplementedAppServer
 	storage storage.Storage
 	app     app.App
 	// *** Service Dependencies ***
-	userService userSrv.UserServiceClient
+	userService  userSrv.UserClient
+	tokenService tokenSrv.TokenClient
 }
 
-func NewAppServiceServer(storage storage.Storage) AppService {
+func NewAppServer(storage storage.Storage) AppService {
 	app := app.NewApp()
-	userService := grpcC.NewUserServiceClient(":8001")
+	userService := grpcC.NewUserClient(":8001")
+	tokenService := grpcC.NewTokenClient(":8002")
 	return AppService{
-		storage:     storage,
-		app:         app,
-		userService: userService,
+		storage:      storage,
+		app:          app,
+		userService:  userService,
+		tokenService: tokenService,
 	}
 }
 

@@ -1,6 +1,7 @@
 package hash
 
 import (
+	"crypto/sha256"
 	"errors"
 	"fmt"
 
@@ -30,4 +31,16 @@ func FromPassword(password []byte) (string, error) {
 func CheckPasswordHash(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
+}
+
+type Sha256 []byte
+
+func (sha Sha256) Hash() []byte {
+	b := sha256.Sum256(sha)
+	return b[:]
+}
+
+func (sha Sha256) String() string {
+	b := sha.Hash()
+	return fmt.Sprintf("%x", b)
 }

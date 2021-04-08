@@ -4,8 +4,8 @@ import (
 	"errors"
 	"net/http"
 
-	userSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/user_service"
-	"github.com/KonstantinGasser/clickstream/utils/ctx_value"
+	userSrv "github.com/KonstantinGasser/datalabs/backend/protobuf/user_service"
+	"github.com/KonstantinGasser/datalabs/utils/ctx_value"
 	"github.com/sirupsen/logrus"
 )
 
@@ -21,7 +21,7 @@ func (api API) HandlerAccountDetails(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// invoke grpc call to retrieve user information
-	resp, err := api.UserSrvClient.GetUser(r.Context(), &userSrv.GetUserRequest{
+	resp, err := api.UserClient.Get(r.Context(), &userSrv.GetRequest{
 		Tracing_ID: ctx_value.GetString(r.Context(), "tracingID"),
 		CallerUuid: user.GetUuid(),
 		ForUuid:    user.GetUuid(),

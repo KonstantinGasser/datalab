@@ -3,9 +3,9 @@ package api
 import (
 	"time"
 
-	userSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/user_service"
-	"github.com/KonstantinGasser/clickstream/backend/services/user_service/pkg/storage"
-	"github.com/KonstantinGasser/clickstream/backend/services/user_service/pkg/user"
+	userSrv "github.com/KonstantinGasser/datalabs/backend/protobuf/user_service"
+	"github.com/KonstantinGasser/datalabs/backend/services/user_service/pkg/storage"
+	"github.com/KonstantinGasser/datalabs/backend/services/user_service/pkg/user"
 )
 
 const (
@@ -15,7 +15,7 @@ const (
 // UserService implements all the methods required by the grpc.UserServiceServer
 // and embeds all the required dependencies
 type UserService struct {
-	userSrv.UnimplementedUserServiceServer
+	userSrv.UnimplementedUserServer
 	// *** Service Dependencies ***
 	storage storage.Storage
 	user    user.User

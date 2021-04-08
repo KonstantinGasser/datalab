@@ -41,7 +41,7 @@
                     <div class="input-group">
                         <input v-model="verify_app_name" type="text" class="form-control" placeholder="Domain/AppName" aria-label="" aria-describedby="basic-addon1">
                         <div class="input-group-append">
-                            <button class="btn btn-standard" @click="verifyStep()" type="button">Authorize and Generate</button>
+                            <button class="btn btn-standard" @click="generateToken()" type="button">Authorize and Generate</button>
                         </div>
                     </div>
                 </div>
@@ -52,25 +52,28 @@
                 <div class="form-group col">
                     <label for="">Your App Token</label>
                     <div class="input-group">
-                        <textarea type="text" class="form-control" rows="2" readonly id="app_token_value" :value="app_token" aria-label="" aria-describedby="basic-addon1"></textarea>
+                        <textarea type="text" class="form-control" rows="2" readonly id="app_token_value" :value="token" aria-label="" aria-describedby="basic-addon1"></textarea>
                         <div class="input-group-append">
                             <button class="btn btn-standard" @click="copyTokenToClipboard()" type="button">Copy</button>
                         </div>
                     </div>
-                    <!-- <input type="text" disabled name="" class="form-control" id="app_token_value" :value="app_token">  -->
+                    <div class="mt-3">
+                        Checkout the <a href="http://localhost:3000/docs/lib" target="_blank">documentation</a> 
+                        on how to implement the client side
+                    </div>
                 </div>
             </div>
         </div>
-        <hr>
-        <h1>How to implement</h1>
+        <!-- <hr>
+        <h1>Implementing the Client-Library</h1>
         <div class="view_component">
             <div class="form-row">
                 <div class="form-group">
                     <label for="">Implementing the Client-Library</label>
-                    <div class="read-only-text">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Debitis accusantium iure laborum fuga exercitationem nostrum iste, ducimus molestias! Iure corporis cum cumque, pariatur reprehenderit incidunt aliquid aliquam officia asperiores consequuntur?</div>
+                    <vue3-markdown-it :source='source' />
                 </div>
             </div>
-        </div>
+        </div> -->
         <hr>
         <h1>~~Dangerous Water~~</h1>
         <div class="view_component">
@@ -95,6 +98,7 @@
 </template>
 
 <script>
+    import axios from 'axios';
 
     export default {
         name: 'TabAppDetails',
@@ -105,9 +109,23 @@
                 verify_app_name: null,
                 verified: false,
                 app_token: "This is a cool application token",
+                source: "```func Read(b []byte) error```",
             };
         },
         props: ['app'],
+        computed: {
+            token() {
+                console.log(this.$props.app.app_token);
+                if (this.$props.app.app_token) {
+                    return this.$props.app.app_token;
+                } 
+                if (this.app_token) {
+                    return this.app_token;
+                }
+                return "";
+                // return this.$props.app.app_token ? this.$props.app.app_token != null : this.app_token;
+                },
+        },
         methods: {
             setMode() {
                 this.isEdit = !this.isEdit;
@@ -115,19 +133,43 @@
                 // diable tabs until saved
                 this.$emit('inEdit', this.isEdit);
             },
-            verifyStep() {
-                if (this.verify_app_name == null || this.verify_app_name !== "datalabs.dev/test") {
-                    this.$toast.warning("Please provide the correct domain/name to proceed")
+            generateToken() {
+                if (this.verify_app_name == null) {
+                    this.$toast.warning("Please provide the correct Organization/AppName");
                     return
                 }
-                this.verified = true;
+                const appOrgn = this.verify_app_name.split("/");
+                if (appOrgn.length < 2) {
+                    this.$toast.warning("Please provide the correct Organization/AppName");
+                    return
+                }
+                let options = {
+                    headers: {
+                        'Authorization': localStorage.getItem("token"),
+                    }
+                };
+                axios.post("http://localhost:8080/api/v2/view/app/generate/token", {
+                    app_uuid: this.$props.app.app_uuid,
+                    app_name: appOrgn[1],
+                    orgn_name: appOrgn[0],
+                }, options).then(res => {
+                    console.log(res);
+                    this.app_token = res.data.app_token;
+                    this.$toast.success(res.data.msg);
+                }).catch(err => {
+                    if (err.response.status === 403) {
+                        this.$toast.error("Organization/AppName do not match")
+                    }
+                    console.log(err);
+                });
             },
             copyTokenToClipboard() {
-                  var token = document.getElementById("app_token_value");
+                var token = document.getElementById("app_token_value");
                 token.select();
                 token.setSelectionRange(0, 99999)
                 document.execCommand("copy");
-                alert("Copied the text: " + token.value);
+                console.log(token);
+                // alert("Copied the text: " + token.value);
             },
         },
     };

@@ -4,8 +4,8 @@ import (
 	"errors"
 	"net/http"
 
-	appSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/app_service"
-	"github.com/KonstantinGasser/clickstream/utils/ctx_value"
+	appSrv "github.com/KonstantinGasser/datalabs/backend/protobuf/app_service"
+	"github.com/KonstantinGasser/datalabs/utils/ctx_value"
 	"github.com/sirupsen/logrus"
 )
 
@@ -30,13 +30,13 @@ func (api API) HandlerAppDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// invoke grpc call to user-service to delete app
-	resp, err := api.AppServiceClient.DeleteApp(r.Context(), &appSrv.DeleteAppRequest{
+	resp, err := api.AppClient.Delete(r.Context(), &appSrv.DeleteRequest{
 		Tracing_ID: ctx_value.GetString(r.Context(), "tracingID"),
 		AppUuid:    payload.AppUUID,
 		CallerUuid: user.GetUuid(),
 	})
 	if err != nil {
-		logrus.Errorf("<%v>[api.HandlerDeleteApp] could execute grpc.DeleteApp %v\n", ctx_value.GetString(r.Context(), "tracingID"), err)
+		logrus.Errorf("<%v>[api.HandlerDeleteApp] could execute grpc.Delete %v\n", ctx_value.GetString(r.Context(), "tracingID"), err)
 		api.onError(w, errors.New("failed to delete app"), http.StatusInternalServerError)
 		return
 	}

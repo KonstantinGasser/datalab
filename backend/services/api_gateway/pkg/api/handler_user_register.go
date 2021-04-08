@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	userSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/user_service"
-	"github.com/KonstantinGasser/clickstream/utils/ctx_value"
+	userSrv "github.com/KonstantinGasser/datalabs/backend/protobuf/user_service"
+	"github.com/KonstantinGasser/datalabs/utils/ctx_value"
 	"github.com/sirupsen/logrus"
 )
 
@@ -38,7 +38,7 @@ func (api API) HandlerUserRegister(w http.ResponseWriter, r *http.Request) {
 
 	// invoke grpc call to user-service to create the user
 	// Response holds only a status-code and a msg (could be an error message)
-	resp, err := api.UserSrvClient.CreateUser(r.Context(), &userSrv.CreateUserRequest{
+	resp, err := api.UserClient.Create(r.Context(), &userSrv.CreateRequest{
 		Tracing_ID: ctx_value.GetString(r.Context(), "tracingID"),
 		User: &userSrv.RegisterUser{
 			Username:     payload.Username,

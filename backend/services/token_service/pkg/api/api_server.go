@@ -1,19 +1,19 @@
 package api
 
 import (
-	tokenSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/token_service"
+	tokenSrv "github.com/KonstantinGasser/datalabs/backend/protobuf/token_service"
 )
 
-type TokenService struct {
-	tokenSrv.UnimplementedTokenServiceServer
+type TokenServer struct {
+	tokenSrv.UnimplementedTokenServer
 	// ** Service Dependencies ***
 }
 
 // NewTokenService creates and returns a new TokenService
-func NewTokenService() TokenService {
-	srv := TokenService{}
+func NewTokenServer() TokenServer {
+	srv := TokenServer{}
 	return srv
 }
 
 // this is required to implemented due to the new go-grpc update: may change in the future
-func (srv TokenService) mustEmbedUnimplementedTokenServiceServer() {}
+func (srv TokenServer) mustEmbedUnimplementedTokenServiceServer() {}

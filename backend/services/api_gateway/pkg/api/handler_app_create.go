@@ -4,8 +4,8 @@ import (
 	"errors"
 	"net/http"
 
-	appSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/app_service"
-	"github.com/KonstantinGasser/clickstream/utils/ctx_value"
+	appSrv "github.com/KonstantinGasser/datalabs/backend/protobuf/app_service"
+	"github.com/KonstantinGasser/datalabs/utils/ctx_value"
 	"github.com/sirupsen/logrus"
 )
 
@@ -25,13 +25,14 @@ func (api API) HandlerAppCreate(w http.ResponseWriter, r *http.Request) {
 		logrus.Errorf("<%v>[api.HandlerAppCreate] could not decode r.Body: %v\n", ctx_value.GetString(r.Context(), "tracingID"), err)
 	}
 	user := ctx_value.GetAuthedUser(r.Context())
+	logrus.Warn(user)
 	if user == nil {
 		logrus.Errorf("<%v>[api.HandlerAppCreate] could not get user-claims, they are nil\n", ctx_value.GetString(r.Context(), "tracingID"))
 		api.onError(w, errors.New("could not find user claims"), http.StatusForbidden)
 		return
 	}
 	// invoke grpc call to user-service to create requested app
-	respApp, err := api.AppServiceClient.CreateApp(r.Context(), &appSrv.CreateAppRequest{
+	respApp, err := api.AppClient.Create(r.Context(), &appSrv.CreateRequest{
 		Tracing_ID:   ctx_value.GetString(r.Context(), "tracingID"),
 		OwnerUuid:    user.GetUuid(),
 		Name:         payload.Name,

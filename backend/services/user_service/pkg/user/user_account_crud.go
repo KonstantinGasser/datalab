@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/KonstantinGasser/clickstream/backend/services/user_service/pkg/storage"
+	"github.com/KonstantinGasser/datalabs/backend/services/user_service/pkg/storage"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -59,12 +59,8 @@ func (user user) Update(ctx context.Context, storage storage.Storage, userItem U
 
 	updateQuery := bson.D{
 		{
-			"$set", userItem,
-			// bson.D{
-			// 	{"first_name", userItem.FirstName},
-			// 	{"last_name", userItem.LastName},
-			// 	{"orgn_position", userItem.OrgnPosition},
-			// },
+			Key:   "$set",
+			Value: userItem,
 		},
 	}
 	if err := storage.UpdateOne(ctx, userDatabase, userCollection, bson.M{"_id": userItem.UUID}, updateQuery); err != nil {
@@ -97,7 +93,7 @@ func (user user) VerifySameOrgn(ctx context.Context, storage storage.Storage, ba
 	comparator := Comparator{
 		Fetch: func() (map[string]interface{}, error) {
 			var data map[string]interface{}
-			err := storage.FindOne(ctx, userDatabase, userCollection, bson.D{{"_id", baseObject}}, &data)
+			err := storage.FindOne(ctx, userDatabase, userCollection, bson.D{{Key: "_id", Value: baseObject}}, &data)
 			if err != nil {
 				return nil, err
 			}
@@ -110,7 +106,7 @@ func (user user) VerifySameOrgn(ctx context.Context, storage storage.Storage, ba
 	comparable := Comparable{
 		Fetch: func() ([]map[string]interface{}, error) {
 			var data []map[string]interface{}
-			err := storage.FindMany(ctx, userDatabase, userCollection, bson.D{{"_id", bson.M{"$in": compareWith}}}, &data)
+			err := storage.FindMany(ctx, userDatabase, userCollection, bson.D{{Key: "_id", Value: bson.M{"$in": compareWith}}}, &data)
 			if err != nil {
 				return nil, err
 			}

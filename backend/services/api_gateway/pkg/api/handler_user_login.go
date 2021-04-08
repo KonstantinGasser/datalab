@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"time"
 
-	tokenSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/token_service"
-	userSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/user_service"
-	"github.com/KonstantinGasser/clickstream/utils/ctx_value"
+	tokenSrv "github.com/KonstantinGasser/datalabs/backend/protobuf/token_service"
+	userSrv "github.com/KonstantinGasser/datalabs/backend/protobuf/user_service"
+	"github.com/KonstantinGasser/datalabs/utils/ctx_value"
 	"github.com/sirupsen/logrus"
 )
 
@@ -36,7 +36,7 @@ func (api API) HandlerUserLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// invoke grpc to user-service to authenticate user
-	respUser, err := api.UserSrvClient.Authenticate(r.Context(), &userSrv.AuthenticateRequest{
+	respUser, err := api.UserClient.Authenticate(r.Context(), &userSrv.AuthenticateRequest{
 		Tracing_ID: ctx_value.GetString(r.Context(), "tracingID"),
 		Username:   payload.Username,
 		Password:   payload.Password,
@@ -58,7 +58,8 @@ func (api API) HandlerUserLogin(w http.ResponseWriter, r *http.Request) {
 	respToken, err := api.TokenSrvClient.IssueUserToken(r.Context(), &tokenSrv.IssueUserTokenRequest{
 		Tracing_ID: ctx_value.GetString(r.Context(), "tracingID"),
 		Claim: &tokenSrv.UserClaim{
-			Uuid: respUser.GetUserClaims().GetUuid(),
+			Uuid:       respUser.GetUserClaims().GetUuid(),
+			OrgnDomain: respUser.GetUserClaims().GetOrgnDomain(),
 		},
 	})
 	if err != nil {

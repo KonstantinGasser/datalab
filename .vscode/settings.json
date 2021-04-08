@@ -7,7 +7,12 @@
         "latex",
         "plaintext",
         "proto3",
+<<<<<<< HEAD
         "go"
+=======
+        "go",
+        "vue"
+>>>>>>> feature_app_token
     ],
     "spellright.parserByClass": {
         "proto3": {

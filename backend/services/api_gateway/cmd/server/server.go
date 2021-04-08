@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/KonstantinGasser/clickstream/backend/services/api_gateway/pkg/api"
+	"github.com/KonstantinGasser/datalabs/backend/services/api_gateway/pkg/api"
 	"github.com/sirupsen/logrus"
 )
 

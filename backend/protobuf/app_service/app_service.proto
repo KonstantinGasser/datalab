@@ -2,21 +2,72 @@ syntax = "proto3";
 
 package app_service;
 
+// name App is suffixion since the protoc code gen will add *Server / *Client 
+// in code: AppServer & AppClient instead of AppServiceServer & AppServiceClient
+service App {
+    rpc Create(CreateRequest) returns (CreateResponse) {}
+    rpc Delete(DeleteRequest) returns (DeleteResponse) {}
 
-service AppService {
-    rpc CreateApp(CreateAppRequest) returns (CreateAppResponse) {}
-    rpc DeleteApp(DeleteAppRequest) returns (DeleteAppResponse) {}
-
-    rpc GetAppList(GetAppListRequest) returns (GetAppListResponse) {}
-    rpc GetApp(GetAppRequest) returns (GetAppResponse) {}
+    rpc GetList(GetListRequest) returns (GetListResponse) {}
+    rpc Get(GetRequest) returns (GetResponse) {}
 
     rpc AddMember(AddMemberRequest) returns (AddMemberResponse) {}
     rpc RemoveMember(RemoveMemberRequest) returns (RemoveMemberResponse) {}
+
+    rpc CanGenToken(CanGenTokenRequest) returns (CanGenTokenResponse) {}
+    rpc CanDelApp(CanDelAppRequest) returns (CanDelAppResponse) {}
+
+    rpc GenerateToken(GenerateTokenRequest) returns (GenerateTokenResponse) {}
 }
+
+// RPC GENERATE TOKEN
+message GenerateTokenRequest {
+    string tracing_ID = 1;
+    string caller_uuid = 2;
+    string app_uuid = 3;
+    string orgn_domain = 4;
+    string app_name = 5;
+}
+
+message GenerateTokenResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    string app_token = 3;
+}
+
+// RPC CAN GEN TOKEN
+message CanGenTokenRequest {
+    string tracing_ID = 1;
+    string caller_uuid = 2;
+    string domain_name = 3;
+    string app_name = 4;
+}
+
+message CanGenTokenResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    bool can_gen_token = 3;
+}
+// ***************************
+
+// RPC CAN DEL APP
+message CanDelAppRequest {
+    string tracing_ID = 1;
+    string caller_uuid = 2;
+    string domain_name = 3;
+    string app_name = 4;
+}
+
+message CanDelAppResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    bool can_del_app = 3;
+}
+// ***************************
 
 
 // RPC CREATE APP
-message CreateAppRequest {
+message CreateRequest {
     string tracing_ID = 1;
     string owner_uuid = 2;
     string name = 3;
@@ -25,7 +76,7 @@ message CreateAppRequest {
     repeated string member = 6;
     repeated string settings = 7;
 }
-message CreateAppResponse {
+message CreateResponse {
     int32 status_code = 1;
     string msg = 2;
     string app_uuid = 3;
@@ -33,24 +84,24 @@ message CreateAppResponse {
 // ***************************
 
 // RPC DELETE APP
-message DeleteAppRequest {
+message DeleteRequest {
     string tracing_ID = 1;
     string app_uuid = 2;
     string caller_uuid = 3;
 }
 
-message DeleteAppResponse {
+message DeleteResponse {
     int32 status_code = 1;
     string msg = 2;
 }
 // ***************************
 
 // RPC GET APP LIST
-message GetAppListRequest {
+message GetListRequest {
     string tracing_ID = 1;
     string caller_uuid = 2;
 }
-message GetAppListResponse {
+message GetListResponse {
     int32 status_code = 1;
     string msg = 2;
     repeated SimpleApp app_list = 3;
@@ -58,13 +109,13 @@ message GetAppListResponse {
 // ***************************
 
 // RPC GET APP
-message GetAppRequest {
+message GetRequest {
     string tracing_ID = 1;
     string app_uuid = 2;
     string caller_uuid = 3;
 }
 
-message GetAppResponse {
+message GetResponse {
     int32 status_code = 1;
     string msg = 2;
     ComplexApp app = 3;
@@ -100,12 +151,13 @@ message RemoveMemberResponse {
 
 // common types
 message ComplexApp {
-    string name = 1;
-    string description = 2;
-    ComplexUser owner = 3;
-    repeated ComplexUser member = 4;
-    repeated string settings = 5;
-    string app_token = 6;
+    string uuid = 1;
+    string name = 2;
+    string description = 3;
+    ComplexUser owner = 4;
+    repeated ComplexUser member = 5;
+    repeated string settings = 6;
+    string app_token = 7;
 }
 
 message SimpleApp {

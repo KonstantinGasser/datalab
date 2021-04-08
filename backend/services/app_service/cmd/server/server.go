@@ -4,9 +4,9 @@ import (
 	"context"
 	"net"
 
-	appSrv "github.com/KonstantinGasser/clickstream/backend/protobuf/app_service"
-	"github.com/KonstantinGasser/clickstream/backend/services/app_service/pkg/api"
-	"github.com/KonstantinGasser/clickstream/backend/services/app_service/pkg/storage"
+	appSrv "github.com/KonstantinGasser/datalabs/backend/protobuf/app_service"
+	"github.com/KonstantinGasser/datalabs/backend/services/app_service/pkg/api"
+	"github.com/KonstantinGasser/datalabs/backend/services/app_service/pkg/storage"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )
@@ -16,8 +16,8 @@ import (
 func Run(ctx context.Context, addr string) error {
 	srv := grpc.NewServer()
 	// create app-service
-	appService := api.NewAppServiceServer(storage.New("mongodb://AppDB:secure@192.168.0.179:27018"))
-	appSrv.RegisterAppServiceServer(srv, appService)
+	appService := api.NewAppServer(storage.New("mongodb://AppDB:secure@192.168.0.179:27018"))
+	appSrv.RegisterAppServer(srv, appService)
 
 	listener, err := net.Listen("tcp", addr)
 	if err != nil {
