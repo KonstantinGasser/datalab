@@ -9,12 +9,12 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/KonstantinGasser/datalabs/backend/services/api_gateway/cmd/server"
+	"github.com/KonstantinGasser/datalabs/backend/services/file_server/cmd/server"
 	"github.com/sirupsen/logrus"
 )
 
 func main() {
-	address := flag.String("listen-addr", "localhost:8080", "address to run the server on")
+	address := flag.String("listen-addr", "localhost:8000", "address to run the server on")
 	flag.Parse()
 
 	// SIG chan to handle interruptions and so on...

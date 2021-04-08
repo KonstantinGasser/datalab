@@ -20,7 +20,7 @@ type TokenClaims struct {
 // an app token.
 func (app app) GetTokenClaims(ctx context.Context, storage storage.Storage, tokenS tokenSrv.TokenClient, appUUID, callerUUID, orgnAndApp string) (int, string, error) {
 	// pre-condition must be true: orgn name and app name from request must match with db records
-	ok, err := app.canGenToken(ctx, storage, appUUID, callerUUID, orgnAndApp)
+	ok, err := app.matchAppHash(ctx, storage, appUUID, callerUUID, orgnAndApp)
 	if err != nil {
 		return http.StatusInternalServerError, "", err
 	}

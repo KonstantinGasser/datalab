@@ -223,9 +223,9 @@ func (app app) AddMember(ctx context.Context, storage storage.Storage, ownerUUID
 	return http.StatusOK, nil
 }
 
-// CanGenToken verifies that the request with domain name and app name matches with the database records
+// matchAppHash verifies that the request with domain name and app name matches with the database records
 // and that the request caller is the owner of the app
-func (app app) canGenToken(ctx context.Context, storage storage.Storage, appUUID, callerUUID, domainAndName string) (bool, error) {
+func (app app) matchAppHash(ctx context.Context, storage storage.Storage, appUUID, callerUUID, domainAndName string) (bool, error) {
 	query := bson.M{"_id": appUUID, "owner_uuid": callerUUID}
 
 	var appData bson.M
@@ -245,14 +245,4 @@ func (app app) canGenToken(ctx context.Context, storage storage.Storage, appUUID
 		return false, nil
 	}
 	return true, nil
-}
-
-func (app app) updateToken(ctx context.Context, storage storage.Storage, appUUID, token string) (int, error) {
-	query := bson.D{
-		{
-			Key:   "$set",
-			Value: bson.M{"app_token": token},
-		},
-	}
-	return storage.UpdateOne(ctx, appDatabase, appCollection, bson.M{"_id": appUUID}, query)
 }

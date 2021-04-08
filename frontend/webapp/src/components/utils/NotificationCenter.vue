@@ -1,10 +1,10 @@
 <template>
     <div class="notification-center">
-        <div><span class="icon icon-bell green big hover" @click="show_notification = !show_notification"></span></div>
+        <!-- <div><span class="icon icon-bell green big hover" @click="show_notification = !show_notification"></span></div>
         <div v-if="showNotifications" class="notification-popover">
           <div class="notification-handle"></div>
             some notification
-        </div>
+        </div> -->
       </div>
 </template>
 
