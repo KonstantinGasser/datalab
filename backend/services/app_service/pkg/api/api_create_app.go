@@ -23,7 +23,7 @@ func (srv AppService) Create(ctx context.Context, in *appSrv.CreateRequest) (*ap
 		return &appSrv.CreateResponse{StatusCode: http.StatusInternalServerError, Msg: "could not create app", AppUuid: ""}, nil
 	}
 	orgnAppHash := hash.Sha256([]byte(strings.Join([]string{in.GetOrganization(), in.GetName()}, "/"))).String()
-	status, err := srv.app.CreateApp(ctx, srv.storage, app.AppItem{
+	status, err := srv.app.Create(ctx, srv.storage, app.AppItem{
 		UUID:           appUUID,
 		AppName:        in.GetName(),
 		Description:    in.GetDescription(),

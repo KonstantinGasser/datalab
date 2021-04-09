@@ -15,7 +15,7 @@ func (srv AppService) Delete(ctx context.Context, in *appSrv.DeleteRequest) (*ap
 	logrus.Infof("<%v>[appService.DeleteApp] received request\n", ctx_value.GetString(ctx, "tracingID"))
 
 	orgnAndApp := strings.Join([]string{in.GetOrgnName(), in.GetAppName()}, "/")
-	status, err := srv.app.DeleteApp(ctx, srv.storage, in.GetAppUuid(), in.GetCallerUuid(), orgnAndApp)
+	status, err := srv.app.Delete(ctx, srv.storage, in.GetAppUuid(), in.GetCallerUuid(), orgnAndApp)
 	if err != nil {
 		logrus.Errorf("<%v>[appService.DeleteApp] could not delete app: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
 		return &appSrv.DeleteResponse{StatusCode: int32(status), Msg: err.Error()}, nil

@@ -12,10 +12,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type TokenClaims struct {
-	OrgnAndAppHash, AppUuid string
-}
-
 // GetTokenClaims gathers all data required to to generate the app token. It calls out to the TokenServer to issue
 // an app token.
 func (app app) GetTokenClaims(ctx context.Context, storage storage.Storage, tokenS tokenSrv.TokenClient, appUUID, callerUUID, orgnAndApp string) (int, string, error) {
