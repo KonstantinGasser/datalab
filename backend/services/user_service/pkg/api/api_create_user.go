@@ -30,7 +30,7 @@ func (srv UserService) Create(ctx context.Context, in *userSrv.CreateRequest) (*
 		return &userSrv.CreateResponse{StatusCode: http.StatusInternalServerError, Msg: "could not create user"}, nil
 	}
 
-	status, err := srv.user.InsertNew(ctx, srv.storage, user.UserItem{
+	status, err := srv.user.Create(ctx, srv.storage, user.UserItem{
 		UUID:          uuid,
 		Username:      strings.TrimSpace(in.GetUser().GetUsername()),
 		Password:      hashedPassword,

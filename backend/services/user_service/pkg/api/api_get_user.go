@@ -14,7 +14,7 @@ func (srv UserService) Get(ctx context.Context, in *userSrv.GetRequest) (*userSr
 
 	logrus.Infof("<%v>[userService.GetUser] received request\n", ctx_value.GetString(ctx, "tracingID"))
 
-	status, user, err := srv.user.GetByID(ctx, srv.storage, in.GetForUuid())
+	status, user, err := srv.user.Get(ctx, srv.storage, in.GetForUuid())
 	if err != nil {
 		logrus.Errorf("<%v>[userService.GetUser] could not get user details: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
 		return &userSrv.GetResponse{StatusCode: int32(status), Msg: err.Error(), User: nil}, nil

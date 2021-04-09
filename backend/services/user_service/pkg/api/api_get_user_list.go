@@ -14,7 +14,7 @@ func (srv UserService) GetList(ctx context.Context, in *userSrv.GetListRequest) 
 
 	logrus.Infof("<%v>[userService.GetUserList] received request\n", ctx_value.GetString(ctx, "tracingID"))
 
-	status, userList, err := srv.user.GetByIDs(ctx, srv.storage, in.GetUuidList())
+	status, userList, err := srv.user.GetAll(ctx, srv.storage, in.GetUuidList())
 	if err != nil {
 		logrus.Errorf("<%v>[userService.GetUserList] could not execute GetByIDs: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
 		return &userSrv.GetListResponse{StatusCode: int32(status), Msg: "Could not get users information", UserList: []*userSrv.ComplexUser{}}, nil

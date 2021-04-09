@@ -15,8 +15,8 @@ const (
 )
 
 type User interface {
-	// InsertNew inserts a new user into the database
-	InsertNew(ctx context.Context, storage storage.Storage, userItem UserItem) (int, error)
+	// Create inserts a new user into the database
+	Create(ctx context.Context, storage storage.Storage, userItem UserItem) (int, error)
 
 	// Authenticate verifies whether a user's credentials match with the ones stored in the database
 	Authenticate(ctx context.Context, storage storage.Storage, username, password string) (int, *UserItemAuth, error)
@@ -24,18 +24,40 @@ type User interface {
 	// Update updates a userItem in the database
 	Update(ctx context.Context, storage storage.Storage, userItem UserItemUpdateable) (int, error)
 
-	// GetByIDs collects all user details for all given UUIDs
-	GetByIDs(ctx context.Context, storage storage.Storage, UUIDs []string) (int, []UserItem, error)
+	// GetAll collects all user details for all given UUIDs
+	GetAll(ctx context.Context, storage storage.Storage, UUIDs []string) (int, []UserItem, error)
 
-	// GetByID collects all user details for the given UUID
-	GetByID(ctx context.Context, storage storage.Storage, UUID string) (int, UserItem, error)
+	// Get collects all user details for the given UUID
+	Get(ctx context.Context, storage storage.Storage, UUID string) (int, UserItem, error)
 
-	// CompareUsers compares users based on some indicator
-	VerifySameOrgn(ctx context.Context, storage storage.Storage, baseObject string, compareWith []string) (int, bool, []string, error)
+	// CompareOrgn compares users based on some indicator
+	CompareOrgn(ctx context.Context, storage storage.Storage, baseObject string, compareWith []string) (int, bool, []string, error)
 }
 
 type user struct{}
 
 func NewUser() User {
 	return &user{}
+}
+
+// UserItem is a representation of a user document which lives in the
+// mongoDB. Fields must be exported in order to serve as (de-)serialization for the mongoDB
+type UserItem struct {
+	UUID          string `bson:"_id"`
+	Username      string `bson:"username"`
+	Password      string `bson:"password"`
+	FirstName     string `bson:"first_name"`
+	LastName      string `bson:"last_name"`
+	OrgnDomain    string `bson:"orgn_domain"`
+	OrgnPosition  string `bson:"orgn_position"`
+	ProfileImgURL string `bson:"profile_img_url"`
+}
+
+// UserItemUpdateable describes the fields of a user which can be updated by the user
+type UserItemUpdateable struct {
+	UUID          string `bson:"_id"`
+	FirstName     string `bson:"first_name"`
+	LastName      string `bson:"last_name"`
+	OrgnPosition  string `bson:"orgn_position"`
+	ProfileImgURL string `bson:"profile_img_url"`
 }
