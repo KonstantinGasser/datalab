@@ -8,13 +8,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-<<<<<<< HEAD
-func (srv AppService) GetApp(ctx context.Context, in *appSrv.GetAppRequest) (*appSrv.GetAppResponse, error) {
+func (srv AppService) Get(ctx context.Context, in *appSrv.GetRequest) (*appSrv.GetResponse, error) {
 	ctx = ctx_value.AddValue(ctx, "tracingID", in.GetTracing_ID())
-=======
-func (srv AppService) Get(ctx context.Context, request *appSrv.GetRequest) (*appSrv.GetResponse, error) {
-	ctx = ctx_value.AddValue(ctx, "tracingID", request.GetTracing_ID())
->>>>>>> feature_app_token
 	logrus.Infof("<%v>[appService.GetApp] received request\n", ctx_value.GetString(ctx, "tracingID"))
 
 	status, app, err := srv.app.GetApp(ctx, srv.storage, srv.userService, in.GetAppUuid(), in.GetCallerUuid())

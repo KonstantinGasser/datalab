@@ -6,11 +6,11 @@
                 <div class="form-group col">
                     <div class="form-row mb-2">
                         <label for="">App Name</label>
-                        <input type="text" class="form-control" readonly name="" id="" :placeholder="app.app_name">
+                        <input type="text" class="form-control" readonly name="" id="" :placeholder="app.name">
                     </div>
                     <div class="form-row">
                         <label for="">App Description</label>
-                        <textarea type="text" class="form-control" rows="2" readonly id="app_token_value" :placeholder="app.app_description"></textarea>
+                        <textarea type="text" class="form-control" rows="2" readonly id="app_token_value" :placeholder="app.description"></textarea>
                     </div>
                     <!-- <label for="">App Name</label>
                     <input type="text" class="form-control" readonly name="" id="" :placeholder="app.app_name"> -->
@@ -22,7 +22,7 @@
                 <div class="form-group col">
                     <label for="">App Settings</label>
                     <ul class="tag-list">
-                        <li class="tag-standard" v-for="item in app.app_setting" :key="item">{{item}}</li>
+                        <li class="tag-standard" v-for="item in app.settings" :key="item">{{item}}</li>
                     </ul>
                 </div>
             </div>
@@ -86,9 +86,9 @@
                         </small>
                     </label>
                     <div class="input-group">
-                        <input v-model="verify_app_name" type="text" class="form-control" placeholder="Domain/AppName" aria-label="" aria-describedby="basic-addon1">
+                        <input v-model="delete_app_verify" type="text" class="form-control" placeholder="Domain/AppName" aria-label="" aria-describedby="basic-addon1">
                         <div class="input-group-append">
-                            <button class="btn btn-standard" @click="verifyStep()" type="button">delete 😮</button>
+                            <button class="btn btn-standard" @click="deleteApp(app.uuid)" type="button">delete 😮</button>
                         </div>
                     </div>
                 </div>
@@ -107,9 +107,9 @@
             return {
                 isEdit: false,
                 verify_app_name: null,
+                delete_app_verify: null,
                 verified: false,
-                app_token: "This is a cool application token",
-                source: "```func Read(b []byte) error```",
+                app_token: null,
             };
         },
         props: ['app'],
@@ -149,7 +149,7 @@
                     }
                 };
                 axios.post("http://localhost:8080/api/v2/view/app/generate/token", {
-                    app_uuid: this.$props.app.app_uuid,
+                    app_uuid: this.$props.app.uuid,
                     app_name: appOrgn[1],
                     orgn_name: appOrgn[0],
                 }, options).then(res => {
@@ -163,13 +163,46 @@
                     console.log(err);
                 });
             },
+            deleteApp(id) {
+                if (this.delete_app_verify == null) {
+                    this.$toast.warning("Please provide the correct Organization/AppName");
+                    return
+                }
+                const appOrgn = this.delete_app_verify.split("/");
+                console.log("I: ", appOrgn);
+                if (appOrgn.length < 2) {
+                    this.$toast.warning("Please provide the correct Organization/AppName");
+                    return
+                }
+                let options = {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': localStorage.getItem("token"),
+                    }
+                };
+                axios.post("http://localhost:8080/api/v2/view/app/delete", {
+                        app_uuid: id,
+                        orgn_name: appOrgn[0],
+                        app_name: appOrgn[1],
+                    }, options
+                ).then((resp) => {
+                    if (resp.status == 200) {
+                        this.$toast.success("App has been deleted");
+                        this.$emit("drop_app", {"type": "drop_app", "app_uuid": id});
+                    }
+                }).catch(err => {
+                    console.log(err);
+                    this.$toast.warning("Sorry app could not be removed");
+                    return;
+                });
+            },
             copyTokenToClipboard() {
-                var token = document.getElementById("app_token_value");
-                token.select();
-                token.setSelectionRange(0, 99999)
-                document.execCommand("copy");
-                console.log(token);
-                // alert("Copied the text: " + token.value);
+                navigator.clipboard.writeText(this.token).then(res => {
+                    
+                    this.$toast.success("Token copied to clipboard");
+                }).catch(err => {
+                    this.$toast.error("Failed to copy token...");
+                });
             },
         },
     };

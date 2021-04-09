@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"strings"
 
 	appSrv "github.com/KonstantinGasser/datalabs/backend/protobuf/app_service"
 	"github.com/KonstantinGasser/datalabs/utils/ctx_value"
@@ -9,16 +10,12 @@ import (
 )
 
 // DeleteApp is the grpc endpoint to delete an app based on a app uuid
-<<<<<<< HEAD
-func (srv AppService) DeleteApp(ctx context.Context, in *appSrv.DeleteAppRequest) (*appSrv.DeleteAppResponse, error) {
+func (srv AppService) Delete(ctx context.Context, in *appSrv.DeleteRequest) (*appSrv.DeleteResponse, error) {
 	ctx = ctx_value.AddValue(ctx, "tracingID", in.GetTracing_ID())
-=======
-func (srv AppService) Delete(ctx context.Context, request *appSrv.DeleteRequest) (*appSrv.DeleteResponse, error) {
-	ctx = ctx_value.AddValue(ctx, "tracingID", request.GetTracing_ID())
->>>>>>> feature_app_token
 	logrus.Infof("<%v>[appService.DeleteApp] received request\n", ctx_value.GetString(ctx, "tracingID"))
 
-	status, err := srv.app.DeleteApp(ctx, srv.storage, in.GetAppUuid())
+	orgnAndApp := strings.Join([]string{in.GetOrgnName(), in.GetAppName()}, "/")
+	status, err := srv.app.DeleteApp(ctx, srv.storage, in.GetAppUuid(), in.GetCallerUuid(), orgnAndApp)
 	if err != nil {
 		logrus.Errorf("<%v>[appService.DeleteApp] could not delete app: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
 		return &appSrv.DeleteResponse{StatusCode: int32(status), Msg: err.Error()}, nil

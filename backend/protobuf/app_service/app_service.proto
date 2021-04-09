@@ -87,7 +87,9 @@ message CreateResponse {
 message DeleteRequest {
     string tracing_ID = 1;
     string app_uuid = 2;
-    string caller_uuid = 3;
+    string app_name = 3;
+    string orgn_name = 4;
+    string caller_uuid = 5;
 }
 
 message DeleteResponse {

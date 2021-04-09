@@ -12,19 +12,11 @@ import (
 )
 
 // IssueJWT issues a new JWT for a authenticated user only
-<<<<<<< HEAD:backend/services/token_service/pkg/api/api_issue_jwt.go
-func (srv TokenService) IssueUserToken(ctx context.Context, in *tokenSrv.IssueUserTokenRequest) (*tokenSrv.IssueUserTokenResponse, error) {
-	ctx = ctx_value.AddValue(ctx, "tracingID", in.GetTracing_ID())
-	logrus.Infof("<%v>[tokenService.IssueUserToken] received request\n", ctx_value.GetString(ctx, "tracingID"))
-
-	userClaim := in.GetClaim()
-=======
 func (srv TokenServer) IssueUserToken(ctx context.Context, request *tokenSrv.IssueUserTokenRequest) (*tokenSrv.IssueUserTokenResponse, error) {
 	ctx = ctx_value.AddValue(ctx, "tracingID", request.GetTracing_ID())
 	logrus.Infof("<%v>[tokenService.IssueUserToken] received request\n", ctx_value.GetString(ctx, "tracingID"))
 
 	userClaim := request.GetClaim()
->>>>>>> feature_app_token:backend/services/token_service/pkg/api/api_issue_user_jwt.go
 	token, err := jwts.IssueUser(ctx, userClaim)
 	if err != nil {
 		logrus.Errorf("<%v>[tokenService.IssueUserToken] could not issue JWT for user: %v", ctx_value.GetString(ctx, "tracingID"), err)

@@ -1,11 +1,12 @@
 <template>
-    <div>
+    <div class="doc-frame">
         <vue3-markdown-it :source='markdown'/>
     </div>
 </template>
 
 <script>
-import axios from 'axios'
+import axios from 'axios';
+import 'highlight.js/styles/monokai.css';
 
 export default {
     name: "ClientLib",
@@ -31,3 +32,12 @@ export default {
     },
 }
 </script>
+
+<style scoped>
+.doc-frame {
+    width: 800px;
+    height: 800px;
+    max-height: 800px;
+    overflow-y: scroll;
+}
+</style>

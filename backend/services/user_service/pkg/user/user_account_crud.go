@@ -91,7 +91,7 @@ func (user user) GetByID(ctx context.Context, storage storage.Storage, UUID stri
 func (user user) VerifySameOrgn(ctx context.Context, storage storage.Storage, baseObject string, compareWith []string) (int, bool, []string, error) {
 	// create Comparator as base to compare values with
 	comparator := Comparator{
-		Fetch: func() (map[string]interface{}, error) {
+		LoadData: func() (map[string]interface{}, error) {
 			var data map[string]interface{}
 			err := storage.FindOne(ctx, userDatabase, userCollection, bson.D{{Key: "_id", Value: baseObject}}, &data)
 			if err != nil {
@@ -104,7 +104,7 @@ func (user user) VerifySameOrgn(ctx context.Context, storage storage.Storage, ba
 	}
 	// create Comparable from the request data
 	comparable := Comparable{
-		Fetch: func() ([]map[string]interface{}, error) {
+		LoadData: func() ([]map[string]interface{}, error) {
 			var data []map[string]interface{}
 			err := storage.FindMany(ctx, userDatabase, userCollection, bson.D{{Key: "_id", Value: bson.M{"$in": compareWith}}}, &data)
 			if err != nil {

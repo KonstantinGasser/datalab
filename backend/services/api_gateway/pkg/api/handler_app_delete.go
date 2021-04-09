@@ -22,7 +22,9 @@ func (api API) HandlerAppDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var payload struct {
-		AppUUID string `json:"app_uuid"`
+		AppUUID  string `json:"app_uuid"`
+		AppName  string `json:"app_name"`
+		OrgnName string `json:"orgn_name"`
 	}
 	if err := api.decode(r.Body, &payload); err != nil {
 		logrus.Errorf("<%v>[api.HandlerDeleteApp] could not decode r.Body: %v\n", ctx_value.GetString(r.Context(), "tracingID"), err)
@@ -34,6 +36,8 @@ func (api API) HandlerAppDelete(w http.ResponseWriter, r *http.Request) {
 		Tracing_ID: ctx_value.GetString(r.Context(), "tracingID"),
 		AppUuid:    payload.AppUUID,
 		CallerUuid: user.GetUuid(),
+		AppName:    payload.AppName,
+		OrgnName:   payload.OrgnName,
 	})
 	if err != nil {
 		logrus.Errorf("<%v>[api.HandlerDeleteApp] could execute grpc.Delete %v\n", ctx_value.GetString(r.Context(), "tracingID"), err)
