@@ -37,3 +37,6 @@ if the request passes a cookie in the request.
 Things like: 
 - "hot areas" aggregating mouse movements
 - aggregate summary per page (like /home, /product/my-product)
+
+
+https://ip-api.com/docs
