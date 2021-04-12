@@ -36,3 +36,4 @@ if the request passes a cookie in the request.
 ## Can the lib aggregate data to do some work in prior?
 Things like: 
 - "hot areas" aggregating mouse movements
+- aggregate summary per page (like /home, /product/my-product)
