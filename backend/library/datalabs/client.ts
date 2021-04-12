@@ -25,6 +25,9 @@ export class DataKraken {
     //          www.youtube.com -> www.my-site.com
     REF_PAGE: string 
 
+    // SESSION_START refers to the time the session was started
+    SESSION_START: number
+
     // COOKIE_NAME refers to the key storing the cookie value
     COOKIE_NAME: string = "datalabs.identity"
 
@@ -44,14 +47,17 @@ export class DataKraken {
 
     constructor(application_token: string) {
         // request access token for web-socket
-        this.issueTicket(application_token, this.hasCookie()).then(resp => {
-            this.meta = resp.meta
-            this.ticket = resp.ticket
-        })
+        this.issueTicket(application_token)
+        // set cookie in runtime to not query it all the time
+        if (this.COOKIE === null || this.COOKIE === "")
+            this.COOKIE = this.getCookie()
+
         // looks up referrer
         this.REF_PAGE = this.referrer()
         // init web-socket connection
-        this.open(this.ticket)
+        this.conn = this.open(this.ticket)
+        // start session timer
+        this.SESSION_START = new Date().getTime()
     }
 
     // Listen takes care of the events triggered by the user.
@@ -62,52 +68,66 @@ export class DataKraken {
     // issueTicket requests a ticket to connect to the web-socket
     // returning the permission on what data is allowed to collect
     // (event listener, etc.)
-    private async issueTicket(token, isInit): Promise<any> {
+    private issueTicket(token) {
         let options: any = {
+            credentials: "same-origin",
             headers: {
                 "x-datalabs-token": token,
             }
         }
-        let URL = this.API_URL + this.INIT_PARAM + isInit
-
-        const resp = await fetch(URL, options)
-        if (resp.status != 200)
-           // do something if fails
-        
-        return resp.json()
+        fetch(this.API_URL, options).then(resp => {return resp.json()}).then(data => {
+            this.meta = data.meta
+            this.ticket = data.ticket
+        }).catch(err => {
+            console.log(err)
+        })
     }
 
     // open opens the web-socket connection with the access_token
     // on failure the function will try to open the connection until
     // the MAX_RETRY is exceeded
-    private open(token: string) {
+    private open(token: string): any {
         if (this.conn != null) 
-            return
+            return null
+        if (token === null || token === "")
+            return null
 
         let URL: string = this.WS_URL
         try {
             // update try count
             this.TRIES++
             // open conn
-            this.conn = new WebSocket(URL)
+            return new WebSocket(URL)
         } catch (error) {
             // exit early if tries exceeded
             if (this.TRIES > this.MAX_RETRY) 
-                return
+                return null
             // try again
-            this.open(token)
+            return this.open(token)
         }
     }
 
-    // TODO: logic to return correct cookie ;D
-    private hasCookie(): string {
-        let cookies = document.cookie.split(";")
-        return cookies[0]
-    }
+
     // attach attaches all the JavaScript EventListener to the
     // present document - all refers to the ones set in the access_token
     private attach() {
 
+    }
+
+    // getCookie returns the stored cookie of the user or null
+    private getCookie(): string {
+        // Get name followed by anything except a semicolon
+        var cookiestring=RegExp(this.COOKIE_NAME+"=[^;]+").exec(document.cookie);
+        // Return everything after the equal sign, or an empty string if the cookie name not found
+        return decodeURIComponent(!!cookiestring ? cookiestring.toString().replace(/^[^=]+./,"") : "");
+    }
+
+    // hasCookie returns true if a cookie is already set
+    private hasCookie(): boolean {
+        var c = this.getCookie()
+        if ( c === null || c === "")
+            return false
+        return true
     }
 
     // referrer looks for the web-page the current page
