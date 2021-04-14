@@ -66,6 +66,10 @@ type AppItem struct {
 	OrgnAndAppHash string `bson:"orgn_and_app_hash"`
 }
 
+func (item AppItem) MustBind() error {
+	return nil
+}
+
 // AppItemLight is a minimum representation of an application
 type AppItemLight struct {
 	// mongoDB pk (document key)
