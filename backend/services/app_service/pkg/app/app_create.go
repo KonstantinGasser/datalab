@@ -15,7 +15,7 @@ import (
 func (app app) Create(ctx context.Context, mongo storage.Storage, appItem AppItem) (int, error) {
 
 	// duplicate names may exists in the system but owners can only hold unique app names
-	exists, err := mongo.Exists(ctx, appDatabase, appCollection, bson.M{"appName": appItem.AppName, "ownerUUID": appItem.OwnerUUID})
+	exists, err := mongo.Exists(ctx, appDatabase, appCollection, bson.M{"name": appItem.AppName, "owner_uuid": appItem.OwnerUUID})
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

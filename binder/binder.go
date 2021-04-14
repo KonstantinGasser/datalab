@@ -1,7 +1,7 @@
 package binder
 
 import (
-	"errors"
+	"fmt"
 	"reflect"
 	"regexp"
 	"strings"
@@ -12,15 +12,21 @@ const (
 	tagPattern = `bind:".+"`
 )
 
-var (
-	ErrMissingValues = errors.New("not all required fields are set")
-)
+type ErrNoFullBind struct {
+	invalid []string
+}
+
+func (err ErrNoFullBind) Error() string {
+	return fmt.Sprintf("%v do not satisfy the bind conditions", err.invalid)
+}
 
 func MustBind(v interface{}) error {
 	regexBind, err := regexp.Compile(tagPattern)
 	if err != nil {
 		return err
 	}
+
+	invalid := []string{}
 
 	el := reflect.ValueOf(v).Elem()
 	for i := 0; i < el.NumField(); i++ {
@@ -31,38 +37,55 @@ func MustBind(v interface{}) error {
 		if len(matches) <= 0 {
 			continue
 		}
-		yes, err := shoudlBind(matches[0])
-		if err != nil {
-			return err
-		}
-		if !yes {
+		ok := shoudlBind(matches[0])
+		if !ok {
 			continue
 		}
 		if isNil(field) {
-			return ErrMissingValues
+			invalid = append(invalid, el.Type().Field(i).Name)
 		}
+	}
+	if len(invalid) > 0 {
+		return ErrNoFullBind{invalid: invalid}
 	}
 	return nil
 }
 
-func shoudlBind(tag string) (bool, error) {
+func shoudlBind(tag string) bool {
 	vs := strings.Split(tag, ":")
 	if len(vs) < 2 {
-		return false, nil
+		return false
 	}
-	re, err := regexp.Compile(`"yes"`)
-	if err != nil {
-		return false, err
-	}
-	return re.MatchString(vs[1]), nil
+	re, _ := regexp.Compile(`"yes"`)
+	return re.MatchString(vs[1])
 }
 
 func isNil(field reflect.Value) bool {
 	switch field.Type().Kind() {
+	case reflect.Uint:
+		return field.Interface().(uint) == 0
+	case reflect.Int8:
+		return field.Interface().(int8) == 0
+	case reflect.Uint8:
+		return field.Interface().(uint8) == 0
+	case reflect.Int16:
+		return field.Interface().(int16) == 0
+	case reflect.Uint16:
+		return field.Interface().(uint16) == 0
+	case reflect.Int32:
+		return field.Interface().(int32) == 0
+	case reflect.Uint32:
+		return field.Interface().(uint32) == 0
+	case reflect.Int64:
+		return field.Interface().(int64) == 0
+	case reflect.Uint64:
+		return field.Interface().(uint64) == 0
+	case reflect.Int:
+		return field.Interface().(int) == 0
 	case reflect.String:
 		return field.Interface().(string) == ""
 	case reflect.Slice:
-		return len(field.Interface().([]interface{})) > 0
+		return field.Len() == 0
 	case reflect.Ptr:
 		return field.Interface() == nil
 	}

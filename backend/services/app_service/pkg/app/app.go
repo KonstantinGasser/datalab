@@ -52,11 +52,11 @@ func NewApp() App {
 // AppItem represents one App in the database
 type AppItem struct {
 	// mongoDB pk (document key)
-	UUID        string   `bson:"_id"`
-	AppName     string   `bson:"name"`
-	URL         string   `bson:"url"`
-	OwnerUUID   string   `bson:"owner_uuid"`
-	OrgnDomain  string   `bson:"orgn_domain"`
+	UUID        string   `bson:"_id" bind:"yes"`
+	AppName     string   `bson:"name" bind:"yes"`
+	URL         string   `bson:"url" bind:"yes"`
+	OwnerUUID   string   `bson:"owner_uuid" bind:"yes"`
+	OrgnDomain  string   `bson:"orgn_domain" bind:"yes"`
 	Description string   `bson:"description"`
 	Member      []string `bson:"member"`
 	Settings    []string `bson:"setting"`
@@ -64,10 +64,6 @@ type AppItem struct {
 	// OrgnAndAppHash is required to verify the generation of an app token
 	// and the deletion of an app
 	OrgnAndAppHash string `bson:"orgn_and_app_hash"`
-}
-
-func (item AppItem) MustBind() error {
-	return nil
 }
 
 // AppItemLight is a minimum representation of an application

@@ -155,7 +155,8 @@
                         this.$toast.success("App " + this.appName + " has been created");
                         this.$emit("createdApp", {"type": "show_app", "app_uuid": resp.data.app_uuid});
                     }).catch(err => {
-                        this.$toast.error("Sorry app could not be created");
+                        console.log(err)
+                        this.$toast.error(err.response.data.msg);
                         return;
                     });
                 }

@@ -36,21 +36,18 @@ func TestShouldBind(t *testing.T) {
 	}
 
 	for _, tc := range tt {
-		yes, err := shoudlBind(tc.tag)
-		if err != nil {
-			is.NoErr(err)
-		}
-		is.True(tc.exp == yes)
+		ok := shoudlBind(tc.tag)
+		is.True(tc.exp == ok)
 	}
 }
 
 type tagfields struct {
-	F1 string `bind:"yes"`
-	F2 string `json:"field" bind:"yes"`
-	F3 string
+	F1 string      `bind:"yes, min=6, max=12"`
+	F2 string      `json:"field" bind:"yes"`
+	F3 interface{} `bind:"yes"`
 }
 
-func TestMustCompile(t *testing.T) {
+func TestMustBind(t *testing.T) {
 	is := is.New(t)
 
 	tt := []struct {
@@ -61,7 +58,7 @@ func TestMustCompile(t *testing.T) {
 			s: tagfields{
 				F1: "test_f1",
 				F2: "test_f2",
-				F3: "",
+				F3: 42,
 			},
 			exp: nil,
 		},
@@ -69,24 +66,9 @@ func TestMustCompile(t *testing.T) {
 			s: tagfields{
 				F1: "",
 				F2: "test_f2",
+				F3: 42,
 			},
-			exp: ErrMissingValues,
-		},
-		{
-			s: tagfields{
-				F1: "",
-				F2: "",
-				F3: "",
-			},
-			exp: ErrMissingValues,
-		},
-		{
-			s: tagfields{
-				F1: "test_f1",
-				F2: "",
-				F3: "",
-			},
-			exp: ErrMissingValues,
+			exp: ErrNoFullBind{invalid: []string{"F1"}},
 		},
 	}
 
@@ -95,3 +77,76 @@ func TestMustCompile(t *testing.T) {
 		is.True(tc.exp == err)
 	}
 }
+
+// {
+// 	s: tagfields{
+// 		F1: "test_f1",
+// 		F2: "test_f2",
+// 		F3: int8(0),
+// 	},
+// 	exp: ErrMissingValues,
+// },
+// {
+// 	s: tagfields{
+// 		F1: "test_f1",
+// 		F2: "test_f2",
+// 		F3: int16(0),
+// 	},
+// 	exp: ErrMissingValues,
+// },
+// {
+// 	s: tagfields{
+// 		F1: "test_f1",
+// 		F2: "test_f2",
+// 		F3: int32(0),
+// 	},
+// 	exp: ErrMissingValues,
+// },
+// {
+// 	s: tagfields{
+// 		F1: "test_f1",
+// 		F2: "test_f2",
+// 		F3: int64(0),
+// 	},
+// 	exp: ErrMissingValues,
+// },
+// {
+// 	s: tagfields{
+// 		F1: "test_f1",
+// 		F2: "test_f2",
+// 		F3: uint(0),
+// 	},
+// 	exp: ErrMissingValues,
+// },
+// {
+// 	s: tagfields{
+// 		F1: "test_f1",
+// 		F2: "test_f2",
+// 		F3: uint8(0),
+// 	},
+// 	exp: ErrMissingValues,
+// },
+// {
+// 	s: tagfields{
+// 		F1: "test_f1",
+// 		F2: "test_f2",
+// 		F3: uint16(0),
+// 	},
+// 	exp: ErrMissingValues,
+// },
+// {
+// 	s: tagfields{
+// 		F1: "test_f1",
+// 		F2: "test_f2",
+// 		F3: uint32(0),
+// 	},
+// 	exp: ErrMissingValues,
+// },
+// {
+// 	s: tagfields{
+// 		F1: "test_f1",
+// 		F2: "test_f2",
+// 		F3: uint64(0),
+// 	},
+// 	exp: ErrMissingValues,
+// },
