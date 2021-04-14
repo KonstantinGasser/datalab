@@ -40,3 +40,9 @@ Things like:
 
 
 https://ip-api.com/docs
+
+
+## onMouseClick
+- check if target exists (if not drop event)
+- - if target tag=a look for href? 
+- - get target name (if not given class or id)

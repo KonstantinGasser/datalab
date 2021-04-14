@@ -17,6 +17,7 @@ func (api API) HandlerAppCreate(w http.ResponseWriter, r *http.Request) {
 
 	var payload struct {
 		Name        string   `json:"app_name"`
+		URL         string   `json:"app_URL"`
 		Description string   `json:"app_description"`
 		Member      []string `json:"app_member"`
 		Settings    []string `json:"app_settings"`
@@ -36,6 +37,7 @@ func (api API) HandlerAppCreate(w http.ResponseWriter, r *http.Request) {
 		Tracing_ID:   ctx_value.GetString(r.Context(), "tracingID"),
 		OwnerUuid:    user.GetUuid(),
 		Name:         payload.Name,
+		AppUrl:       payload.URL,
 		Organization: user.GetOrgnDomain(),
 		Description:  payload.Description,
 		Member:       payload.Member,

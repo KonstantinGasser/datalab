@@ -13,7 +13,7 @@ import (
 const (
 	issuerUser  = "com.datalabs.token-service"
 	SecretUser  = "super_secure"
-	expTimeUser = time.Minute * 60
+	expTimeUser = time.Minute * 60 * 4
 )
 
 // IssueUser takes in arguments for the token of the user

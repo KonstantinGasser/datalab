@@ -8,17 +8,17 @@
                         <label for="">App Name</label>
                         <input type="text" class="form-control" readonly name="" id="" :placeholder="app.name">
                     </div>
-                    <div class="form-row">
-                        <label for="">App Description</label>
-                        <textarea type="text" class="form-control" rows="2" readonly id="app_token_value" :placeholder="app.description"></textarea>
-                    </div>
-                    <!-- <label for="">App Name</label>
-                    <input type="text" class="form-control" readonly name="" id="" :placeholder="app.app_name"> -->
                 </div>
-                <!-- <div class="form-group col">
+                <div class="form-group col">
+                    <label for="">App URL</label>
+                    <input v-model="appURL" type="text" class="form-control" name="" readonly id="app_url" :placeholder="app.URL">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col">
                     <label for="">App Description</label>
-                    <input type="text" class="form-control" readonly name="" id="" :placeholder="app.app_description">
-                </div> -->
+                    <textarea readonly class="form-control" name="" id="app_desc" rows="2" :placeholder="app.description"></textarea>
+                </div>
                 <div class="form-group col">
                     <label for="">App Settings</label>
                     <ul class="tag-list">
@@ -64,16 +64,6 @@
                 </div>
             </div>
         </div>
-        <!-- <hr>
-        <h1>Implementing the Client-Library</h1>
-        <div class="view_component">
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="">Implementing the Client-Library</label>
-                    <vue3-markdown-it :source='source' />
-                </div>
-            </div>
-        </div> -->
         <hr>
         <h1>~~Dangerous Water~~</h1>
         <div class="view_component">

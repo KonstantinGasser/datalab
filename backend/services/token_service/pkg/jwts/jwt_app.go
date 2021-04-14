@@ -17,11 +17,13 @@ const (
 
 // IssueApp takes in arguments for the token of the user
 // returning a JWT with exp set to expTime and the data passed in
-func IssueApp(ctx context.Context, appUuid, orgnAndAppHash string) (string, error) {
+func IssueApp(ctx context.Context, appUuid, orgnAndAppHash, appOrigin string) (string, error) {
 	claims := jwt.MapClaims{}
 	claims["sub"] = appUuid
+	claims["origin"] = appOrigin
 	claims["hash"] = orgnAndAppHash
-	claims["iat"] = issuerApp
+	claims["iss"] = issuerApp
+	claims["iat"] = time.Now().Unix()
 	claims["exp"] = time.Now().Add(expTimeApp).Unix()
 
 	_token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

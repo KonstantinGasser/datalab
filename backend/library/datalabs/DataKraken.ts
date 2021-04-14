@@ -10,7 +10,7 @@ enum EVENT_TYPE {
     MOUSEMOVE,
 }
 
-export default class DataKraken {
+export class DataKraken {
 
     // CONN_STATE refers to the state of the web-socket connection
     private CONN_STATE: SOCKET_STATE = SOCKET_STATE.IDLE

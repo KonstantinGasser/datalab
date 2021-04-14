@@ -26,6 +26,7 @@ func (srv AppService) Create(ctx context.Context, in *appSrv.CreateRequest) (*ap
 	status, err := srv.app.Create(ctx, srv.storage, app.AppItem{
 		UUID:           appUUID,
 		AppName:        in.GetName(),
+		URL:            in.GetAppUrl(),
 		Description:    in.GetDescription(),
 		OwnerUUID:      in.GetOwnerUuid(),
 		OrgnDomain:     in.GetOrganization(),

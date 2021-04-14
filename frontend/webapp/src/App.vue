@@ -192,6 +192,9 @@ input {
 .standard-font {
   font-size: 14px;
 }
+.medium-font {
+  font-size: 16px;
+}
 .icon.white {
   color: #fff;
 }

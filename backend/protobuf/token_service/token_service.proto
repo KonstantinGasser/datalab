@@ -28,6 +28,7 @@ message IssueAppTokenRequest {
     string tracing_ID = 1;
     string orgnAndAppHash = 2;
     string app_uuid = 3;
+    string origin = 4;
 }
 
 message IssueAppTokenResponse {

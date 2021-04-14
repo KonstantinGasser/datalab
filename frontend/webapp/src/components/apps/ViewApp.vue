@@ -5,12 +5,11 @@
                 <button @click="modeCreateApp()" class="btn btn-standard">Create new App <span class="icon icon-plus"></span></button>
             </div>
             <div class="app_name_list">
-                {{isInCreateMode}}
                 <p class="info-text" v-if="app_list == null || app_list.length === 0">
                     Mhm looks like you do not have any apps yet - <a @click="modeCreateApp()">go create one!</a>
                 </p>
-                <div class="app-name d-flex justify-between align-center" v-for="app in app_list" :key="app.uuid">
-                    <span class="dots standard-font" @click="getAppDetails(app.uuid)">{{ app.name }}</span>
+                <div class="app-name d-flex justify-center align-center" v-for="app in app_list" :key="app.uuid">
+                    <span class="dots medium-font" @click="getAppDetails(app.uuid)">{{ app.name }}</span>
                     <!-- <span class="icon icon-delete hover big" @click="removeApp(app.uuid)"></span> -->
                 </div>
             </div>

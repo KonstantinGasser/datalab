@@ -1,15 +1,54 @@
 <template>
+    <div class="view_component d-flex">
+        <div class="form-row w-100">
+           <div class="form-group col">
+                <div class="form-group col">
+                    <label for="">App Name</label>
+                    <input v-model="appName" type="text" class="form-control" name="" id="app_name" placeholder="try something meaningful">
+                </div>
+                <div class="form-group col">
+                    <label for="">App URL</label>
+                    <input v-model="appURL" type="text" class="form-control" name="" id="app_url" placeholder="https://awesome.app.dev">
+                    <small>We need to know the URL in order to verify that the client is indeed allowed to provide user data</small>
+                </div>
+            </div>
+            <div class="form-group col">
+                <label for="">App Description</label>
+               <textarea v-model="appDesc" class="form-control" name="" id="app_desc" rows="2" placeholder="what is the app about?"></textarea>
+            </div>
+        </div>
+    </div>
     <div class="view_component">
-       <div class="form-row">
-           <div class="form-group col">
-               <label for="">App Name</label>
-               <input v-model="appName" type="text" class="form-control" name="" id="app_name" placeholder="try something meaningful">
-           </div>
-           <div class="form-group col">
-               <label for="">App Description</label>
-               <input v-model="appDesc" type="text" class="form-control" name="" id="app_desc" placeholder="what's it about?">
-           </div>
-        </div> 
+        
+        <!-- <div class="form-row">
+            <div class="form-group col">
+                <label for="">What do you want to monitor</label>
+                <div class="d-flex justify-between align-center">
+                    <div class="custom-control custom-switch">
+                    <input v-model="appCfgs" :value="'mouse-move-map'" @change="setConfig($event)" type="checkbox" class="custom-control-input" id="mouse-move-map">
+                    <label class="custom-control-label" for="mouse-move-map">Mouse Movements</label>
+                </div>
+                <div class="custom-control custom-switch">
+                    <input v-model="appCfgs" :value="'customer_journey'" @change="setConfig($event)" type="checkbox" class="custom-control-input" id="customer_journey">
+                    <label class="custom-control-label" for="customer_journey">Customer Journey</label>
+                </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col">
+                <div class="d-flex justify-evenly align-center">
+                    <div class="custom-control custom-switch">
+                    <input v-model="appCfgs" :value="'heat_map'" @change="setConfig($event)" type="checkbox" class="custom-control-input" id="heat_map">
+                    <label class="custom-control-label" for="heat_map">Heat-Map of mouse movements</label>
+                </div>
+                <div class="custom-control custom-switch">
+                    <input v-model="appCfgs" :value="'customer_journey'" @change="setConfig($event)" type="checkbox" class="custom-control-input" id="customer_journey">
+                    <label class="custom-control-label" for="customer_journey">Customer Journey</label>
+                </div>
+                </div>
+            </div>
+        </div> -->
     </div>
     <div class="view_component">
         <div class="form-row">
@@ -35,23 +74,6 @@
             </div>
         </div>
     </div>
-    <div class="view_component">
-        <div class="form-row">
-            <div class="form-group col">
-                <label for="">What do you want to monitor</label>
-                <div class="d-flex justify-evenly align-center">
-                    <div class="custom-control custom-switch">
-                    <input v-model="appCfgs" :value="'heat_map'" @change="setConfig($event)" type="checkbox" class="custom-control-input" id="heat_map">
-                    <label class="custom-control-label" for="heat_map">Heat-Map of mouse movements</label>
-                </div>
-                <div class="custom-control custom-switch">
-                    <input v-model="appCfgs" :value="'customer_journey'" @change="setConfig($event)" type="checkbox" class="custom-control-input" id="customer_journey">
-                    <label class="custom-control-label" for="customer_journey">Customer Journey</label>
-                </div>
-                </div>
-            </div>
-        </div>
-    </div>
     <div class="d-flex justify-end align-center mt-2">
         <button class="btn btn-standard" @click="createNewApp()">Create App {{ appName }}</button>
     </div>
@@ -68,6 +90,7 @@
             return {
                 isEdit: false,
                 appName: null,
+                appURL: null,
                 appDesc: null,
                 appMember: [],
                 appCfgs: [],
@@ -93,6 +116,14 @@
             async createNewApp (){
                 
                 let formValid = true;
+                if (this.appURL === null || this.appURL === '') {
+                    this.$toast.error('App URL is required');
+                    formValid = false;
+                }
+                if (!this.validURL(this.appURL)) {
+                    this.$toast.error('Mhm does not look like an URL does it ?');
+                    formValid = false;
+                }
                 if (this.appName === null || this.appName === '') {
                     this.$toast.error('App Name is required');
                     formValid = false;
@@ -117,6 +148,7 @@
                             app_description: this.appDesc,
                             app_member: this.appMember,
                             app_settings: this.appCfgs,
+                            app_url: this.appURL,
                         }, options
                     ).then((resp) => {
                         console.log("Resp ",resp);
@@ -127,6 +159,15 @@
                         return;
                     });
                 }
+            },
+            validURL(str) {
+                var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+                    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+                    '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+                    '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+                    '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+                    '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+                return !!pattern.test(str);
             },
         },
     };

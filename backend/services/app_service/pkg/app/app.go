@@ -54,6 +54,7 @@ type AppItem struct {
 	// mongoDB pk (document key)
 	UUID        string   `bson:"_id"`
 	AppName     string   `bson:"name"`
+	URL         string   `bson:"url"`
 	OwnerUUID   string   `bson:"owner_uuid"`
 	OrgnDomain  string   `bson:"orgn_domain"`
 	Description string   `bson:"description"`

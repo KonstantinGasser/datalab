@@ -50,6 +50,7 @@ func (app app) Get(ctx context.Context, storage storage.Storage, userService use
 	// prepare data of app append with user data if calls successful
 	var appData *appSrv.ComplexApp = &appSrv.ComplexApp{
 		Uuid:        queryData.UUID,
+		URL:         queryData.URL,
 		Name:        queryData.AppName,
 		Description: queryData.Description,
 		Settings:    queryData.Settings,

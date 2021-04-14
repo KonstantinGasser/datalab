@@ -44,6 +44,7 @@ func (app app) GetTokenClaims(ctx context.Context, storage storage.Storage, toke
 	resp, err := tokenS.IssueAppToken(ctx, &tokenSrv.IssueAppTokenRequest{
 		Tracing_ID:     ctx_value.GetString(ctx, "tracingID"),
 		AppUuid:        appData.UUID,
+		Origin:         appData.URL,
 		OrgnAndAppHash: appData.OrgnAndAppHash,
 	})
 	if err != nil {

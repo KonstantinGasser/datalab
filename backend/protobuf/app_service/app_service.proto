@@ -73,8 +73,9 @@ message CreateRequest {
     string name = 3;
     string organization = 4;
     string description = 5;
-    repeated string member = 6;
-    repeated string settings = 7;
+    string app_url = 6;
+    repeated string member = 7;
+    repeated string settings = 8;
 }
 message CreateResponse {
     int32 status_code = 1;
@@ -155,11 +156,12 @@ message RemoveMemberResponse {
 message ComplexApp {
     string uuid = 1;
     string name = 2;
-    string description = 3;
-    ComplexUser owner = 4;
-    repeated ComplexUser member = 5;
-    repeated string settings = 6;
-    string app_token = 7;
+    string URL = 3;
+    string description = 4;
+    ComplexUser owner = 5;
+    repeated ComplexUser member = 6;
+    repeated string settings = 7;
+    string app_token = 8;
 }
 
 message SimpleApp {
