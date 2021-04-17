@@ -7,10 +7,10 @@ import (
 
 	appSrv "github.com/KonstantinGasser/datalabs/backend/protobuf/app_service"
 	"github.com/KonstantinGasser/datalabs/backend/services/app_service/pkg/app"
-	"github.com/KonstantinGasser/datalabs/binder"
 	"github.com/KonstantinGasser/datalabs/utils/ctx_value"
 	"github.com/KonstantinGasser/datalabs/utils/hash"
 	"github.com/KonstantinGasser/datalabs/utils/unique"
+	"github.com/KonstantinGasser/required"
 	"github.com/sirupsen/logrus"
 )
 
@@ -35,8 +35,9 @@ func (srv AppService) Create(ctx context.Context, in *appSrv.CreateRequest) (*ap
 		Settings:       in.GetSettings(),
 		OrgnAndAppHash: orgnAppHash,
 	}
-	if err := binder.MustBind(&appItem); err != nil {
-		logrus.Errorf("<%v>[appService.CreateApp] %v\n", err)
+	if err := required.All(&appItem); err != nil {
+		logrus.Errorf("<%v>[appService.CreateApp] %v\n", ctx_value.GetString(ctx, "tracingID"), err)
+		return &appSrv.CreateResponse{StatusCode: http.StatusBadRequest, Msg: "mandatory fields missing"}, nil
 	}
 	status, err := srv.app.Create(ctx, srv.storage, appItem)
 	if err != nil {

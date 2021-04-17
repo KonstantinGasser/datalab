@@ -52,11 +52,11 @@ func NewApp() App {
 // AppItem represents one App in the database
 type AppItem struct {
 	// mongoDB pk (document key)
-	UUID        string   `bson:"_id" bind:"yes"`
-	AppName     string   `bson:"name" bind:"yes"`
-	URL         string   `bson:"url" bind:"yes"`
-	OwnerUUID   string   `bson:"owner_uuid" bind:"yes"`
-	OrgnDomain  string   `bson:"orgn_domain" bind:"yes"`
+	UUID        string   `bson:"_id" required:"yes"`
+	AppName     string   `bson:"name" required:"yes"`
+	URL         string   `bson:"url" required:"yes"`
+	OwnerUUID   string   `bson:"owner_uuid" required:"yes"`
+	OrgnDomain  string   `bson:"orgn_domain" required:"yes"`
 	Description string   `bson:"description"`
 	Member      []string `bson:"member"`
 	Settings    []string `bson:"setting"`
@@ -69,8 +69,8 @@ type AppItem struct {
 // AppItemLight is a minimum representation of an application
 type AppItemLight struct {
 	// mongoDB pk (document key)
-	UUID    string `bson:"_id"`
-	AppName string `bson:"name"`
+	UUID    string `bson:"_id" required:"yes"`
+	AppName string `bson:"name" required:"yes"`
 }
 
 // matchAppHash verifies that the request with domain name and app name matches with the database records

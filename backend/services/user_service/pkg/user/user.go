@@ -43,21 +43,21 @@ func NewUser() User {
 // UserItem is a representation of a user document which lives in the
 // mongoDB. Fields must be exported in order to serve as (de-)serialization for the mongoDB
 type UserItem struct {
-	UUID          string `bson:"_id"`
-	Username      string `bson:"username"`
-	Password      string `bson:"password"`
-	FirstName     string `bson:"first_name"`
-	LastName      string `bson:"last_name"`
-	OrgnDomain    string `bson:"orgn_domain"`
-	OrgnPosition  string `bson:"orgn_position"`
-	ProfileImgURL string `bson:"profile_img_url"`
+	UUID          string `bson:"_id" required:"yes"`
+	Username      string `bson:"username" required:"yes"`
+	Password      string `bson:"password" required:"yes"`
+	FirstName     string `bson:"first_name" required:"yes"`
+	LastName      string `bson:"last_name" required:"yes"`
+	OrgnDomain    string `bson:"orgn_domain" required:"yes"`
+	OrgnPosition  string `bson:"orgn_position" required:"yes"`
+	ProfileImgURL string `bson:"profile_img_url" required:"yes"`
 }
 
 // UserItemUpdateable describes the fields of a user which can be updated by the user
 type UserItemUpdateable struct {
-	UUID          string `bson:"_id"`
-	FirstName     string `bson:"first_name"`
-	LastName      string `bson:"last_name"`
-	OrgnPosition  string `bson:"orgn_position"`
-	ProfileImgURL string `bson:"profile_img_url"`
+	UUID          string `bson:"_id" required:"yes"`
+	FirstName     string `bson:"first_name" required:"yes"`
+	LastName      string `bson:"last_name" required:"yes"`
+	OrgnPosition  string `bson:"orgn_position" required:"yes"`
+	ProfileImgURL string `bson:"profile_img_url" required:"yes"`
 }
