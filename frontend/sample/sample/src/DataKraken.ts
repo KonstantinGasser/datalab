@@ -259,7 +259,7 @@ export class DataKraken {
 
     // isAlive tells if the socket is ready to accept events
     private isAlive(): boolean {
-        return this.CONN_STATE === SOCKET_STATE.READY ? true : false
+        return this.CONN_STATE === SOCKET_STATE.READY
     }
 
     // device_info returns the all device info of the client that can be found
