@@ -2,23 +2,21 @@
     <div class="view_app">
         <div class="app_list">
             <div class="add_new_app d-flex justify-center align-center">
-                <button @click="modeCreateApp()" class="btn btn-standard">Create new App <span class="icon icon-plus"></span></button>
+                <button @click="modeCreateApp()" class="btn btn-standard">Create App <span class="">🙌</span></button>
             </div>
             <div class="app_name_list">
                 <p class="info-text" v-if="app_list == null || app_list.length === 0">
                     Mhm looks like you do not have any apps yet - <a @click="modeCreateApp()">go create one!</a>
                 </p>
-                <div class="app-name d-flex justify-center align-center" v-for="app in app_list" :key="app.uuid">
-                    <span class="dots medium-font" @click="getAppDetails(app.uuid)">{{ app.name }}</span>
+                <div class="app-name d-flex justify-start align-center" v-for="app in app_list" :key="app.uuid" @click="getAppDetails(app.uuid)">
+                    <span class="dots medium-font" >{{ app.name }}</span>
                     <!-- <span class="icon icon-delete hover big" @click="removeApp(app.uuid)"></span> -->
                 </div>
             </div>
         </div>
         <div>
-            <Tabs v-if="!isInCreateMode" ref="Tabs" :class="{ block: blockTabs }" :initTab="'App Details'" :tabs="[{name:'App Details'},{name:'Member'}]" @tabChange="tabChange"/>
             <TabCreateApp v-if="isInCreateMode" @createdApp="updateState" />
             <TabAppDetails ref="tab_app_token" @drop_app="updateState" v-cloak v-if="activeTab === 'App Details' && !isInCreateMode" :app="activeApp"/>
-            <TabMember ref="tab_member" v-if="activeTab === 'Member' && !isInCreateMode" :member_list="activeApp.member"/>
         </div>
     </div>
 </template>
@@ -63,14 +61,11 @@
             this.getViewApp().then(data => {
                 this.apps = data.app_list;
                 this.activeApp = data.app_details;
-                console.log("AC: ", this.activeApp);
                 if (this.apps == null || this.apps.length === 0) {
                     this.isInCreateMode = true;
                 } else {
                     this.isInCreateMode = false;
-                    // if apps call full app 
                 }
-                // if (this.app !== null && this.apps.length === 0) this.isInCreateMode = true;
             }).catch(error => {
                if (err.response.status === 401) {
                         localStorage.removeItem('token');
@@ -103,7 +98,17 @@
                     case "drop_app":
                         this.isInCreateMode = true;
                         this.apps = this.apps.filter(item => item.uuid != event.app_uuid);
-                        
+                        this.getViewApp().then(data => {
+                            this.apps = data.app_list;
+                            this.activeApp = data.app_details;
+                        }).catch(error => {
+                            if (error.response.status === 401) {
+                                localStorage.removeItem('token');
+                                this.$router.replace({ name: 'login' });
+                            }
+                            console.log(error);
+                            this.$toast.error("could not refresh app list");
+                        });
                         break;
                     default:
                         break;
@@ -143,10 +148,10 @@
                     console.log(error);
                 });
             },
-            tabChange(tab) {
-                this.isInCreateMode = false;
-                this.activeTab = tab;
-            },
+            // tabChange(tab) {
+            //     this.isInCreateMode = false;
+            //     this.activeTab = tab;
+            // },
             enableDisableTabs(toggle) {
                 this.tabsBlocked = toggle;
                 // block tab change by sending toggle to @Tabs
@@ -163,35 +168,36 @@
 }
 .view_app {
     display: grid;
-    grid-template-columns: 185px 1fr;
+    grid-template-columns: 245px 1fr;
     grid-column-gap: 15px;
     height: 100%;
 }
 .app_list {
-    background: #1E1E1E;
+    background: var(--sub-bg);
     border-radius: 8px;
     padding: 15px;
     height: max-content;
     min-height: 225px;
     max-height: 100%;
     overflow-y: scroll;
-    border: 1px solid #30363D;
+    border: 1px solid var(--sub-border);
 }
 .app_name_list {
     margin-top: 25px;
     padding: 0 7px;
 }
 .app-name {
-    background:linear-gradient(135deg, #50e3c2 0%,#10d574 100%);
+    background: var(--gradient-green);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent; 
     font-size: 16px;
     font-weight: bold;
     padding: 5px;
     margin: 5px 0;
-    border: 1px solid #10d574;
     border-radius: 8px;
     border-style: dashed;
+    border-color: var(--sub-border);
+    border-width: 1px;
 }
 .app-name:hover {
     cursor: pointer;

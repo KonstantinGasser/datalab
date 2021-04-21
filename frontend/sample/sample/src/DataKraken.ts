@@ -187,7 +187,10 @@ export class DataKraken {
         const clickX: number = Math.floor(evt.clientX)
         const clickY: number = Math.floor(evt.clientY)
         const targetName: string = evt.target.name
-        const point: string = this.KrakenEvent(time_stamp, this.TYPE_CLICK, { "X": clickX, "Y": clickY, "target": targetName, "elapsed": elapsed})
+        // target name must be set else data point is kinda useless
+        if (targetName === undefined || targetName === null || targetName.length === 0)
+            return
+        const point: string = this.KrakenEvent(time_stamp, this.TYPE_CLICK, { "X": clickX, "Y": clickY, "target": "targetName", "elapsed": elapsed})
         this.MOUSECLICK_ELAPSED = time_stamp
         try {
             // send over the wire 

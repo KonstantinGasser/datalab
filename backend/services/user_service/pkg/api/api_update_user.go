@@ -26,7 +26,7 @@ func (srv UserService) Update(ctx context.Context, in *userSrv.UpdateRequest) (*
 		OrgnPosition:  strings.TrimSpace(in.GetUser().GetOrgnPosition()),
 		ProfileImgURL: strings.TrimSpace(in.GetUser().GetProfileImgUrl()),
 	}
-	if err := required.All(&updatableUser); err != nil {
+	if err := required.Atomic(&updatableUser); err != nil {
 		logrus.Errorf("<%v>[userService.Update] new user: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
 		return &userSrv.UpdateResponse{StatusCode: http.StatusBadRequest, Msg: "missing of mandatory field"}, nil
 	}

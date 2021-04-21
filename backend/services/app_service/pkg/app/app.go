@@ -59,7 +59,7 @@ type AppItem struct {
 	OrgnDomain  string   `bson:"orgn_domain" required:"yes"`
 	Description string   `bson:"description"`
 	Member      []string `bson:"member"`
-	Settings    []string `bson:"setting"`
+	Settings    []string `bson:"setting" required:"yes" min:"1"`
 	AppToken    string   `bson:"app_token"`
 	// OrgnAndAppHash is required to verify the generation of an app token
 	// and the deletion of an app

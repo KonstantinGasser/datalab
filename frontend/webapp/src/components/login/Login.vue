@@ -75,7 +75,7 @@ h1, h2{
   font-size: 45px;
   text-align: center;
   font-weight: 100;
-  background:linear-gradient(135deg, #50e3c2 0%,#10d574 100%);
+  background: var(--gradient-green);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -89,7 +89,6 @@ h1, h2{
   align-content: center;
   grid-template-rows: min-content min-content;
   grid-row-gap: 25px;
-  /* background: #0D1116; */
 }
 .component-fade-enter-active, .component-fade-leave-active {
   transition: opacity .3s ease;
@@ -105,7 +104,7 @@ h1, h2{
 .context {
   display: flex;
   height: 471px;
-  background: #1E1E1E;
+  background: var(--sub-bg);
   border-radius: 20px;
   box-shadow: 0 0 16px 10px rgb(0 0 0 / 10%);
 }
@@ -133,7 +132,7 @@ h1, h2{
   font-size: 18px;
   border-radius: 5px;
   padding: 5px 15px;
-  border: 1px solid rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--sub-border);
   width: 200px;
 }
 
@@ -151,15 +150,14 @@ h1, h2{
   border-radius: 50px;
   background-color: transparent;
   border: none; 
-  color: #10d574;
   font-size: 18px;
   font-weight: 200;
   transition: all 0.3s ease-in-out;
 }
 .submit-btn button:hover {
   cursor: pointer;
-  background: linear-gradient(135deg, #50e3c2 0%,#10d574 100%);
-  color: #121212;
+  background: var(--gradient-green);
+  color: var(--btn-font-hover);
   width: 180px;
   height: 40px;
   font-size: 18px;
@@ -177,13 +175,13 @@ h1, h2{
 .footer .ankor-text {
   font-size: 14px;
   opacity: 0.6;
-  color: #ccc;
+  color: var(--txt-small);
   margin: 0px 5px;
 }
 
 .ankor-text:hover {
   cursor: pointer;
-  color: #fff;
+  color: var(--txt-small);
 }
 
 button {

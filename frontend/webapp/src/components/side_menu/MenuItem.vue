@@ -46,26 +46,25 @@ export default {
 .menu_item:hover {
     cursor: pointer;
     width: 100%;
-    background:#0000001c;
-    /* border: 1px solid #30363D; */
+    background: var(--sub-border);
 }
 .menu_text {
-    color: #fff;
+    color: var(--h-color);
     font-size: 20px;
     text-align: left;
 }
 .menu_item:hover .menu_text {
-    background:linear-gradient(135deg, #50e3c2 0%,#10d574 100%);
+    background: var(--gradient-green);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
 .menu_item.active {
-    background: #0000001c;
+    background: var(--sub-border);
     /* border: 1px solid #30363D; */
 }
 .active .menu_text {
-    background:linear-gradient(135deg, #50e3c2 0%,#10d574 100%);
+    background: var(--gradient-green);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }

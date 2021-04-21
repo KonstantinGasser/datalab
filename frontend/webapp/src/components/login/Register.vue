@@ -141,7 +141,7 @@ hr {
 .context {
   display: flex;
   height: 471px;
-  background: #1E1E1E;
+  background: var(--sub-bg);
   border-radius: 20px;
   box-shadow: 0 0 16px 10px rgb(0 0 0 / 10%);
 }
@@ -168,7 +168,7 @@ hr {
   font-size: 18px;
   border-radius: 5px;
   padding: 5px 15px;
-  border: 1px solid rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--sub-border);
   width: 200px;
 }
 
@@ -190,15 +190,14 @@ hr {
   border-radius: 50px;
   background-color: transparent;
   border: none; 
-  color: #10d574;
   font-size: 18px;
   font-weight: 200;
   transition: all 0.3s ease-in-out;
 }
 .submit-btn button:hover {
   cursor: pointer;
-  background: linear-gradient(135deg, #50e3c2 0%,#10d574 100%);
-  color: #121212;
+  background: var(--gradient-green);
+  color: var(--btn-font-hover);
   width: 180px;
   height: 40px;
   font-size: 18px;
@@ -216,13 +215,13 @@ hr {
 .footer .ankor-text {
   font-size: 14px;
   opacity: 0.6;
-  color: #ccc;
+  color: var(--txt-small);
   margin: 0px 5px;
 }
 
 .ankor-text:hover {
   cursor: pointer;
-  color: #fff;
+  color:var(--txt-small);
 }
 
 button {

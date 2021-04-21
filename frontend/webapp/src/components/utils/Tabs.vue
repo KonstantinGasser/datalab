@@ -1,6 +1,6 @@
 <template>
     <div class="tab-line">
-        <div :class="{active: activeTab===tab.name}" v-for="tab in tabs" :key="tab.name" class="tab" @click="setActive(tab.name)">
+        <div :class="{active: update===tab.name}" v-for="tab in tabs" :key="tab.name" class="tab" @click="setActive(tab.name)">
             <span class="text">{{ tab.name }}</span>
         </div>
     </div>
@@ -12,25 +12,26 @@ export default {
   name: 'Tabs',
   data() {
       return {
-          activeTab: this.initTab,
+          activeTab: this.$props.initTab,
           block: false,
       };
   },
   props: {
       initTab: String,
+      update: String,
       tabs: {
           type: Array,
           default() { return []; },
       },
   },
   methods: {
-      setActive(clicked) {
+    setActive(clicked) {
         // allow tab change only if !blocked
         if (this.block) return;
         // emit change to parent
         this.activeTab = clicked;
         this.$emit('tabChange', clicked);
-      }
+      },
   },
 };
 </script>
@@ -47,12 +48,12 @@ hr {
   grid-column-gap: 5px;
 }
 .tab {
-    background: #30363D;
+    background: #fff;
     font-size: 14px;
     font-weight: bolder;
     border-radius: 8px;
     padding: 5px 10px;
-    border: 1px solid transparent;
+    border: 1px solid var(--tab-bg);
 }
 .tab:hover {
     cursor: pointer;
@@ -65,15 +66,15 @@ hr {
 }
 
 .active {
-    background: linear-gradient(135deg, #50e3c2 0%,#10d574 100%);
-    border: 1px solid #30363D;
+    background: var(--gradient-green);
+    border: 1px solid #fff;
 }
 .active .text {
-    -webkit-text-fill-color: #0D1116; 
+    -webkit-text-fill-color: var(--tab-font-selected); 
 }
 
 .text {
-    background: linear-gradient(135deg, #50e3c2 0%,#10d574 100%);
+    background: var(--gradient-green);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }

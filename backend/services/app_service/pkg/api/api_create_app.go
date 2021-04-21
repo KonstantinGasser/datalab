@@ -35,7 +35,7 @@ func (srv AppService) Create(ctx context.Context, in *appSrv.CreateRequest) (*ap
 		Settings:       in.GetSettings(),
 		OrgnAndAppHash: orgnAppHash,
 	}
-	if err := required.All(&appItem); err != nil {
+	if err := required.Atomic(&appItem); err != nil {
 		logrus.Errorf("<%v>[appService.CreateApp] %v\n", ctx_value.GetString(ctx, "tracingID"), err)
 		return &appSrv.CreateResponse{StatusCode: http.StatusBadRequest, Msg: "mandatory fields missing"}, nil
 	}

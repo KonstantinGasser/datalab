@@ -227,5 +227,14 @@ func (api API) SetUp() {
 			),
 		),
 	)
+	api.route("/api/v2/view/app/upload/img",
+		api.WithTracing(
+			api.WithCors(
+				api.WithAuth(
+					api.HandlerAppImageUpload,
+				),
+			),
+		),
+	)
 	// ***********************************
 }

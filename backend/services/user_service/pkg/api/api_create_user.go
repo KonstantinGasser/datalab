@@ -41,7 +41,7 @@ func (srv UserService) Create(ctx context.Context, in *userSrv.CreateRequest) (*
 		OrgnPosition:  strings.TrimSpace(in.GetUser().GetOrgnPosition()),
 		ProfileImgURL: "https://avatars.githubusercontent.com/u/43576797?v=4", // can be set to default image later
 	}
-	if err := required.All(&user); err != nil {
+	if err := required.Atomic(&user); err != nil {
 		logrus.Errorf("<%v>[userService.Create] new user: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
 		return &userSrv.CreateResponse{StatusCode: http.StatusBadRequest, Msg: "missing mandatory fields"}, nil
 	}

@@ -5,9 +5,37 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Signika:wght@300;400&display=swap');
 
+:root {
+  --main-bg: #cccccc1B;
+  --sub-bg: #fff;
+  --sub-border: #cccccc3F;
+
+  --main-color: #666666AA;
+
+  --btn-bg: #cccccc1B; 
+  --btn-bg-hover: #10d574;
+  --btn-font: #fff;
+  --btn-font-hover: #fff;
+
+  --tab-bg: #10d574;
+  --tab-bg-selected: #10d574;
+  --tab-font: #fff;
+  --tab-font-selected: #fff;
+
+  --menu-bg: #10d574;
+  --menu-bg-selected: #10d574;
+  --menu-font: #fff;
+  --menu-font-selected: #fff;
+
+  --gradient-green: linear-gradient(0deg, #50e3c2 0%,#10d574 100%);
+  --h-color: #666666;
+  --txt-small: #666666AA;
+}
+
+
 html, body {
     overflow: hidden;
-    color: #fff;
+    color: var(--main-color);
 }
 body {
   margin: 0;
@@ -19,7 +47,13 @@ hr {
 }
 
 h2, h1 {
-  color: #ccc; 
+  color: var(--h-color); 
+}
+a {
+  text-decoration: underline;
+  background: linear-gradient(135deg, #50e3c2 0%,#10d574 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 #app {
@@ -29,36 +63,26 @@ h2, h1 {
   justify-content: center;
 
   font-family: 'Signika', sans-serif;
-  /* font-family: Avenir, Helvetica, Arial, sans-serif; */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* background: linear-gradient(0deg, #50e3c2 0%,#10d574 100%); */
-  /* background: rgba(0,0,0,0.01); */
-  /* background: #50e3c2; */
-  /* background: #121212; */
-  background: #1E1E1E;
-  /* background: linear-gradient(135deg, #50e3c2 0%,#10d574 100%); */
-  /* background-image: url("assets/dash_bottom.svg"), url("assets/dash_top.svg");
-  background-repeat: no-repeat, no-repeat;
-  background-position: left bottom, right top; */
-  /* background-image: url("assets/dash_bottom_green.svg"), url("assets/dash_top_green.svg"); */
+  background: var(--main-bg);
   background-image: url("assets/dash_bottom_green.svg"), url("assets/dash_top_green.svg");
   background-repeat: no-repeat, no-repeat;
   background-position: left bottom, right top;
   background-size: contain, contain;
 }
-a {
-  text-decoration: underline;
-  background: linear-gradient(135deg, #50e3c2 0%,#10d574 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+
+.view_component {
+  background: var(--sub-bg);
+  border: 1px solid var(--sub-border);
 }
+
 
 .scroll_view {
   overflow-y: scroll;
   height: 800px;
   min-height: 400px;
-  max-height: 800px;
+  max-height: 750px;
 }
 .text-capture {
   background: linear-gradient(135deg, #50e3c2 0%,#10d574 100%);
@@ -69,7 +93,8 @@ a {
 .text-capture.big {
   font-size: 20px;
 }
-.btn-standard {
+
+input[type="submit"] {
   background: transparent;
   border: 1px solid #50e3c2;
   color: #10d574;
@@ -78,18 +103,38 @@ a {
   outline: none;
 }
 
+.btn-standard {
+  background: var(--btn-bg);
+  border: 1px solid #50e3c2;
+  color: #10d574;
+  border-radius: 8px;
+  padding: 2px 5px;
+  outline: none;
+  width: max-content;
+}
+
 .btn-standard:focus {
   outline: none;
+}
+input[type="submit"]:hover {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--btn-bg);
+  color: var(--btn-font);
 }
 .btn-standard:hover {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(0deg, #50e3c2 0%,#10d574 100%);
-  color: #121212;
+  background: var(--btn-bg-hover);
+  color: var(--btn-font-hover);
 }
 
 .info-text {
-  color: #fff;
+  color: var(--txt-small);
+}
+
+.super-lg {
+  font-size: 45px;
 }
 
 .tag-list {
@@ -110,7 +155,7 @@ a {
   color: rgba(255, 0, 0, 1);
 }
 .danger-text small {
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--txt-small);
 }
 
 .form-control:disabled {
@@ -277,6 +322,7 @@ input {
 .modal-default-button {
   float: right;
 }
+
 
 /*
  * The following styles are auto-applied to elements with

@@ -19,36 +19,29 @@
         </div>
     </div>
     <div class="view_component">
-        
-        <!-- <div class="form-row">
-            <div class="form-group col">
-                <label for="">What do you want to monitor</label>
-                <div class="d-flex justify-between align-center">
+        <div class="p-2">
+            <label for="">What do you want to monitor?</label>
+            <ul class="checkboxes">
+                <li>
                     <div class="custom-control custom-switch">
-                    <input v-model="appCfgs" :value="'mouse-move-map'" @change="setConfig($event)" type="checkbox" class="custom-control-input" id="mouse-move-map">
-                    <label class="custom-control-label" for="mouse-move-map">Mouse Movements</label>
-                </div>
-                <div class="custom-control custom-switch">
-                    <input v-model="appCfgs" :value="'customer_journey'" @change="setConfig($event)" type="checkbox" class="custom-control-input" id="customer_journey">
-                    <label class="custom-control-label" for="customer_journey">Customer Journey</label>
-                </div>
-                </div>
-            </div>
+                        <input v-model="appCfgs" :value="'mouse-move-map'" @change="setConfig($event)" type="checkbox" class="custom-control-input" id="mouse-move-map">
+                        <label class="custom-control-label" for="mouse-move-map">Mouse Movements</label>
+                    </div>
+                </li>
+                <li>
+                    <div class="custom-control custom-switch">
+                        <input v-model="appCfgs" :value="'mouse-move-map'" @change="setConfig($event)" type="checkbox" class="custom-control-input" id="mouse-move-map">
+                        <label class="custom-control-label" for="mouse-move-map">Customer Journey</label>
+                    </div>
+                </li>
+                <li>
+                    <div class="custom-control custom-switch">
+                        <input v-model="appCfgs" :value="'mouse-move-map'" @change="setConfig($event)" type="checkbox" class="custom-control-input" id="mouse-move-map">
+                        <label class="custom-control-label" for="mouse-move-map">User Fun-Facts</label>
+                    </div>
+                </li>
+            </ul>
         </div>
-        <div class="form-row">
-            <div class="form-group col">
-                <div class="d-flex justify-evenly align-center">
-                    <div class="custom-control custom-switch">
-                    <input v-model="appCfgs" :value="'heat_map'" @change="setConfig($event)" type="checkbox" class="custom-control-input" id="heat_map">
-                    <label class="custom-control-label" for="heat_map">Heat-Map of mouse movements</label>
-                </div>
-                <div class="custom-control custom-switch">
-                    <input v-model="appCfgs" :value="'customer_journey'" @change="setConfig($event)" type="checkbox" class="custom-control-input" id="customer_journey">
-                    <label class="custom-control-label" for="customer_journey">Customer Journey</label>
-                </div>
-                </div>
-            </div>
-        </div> -->
     </div>
     <div class="view_component">
         <div class="form-row">
@@ -178,10 +171,8 @@
 .view_component {
     margin-bottom: 15px;
     padding: 15px;
-    background: #1E1E1E;
     border-radius: 8px;
     height: max-content;
-    border: 1px solid #30363D;
 }
 h2 {
     margin: 5px 0px;
@@ -191,6 +182,10 @@ h2 {
 }
 .pos_1_2 {
     grid-row: 2;
+}
+
+.checkboxes {
+    columns: 3 8em;
 }
 
 .test {
