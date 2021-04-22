@@ -29,6 +29,7 @@
                             <button class="btn btn-standard" @click="copyTokenToClipboard()" type="button">Copy</button>
                         </div>
                     </div>
+                    <div v-if="app_token || app.app_token" class=""><small>Token expires in {{get_valid_till.days}} days {{get_valid_till.hours}} hours</small></div>
                     <div class="mt-3">
                         Checkout the <a href="http://localhost:3000/docs/lib" target="_blank">documentation</a> 
                         on how to implement the client side
@@ -128,6 +129,9 @@
                 app_token: null,
                 new_img_url: null,
                 header_name: "",
+                valid_till: new Date().setDate(new Date().getDate() + 7),
+                valid_days: null,
+                valid_hours: null,
             };
         },
         props: ['app', 'token_placeholder'],
@@ -142,6 +146,13 @@
                 }
                 return "";
                 },
+            get_valid_till() {
+                const total = Math.abs(this.valid_hours - new Date()) / 1000;
+                console.log(total);
+                const hours = Math.floor( (total/(1000*60*60)) % 24 );
+                const days = Math.floor( total/(1000*60*60*24) );
+                return {days: days, hours: hours};
+            },
         },
         methods: {
             generateToken() {

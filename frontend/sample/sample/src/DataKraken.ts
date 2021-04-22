@@ -8,6 +8,7 @@ enum SOCKET_STATE {
 enum EVENT_TYPE {
     CLICK = 0,
     MOUSEMOVE,
+    MOUSEOVER,
 }
 
 export class DataKraken {
@@ -57,10 +58,13 @@ export class DataKraken {
 
     // TYPE_CLICK refers to the event type "click"
     private TYPE_CLICK: EVENT_TYPE = EVENT_TYPE.CLICK
+    
+    // TYPE_MOUSEON refers to the event when hovering over a specific element
+    private TYPE_MOUSEOVER: EVENT_TYPE = EVENT_TYPE.MOUSEOVER
 
     // session refers to the current session data. Holding meta data and
     // allowed events and settings
-    private session: any = {cookie: "", ticket: "", events: [0, 1]}
+    private session: any = {cookie: "", ticket: "", events: [2],}
 
     // device refers to the device data of the client
     private device: any
@@ -92,6 +96,10 @@ export class DataKraken {
                 case this.TYPE_MOUSEMOVE:
                     this.attach("mousemove", this.onMouseMove)
                     break
+                case this.TYPE_MOUSEOVER:
+                    this.attach("mouseover", this.onMouseMove)
+                    break
+                    
                 default:
                     break
             }
@@ -171,7 +179,7 @@ export class DataKraken {
         try {
             // send over the wire 
             // this.conn.send(point)
-            console.log(point)
+            console.log(evt)
         } catch (error) {
             return
         }
