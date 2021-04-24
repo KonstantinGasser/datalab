@@ -6,6 +6,7 @@
     </div>
     <ViewApp v-if="active_view === 'view_app'" class="app-view"/>
     <ViewAccount v-if="active_view == 'view_account'" class="app-view" />
+    <ViewCharts v-if="active_view == 'view_dashboard'" class="app-view" />
   </div>
   <vue-confirm-dialog></vue-confirm-dialog>
 </template>
@@ -15,6 +16,7 @@ import SideMenu from '@/components/side_menu/SideMenu.vue';
 import CompanyThumb from '@/components/company/CompanyThumb.vue';
 import ViewApp from '@/components/apps/ViewApp.vue';
 import ViewAccount from '@/components/account/ViewAccount.vue';
+import ViewCharts from '@/components/charts/ViewCharts';
 import NotificationCenter from '@/components/utils/NotificationCenter';
 
 export default {
@@ -27,6 +29,7 @@ export default {
   components: {
     CompanyThumb,
     ViewApp,
+    ViewCharts,
     ViewAccount,
     NotificationCenter,
     SideMenu,

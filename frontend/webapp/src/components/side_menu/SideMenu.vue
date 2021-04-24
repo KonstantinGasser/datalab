@@ -2,17 +2,22 @@
   <div class="side_menu">
       <div class="menu">
         <!-- <h4>Analysis Functions</h4> -->
+        <!-- <a href="http://localhost:8080">Checkout referrer link</a> -->
         <MenuItem @click="setActive('view_dashboard')" :tabName="'view_dashboard'" :item="'Dashboard'" />
         <MenuItem @click="setActive('view_queries')" :tabName="'view_queries'" :item="'Queries'" />
         <MenuItem @click="setActive('view_app')" :tabName="'view_app'" :item="'Apps'" />
         <MenuItem @click="setActive('view_account')" :tabName="'view_account'" :item="'Account'" />
         <!-- <MenuItem @click="setActive('view_settings')" :tabName="'view_settings'" :item="'Settings'" /> -->
-        <MenuItem @click="setActive('view_logout')" :item="'Logout 👋'" /> 
-        <div class="custom-control custom-switch d-flex justify-center">
+        <MenuItem @click="setActive('view_logout')" :item="'Logout 👋'" />
+        <div class="d-flex justify-center">
+          <input id="toggle" class="toggle" type="checkbox" @change="setMode($event)">
+          <!-- <div class="background"></div> -->
+          <!-- <label for="toggle" class="title">Toggle dark mode</label> -->
+        </div>
+        <!-- <div class="custom-control custom-switch d-flex justify-center">
             <input v-model="appCfgs" :value="'css-mode'" @change="setMode($event)" type="checkbox" class="custom-control-input" id="css-mode">
             <label class="custom-control-label" for="css-mode"></label>
-            <!-- {{mode ? "Light Mode" : "Dark Mode"}} -->
-        </div>
+        </div> -->
       </div>
       <!-- <div class="menu bottom-set"> -->
         <!-- <h4>App Settings</h4> -->
@@ -48,6 +53,7 @@ export default {
         if (this.mode) {
           root.style.setProperty("--main-bg", "#cccccc1B");
           root.style.setProperty("--sub-bg", "#fff");
+          root.style.setProperty("--tab-bg", "#fff");
           root.style.setProperty("--btn-font-hover", "#fff");
           root.style.setProperty("--tab-font-selected", "#fff");
           root.style.setProperty("--h-color", "#666666");
@@ -55,9 +61,10 @@ export default {
           root.style.setProperty("--main-color", "#666666AA");
         } else {
           root.style.setProperty("--main-bg", "#1E1E1E");
-          root.style.setProperty("--sub-bg", "#1E1E1E");
+          root.style.setProperty("--sub-bg", "#2F2F2F");
           root.style.setProperty("--btn-font-hover", "#121212");
           root.style.setProperty("--tab-font-selected", "#121212");
+          root.style.setProperty("--tab-bg", "#666666");
           root.style.setProperty("--h-color", "#ccc");
           root.style.setProperty("--txt-small", "#FFFFFFAA");
           root.style.setProperty("--main-color", "#FFFFFFAA");
@@ -90,4 +97,51 @@ h4 {
     align-content: space-around;
     border-radius: 8px 0 0 8px;
 }
+
+
+
+.toggle {
+  --size: 1.5rem;
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+  outline: none;
+  cursor: pointer;
+  width: var(--size);
+  height: var(--size);
+  box-shadow: inset calc(var(--size) * 0.33) calc(var(--size) * -0.25) 0;
+  border-radius: 999px;
+  color:  #03045e;
+  transition: all 500ms;
+}
+.toggle:checked {
+  --ray-size: calc(var(--size) * -0.4);
+  --offset-orthogonal: calc(var(--size) * 0.65);
+  --offset-diagonal: calc(var(--size) * 0.45);
+  transform: scale(0.75);
+  color: #ffaa00;
+  box-shadow: inset 0 0 0 var(--size), calc(var(--offset-orthogonal) * -1) 0 0 var(--ray-size), var(--offset-orthogonal) 0 0 var(--ray-size), 0 calc(var(--offset-orthogonal) * -1) 0 var(--ray-size), 0 var(--offset-orthogonal) 0 var(--ray-size), calc(var(--offset-diagonal) * -1) calc(var(--offset-diagonal) * -1) 0 var(--ray-size), var(--offset-diagonal) var(--offset-diagonal) 0 var(--ray-size), calc(var(--offset-diagonal) * -1) var(--offset-diagonal) 0 var(--ray-size), var(--offset-diagonal) calc(var(--offset-diagonal) * -1) 0 var(--ray-size);
+}
+
+.toggle {
+  z-index: 1;
+}
+.toggle:checked ~ .background {
+  --bg: white;
+}
+/* .toggle:checked ~ .title {
+  --color: hsl(40, 100%, 50%);
+}
+
+.title {
+  --color: hsl(240, 100%, 95%);
+  color: var(--color);
+  z-index: 1;
+  cursor: pointer;
+  display: block;
+  padding: 0.5rem 0 0;
+  transition: color 500ms;
+} */
+
+
 </style>

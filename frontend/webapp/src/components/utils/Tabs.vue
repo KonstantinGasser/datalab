@@ -1,7 +1,7 @@
 <template>
     <div class="tab-line">
         <div :class="{active: update===tab.name}" v-for="tab in tabs" :key="tab.name" class="tab" @click="setActive(tab.name)">
-            <span class="text">{{ tab.name }}</span>
+            <span>{{tab.emoji}}</span>&nbsp<span class="text">{{ tab.name }}</span>
         </div>
     </div>
 </template>
@@ -48,7 +48,7 @@ hr {
   grid-column-gap: 5px;
 }
 .tab {
-    background: #fff;
+    background: var(--tab-bg);
     font-size: 14px;
     font-weight: bolder;
     border-radius: 8px;
@@ -66,8 +66,8 @@ hr {
 }
 
 .active {
-    background: var(--gradient-green);
-    border: 1px solid #fff;
+    background: var(--btn-bg-hover);
+    border: 1px solid var(--sub-bg);
 }
 .active .text {
     -webkit-text-fill-color: var(--tab-font-selected); 

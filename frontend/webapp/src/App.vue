@@ -17,7 +17,7 @@
   --btn-font: #fff;
   --btn-font-hover: #fff;
 
-  --tab-bg: #10d574;
+  --tab-bg: #fff;
   --tab-bg-selected: #10d574;
   --tab-font: #fff;
   --tab-font-selected: #fff;
@@ -225,8 +225,14 @@ input {
 .align-center {
   align-items: center;
 }
+.align-start {
+  align-items: flex-start;
+}
 .flex-wrap {
   flex-wrap: wrap;
+}
+.flex-col {
+  flex-direction: column;
 }
 .icon.green {
   background:linear-gradient(135deg, #50e3c2 0%,#10d574 100%);
@@ -248,6 +254,10 @@ input {
 }
 .icon.medium {
   font-size: 16px;
+}
+
+.icon.super {
+  font-size: 35px;
 }
 
 .icon.hover:hover {

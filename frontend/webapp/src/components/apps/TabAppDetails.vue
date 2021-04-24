@@ -3,8 +3,9 @@
         <h1 class="super-lg">{{app.owner?.orgn_domain}}/{{app.name}}</h1>
         <div class="desc_test">{{app.description}}</div>
         <hr>
-        <Tabs class="my-2" v-if="!isInCreateMode" ref="Tabs" :update="activeTab" :initTab="activeTab" :tabs="[{name:'Overview'},{name:'Configuration'},{name:'Client Library'}]" @tabChange="tabChange"/>
+        <Tabs class="my-2" v-if="!isInCreateMode" ref="Tabs" :update="activeTab" :initTab="activeTab" :tabs="tabs" @tabChange="tabChange"/>
         <General v-if="activeTab === 'Overview'" :app="app" @drop_app="drop_app" :token_placeholder="token_placeholder"/>
+        <Config v-if="activeTab == 'Configuration'" />
         <DocClient v-if="activeTab === 'Client Library'" :hasToken="false" @goCreateToken="goCreateToken"/>
     </div>
 </template>
@@ -12,20 +13,22 @@
 <script>
     import Tabs from '@/components/utils/Tabs.vue';
     import General from '@/components/apps/General.vue';
+    import Config from '@/components/apps/Config';
     import DocClient from '@/components/apps/DocClient.vue';
-    import axios from 'axios';
 
     export default {
         name: 'TabAppDetails',
         components: {
             Tabs,
             General,
+            Config,
             DocClient,
         },
         data() {
             return {
                 token_placeholder: "Organization-Domain/App-Name",
                 activeTab: "Overview",
+                tabs: [{name:'Overview', emoji: "🎛"},{name:'Configuration', emoji: "⚙️"},{name:'Client Library', emoji: "📓"}]
             };
         },
         props: ['app'],
