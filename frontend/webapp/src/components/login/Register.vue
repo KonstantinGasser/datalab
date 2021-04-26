@@ -1,10 +1,10 @@
 <template>
   <div class="main-container">
     <div>
-      <h1 v-if="!hasRegistered">DataLabs - Mine Your Business</h1>
-      <h1 v-if="hasRegistered">Welcome to Datalabs</h1>
+      <h1 v-if="!hasRegistered">Datalab - Mine Your Business</h1>
+      <h1 v-if="hasRegistered">Welcome to Datalab</h1>
     </div>
-    <!-- <h1>DataLabs Mine Your business </h1> -->
+    <!-- <h1>datalab Mine Your business </h1> -->
     <div class="login-grid">
     <div class="context">
       <div class="login-form">
@@ -23,7 +23,7 @@
                 <div class="field-set">
                   <input type="text" name="orgn_domain" for="orgn_domain" id="orgn_domain" placeholder="Organization domain" v-model="input.orgn_domain"/>
                   <input type="text" name="orgn_position" for="orgn_position" id="orgn_position" placeholder="Your Position" v-model="input.orgn_position"/>
-                  <!-- <span class="tooltiptext">this is used to map colleagues to your project<br>(example com.datalabs)</span> -->
+                  <!-- <span class="tooltiptext">this is used to map colleagues to your project<br>(example com.datalab)</span> -->
                 </div>
                 <hr>
                 <div class="text-capture big mt-2">Add Protection</div>

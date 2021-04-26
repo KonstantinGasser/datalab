@@ -1,9 +1,9 @@
 <template>
   <div class="main-container">
     <div>
-      <h1>DataLabs - Mine Your Business</h1>
+      <h1>Datalab - Mine Your Business</h1>
     </div>
-    <!-- <h1>DataLabs Mine Your business </h1> -->
+    <!-- <h1>datalab Mine Your business </h1> -->
     <div class="login-grid">
     <div class="context">
       <div class="login-form">

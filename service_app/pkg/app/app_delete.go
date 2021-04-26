@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/KonstantinGasser/datalabs/service_app/pkg/storage"
+	"github.com/KonstantinGasser/datalab/service_app/pkg/storage"
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 )

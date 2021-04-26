@@ -1,8 +1,8 @@
 package grpcC
 
 import (
-	tokenSrv "github.com/KonstantinGasser/datalabs/protobuf/token_service"
-	userSrv "github.com/KonstantinGasser/datalabs/protobuf/user_service"
+	tokenSrv "github.com/KonstantinGasser/datalab/protobuf/token_service"
+	userSrv "github.com/KonstantinGasser/datalab/protobuf/user_service"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )

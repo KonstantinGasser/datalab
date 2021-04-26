@@ -10,7 +10,7 @@
     export default {
         name: 'CompanyThumb',
         data() {
-            return { company: "com.datalabs"};
+            return { company: "com.datalab"};
         },
         props: ['status'],
         methods: {

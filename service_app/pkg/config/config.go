@@ -3,12 +3,12 @@ package config
 import (
 	"context"
 
-	"github.com/KonstantinGasser/datalabs/service_app/pkg/storage"
+	"github.com/KonstantinGasser/datalab/service_app/pkg/storage"
 )
 
 const (
 	// MongoDB database name
-	cfgDatabase = "datalabs_app"
+	cfgDatabase = "datalab_app"
 	// collection to store funnel configs
 	appcfgColl = "app"
 )

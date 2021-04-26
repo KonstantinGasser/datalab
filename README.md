@@ -1,4 +1,4 @@
-# datalabs analysis platform for user activity data
+# datalab analysis platform for user activity data
 
 ### Infrastructure cheat sheet
 

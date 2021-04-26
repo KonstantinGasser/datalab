@@ -1,8 +1,8 @@
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
-github.com/KonstantinGasser/datalabs v0.0.0-20210305235100-b20e9423ff63 h1:8FCaP9kt9uNqRacxYyD/ONAUhHil6rqDiy5/bRiGgEs=
-github.com/KonstantinGasser/datalabs v0.0.0-20210305235100-b20e9423ff63/go.mod h1:t+VJ691KaXLfa81QV7XyvREofaNxwUM5x2tMf7OlwtM=
-github.com/KonstantinGasser/datalabs v0.0.0-20210326193859-605f44c20979 h1:8ePHUE/7TkE4TVswNm69XAwJ9eimPcQ3HOwL+UDs0bw=
+github.com/KonstantinGasser/datalab v0.0.0-20210305235100-b20e9423ff63 h1:8FCaP9kt9uNqRacxYyD/ONAUhHil6rqDiy5/bRiGgEs=
+github.com/KonstantinGasser/datalab v0.0.0-20210305235100-b20e9423ff63/go.mod h1:t+VJ691KaXLfa81QV7XyvREofaNxwUM5x2tMf7OlwtM=
+github.com/KonstantinGasser/datalab v0.0.0-20210326193859-605f44c20979 h1:8ePHUE/7TkE4TVswNm69XAwJ9eimPcQ3HOwL+UDs0bw=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
 github.com/cncf/udpa/go v0.0.0-20201120205902-5459f2c99403/go.mod h1:WmhPx2Nbnhtbo57+VJT5O0JRkEi1Wbu0z5j0R8u5Hbk=

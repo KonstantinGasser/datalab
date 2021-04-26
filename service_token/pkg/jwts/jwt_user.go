@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"time"
 
-	tokenSrv "github.com/KonstantinGasser/datalabs/protobuf/token_service"
+	tokenSrv "github.com/KonstantinGasser/datalab/protobuf/token_service"
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
 // Todo: must go in env
 const (
-	issuerUser  = "com.datalabs.token-service"
+	issuerUser  = "com.datalab.token-service"
 	SecretUser  = "super_secure"
 	expTimeUser = time.Minute * 60 * 4
 )

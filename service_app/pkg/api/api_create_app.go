@@ -5,11 +5,11 @@ import (
 	"net/http"
 	"strings"
 
-	appSrv "github.com/KonstantinGasser/datalabs/protobuf/app_service"
-	"github.com/KonstantinGasser/datalabs/service_app/pkg/app"
-	"github.com/KonstantinGasser/datalabs/utils/ctx_value"
-	"github.com/KonstantinGasser/datalabs/utils/hash"
-	"github.com/KonstantinGasser/datalabs/utils/unique"
+	appSrv "github.com/KonstantinGasser/datalab/protobuf/app_service"
+	"github.com/KonstantinGasser/datalab/service_app/pkg/app"
+	"github.com/KonstantinGasser/datalab/utils/ctx_value"
+	"github.com/KonstantinGasser/datalab/utils/hash"
+	"github.com/KonstantinGasser/datalab/utils/unique"
 	"github.com/KonstantinGasser/required"
 	"github.com/sirupsen/logrus"
 )

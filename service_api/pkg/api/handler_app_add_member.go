@@ -4,9 +4,9 @@ import (
 	"errors"
 	"net/http"
 
-	appSrv "github.com/KonstantinGasser/datalabs/protobuf/app_service"
+	appSrv "github.com/KonstantinGasser/datalab/protobuf/app_service"
 
-	"github.com/KonstantinGasser/datalabs/utils/ctx_value"
+	"github.com/KonstantinGasser/datalab/utils/ctx_value"
 	"github.com/sirupsen/logrus"
 )
 

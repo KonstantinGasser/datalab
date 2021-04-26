@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/KonstantinGasser/datalabs/service_app/pkg/storage"
-	"github.com/KonstantinGasser/datalabs/utils/hash"
+	"github.com/KonstantinGasser/datalab/service_app/pkg/storage"
+	"github.com/KonstantinGasser/datalab/utils/hash"
 	"go.mongodb.org/mongo-driver/bson"
 )
 

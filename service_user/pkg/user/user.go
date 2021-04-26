@@ -3,12 +3,12 @@ package user
 import (
 	"context"
 
-	"github.com/KonstantinGasser/datalabs/service_user/pkg/storage"
+	"github.com/KonstantinGasser/datalab/service_user/pkg/storage"
 )
 
 const (
 	// userDatabase is the name of the mongoDB
-	userDatabase = "datalabs_user"
+	userDatabase = "datalab_user"
 	// userCollection is the name of the collection used to
 	// store user documents
 	userCollection = "user"

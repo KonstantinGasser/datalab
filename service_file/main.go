@@ -9,7 +9,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/KonstantinGasser/datalabs/backend/services/file_server/cmd/server"
+	"github.com/KonstantinGasser/datalab/backend/services/file_server/cmd/server"
 	"github.com/sirupsen/logrus"
 )
 

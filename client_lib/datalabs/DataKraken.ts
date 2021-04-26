@@ -40,7 +40,7 @@ export class DataKraken {
 
 
     // COOKIE_NAME refers to the key storing the cooking value
-    private COOKIE_NAME: string = "datalabs.identity"
+    private COOKIE_NAME: string = "datalab.identity"
 
     // TYPE_MOUSEMOVE refers to the event type "mousemove"
     private TYPE_MOUSEMOVE: EVENT_TYPE = EVENT_TYPE.MOUSEMOVE
@@ -104,7 +104,7 @@ export class DataKraken {
             // will set cookie if present
             credentials: "same-origin",
             headers: {
-                "x-datalabs-token": app_token,
+                "x-datalab-token": app_token,
             },
         }
         fetch(this.API_WHOAMI, opts).then(resp => resp.json()).then(data => {

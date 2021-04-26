@@ -5,9 +5,9 @@ import (
 	"errors"
 	"net/http"
 
-	tokenSrv "github.com/KonstantinGasser/datalabs/protobuf/token_service"
-	"github.com/KonstantinGasser/datalabs/service_app/pkg/storage"
-	"github.com/KonstantinGasser/datalabs/utils/ctx_value"
+	tokenSrv "github.com/KonstantinGasser/datalab/protobuf/token_service"
+	"github.com/KonstantinGasser/datalab/service_app/pkg/storage"
+	"github.com/KonstantinGasser/datalab/utils/ctx_value"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )

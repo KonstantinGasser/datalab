@@ -3,9 +3,9 @@ package api
 import (
 	"context"
 
-	appSrv "github.com/KonstantinGasser/datalabs/protobuf/app_service"
-	"github.com/KonstantinGasser/datalabs/service_app/pkg/config"
-	"github.com/KonstantinGasser/datalabs/utils/ctx_value"
+	appSrv "github.com/KonstantinGasser/datalab/protobuf/app_service"
+	"github.com/KonstantinGasser/datalab/service_app/pkg/config"
+	"github.com/KonstantinGasser/datalab/utils/ctx_value"
 	"github.com/sirupsen/logrus"
 )
 

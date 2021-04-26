@@ -4,8 +4,8 @@ import (
 	"context"
 	"net"
 
-	tokenSrv "github.com/KonstantinGasser/datalabs/protobuf/token_service"
-	"github.com/KonstantinGasser/datalabs/service_token/pkg/api"
+	tokenSrv "github.com/KonstantinGasser/datalab/protobuf/token_service"
+	"github.com/KonstantinGasser/datalab/service_token/pkg/api"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )

@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/KonstantinGasser/datalabs/service_user/pkg/storage"
-	"github.com/KonstantinGasser/datalabs/utils/hash"
+	"github.com/KonstantinGasser/datalab/service_user/pkg/storage"
+	"github.com/KonstantinGasser/datalab/utils/hash"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )

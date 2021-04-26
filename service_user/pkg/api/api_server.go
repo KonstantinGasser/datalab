@@ -3,9 +3,9 @@ package api
 import (
 	"time"
 
-	userSrv "github.com/KonstantinGasser/datalabs/protobuf/user_service"
-	"github.com/KonstantinGasser/datalabs/service_user/pkg/storage"
-	"github.com/KonstantinGasser/datalabs/service_user/pkg/user"
+	userSrv "github.com/KonstantinGasser/datalab/protobuf/user_service"
+	"github.com/KonstantinGasser/datalab/service_user/pkg/storage"
+	"github.com/KonstantinGasser/datalab/service_user/pkg/user"
 )
 
 const (

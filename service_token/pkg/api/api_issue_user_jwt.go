@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"net/http"
 
-	tokenSrv "github.com/KonstantinGasser/datalabs/protobuf/token_service"
-	"github.com/KonstantinGasser/datalabs/service_token/pkg/jwts"
-	"github.com/KonstantinGasser/datalabs/utils/ctx_value"
+	tokenSrv "github.com/KonstantinGasser/datalab/protobuf/token_service"
+	"github.com/KonstantinGasser/datalab/service_token/pkg/jwts"
+	"github.com/KonstantinGasser/datalab/utils/ctx_value"
 	"github.com/sirupsen/logrus"
 )
 

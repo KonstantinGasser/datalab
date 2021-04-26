@@ -4,8 +4,8 @@ import (
 	"errors"
 	"net/http"
 
-	userSrv "github.com/KonstantinGasser/datalabs/protobuf/user_service"
-	"github.com/KonstantinGasser/datalabs/utils/ctx_value"
+	userSrv "github.com/KonstantinGasser/datalab/protobuf/user_service"
+	"github.com/KonstantinGasser/datalab/utils/ctx_value"
 	"github.com/sirupsen/logrus"
 )
 

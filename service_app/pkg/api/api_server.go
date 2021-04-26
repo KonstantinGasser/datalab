@@ -1,13 +1,13 @@
 package api
 
 import (
-	appSrv "github.com/KonstantinGasser/datalabs/protobuf/app_service"
-	tokenSrv "github.com/KonstantinGasser/datalabs/protobuf/token_service"
-	userSrv "github.com/KonstantinGasser/datalabs/protobuf/user_service"
-	"github.com/KonstantinGasser/datalabs/service_app/pkg/app"
-	"github.com/KonstantinGasser/datalabs/service_app/pkg/config"
-	"github.com/KonstantinGasser/datalabs/service_app/pkg/grpcC"
-	"github.com/KonstantinGasser/datalabs/service_app/pkg/storage"
+	appSrv "github.com/KonstantinGasser/datalab/protobuf/app_service"
+	tokenSrv "github.com/KonstantinGasser/datalab/protobuf/token_service"
+	userSrv "github.com/KonstantinGasser/datalab/protobuf/user_service"
+	"github.com/KonstantinGasser/datalab/service_app/pkg/app"
+	"github.com/KonstantinGasser/datalab/service_app/pkg/config"
+	"github.com/KonstantinGasser/datalab/service_app/pkg/grpcC"
+	"github.com/KonstantinGasser/datalab/service_app/pkg/storage"
 )
 
 type AppService struct {

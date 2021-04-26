@@ -1,7 +1,7 @@
 package api
 
 import (
-	tokenSrv "github.com/KonstantinGasser/datalabs/protobuf/token_service"
+	tokenSrv "github.com/KonstantinGasser/datalab/protobuf/token_service"
 )
 
 type TokenServer struct {

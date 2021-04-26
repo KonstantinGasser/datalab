@@ -3,7 +3,7 @@ package user
 import (
 	"context"
 
-	"github.com/KonstantinGasser/datalabs/service_user/pkg/storage"
+	"github.com/KonstantinGasser/datalab/service_user/pkg/storage"
 	"go.mongodb.org/mongo-driver/bson"
 )
 

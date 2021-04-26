@@ -3,7 +3,7 @@ package ctx_value
 import (
 	"context"
 
-	tokenSrv "github.com/KonstantinGasser/datalabs/protobuf/token_service"
+	tokenSrv "github.com/KonstantinGasser/datalab/protobuf/token_service"
 )
 
 type ctxKey string

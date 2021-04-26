@@ -10,7 +10,7 @@ import (
 
 // Todo: must go in env
 const (
-	issuerApp  = "com.datalabs.token-service"
+	issuerApp  = "com.datalab.token-service"
 	SecretApp  = "super_secure"
 	expTimeApp = time.Hour * 24 * 7 // valid for 7 days
 )
