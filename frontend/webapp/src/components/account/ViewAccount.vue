@@ -4,6 +4,9 @@
         <div>
             <h2>Personal Information</h2>
             <div class="view_component">
+                <div class="d-flex justify-end align-center mt-2">
+                    <button class="btn btn-standard" @click="updateAccount()">Update Profile</button>
+                </div>
                 <div class="form-row justfy-start">
                     <div class="form-group col d-grid justify-center align-center">
                         <div class="d-flex align-center justify-center">
@@ -47,10 +50,6 @@
                         <input v-model="user.orgn_position" class="form-control" type="text" name="" id="last_name" :placeholder="user.orgn_position">
                     </div>
                 </div>
-            </div>
-
-            <div class="d-flex justify-end align-center mt-2">
-                <button class="btn btn-standard" @click="updateAccount()">Update Profile</button>
             </div>
         </div>
     </div>

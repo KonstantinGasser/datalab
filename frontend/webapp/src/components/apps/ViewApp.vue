@@ -16,24 +16,37 @@
         </div>
         <div>
             <TabCreateApp v-if="isInCreateMode" @createdApp="updateState" />
-            <TabAppDetails ref="tab_app_token" @drop_app="updateState" v-cloak v-if="activeTab === 'App Details' && !isInCreateMode" :app="activeApp"/>
+            <div v-if="!isInCreateMode">
+                <h1 class="super-lg">{{activeApp.owner?.orgn_domain}}/{{activeApp.name}}</h1>
+                <div class="desc_test">{{activeApp.description}}</div>
+                <hr>
+                <Tabs class="my-2" ref="Tabs" :update="activeTab" :initTab="activeTab" :tabs="tabs" @tabChange="tabChange"/>
+                <General v-if="activeTab === 'Overview'" :app="activeApp" @drop_app="drop_app" :token_placeholder="token_placeholder"/>
+                <Config v-if="activeTab == 'Configuration'" :app_uuid="activeApp.uuid" :app_config="activeApp.app_config" />
+                <DocClient v-if="activeTab === 'Client Library'" :hasToken="false" @goCreateToken="goCreateToken"/>
+            </div>
+            <!-- <TabAppDetails ref="tab_app_token" @drop_app="updateState" v-cloak v-if="activeTab === 'App Details' && !isInCreateMode" :app="activeApp"/> -->
         </div>
     </div>
 </template>
 
 <script>
-    import Tabs from '@/components/utils/Tabs.vue';
-    import TabAppDetails from '@/components/apps/TabAppDetails.vue';
+    // import TabAppDetails from '@/components/apps/TabAppDetails.vue';
     import TabCreateApp from '@/components/apps/TabCreateApp.vue';
-    import TabMember from '@/components/apps/TabMember.vue';
+    import Tabs from '@/components/utils/Tabs.vue';
+    import General from '@/components/apps/General.vue';
+    import Config from '@/components/apps/Config';
+    import DocClient from '@/components/apps/DocClient.vue';
     import axios from 'axios';
+
     export default {
         name: 'ViewApp',
         components: {
             Tabs,
             TabCreateApp,
-            TabAppDetails,
-            TabMember,
+            General,
+            Config,
+            DocClient,
         },
         computed: {
             blockTabs() {
@@ -54,6 +67,9 @@
                 newApp: { name: '' },
                 apps: [],
                 activeApp: {},
+                token_placeholder: "Organization-Domain/App-Name",
+                activeTab: "Overview",
+                tabs: [{name:'Overview', emoji: "🎛"},{name:'Configuration', emoji: "⚙️"},{name:'Client Library', emoji: "📓"}]
             };
         },
         async created() {
@@ -77,44 +93,40 @@
         },
         props: ['status'],
         methods: {
+            tabChange(tab) {
+                this.activeTab = tab;
+            },
             updateState(event) {
-                console.log(event);
-                switch (event.type) {
-                    case "show_app":
-                        this.isInCreateMode = false;
-                        // update app list on the left to show newly created app
-                        this.getViewApp().then(data => {
-                            this.apps = data.app_list;
-                            this.activeApp = data.app_details;
-                        }).catch(error => {
-                            if (error.response.status === 401) {
-                                localStorage.removeItem('token');
-                                this.$router.replace({ name: 'login' });
-                            }
-                            console.log(error);
-                            this.$toast.error("could not refresh app list");
-                        });
-                        break;
-                    case "drop_app":
-                        this.isInCreateMode = true;
-                        this.apps = this.apps.filter(item => item.uuid != event.app_uuid);
-                        this.getViewApp().then(data => {
-                            this.apps = data.app_list;
-                            this.activeApp = data.app_details;
-                        }).catch(error => {
-                            if (error.response.status === 401) {
-                                localStorage.removeItem('token');
-                                this.$router.replace({ name: 'login' });
-                            }
-                            console.log(error);
-                            this.$toast.error("could not refresh app list");
-                        });
-                        break;
-                    default:
-                        break;
-                }
-                this.isInCreateMode = false;
+                // update app list on the left to show newly created app
+                this.getViewApp().then(data => {
+                    this.apps = data.app_list;
+                    this.activeApp = data.app_details;
+                    this.isInCreateMode = false;
+                }).catch(error => {
+                    if (error.response.status === 401) {
+                        localStorage.removeItem('token');
+                        this.$router.replace({ name: 'login' });
+                    }
+                    console.log(error);
+                    this.$toast.error("could not refresh app list");
+                });
                 
+                
+            },
+            drop_app() {
+                this.isInCreateMode = true;
+                this.apps = this.apps.filter(item => item.uuid != event.app_uuid);
+                this.getViewApp().then(data => {
+                    this.apps = data.app_list;
+                    this.activeApp = data.app_details;
+                }).catch(error => {
+                    if (error.response.status === 401) {
+                        localStorage.removeItem('token');
+                        this.$router.replace({ name: 'login' });
+                    }
+                    console.log(error);
+                    this.$toast.error("could not refresh app list");
+                });
             },
             modeCreateApp() {
                 this.isInCreateMode = true;
@@ -131,6 +143,7 @@
                     console.log(this.isInCreateMode);
                     return null;
                 }
+                this.activeTab = "Overview";
                 return res.data;
                 
             },
@@ -144,24 +157,31 @@
                     if (this.isInCreateMode)
                         this.isInCreateMode = !this.isInCreateMode;
                     this.activeApp = resp.data.app;
+                    this.activeTab = "Overview";
                 }).catch(error => {
                     console.log(error);
                 });
             },
-            // tabChange(tab) {
-            //     this.isInCreateMode = false;
-            //     this.activeTab = tab;
-            // },
-            enableDisableTabs(toggle) {
-                this.tabsBlocked = toggle;
-                // block tab change by sending toggle to @Tabs
-                this.$refs.Tabs.block = this.tabsBlocked;
-            }
         },
     };
 </script>
 
 <style scoped>
+.view_component {
+    margin-top: 15px;
+    padding: 15px;
+    border-radius: 8px;
+    height: max-width;
+}
+h2 {
+    margin: 5px 0px;
+}
+.pos_1_1 {
+    grid-row: 1;
+}
+.pos_1_2 {
+    grid-row: 2;
+}
 .tab-line {
     grid-column: 1;
     grid-row: 1;

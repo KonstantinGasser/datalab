@@ -53,39 +53,38 @@ func (api API) HandlerAppUpdateConfig(w http.ResponseWriter, r *http.Request) {
 	// updateFlag can be "funnel", "campaign" or "*" (update all)
 	updateFlag := api.getQuery(r.URL, "resource")
 
-	var funnel = make([]*appSrv.Funnel, len(payload.Funnel))
+	var funnelStages = make([]*appSrv.Funnel, len(payload.Funnel))
 	for i, item := range payload.Funnel {
-		funnel[i] = &appSrv.Funnel{
+		funnelStages[i] = &appSrv.Funnel{
 			Id:         item.ID,
 			Name:       item.Name,
 			Transition: item.Transition,
 		}
 	}
-	var campaign = make([]*appSrv.Campaign, len(payload.Campaign))
+	var campaignRecords = make([]*appSrv.Campaign, len(payload.Campaign))
 	for i, item := range payload.Campaign {
-		campaign[i] = &appSrv.Campaign{
+		campaignRecords[i] = &appSrv.Campaign{
 			Id:     item.ID,
 			Name:   item.Name,
 			Prefix: item.Prefix,
 		}
 	}
-	var btnTime = make([]*appSrv.BtnTime, len(payload.BtnTime))
+	var btnDefs = make([]*appSrv.BtnTime, len(payload.BtnTime))
 	for i, item := range payload.BtnTime {
-		btnTime[i] = &appSrv.BtnTime{
+		btnDefs[i] = &appSrv.BtnTime{
 			Id:      item.ID,
 			Name:    item.Name,
 			BtnName: item.BtnName,
 		}
 	}
-
 	resp, err := api.AppClient.UpdateCfg(r.Context(), &appSrv.UpdateCfgRequest{
 		Tracing_ID: ctx_value.GetString(r.Context(), "tracingID"),
 		CallerUuid: user.GetUuid(),
 		UpdateFlag: updateFlag,
 		AppUuid:    payload.AppUUID,
-		Funnel:     funnel,
-		Campaign:   campaign,
-		BtnTime:    btnTime,
+		Stages:     funnelStages,
+		Records:    campaignRecords,
+		BtnDefs:    btnDefs,
 	})
 	if err != nil {
 		logrus.Errorf("<%s>[api.HandlerAppUpdateConfig] could not execute grpc call: %v\n", ctx_value.GetString(r.Context(), "tracingID"), err)

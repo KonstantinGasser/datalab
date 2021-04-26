@@ -40,12 +40,36 @@ func (app app) Get(ctx context.Context, storage storage.Storage, userService use
 	}
 	var queryData AppItem
 	err := storage.FindOne(ctx, appDatabase, appCollection, appQuery, &queryData)
-	// check if no results have been found
-	if err == mongo.ErrNoDocuments {
-		return http.StatusBadRequest, nil, errors.New("could not find any match")
-	}
 	if err != nil {
+		// check if no results have been found
+		if err == mongo.ErrNoDocuments {
+			return http.StatusBadRequest, nil, errors.New("could not find any match")
+		}
 		return http.StatusInternalServerError, nil, err
+	}
+	var funnelStages = make([]*appSrv.Funnel, len(queryData.Configurations.Funnel))
+	for i, item := range queryData.Configurations.Funnel {
+		funnelStages[i] = &appSrv.Funnel{
+			Id:         item.ID,
+			Name:       item.Name,
+			Transition: item.Transition,
+		}
+	}
+	var campaignRecords = make([]*appSrv.Campaign, len(queryData.Configurations.Campaign))
+	for i, item := range queryData.Configurations.Campaign {
+		campaignRecords[i] = &appSrv.Campaign{
+			Id:     item.ID,
+			Name:   item.Name,
+			Prefix: item.Prefix,
+		}
+	}
+	var btnDefs = make([]*appSrv.BtnTime, len(queryData.Configurations.BtnTime))
+	for i, item := range queryData.Configurations.BtnTime {
+		btnDefs[i] = &appSrv.BtnTime{
+			Id:      item.ID,
+			Name:    item.Name,
+			BtnName: item.BtnName,
+		}
 	}
 	// prepare data of app append with user data if calls successful
 	var appData *appSrv.ComplexApp = &appSrv.ComplexApp{
@@ -53,8 +77,12 @@ func (app app) Get(ctx context.Context, storage storage.Storage, userService use
 		URL:         queryData.URL,
 		Name:        queryData.AppName,
 		Description: queryData.Description,
-		Settings:    queryData.Settings,
 		AppToken:    queryData.AppToken,
+		AppConfig: &appSrv.AppConfig{
+			Funnel:   funnelStages,
+			Campaign: campaignRecords,
+			BtnTime:  btnDefs,
+		},
 	}
 
 	// fetch user information needed: owner and all members

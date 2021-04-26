@@ -20,25 +20,25 @@ func (srv AppService) UpdateCfg(ctx context.Context, in *appSrv.UpdateCfgRequest
 	}
 
 	var funnel = []config.Stage{}
-	for _, item := range in.GetFunnel() {
+	for _, item := range in.GetStages() {
 		funnel = append(funnel, config.Stage{
-			ID:         item.Id,
+			ID:         item.GetId(),
 			Name:       item.Name,
 			Transition: item.Transition,
 		})
 	}
 	var campaign = []config.Record{}
-	for _, item := range in.GetCampaign() {
+	for _, item := range in.GetRecords() {
 		campaign = append(campaign, config.Record{
-			ID:     item.Id,
+			ID:     item.GetId(),
 			Name:   item.Name,
 			Prefix: item.Prefix,
 		})
 	}
 	var btnTime = []config.BtnDef{}
-	for _, item := range in.GetBtnTime() {
+	for _, item := range in.GetBtnDefs() {
 		btnTime = append(btnTime, config.BtnDef{
-			ID:      item.Id,
+			ID:      item.GetId(),
 			Name:    item.Name,
 			BtnName: item.BtnName,
 		})

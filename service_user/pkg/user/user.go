@@ -59,5 +59,5 @@ type UserItemUpdateable struct {
 	FirstName     string `bson:"first_name" required:"yes"`
 	LastName      string `bson:"last_name" required:"yes"`
 	OrgnPosition  string `bson:"orgn_position" required:"yes"`
-	ProfileImgURL string `bson:"profile_img_url" required:"yes"`
+	ProfileImgURL string `bson:"profile_img_url"`
 }

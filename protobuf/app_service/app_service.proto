@@ -28,9 +28,9 @@ message UpdateCfgRequest {
     string caller_uuid = 2;
     string update_flag = 3;
     string app_uuid = 4;
-    repeated Funnel funnel = 5;
-    repeated Campaign campaign = 6;
-    repeated BtnTime btn_time = 7;
+    repeated Funnel stages = 5;
+    repeated Campaign records = 6;
+    repeated BtnTime btn_defs = 7;
 }
 message Funnel {
     int32 id = 1;
@@ -195,6 +195,13 @@ message ComplexApp {
     repeated ComplexUser member = 6;
     repeated string settings = 7;
     string app_token = 8;
+    AppConfig app_config = 9;
+}
+
+message AppConfig {
+    repeated Funnel funnel = 1;
+    repeated Campaign campaign = 2;
+    repeated BtnTime btn_time = 3;
 }
 
 message SimpleApp {

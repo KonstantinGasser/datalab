@@ -15,7 +15,6 @@ const (
 
 type Config interface {
 	UpdateByFlag(ctx context.Context, storage storage.Storage, cfg Cfgs, updateFlag string) (int, error)
-	// InitOnNew(ctx context.Context, storage storage.Storage, refApp string) error
 }
 
 type config struct{}

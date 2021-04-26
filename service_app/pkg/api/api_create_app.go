@@ -25,14 +25,14 @@ func (srv AppService) Create(ctx context.Context, in *appSrv.CreateRequest) (*ap
 	}
 	orgnAppHash := hash.Sha256([]byte(strings.Join([]string{in.GetOrganization(), in.GetName()}, "/"))).String()
 	appItem := app.AppItem{
-		UUID:           appUUID,
-		AppName:        in.GetName(),
-		URL:            in.GetAppUrl(),
-		Description:    in.GetDescription(),
-		OwnerUUID:      in.GetOwnerUuid(),
-		OrgnDomain:     in.GetOrganization(),
-		Member:         append(in.GetMember(), in.GetOwnerUuid()), // by default owner will always be in the app team
-		Settings:       in.GetSettings(),
+		UUID:        appUUID,
+		AppName:     in.GetName(),
+		URL:         in.GetAppUrl(),
+		Description: in.GetDescription(),
+		OwnerUUID:   in.GetOwnerUuid(),
+		OrgnDomain:  in.GetOrganization(),
+		Member:      append(in.GetMember(), in.GetOwnerUuid()), // by default owner will always be in the app team
+		// Settings:       in.GetSettings(),
 		OrgnAndAppHash: orgnAppHash,
 	}
 	if err := required.Atomic(&appItem); err != nil {

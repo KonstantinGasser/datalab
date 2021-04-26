@@ -1,5 +1,8 @@
 <template>
-    <div class="view_component d-flex">
+    <div class="view_component">
+        <div class="d-flex justify-end align-center mt-2">
+            <button class="btn btn-standard" @click="createNewApp()">Create App {{ appName }}</button>
+        </div>
         <div class="form-row w-100">
            <div class="form-group col">
                 <div class="form-group col">
@@ -19,7 +22,15 @@
         </div>
     </div>
     <div class="view_component">
-        <div class="p-2">
+        <div class="form-row">
+            <div class="form-group col">
+                <div class="info-txt">Further configurations can be set in the app itself after its creation. There you will find
+                    the options to configure a <strong>conversion rate funnel</strong>, <strong>campaign tracking</strong> and 
+                    <strong>interesting buttons</strong>...👍
+                </div>
+            </div>
+        </div>
+        <!-- <div class="p-2">
             <label for="">What do you want to monitor?</label>
             <ul class="checkboxes">
                 <li>
@@ -41,9 +52,9 @@
                     </div>
                 </li>
             </ul>
-        </div>
+        </div> -->
     </div>
-    <div class="view_component">
+    <!-- <div class="view_component">
         <div class="form-row">
             <div class="from-group col-6">
                 <label for="">Add Colleagues to the App</label>
@@ -66,10 +77,7 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="d-flex justify-end align-center mt-2">
-        <button class="btn btn-standard" @click="createNewApp()">Create App {{ appName }}</button>
-    </div>
+    </div> -->
 </template>
 
 <script>

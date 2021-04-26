@@ -26,7 +26,7 @@
                     <div v-for="f in funnel" :key="f.id" class="d-flex align-center m-1">
                         <div class="funnel">
                             <div class="d-flex justify-end trash-span">
-                                <span v-if="f.id >= funnel.length - 1" class="icon icon-trash-2 hover" @click="removeStage(f.id)"></span>
+                                <span v-if="f.id >= funnel.length" class="icon icon-trash-2 hover" @click="removeStage(f.id)"></span>
                             </div>
                             <div class="d-flex justify-center align-center flex-col">
                                 <div class="stage-name">{{f.name}}</div>
@@ -44,12 +44,12 @@
                          <div>
                              <div class="">
                                 <div class=" col">
-                                    <input v-model="stage_name" class="form-control" type="text" name="stage_name" id="stage_name" placeholder="Stage Name">
+                                    <input v-model="stage_name" class="form-control border" type="text" name="stage_name" id="stage_name" placeholder="Stage Name" :class="{'border-danger': stage_invalid}" >
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class=" col">
-                                    <input v-model="stage_transition" class="form-control" type="text" name="stage_tansition" id="stage_tansition" placeholder="Transition">
+                                    <input v-model="stage_transition" class="form-control border" type="text" name="stage_tansition" id="stage_tansition" placeholder="Transition" :class="{'border-danger': stage_invalid}" >
                                 </div>
                             </div>
                          </div>
@@ -84,8 +84,8 @@
                 </tr>
                 <tr>
                     <th class="v-center">{{campaign_count}}</th>
-                    <td><input v-model="campaign_name" type="text" placeholder="Name (E-Mail Campaign)" class="form-control"></td>
-                    <td><input v-model="campaign_prefix" type="text" placeholder="Prefix (#prop-email)" class="form-control"></td>
+                    <td><input v-model="campaign_name" type="text" placeholder="Name (E-Mail Campaign)" class="form-control border" :class="{'border-danger': campaign_invalid}" ></td>
+                    <td><input v-model="campaign_prefix" type="text" placeholder="Prefix (#prop-email)" class="form-control border" :class="{'border-danger': campaign_invalid}" ></td>
                     <td class="v-center"><span class="icon icon-plus hover" @click="addCampaign"></span></td>
                 </tr> 
             </tbody>
@@ -95,7 +95,7 @@
         <h1>Interesting Buttons</h1>
         <div class="view_component table-height">
             <div class="d-flex align-center justify-end mb-2">
-                <button class="btn btn-standard" @click="updateCampaigns">Update</button>
+                <button class="btn btn-standard" @click="updateBtnTime">Update</button>
             </div>
             <table class="table table-borderless">
             <thead>
@@ -110,14 +110,14 @@
                 <tr v-for="item in buttons" :key="item.id">
                     <th>{{item.id}}</th>
                     <th>{{item.name}}</th>
-                    <th>{{item.btn}}</th>
-                    <th><span class="icon icon-trash-2 hover"></span></th>
+                    <th>{{item.btn_name}}</th>
+                    <th><span class="icon icon-trash-2 hover" @click="removeBtnTime(item.id)"></span></th>
                 </tr>
                 <tr>
                     <th class="v-center">{{button_count}}</th>
-                    <td><input v-model="button_name" type="text" placeholder="Name (Btn-Order)" class="form-control"></td>
-                    <td><input v-model="button_btn" type="text" placeholder="Btn (btn_order)" class="form-control"></td>
-                    <td class="v-center"><span class="icon icon-plus hover"></span></td>
+                    <td><input v-model="button_name" type="text" placeholder="Name (Btn-Order)" class="form-control border" :class="{'border-danger': button_invalid}" ></td>
+                    <td><input v-model="button_btn" type="text" placeholder="Btn (btn_order)" class="form-control border" :class="{'border-danger': button_invalid}" ></td>
+                    <td class="v-center"><span class="icon icon-plus hover" @click="addBtnTime"></span></td>
                 </tr> 
             </tbody>
             </table>
@@ -132,38 +132,78 @@ export default {
     name: "Configuration",
     data() {
         return {
+            funnel: [],
             stage_name: null,
             stage_transition: null,
-            stage_count: 0,
-            funnel: [],
+            funnel_count: 0,
+            stage_invalid: false,
+
+            campaign: [],
             campaign_name: null,
             campaign_prefix: null,
             campaign_count: 0,
-            campaign: [],
+            campaign_invalid: false,
+
             buttons: [],
-            button_count: 0,
             button_name: null,
             button_btn: null,
+            buttons_count: 0,
+            button_invalid: false,
         };
     },
-    props: ["app_uuid"],
+    props: {
+        app_uuid: String,
+        app_config: {
+            type: Object,
+            default: null,
+        }
+
+    },
+    mounted() {
+        if (this.$props.app_config === null || Object.keys(this.$props.app_config).length === 0){
+            this.funnel = [];
+            this.funnel_count = 1;
+            this.campaign = [];
+            this.campaign_count = 1;
+            this.buttons = [];
+            this.buttons_count = 1;
+            return
+        }
+        this.funnel = this.$props.app_config.funnel;
+        this.funnel_count = this.$props.app_config.funnel.length + 1;
+
+        this.campaign = this.$props.app_config.campaign;
+        this.campaign_count = this.$props.app_config.campaign.length + 1;
+
+        this.buttons = this.$props.app_config.btn_time;
+        this.buttons_count = this.$props.app_config.btn_time.length + 1;
+    },
     computed: {
     },
     methods: {
         addStage() {
+            if (this.stage_invalid) this.stage_invalid = false;
+            const tmp = this.funnel.filter(item => item.name === this.stage_name || item.transition === this.stage_transition)
+            if (tmp.length > 0) {
+                this.$toast.warning("Funnel Name and Transition must be unique");
+                this.stage_invalid = true;
+                return
+            }
+
             this.funnel.push({
-                id: this.stage_count,
+                id: this.funnel_count,
                 name: this.stage_name,
                 transition: this.stage_transition,
             });
             this.stage_name = null;
             this.stage_transition = null;
-            this.stage_count++;
+            this.funnel_count++;
         },
         removeStage(id) {
+            console.log(id);
             this.funnel = this.funnel.filter(item => item.id != id);
             this.funnel.forEach((item,i) => {
-                item.id = i;
+                item.id = i+1;
             });
             this.funnel_count--;
         },
@@ -179,9 +219,17 @@ export default {
             }
             axios.post("http://localhost:8080/api/v2/view/app/update/config?resource=funnel", payload, options).then(res => {
                 console.log(res);
-            }).catch(err => console.log(err));
+                this.$toast.success("Updated Funnel information")
+            }).catch(err => this.$toast.error("Could not update Funnel information"));
         },
         addCampaign() {
+            if (this.campaign_invalid) this.campaign_invalid = false;
+            const tmp = this.campaign.filter(item => item.name === this.campaign_name || item.prefix === this.campaign_prefix)
+            if (tmp.length > 0) {
+                this.$toast.warning("Campaign Name and Prefix must be unique");
+                this.campaign_invalid = true;
+                return
+            }
             this.campaign.push(
                 {
                     id: this.campaign_count,
@@ -196,7 +244,7 @@ export default {
         removeCampaign(id) {
             this.campaign = this.campaign.filter(item => item.id != id);
             this.campaign.forEach((item,i) => {
-                item.id = i;
+                item.id = i+1;
             });
             this.campaign_count--;
         },
@@ -212,15 +260,58 @@ export default {
             }
             axios.post("http://localhost:8080/api/v2/view/app/update/config?resource=campaign", payload, options).then(res => {
                 console.log(res);
-            }).catch(err => console.log(err));
+                this.$toast.success("Updated Campaign information")
+            }).catch(err => this.$toast.error("Could not update Campaign information"));
         },
+
+        addBtnTime() {
+            if (this.button_invalid) this.button_invalid = false;
+            const tmp = this.buttons.filter(item => item.name === this.button_name || item.btn_name === this.button_name);
+            if (tmp.length > 0) {
+                this.$toast.warning("Button Name and Identifier must be unique");
+                this.button_invalid = true;
+                return
+            }
+
+            this.buttons.push({
+                id: this.buttons_count,
+                name: this.button_name,
+                btn_name: this.button_btn,
+            })
+
+            this.button_name = null;
+            this.button_btn = null;
+            this.buttons_count++;
+        },
+        removeBtnTime(id) {
+            this.buttons = this.buttons.filter(item => item.id != id);
+            this.buttons.forEach((item,i) => {
+                item.id = i+1;
+            });
+            this.buttons_count--;
+        },
+        updateBtnTime() {
+            let options = {
+                headers: {
+                    'Authorization': localStorage.getItem("token"),
+                }
+            }; 
+            const payload = {
+                app_uuid: this.$props.app_uuid,
+                btn_time: this.buttons,
+            }
+            axios.post("http://localhost:8080/api/v2/view/app/update/config?resource=btnTime", payload, options).then(res => {
+                console.log(res);
+                this.$toast.success("Updated Interesting-Buttons information")
+            }).catch(err => this.$toast.error("Could not update Interesting-Buttons information"));
+        }
     },
 }
 </script>
 
 <style sceped>
 .main-cfg {
-    height: 700px;
+    height: 70vh;
     overflow-y: scroll;
 }
 .view_component {
@@ -266,8 +357,8 @@ td .icon {
 .add-box {
     opacity: 0.5;
     border: none;
-    width: 220px;
-    max-width: 220px;
+    width: 215px;
+    max-width: 215px;
 }
 .add-box:focus,.add-box:hover {
     opacity: 1;

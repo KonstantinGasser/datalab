@@ -56,14 +56,14 @@ func NewApp() App {
 // AppItem represents one App in the database
 type AppItem struct {
 	// mongoDB pk (document key)
-	UUID           string      `bson:"_id" required:"yes"`
-	AppName        string      `bson:"name" required:"yes"`
-	URL            string      `bson:"url" required:"yes"`
-	OwnerUUID      string      `bson:"owner_uuid" required:"yes"`
-	OrgnDomain     string      `bson:"orgn_domain" required:"yes"`
-	Description    string      `bson:"description"`
-	Member         []string    `bson:"member"`
-	Settings       []string    `bson:"setting" required:"yes" min:"1"`
+	UUID        string   `bson:"_id" required:"yes"`
+	AppName     string   `bson:"name" required:"yes"`
+	URL         string   `bson:"url" required:"yes"`
+	OwnerUUID   string   `bson:"owner_uuid" required:"yes"`
+	OrgnDomain  string   `bson:"orgn_domain" required:"yes"`
+	Description string   `bson:"description"`
+	Member      []string `bson:"member"`
+	// Settings       []string    `bson:"setting" required:"yes" min:"1"`
 	AppToken       string      `bson:"app_token"`
 	Configurations config.Cfgs `bson:"app_config"`
 	// OrgnAndAppHash is required to verify the generation of an app token

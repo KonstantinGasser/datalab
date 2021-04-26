@@ -8,25 +8,14 @@
         <MenuItem @click="setActive('view_app')" :tabName="'view_app'" :item="'Apps'" />
         <MenuItem @click="setActive('view_account')" :tabName="'view_account'" :item="'Account'" />
         <!-- <MenuItem @click="setActive('view_settings')" :tabName="'view_settings'" :item="'Settings'" /> -->
-        <MenuItem @click="setActive('view_logout')" :item="'Logout 👋'" />
-        <div class="d-flex justify-center">
-          <input id="toggle" class="toggle" type="checkbox" @change="setMode($event)">
-          <!-- <div class="background"></div> -->
-          <!-- <label for="toggle" class="title">Toggle dark mode</label> -->
-        </div>
-        <!-- <div class="custom-control custom-switch d-flex justify-center">
-            <input v-model="appCfgs" :value="'css-mode'" @change="setMode($event)" type="checkbox" class="custom-control-input" id="css-mode">
-            <label class="custom-control-label" for="css-mode"></label>
-        </div> -->
       </div>
-      <!-- <div class="menu bottom-set"> -->
-        <!-- <h4>App Settings</h4> -->
-        <!-- <div class="custom-control custom-switch">
-            <input v-model="appCfgs" :value="'mouse-move-map'" @change="setMode($event)" type="checkbox" class="custom-control-input" id="mouse-move-map">
-            <label class="custom-control-label" for="mouse-move-map">{{mode ? "Light Mode" : "Dark Mode"}}</label>
+      <div class="divider"></div>
+      <div class="menu">
+          <MenuItem @click="setActive('view_logout')" :item="'Logout 👋'" />
+          <div class="d-flex justify-center">
+            <input id="toggle" class="toggle" type="checkbox" @change="setMode($event)">
+          </div>
         </div>
-        <MenuItem @click="setActive('view_logout')" :item="'Logout 👋'" /> 
-      </div>  -->
   </div>
 </template>
 
@@ -94,12 +83,14 @@ h4 {
     display: grid;
     justify-content: flex-start;
     height: 100%;
-    align-content: space-around;
+    align-content: flex-start;
     border-radius: 8px 0 0 8px;
 }
 
 
-
+.divider {
+  height: 100px;
+}
 .toggle {
   --size: 1.5rem;
   -webkit-appearance: none;
