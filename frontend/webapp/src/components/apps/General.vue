@@ -235,7 +235,6 @@
     margin-top: 15px;
     padding: 15px;
     border-radius: 8px;
-    height: max-width;
 }
 h2 {
     margin: 5px 0px;

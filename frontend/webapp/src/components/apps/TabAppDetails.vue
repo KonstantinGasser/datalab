@@ -5,7 +5,7 @@
         <hr>
         <Tabs class="my-2" v-if="!isInCreateMode" ref="Tabs" :update="activeTab" :initTab="activeTab" :tabs="tabs" @tabChange="tabChange"/>
         <General v-if="activeTab === 'Overview'" :app="app" @drop_app="drop_app" :token_placeholder="token_placeholder"/>
-        <Config v-if="activeTab == 'Configuration'" />
+        <Config v-if="activeTab == 'Configuration'" :app_uuid="app.uuid" />
         <DocClient v-if="activeTab === 'Client Library'" :hasToken="false" @goCreateToken="goCreateToken"/>
     </div>
 </template>

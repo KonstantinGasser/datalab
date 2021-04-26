@@ -17,17 +17,49 @@ Database server:
 The idea of this `README` is to explain how the data collection on the client-side works. Further, the session and data life-cycle will be explained as well as the data format.
 
 ## Session Life-Cycle
+
 STATE: INIT <br>
-As soon as the `DataKraken` object gets instantiated the code will perform an API call to the data backend. As a result, the server will set a new `cookie` if non is present in the request along with a web-socket  `ticket` and app-specific meta-data. The `ticket` can be used to open the web-socket connection (`ttl` is 15sec). Based on the meta-data, all allowed `EventListener` will be attached to the `document` with their corresponding functions. <br><br>
+- call to `/api/hello` to indicate session start with following data:
+``` json
+{   
+    "session_start": "UNIX time-stamp",
+    "referrer": "page current page was called from",
+    "browser": "Chrome",
+    "OS": "MacOS",
+}
+```
+- pass `cookie` if present else server sets new cookie
+- call-back returns `web-socket ticket` to connect to socket
+- attach `Event-Listener` to document
+
+STATE: CONNECT <br>
+- connect with Web-Socket
+
 STATE: LISTEN <br>
-After calling `DataKraken.Listen()` the web-socket gets opened and the functions `onopen`, `onclose` and `onerror` will be assigned. `.Listen()` further changes the `DataKraken.CONN_STATE` to `SOCKET_EVENT.READY` - if `onerror` is not triggered. This will wake up the `EventListener` which can now start streaming events to the socket connection. If the connections gets closed (by closing the tab/browser, network errors) the `onclose` function fires a close-event to the socket connection, indicated that the session is over.<br><br>
+- `listen for events` -> `process event` -> `send to web-socket` -> `start over`
 
-STATE: CLOSING<br>
-While the `DataKraken.CONN_STATE == SOCKET_EVENT.CLOSING` the `EventListener` will be detached from the document. Computing the session duration will happen on the server since the web-socket connection might not work any longer.
+STATE: CLOSING <br>
+- graceful: send `goodbye` to server
+- forceful: conn interrupt -> server terminates session
 
-## Data  Life-Cycle
+## Client data we get
+- `referrer` | #1, #3
+- `device info` | #4
+- `click` of element | #2, #1
+- `X,Y` of mouse-movement (needs more thinking - what to do with the data??)
+- `elpased time` mouse hovered over specific element | #4
+- `URL change` | #1, #2
+- `time on URL` | #4
 
-## Data Specifications
+## What to visualize?
+- `Customer Journey` [1]
+- `Funnel (conversion rate)` [2]
+- `Compaign Tracking` [3]
+- `Audience Info` [4]
+
+
+## Data by event
+
 DATA: SESSION_RECORD<br>
 ```json
 {
@@ -38,7 +70,7 @@ DATA: SESSION_RECORD<br>
     }
 }
 ```
-DATA: EVENT_MOUSECLICK<br>
+EVENT: MOUSECLICK<br>
 ```json
 {
     "type": 0,
@@ -50,7 +82,29 @@ DATA: EVENT_MOUSECLICK<br>
     }
 }
 ```
-DATA: EVENT_MOUSEMOVE<br>
+EVENT: URLCHANGE<br>
+```json
+{
+    "type": 0,
+    "timestamp" unix-timestamp,
+    "event": {
+        "elapsed" time-in-seconds,
+        "next": "http://awesome.dev/next"
+    }
+}
+```
+EVENT: MOUSEHOVER<br>
+```json
+{
+    "type": 0,
+    "timestamp" unix-timestamp,
+    "event": {
+        "elapsed": duration of no-pos-change,
+        "target": "css class | id | name"
+    }
+}
+```
+EVENT: MOUSEMOVE<br>
 ```json
 {
     "type": 1,
@@ -58,12 +112,12 @@ DATA: EVENT_MOUSEMOVE<br>
     "event": {
         "X": pos-mouse-x,
         "Y": pos-mouse-y,
-        "ellapsed": duration of no-pos-change
+        "elapsed": duration of no-pos-change
     }
 }
 ```
 # So fare...
  
-![](demo_img_1.png)
+![](git-resources/demo_img_1.png)
 
-![](demo_img_2.png)
+![](git-resources/demo_img_2.png)
