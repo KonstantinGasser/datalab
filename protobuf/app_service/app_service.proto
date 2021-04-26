@@ -30,6 +30,7 @@ message UpdateCfgRequest {
     string app_uuid = 4;
     repeated Funnel funnel = 5;
     repeated Campaign campaign = 6;
+    repeated BtnTime btn_time = 7;
 }
 message Funnel {
     int32 id = 1;
@@ -40,6 +41,11 @@ message Campaign {
     int32 id = 1;
     string name = 2;
     string prefix = 3;
+}
+message BtnTime {
+    int32 id = 1;
+    string name = 2;
+    string btn_name = 3;
 }
 
 message UpdateCfgResponse {

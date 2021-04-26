@@ -27,12 +27,17 @@ func (api API) HandlerAppUpdateConfig(w http.ResponseWriter, r *http.Request) {
 			ID         int32  `json:"id"`
 			Name       string `json:"name"`
 			Transition string `json:"transition"`
-		} `json:"funnel, omitempty"`
+		} `json:"funnel"`
 		Campaign []struct {
 			ID     int32  `json:"id"`
 			Name   string `json:"name"`
 			Prefix string `json:"prefix"`
-		} `json:"campaign, omitempty"`
+		} `json:"campaign"`
+		BtnTime []struct {
+			ID      int32  `json:"id"`
+			Name    string `json:"name"`
+			BtnName string `json:"btn_name"`
+		} `json:"btn_time"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
 		logrus.Errorf("<%s>[api.HandlerAppUpdateConfig] could not decode r.Body: %v\n", ctx_value.GetString(r.Context(), "tracingID"), err)
@@ -48,44 +53,31 @@ func (api API) HandlerAppUpdateConfig(w http.ResponseWriter, r *http.Request) {
 	// updateFlag can be "funnel", "campaign" or "*" (update all)
 	updateFlag := api.getQuery(r.URL, "resource")
 
-	var funnel []*appSrv.Funnel
-	var campaign []*appSrv.Campaign
-	switch updateFlag {
-	case "funnel":
-		funnel = make([]*appSrv.Funnel, len(payload.Funnel))
-		for i, item := range payload.Funnel {
-			funnel[i] = &appSrv.Funnel{
-				Id:         item.ID,
-				Name:       item.Name,
-				Transition: item.Transition,
-			}
+	var funnel = make([]*appSrv.Funnel, len(payload.Funnel))
+	for i, item := range payload.Funnel {
+		funnel[i] = &appSrv.Funnel{
+			Id:         item.ID,
+			Name:       item.Name,
+			Transition: item.Transition,
 		}
-	case "campaign":
-		campaign = make([]*appSrv.Campaign, len(payload.Campaign))
-		for i, item := range payload.Campaign {
-			campaign[i] = &appSrv.Campaign{
-				Id:     item.ID,
-				Name:   item.Name,
-				Prefix: item.Prefix,
-			}
-		}
-	case "*": // could also be default case but can introduce unwanted bugs if pattern has type
-		for i, item := range payload.Funnel {
-			funnel[i] = &appSrv.Funnel{
-				Id:         item.ID,
-				Name:       item.Name,
-				Transition: item.Transition,
-			}
-		}
-		for i, item := range payload.Campaign {
-			campaign[i] = &appSrv.Campaign{
-				Id:     item.ID,
-				Name:   item.Name,
-				Prefix: item.Prefix,
-			}
-		}
-
 	}
+	var campaign = make([]*appSrv.Campaign, len(payload.Campaign))
+	for i, item := range payload.Campaign {
+		campaign[i] = &appSrv.Campaign{
+			Id:     item.ID,
+			Name:   item.Name,
+			Prefix: item.Prefix,
+		}
+	}
+	var btnTime = make([]*appSrv.BtnTime, len(payload.BtnTime))
+	for i, item := range payload.BtnTime {
+		btnTime[i] = &appSrv.BtnTime{
+			Id:      item.ID,
+			Name:    item.Name,
+			BtnName: item.BtnName,
+		}
+	}
+
 	resp, err := api.AppClient.UpdateCfg(r.Context(), &appSrv.UpdateCfgRequest{
 		Tracing_ID: ctx_value.GetString(r.Context(), "tracingID"),
 		CallerUuid: user.GetUuid(),
@@ -93,6 +85,7 @@ func (api API) HandlerAppUpdateConfig(w http.ResponseWriter, r *http.Request) {
 		AppUuid:    payload.AppUUID,
 		Funnel:     funnel,
 		Campaign:   campaign,
+		BtnTime:    btnTime,
 	})
 	if err != nil {
 		logrus.Errorf("<%s>[api.HandlerAppUpdateConfig] could not execute grpc call: %v\n", ctx_value.GetString(r.Context(), "tracingID"), err)
