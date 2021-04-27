@@ -1,5 +1,5 @@
 const platform = require('platform');
-
+const axios = require('axios');
 enum EVENT {
     HOVER_THEN_CLICK = 0,
     HOVER_THEN_LEFT,
@@ -7,28 +7,65 @@ enum EVENT {
     ELEMENT_CLICK,
 }
 
-export class DataKraken {
-
-    private APP_TOKEN: string
-    
+export class DataKraken {    
     private URL_RATE: number = 1000
     private URL_TIME: number = new Date().getTime()
     private CURRENT_URL: string = history.state.current
 
     private LAST_CLICK: number = new Date().getTime()
-    private btns: Array<string> =  ["checkout"]
+    private BTN_DEFS: Array<string> =  ["checkout"]
 
+    private WS_TICKET: string = ""
 
+    // TODO: struct how the init of the class must look like when to init the session, the web socket
+    // the event listener
     constructor(app_token: string) {
-        this.APP_TOKEN = app_token
-        this.attach("mouseover", this.onHover)
+
+        // if (!this.sayHello(app_token))
+        //     return
+        
+        // connect to web socket thou
+        console.log(this.getCampaign())
         this.attach("click", this.onClick)
+        this.attach("mouseover", this.onHover)
         this.urlListener()
-        console.log(this.getDevice())
+
+        // this.APP_TOKEN = app_token
+        // this.attach("mouseover", this.onHover)
+        // this.attach("click", this.onClick)
+        // this.urlListener()
+        // console.log(this.getDevice())
     }
 
-
-
+    // sayHello initializes the client session passing basic client information to the
+    // server. If a cookie is present it will get send along the request else the server
+    // assigns a new cookie (also indicating that the client is new). The session start is handled
+    // server-side. If the authentication succeeds the response will hole the web-socket ticket to establish 
+    // the web-socket connection further, the response holds meat-data such as button-definitions.
+    // If the authentication fails or the server fails respond (including re-tries) the function returns a -1
+    // indicating to not do anything further.
+    private sayHello(token: string): boolean {
+        const opts = {
+            headers: {
+                "x-datalab-token": token
+            }
+        }
+        axios.post("http://localhost:8004/api/v1/hello", {
+            referrer: this.getReferrer(),
+            meta: this.getDevice(),
+        }, opts).then((res: any) => {
+            if (res.status != 200)
+                return false
+            const data: any = res.data
+            this.BTN_DEFS = data.btn_defs
+            this.WS_TICKET = data.ticket
+            return true
+        }).catch((err: any) => {
+            console.log(err)
+            // TODO: what should happen on-error. Re-Tries? How Many?
+        })
+        return false
+    }
 
     // functions for events
     // events:
@@ -50,6 +87,17 @@ export class DataKraken {
         if (document.referrer === "")
             return null
         return document.referrer
+    }
+
+    // getCampaign returns the value of the URL-Query("campaign") if not present returns null
+    private getCampaign(): any {
+        const url = new URL(document.location.href);
+        const params = new URLSearchParams(url.search.slice(1));
+        
+        if (params.has("campaign")) {
+            return params.get("campaign")
+        }
+        return null
     }
 
     // urlListener periodically checks if the url has changed. If so it captures the
@@ -108,7 +156,7 @@ export class DataKraken {
     // }
     private onHover(event: any) {
         // lookup if target is listed as watcher
-        if (!this.btns.includes(event.target.name))
+        if (!this.BTN_DEFS.includes(event.target.name))
             return
         console.log(event)
         const event_start: number = new Date().getTime()
