@@ -37,7 +37,7 @@
 <script>
 
 import axios from 'axios';
-console.log("ref", document.referrer);
+
 export default {
   name: 'Login',
   data() {

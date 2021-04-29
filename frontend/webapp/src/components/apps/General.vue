@@ -57,59 +57,6 @@
                 </div>
             </div>
         </div>
-      <!-- <h2>App Details</h2>
-            <div class="view_component">
-                <div class="form-row">
-                    <div class="form-group col">
-                        <div class="form-row mb-2">
-                            <label for="">App Name</label>
-                            <input type="text" class="form-control" readonly name="" id="" :placeholder="app.name">
-                        </div>
-                    </div>
-                    <div class="form-group col">
-                        <label for="">App URL</label>
-                        <input v-model="appURL" type="text" class="form-control" name="" readonly id="app_url" :placeholder="app.URL">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group col">
-                        <label for="">App Description</label>
-                        <textarea readonly class="form-control" name="" id="app_desc" rows="2" :placeholder="app.description"></textarea>
-                    </div>
-                    <div class="form-group col">
-                        <label for="">App Settings</label>
-                        <ul class="tag-list">
-                            <li class="tag-standard" v-for="item in app.settings" :key="item">{{item}}</li>
-                        </ul>
-                    </div>
-                </div>
-            </div> -->
-            <!-- <hr> -->
-            <!-- <br>
-            <h1>Images for Mouse-Movements</h1>
-            <div class="view_component">
-                    <div class="img-upload d-flex justify-between">
-                        <div class="d-flex justift-between w-100">
-                            <div class="input-group mr-3 w-50">
-                                <input v-model="new_img_url" type="text" class="form-control" placeholder="URL for Image">
-                            </div>
-                            <div class="d-flex align-center">
-                                <label for="file-upload" class="custom-file-upload">Select File  📄</label>
-                                <input id="file-upload" type="file" accept="image/png, image/jpeg" enctype="multipart/form-data"/>
-                            </div>
-                        </div>
-                        <div class="">
-                            <button type="submit" class="btn btn-standard" @click="onUpload">Update images</button>
-                        </div>
-                    </div>
-                <hr>
-                <div class="img-grid">
-                    <div class="img-card">
-                        <img src="https://lh3.googleusercontent.com/proxy/l7r-8QDwkB07BJwYZ7tivKsKDqGwvhTcOriEyi3Cxh8gaW18_vU8OYpgBsKlIbSAqzZr5Ji2ZXtFopbUnDZ-zg6C4kDFOLe58fzQqMaAKhflp7r2-8v9NjHYjbeUA7n0To8Zo1E_YShTSux2wJCAkPfgfC7Mjw8CGzpuWpU" alt="">
-                        <input type="text" class="form-control" placeholder="app/products/iphones"/>
-                    </div>
-                </div>
-            </div> -->
     </div>
 </template>
 
@@ -137,7 +84,6 @@
         props: ['app', 'token_placeholder'],
         computed: {
             token() {
-                console.log(this.$props.app.app_token);
                 if (this.$props.app.app_token) {
                     return this.$props.app.app_token;
                 } 
@@ -148,7 +94,6 @@
                 },
             get_valid_till() {
                 const total = Math.abs(this.valid_hours - new Date()) / 1000;
-                console.log(total);
                 const hours = Math.floor( (total/(1000*60*60)) % 24 );
                 const days = Math.floor( total/(1000*60*60*24) );
                 return {days: days, hours: hours};
@@ -179,10 +124,7 @@
                     this.app_token = res.data.app_token;
                     this.$toast.success(res.data.msg);
                 }).catch(err => {
-                    if (err.response.status === 403) {
-                        this.$toast.error("Organization/AppName do not match")
-                    }
-                    console.log(err);
+                    this.$toast.warning(err.response.data.msg);
                 });
             },
             deleteApp(id) {

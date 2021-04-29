@@ -6,6 +6,7 @@ import (
 
 	appSrv "github.com/KonstantinGasser/datalab/protobuf/app_service"
 	"github.com/KonstantinGasser/datalab/utils/ctx_value"
+	"github.com/KonstantinGasser/required"
 	"github.com/sirupsen/logrus"
 )
 
@@ -25,6 +26,10 @@ func (api API) HandlerAppGenerateToken(w http.ResponseWriter, r *http.Request) {
 	}
 	if err := api.decode(r.Body, &payload); err != nil {
 		api.onError(w, errors.New("could not decode request body"), http.StatusBadRequest)
+		return
+	}
+	if err := required.Atomic(&payload); err != nil {
+		api.onError(w, errors.New("mandatory fields are missing"), http.StatusBadRequest)
 		return
 	}
 	resp, err := api.AppClient.GenerateToken(r.Context(), &appSrv.GenerateTokenRequest{

@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"net/http"
 
 	userSrv "github.com/KonstantinGasser/datalab/protobuf/user_service"
 	"github.com/KonstantinGasser/datalab/utils/ctx_value"
@@ -14,17 +15,17 @@ func (srv UserService) Authenticate(ctx context.Context, in *userSrv.Authenticat
 	ctx = ctx_value.AddValue(ctx, "tracingID", in.GetTracing_ID())
 	logrus.Infof("<%v>[userService.Authenticate] received request\n", ctx_value.GetString(ctx, "tracingID"))
 
-	status, authedUser, err := srv.user.Authenticate(ctx, srv.storage, in.GetUsername(), in.GetPassword())
+	authedUser, err := srv.user.Authenticate(ctx, srv.storage, in.GetUsername(), in.GetPassword())
 	if err != nil || authedUser == nil {
-		logrus.Errorf("<%v>[userService.Authenticate] could not authenticate user or authedUser is <nil>: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
+		logrus.Errorf("<%v>[userService.Authenticate] could not authenticate user or authedUser is <nil>: %v\n", ctx_value.GetString(ctx, "tracingID"), err.Error())
 		return &userSrv.AuthenticateResponse{
-			StatusCode: int32(status),
-			Msg:        "could not authenticate user",
+			StatusCode: err.Code(),
+			Msg:        err.Info(),
 			UserClaims: nil,
 		}, nil
 	}
 	return &userSrv.AuthenticateResponse{
-		StatusCode: int32(status),
+		StatusCode: http.StatusOK,
 		Msg:        "user is authenticated",
 		UserClaims: &userSrv.UserTokenClaim{
 			Uuid:       authedUser.UUID,

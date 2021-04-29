@@ -41,8 +41,8 @@ func (api API) HandlerAppDelete(w http.ResponseWriter, r *http.Request) {
 	})
 	if err != nil {
 		logrus.Errorf("<%v>[api.HandlerDeleteApp] could execute grpc.Delete %v\n", ctx_value.GetString(r.Context(), "tracingID"), err)
-		api.onError(w, errors.New("failed to delete app"), http.StatusInternalServerError)
+		api.onError(w, errors.New("could not delete app"), http.StatusInternalServerError)
 		return
 	}
-	api.onScucessJSON(w, map[string]interface{}{}, int(resp.GetStatusCode()))
+	api.onScucessJSON(w, map[string]interface{}{"msg": resp.GetMsg()}, int(resp.GetStatusCode()))
 }

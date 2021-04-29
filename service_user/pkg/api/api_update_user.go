@@ -31,10 +31,9 @@ func (srv UserService) Update(ctx context.Context, in *userSrv.UpdateRequest) (*
 		logrus.Errorf("<%v>[userService.Update] new user: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
 		return &userSrv.UpdateResponse{StatusCode: http.StatusBadRequest, Msg: "missing of mandatory field"}, nil
 	}
-	status, err := srv.user.Update(ctx, srv.storage, updatableUser)
-	if err != nil {
-		logrus.Errorf("<%v>[userService.Update] could not update user: %v\n", err)
-		return &userSrv.UpdateResponse{StatusCode: int32(status), Msg: "could not update user details"}, nil
+	if err := srv.user.Update(ctx, srv.storage, updatableUser); err != nil {
+		logrus.Errorf("<%v>[userService.Update] could not update user: %v\n", err.Error())
+		return &userSrv.UpdateResponse{StatusCode: err.Code(), Msg: err.Info()}, nil
 	}
-	return &userSrv.UpdateResponse{StatusCode: int32(status), Msg: "user details updated"}, nil
+	return &userSrv.UpdateResponse{StatusCode: http.StatusOK, Msg: "user details updated"}, nil
 }

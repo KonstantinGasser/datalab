@@ -169,14 +169,14 @@ export default {
             this.buttons_count = 1;
             return
         }
-        this.funnel = this.$props.app_config.funnel;
-        this.funnel_count = this.$props.app_config.funnel.length + 1;
+        this.funnel = this.$props.app_config.funnel ? this.$props.app_config?.funnel: [];
+        this.funnel_count = this.funnel.length + 1;
 
-        this.campaign = this.$props.app_config.campaign;
-        this.campaign_count = this.$props.app_config.campaign.length + 1;
+        this.campaign = this.$props.app_config.campaign ? this.$props.app_config?.campaign: [];
+        this.campaign_count = this.campaign.length + 1;
 
-        this.buttons = this.$props.app_config.btn_time;
-        this.buttons_count = this.$props.app_config.btn_time.length + 1;
+        this.buttons = this.$props.app_config.btn_time ? this.$props.app_config?.btn_time: [];
+        this.buttons_count = this.buttons.length + 1;
     },
     computed: {
     },

@@ -2,12 +2,12 @@ package app
 
 import (
 	"context"
-	"errors"
 	"net/http"
 	"sync"
 
 	appSrv "github.com/KonstantinGasser/datalab/protobuf/app_service"
 	userSrv "github.com/KonstantinGasser/datalab/protobuf/user_service"
+	"github.com/KonstantinGasser/datalab/service_app/pkg/errors"
 	"github.com/KonstantinGasser/datalab/service_app/pkg/storage"
 	"github.com/KonstantinGasser/datalab/utils/ctx_value"
 	"github.com/sirupsen/logrus"
@@ -17,7 +17,7 @@ import (
 
 // GetByID collects all the app details for a given appUUID
 // it fetches the user data for the owner and all members from the user-service
-func (app app) Get(ctx context.Context, storage storage.Storage, userService userSrv.UserClient, appUUID, callerUUID string) (int, *appSrv.ComplexApp, error) {
+func (app app) Get(ctx context.Context, storage storage.Storage, userService userSrv.UserClient, appUUID, callerUUID string) (*appSrv.ComplexApp, errors.ErrApi) {
 
 	// search for app_uuid where either owner_uuid or one of the members
 	// match the callerUUID else not permitted
@@ -43,9 +43,17 @@ func (app app) Get(ctx context.Context, storage storage.Storage, userService use
 	if err != nil {
 		// check if no results have been found
 		if err == mongo.ErrNoDocuments {
-			return http.StatusBadRequest, nil, errors.New("could not find any match")
+			return nil, errors.ErrAPI{
+				Status: http.StatusBadRequest,
+				Err:    err,
+				Msg:    "Could not find any App-Details for UUID",
+			}
 		}
-		return http.StatusInternalServerError, nil, err
+		return nil, errors.ErrAPI{
+			Status: http.StatusInternalServerError,
+			Err:    err,
+			Msg:    "Could not get App-Details",
+		}
 	}
 	var funnelStages = make([]*appSrv.Funnel, len(queryData.Configurations.Funnel))
 	for i, item := range queryData.Configurations.Funnel {
@@ -147,5 +155,5 @@ func (app app) Get(ctx context.Context, storage storage.Storage, userService use
 		logrus.Errorf("<%v>[app.GetApp] could not get owner user data:%v\n", ctx_value.GetString(ctx, "tracingID"), ownerErr)
 	}
 
-	return http.StatusOK, appData, nil
+	return appData, nil
 }

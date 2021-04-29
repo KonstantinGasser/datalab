@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"net/http"
 	"strings"
 
 	appSrv "github.com/KonstantinGasser/datalab/protobuf/app_service"
@@ -15,13 +16,12 @@ func (srv AppService) Delete(ctx context.Context, in *appSrv.DeleteRequest) (*ap
 	logrus.Infof("<%v>[appService.DeleteApp] received request\n", ctx_value.GetString(ctx, "tracingID"))
 
 	orgnAndApp := strings.Join([]string{in.GetOrgnName(), in.GetAppName()}, "/")
-	status, err := srv.app.Delete(ctx, srv.storage, in.GetAppUuid(), in.GetCallerUuid(), orgnAndApp)
-	if err != nil {
-		logrus.Errorf("<%v>[appService.DeleteApp] could not delete app: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
-		return &appSrv.DeleteResponse{StatusCode: int32(status), Msg: err.Error()}, nil
+	if err := srv.app.Delete(ctx, srv.storage, in.GetAppUuid(), in.GetCallerUuid(), orgnAndApp); err != nil {
+		logrus.Errorf("<%v>[appService.DeleteApp] %v\n", ctx_value.GetString(ctx, "tracingID"), err.Error())
+		return &appSrv.DeleteResponse{StatusCode: err.Code(), Msg: err.Error()}, nil
 	}
 	return &appSrv.DeleteResponse{
-		StatusCode: int32(status),
+		StatusCode: http.StatusOK,
 		Msg:        "app has been deleted",
 	}, nil
 }

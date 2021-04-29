@@ -2,9 +2,10 @@ package storage
 
 import (
 	"context"
-	"fmt"
+	"net/http"
 	"reflect"
 
+	"github.com/KonstantinGasser/datalab/service_app/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -23,10 +24,16 @@ func (client mongoClient) FindMany(ctx context.Context, db, collection string, f
 
 	cur, err := coll.Find(ctx, filter)
 	if err != nil {
-		return err
+		return errors.ErrAPI{
+			Status: http.StatusInternalServerError,
+			Err:    err,
+		}
 	}
 	if err = cur.All(ctx, result); err != nil {
-		return err
+		return errors.ErrAPI{
+			Status: http.StatusInternalServerError,
+			Err:    err,
+		}
 	}
 	return nil
 }
@@ -42,9 +49,16 @@ func (client mongoClient) FindOne(ctx context.Context, db, collection string, fi
 		// Decode will return ErrNoDocuments if the query returns no result
 		// this is less an error but similar to io.EOF and means NoRecoredFound
 		if err == mongo.ErrNoDocuments {
-			return err
+			return errors.ErrAPI{
+				Status: http.StatusBadGateway,
+				Err:    err,
+				Msg:    "Could not find any document for request",
+			}
 		}
-		return fmt.Errorf("mongo client, could not decode FindOne result: %v", err)
+		return errors.ErrAPI{
+			Status: http.StatusInternalServerError,
+			Err:    err,
+		}
 	}
 	return nil
 }
@@ -59,14 +73,20 @@ func (client mongoClient) InsertOne(ctx context.Context, db, collection string, 
 	if reflect.ValueOf(query).Kind() == reflect.Struct {
 		data, err = bson.Marshal(query)
 		if err != nil {
-			return err
+			return errors.ErrAPI{
+				Status: http.StatusInternalServerError,
+				Err:    err,
+			}
 		}
 	}
 
 	coll := client.conn.Database(db).Collection(collection)
 	_, err = coll.InsertOne(ctx, data)
 	if err != nil {
-		return fmt.Errorf("mongo client, could not execute InsertOne: %v", err)
+		return errors.ErrAPI{
+			Status: http.StatusInternalServerError,
+			Err:    err,
+		}
 	}
 	return nil
 }
@@ -77,7 +97,10 @@ func (client mongoClient) DeleteOne(ctx context.Context, db, collection string, 
 	coll := client.conn.Database(db).Collection(collection)
 
 	if _, err := coll.DeleteOne(ctx, filter); err != nil {
-		return err
+		return errors.ErrAPI{
+			Status: http.StatusInternalServerError,
+			Err:    err,
+		}
 	}
 	return nil
 }
@@ -91,14 +114,20 @@ func (client mongoClient) UpdateOne(ctx context.Context, db, collection string, 
 	if reflect.ValueOf(query).Kind() == reflect.Struct {
 		data, err = bson.Marshal(query)
 		if err != nil {
-			return 0, err
+			return 0, errors.ErrAPI{
+				Status: http.StatusInternalServerError,
+				Err:    err,
+			}
 		}
 	}
 
 	coll := client.conn.Database(db).Collection(collection)
 	updated, err := coll.UpdateOne(ctx, filter, data, &options.UpdateOptions{Upsert: &upsert})
 	if err != nil {
-		return int(updated.ModifiedCount), err
+		return int(updated.ModifiedCount), errors.ErrAPI{
+			Status: http.StatusInternalServerError,
+			Err:    err,
+		}
 	}
 	return int(updated.ModifiedCount), nil
 }
@@ -115,7 +144,10 @@ func (client mongoClient) Exists(ctx context.Context, db, collection string, fil
 		if err == mongo.ErrNoDocuments {
 			return false, nil
 		}
-		return false, fmt.Errorf("mongo client, could not decode FindOne result: %v", err)
+		return false, errors.ErrAPI{
+			Status: http.StatusInternalServerError,
+			Err:    err,
+		}
 	}
 	if len(records) == 0 {
 		return false, nil

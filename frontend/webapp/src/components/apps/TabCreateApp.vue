@@ -133,9 +133,6 @@
                     this.$toast.error('App Description is required');
                     formValid = false;
                 }
-                if (this.appCfgs.length === 0) {
-                    this.$toast.warning("If no App Configs are set the app will not generate any data...");
-                }
                 
                 if (formValid) {
                     let options = {

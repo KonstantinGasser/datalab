@@ -45,10 +45,9 @@ func (srv UserService) Create(ctx context.Context, in *userSrv.CreateRequest) (*
 		logrus.Errorf("<%v>[userService.Create] new user: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
 		return &userSrv.CreateResponse{StatusCode: http.StatusBadRequest, Msg: "missing mandatory fields"}, nil
 	}
-	status, err := srv.user.Create(ctx, srv.storage, user)
-	if err != nil {
-		logrus.Errorf("<%v>[userService.Create] could not create user: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
-		return &userSrv.CreateResponse{StatusCode: int32(status), Msg: "could not create user"}, nil
+	if err := srv.user.Create(ctx, srv.storage, user); err != nil {
+		logrus.Errorf("<%v>[userService.Create] could not create user: %v\n", ctx_value.GetString(ctx, "tracingID"), err.Error())
+		return &userSrv.CreateResponse{StatusCode: err.Code(), Msg: err.Info()}, nil
 	}
-	return &userSrv.CreateResponse{StatusCode: int32(status), Msg: "user has been created"}, nil
+	return &userSrv.CreateResponse{StatusCode: http.StatusOK, Msg: "user has been created"}, nil
 }

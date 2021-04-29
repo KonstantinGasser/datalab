@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 
+	"github.com/KonstantinGasser/datalab/service_app/pkg/errors"
 	"github.com/KonstantinGasser/datalab/service_user/pkg/storage"
 )
 
@@ -16,22 +17,22 @@ const (
 
 type User interface {
 	// Create inserts a new user into the database
-	Create(ctx context.Context, storage storage.Storage, userItem UserItem) (int, error)
+	Create(ctx context.Context, storage storage.Storage, userItem UserItem) errors.ErrApi
 
 	// Authenticate verifies whether a user's credentials match with the ones stored in the database
-	Authenticate(ctx context.Context, storage storage.Storage, username, password string) (int, *UserItemAuth, error)
+	Authenticate(ctx context.Context, storage storage.Storage, username, password string) (*UserItemAuth, errors.ErrApi)
 
 	// Update updates a userItem in the database
-	Update(ctx context.Context, storage storage.Storage, userItem UserItemUpdateable) (int, error)
+	Update(ctx context.Context, storage storage.Storage, userItem UserItemUpdateable) errors.ErrApi
 
 	// GetAll collects all user details for all given UUIDs
-	GetAll(ctx context.Context, storage storage.Storage, UUIDs []string) (int, []UserItem, error)
+	GetAll(ctx context.Context, storage storage.Storage, UUIDs []string) ([]UserItem, errors.ErrApi)
 
 	// Get collects all user details for the given UUID
-	Get(ctx context.Context, storage storage.Storage, UUID string) (int, UserItem, error)
+	Get(ctx context.Context, storage storage.Storage, UUID string) (UserItem, errors.ErrApi)
 
 	// CompareOrgn compares users based on some indicator
-	CompareOrgn(ctx context.Context, storage storage.Storage, baseObject string, compareWith []string) (int, bool, []string, error)
+	CompareOrgn(ctx context.Context, storage storage.Storage, baseObject string, compareWith []string) (bool, []string, errors.ErrApi)
 }
 
 type user struct{}

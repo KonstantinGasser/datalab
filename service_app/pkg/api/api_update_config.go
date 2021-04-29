@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"net/http"
 
 	appSrv "github.com/KonstantinGasser/datalab/protobuf/app_service"
 	"github.com/KonstantinGasser/datalab/service_app/pkg/config"
@@ -13,12 +14,9 @@ func (srv AppService) UpdateCfg(ctx context.Context, in *appSrv.UpdateCfgRequest
 	ctx = ctx_value.AddValue(ctx, "tracingID", in.GetTracing_ID())
 	logrus.Infof("<%v>[appService.UpdateCfg] received request\n", ctx_value.GetString(ctx, "tracingID"))
 
-	status, ok, err := srv.app.HasPermissions(ctx, srv.storage, in.GetCallerUuid(), in.GetAppUuid())
-	if err != nil || !ok {
-		logrus.Warn("<%v>[appService.UpdateCfg] could not authorize request: %v - %v\n", ctx_value.GetString(ctx, "tracingID"), ok, err)
-		return &appSrv.UpdateCfgResponse{StatusCode: int32(status), Msg: "could not process request"}, nil
+	if err := srv.app.HasPermissions(ctx, srv.storage, in.GetCallerUuid(), in.GetAppUuid()); err != nil {
+		return &appSrv.UpdateCfgResponse{StatusCode: err.Code(), Msg: err.Info()}, nil
 	}
-
 	var funnel = []config.Stage{}
 	for _, item := range in.GetStages() {
 		funnel = append(funnel, config.Stage{
@@ -51,10 +49,9 @@ func (srv AppService) UpdateCfg(ctx context.Context, in *appSrv.UpdateCfgRequest
 		BtnTime:  btnTime,
 	}
 
-	status, err = srv.config.UpdateByFlag(ctx, srv.storage, cfg, in.GetUpdateFlag())
-	if err != nil {
-		logrus.Errorf("<%v>[appService.UpdateCfg] could not update config(s)\n", ctx_value.GetString(ctx, "tracingID"), err)
-		return &appSrv.UpdateCfgResponse{StatusCode: int32(status), Msg: "could not update configs"}, nil
+	if err := srv.app.UpdateConfig(ctx, srv.storage, cfg, in.GetUpdateFlag()); err != nil {
+		logrus.Errorf("<%v>[appService.UpdateCfg] could not update config(s)\n", ctx_value.GetString(ctx, "tracingID"), err.Error())
+		return &appSrv.UpdateCfgResponse{StatusCode: err.Code(), Msg: err.Info()}, nil
 	}
-	return &appSrv.UpdateCfgResponse{StatusCode: int32(status), Msg: "configs updated"}, nil
+	return &appSrv.UpdateCfgResponse{StatusCode: http.StatusOK, Msg: "configs updated"}, nil
 }

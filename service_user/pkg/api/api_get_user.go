@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"net/http"
 
 	userSrv "github.com/KonstantinGasser/datalab/protobuf/user_service"
 	"github.com/KonstantinGasser/datalab/utils/ctx_value"
@@ -14,16 +15,13 @@ func (srv UserService) Get(ctx context.Context, in *userSrv.GetRequest) (*userSr
 
 	logrus.Infof("<%v>[userService.GetUser] received request\n", ctx_value.GetString(ctx, "tracingID"))
 
-	status, user, err := srv.user.Get(ctx, srv.storage, in.GetForUuid())
+	user, err := srv.user.Get(ctx, srv.storage, in.GetForUuid())
 	if err != nil {
-		logrus.Errorf("<%v>[userService.GetUser] could not get user details: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
-		return &userSrv.GetResponse{StatusCode: int32(status), Msg: err.Error(), User: nil}, nil
-	}
-	if status != 200 {
-		return &userSrv.GetResponse{StatusCode: int32(status), Msg: err.Error(), User: nil}, nil
+		logrus.Errorf("<%v>[userService.GetUser] could not get user details: %v\n", ctx_value.GetString(ctx, "tracingID"), err.Error())
+		return &userSrv.GetResponse{StatusCode: err.Code(), Msg: err.Info(), User: nil}, nil
 	}
 	return &userSrv.GetResponse{
-		StatusCode: int32(status),
+		StatusCode: http.StatusOK,
 		Msg:        "requested user found",
 		User: &userSrv.ComplexUser{
 			Uuid:          user.UUID,

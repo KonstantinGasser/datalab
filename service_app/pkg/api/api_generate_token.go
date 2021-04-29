@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"net/http"
 	"strings"
 
 	appSrv "github.com/KonstantinGasser/datalab/protobuf/app_service"
@@ -14,14 +15,18 @@ func (srv AppService) GenerateToken(ctx context.Context, in *appSrv.GenerateToke
 	ctx = ctx_value.AddValue(ctx, "tracingID", in.GetTracing_ID())
 	logrus.Infof("<%v>[appService.GenerateToken] received request\n", ctx_value.GetString(ctx, "tracingID"))
 
+	if err := srv.app.HasPermissions(ctx, srv.storage, in.GetCallerUuid(), in.GetAppUuid()); err != nil {
+		return &appSrv.GenerateTokenResponse{StatusCode: err.Code(), Msg: err.Info()}, nil
+	}
+
 	orgnAndApp := strings.Join([]string{in.GetOrgnDomain(), in.GetAppName()}, "/")
-	status, appToken, err := srv.app.GetTokenClaims(ctx, srv.storage, srv.tokenService, in.GetAppUuid(), in.GetCallerUuid(), orgnAndApp)
+	appToken, err := srv.app.GetTokenClaims(ctx, srv.storage, srv.tokenService, in.GetAppUuid(), in.GetCallerUuid(), orgnAndApp)
 	if err != nil {
-		logrus.Errorf("<%v>[appService.GenerateToken] could not generate token: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
-		return &appSrv.GenerateTokenResponse{StatusCode: int32(status), Msg: "could not generate token", AppToken: ""}, nil
+		logrus.Errorf("<%v>[appService.GenerateToken] could not generate token: %v\n", ctx_value.GetString(ctx, "tracingID"), err.Error())
+		return &appSrv.GenerateTokenResponse{StatusCode: err.Code(), Msg: err.Info(), AppToken: ""}, nil
 	}
 	return &appSrv.GenerateTokenResponse{
-		StatusCode: int32(status),
+		StatusCode: http.StatusOK,
 		Msg:        "app token created",
 		AppToken:   appToken,
 	}, nil

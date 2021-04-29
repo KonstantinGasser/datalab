@@ -31,13 +31,12 @@ func (srv AppService) AddMember(ctx context.Context, in *appSrv.AddMemberRequest
 		return &appSrv.AddMemberResponse{StatusCode: int32(http.StatusBadRequest), Msg: "all member must be from owner orgn"}, nil
 	}
 
-	status, err := srv.app.AddMember(ctx, srv.storage, in.GetCallerUuid(), in.GetAppUuid(), in.GetMember())
-	if err != nil {
-		logrus.Errorf("<v>[appService.AddMember] could not add member to app: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
-		return &appSrv.AddMemberResponse{StatusCode: int32(status), Msg: "could not add member(s) to app"}, nil
+	if err := srv.app.AddMember(ctx, srv.storage, in.GetCallerUuid(), in.GetAppUuid(), in.GetMember()); err != nil {
+		logrus.Errorf("<v>[appService.AddMember] %v\n", ctx_value.GetString(ctx, "tracingID"), err.Error())
+		return &appSrv.AddMemberResponse{StatusCode: err.Code(), Msg: "could not add member(s) to app"}, nil
 	}
 	return &appSrv.AddMemberResponse{
-		StatusCode: int32(status),
+		StatusCode: http.StatusOK,
 		Msg:        "added member(s) to app",
 	}, nil
 }

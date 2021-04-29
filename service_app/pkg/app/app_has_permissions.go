@@ -2,14 +2,16 @@ package app
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
+	"github.com/KonstantinGasser/datalab/service_app/pkg/errors"
 	"github.com/KonstantinGasser/datalab/service_app/pkg/storage"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
 // HasPermissions verifies that a given caller of a request is indeed allowed to retrieve or modify the passed app data
-func (app app) HasPermissions(ctx context.Context, storage storage.Storage, callerUUID, appUUID string) (int, bool, error) {
+func (app app) HasPermissions(ctx context.Context, storage storage.Storage, callerUUID, appUUID string) errors.ErrApi {
 	filter := bson.D{
 		{
 			Key: "$and",
@@ -21,7 +23,18 @@ func (app app) HasPermissions(ctx context.Context, storage storage.Storage, call
 	}
 	ok, err := storage.Exists(ctx, appDatabase, appCollection, filter)
 	if err != nil {
-		return http.StatusInternalServerError, false, err
+		return errors.ErrAPI{
+			Status: http.StatusInternalServerError,
+			Err:    err,
+			Msg:    "Could not authorize request",
+		}
 	}
-	return http.StatusOK, ok, nil
+	if !ok {
+		return errors.ErrAPI{
+			Status: http.StatusUnauthorized,
+			Err:    fmt.Errorf("caller has no permissions for this resource"),
+			Msg:    "Missing permissions for action",
+		}
+	}
+	return nil
 }

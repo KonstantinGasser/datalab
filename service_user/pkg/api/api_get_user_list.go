@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"net/http"
 
 	userSrv "github.com/KonstantinGasser/datalab/protobuf/user_service"
 	"github.com/KonstantinGasser/datalab/utils/ctx_value"
@@ -14,10 +15,10 @@ func (srv UserService) GetList(ctx context.Context, in *userSrv.GetListRequest) 
 
 	logrus.Infof("<%v>[userService.GetUserList] received request\n", ctx_value.GetString(ctx, "tracingID"))
 
-	status, userList, err := srv.user.GetAll(ctx, srv.storage, in.GetUuidList())
+	userList, err := srv.user.GetAll(ctx, srv.storage, in.GetUuidList())
 	if err != nil {
-		logrus.Errorf("<%v>[userService.GetUserList] could not execute GetByIDs: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
-		return &userSrv.GetListResponse{StatusCode: int32(status), Msg: "Could not get users information", UserList: []*userSrv.ComplexUser{}}, nil
+		logrus.Errorf("<%v>[userService.GetUserList] could not execute GetByIDs: %v\n", ctx_value.GetString(ctx, "tracingID"), err.Error())
+		return &userSrv.GetListResponse{StatusCode: err.Code(), Msg: err.Info(), UserList: []*userSrv.ComplexUser{}}, nil
 	}
 	// convert found userList to grpc User slice
 	var users []*userSrv.ComplexUser = make([]*userSrv.ComplexUser, len(userList))
@@ -33,7 +34,7 @@ func (srv UserService) GetList(ctx context.Context, in *userSrv.GetListRequest) 
 		}
 	}
 	return &userSrv.GetListResponse{
-		StatusCode: int32(status),
+		StatusCode: http.StatusOK,
 		Msg:        "users record by uuids",
 		UserList:   users,
 	}, nil

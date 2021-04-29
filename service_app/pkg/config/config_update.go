@@ -5,20 +5,13 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/KonstantinGasser/datalab/service_app/pkg/errors"
 	"github.com/KonstantinGasser/datalab/service_app/pkg/storage"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-// InitOnNew initializes all required configurations in the database and maps them to the newly created
-// app
-// func (cfg config) InitOnNew(ctx context.Context, storage storage.Storage, refApp string) error {
-
-// 	if err := storage.InsertOne(ctx, cfgDatabase, funnelCollection, funnel)
-// 	return nil
-// }
-
-// Upsert updates the app configurations based on the updateFlag.
-func (cfg config) UpdateByFlag(ctx context.Context, storage storage.Storage, changes Cfgs, updateFlag string) (int, error) {
+// UpdateByFlag updates the app configurations based on the updateFlag.
+func UpdateByFlag(ctx context.Context, storage storage.Storage, changes Cfgs, updateFlag string) errors.ErrApi {
 	var err error
 	switch updateFlag {
 	case "funnel":
@@ -43,10 +36,18 @@ func (cfg config) UpdateByFlag(ctx context.Context, storage storage.Storage, cha
 			},
 		}, false)
 	default:
-		return http.StatusBadRequest, fmt.Errorf("invalid update-flag: %s", updateFlag)
+		return errors.ErrAPI{
+			Status: http.StatusBadRequest,
+			Err:    fmt.Errorf("invalid update-flag: %s", updateFlag),
+			Msg:    "Provided config flag is invalid",
+		}
 	}
 	if err != nil {
-		return http.StatusInternalServerError, err
+		return errors.ErrAPI{
+			Status: http.StatusInternalServerError,
+			Err:    err,
+			Msg:    "Could not update config(s)",
+		}
 	}
-	return http.StatusOK, nil
+	return nil
 }

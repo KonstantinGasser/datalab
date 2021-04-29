@@ -48,5 +48,5 @@ func (api API) HandlerAccountUpdate(w http.ResponseWriter, r *http.Request) {
 		api.onError(w, errors.New("could not update user account"), http.StatusInternalServerError)
 		return
 	}
-	api.onScucessJSON(w, map[string]interface{}{"msg": "account updated"}, int(resp.GetStatusCode()))
+	api.onScucessJSON(w, map[string]interface{}{"msg": resp.GetMsg()}, int(resp.GetStatusCode()))
 }

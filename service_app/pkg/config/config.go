@@ -1,11 +1,5 @@
 package config
 
-import (
-	"context"
-
-	"github.com/KonstantinGasser/datalab/service_app/pkg/storage"
-)
-
 const (
 	// MongoDB database name
 	cfgDatabase = "datalab_app"
@@ -13,15 +7,16 @@ const (
 	appcfgColl = "app"
 )
 
-type Config interface {
-	UpdateByFlag(ctx context.Context, storage storage.Storage, cfg Cfgs, updateFlag string) (int, error)
-}
+// type Config interface {
+// 	UpdateByFlag(ctx context.Context, storage storage.Storage, cfg Cfgs, updateFlag string) (int, error)
+// 	HasConfig(ctx context.Context, storage storage.Storage, appUUID string) error
+// }
 
-type config struct{}
+// type config struct{}
 
-func NewConfig() Config {
-	return &config{}
-}
+// func NewConfig() Config {
+// 	return &config{}
+// }
 
 type Cfgs struct {
 	RefApp   string

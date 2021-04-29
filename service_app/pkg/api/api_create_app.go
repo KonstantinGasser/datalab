@@ -39,13 +39,12 @@ func (srv AppService) Create(ctx context.Context, in *appSrv.CreateRequest) (*ap
 		logrus.Errorf("<%v>[appService.CreateApp] %v\n", ctx_value.GetString(ctx, "tracingID"), err)
 		return &appSrv.CreateResponse{StatusCode: http.StatusBadRequest, Msg: "mandatory fields missing"}, nil
 	}
-	status, err := srv.app.Create(ctx, srv.storage, appItem)
-	if err != nil {
-		logrus.Errorf("<%v>[appService.CreateApp] could not create app: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
-		return &appSrv.CreateResponse{StatusCode: int32(status), Msg: err.Error()}, nil
+	if err := srv.app.Create(ctx, srv.storage, appItem); err != nil {
+		logrus.Errorf("<%v>[appService.CreateApp] %v\n", ctx_value.GetString(ctx, "tracingID"), err.Error())
+		return &appSrv.CreateResponse{StatusCode: err.Code(), Msg: err.Error()}, nil
 	}
 	return &appSrv.CreateResponse{
-		StatusCode: int32(status),
+		StatusCode: http.StatusOK,
 		Msg:        "app has been created",
 		AppUuid:    appUUID,
 	}, nil

@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -13,6 +14,13 @@ const (
 	// time to wait for service to connect to MongoDB
 	connectTimeout = time.Second * 10
 	collectTimeout = time.Second * 10
+)
+
+var (
+	ErrDocExists    = errors.New("requested document exists")
+	ErrInsertFailed = errors.New("\"insert\" of data failed")
+	ErrFindeFailed  = errors.New("\"find\" document failed")
+	ErrUpdateFailed = errors.New("\"update\" of document failed")
 )
 
 // Storage is the api def to speak with the mongoDB
