@@ -12,21 +12,21 @@ import (
 )
 
 // Run is a run-abstraction for the main func
-func Run(ctx context.Context, addr string) error {
+func Run(ctx context.Context, host, dbAddr string) error {
 	srv := grpc.NewServer()
 
 	// create new UserService
 	// database dependency to mongoDB
-	mongoC := storage.NewMongoClient("mongodb://userDB:secure@192.168.0.179:27017")
+	mongoC := storage.NewMongoClient(dbAddr)
 	userService := api.NewUserService(mongoC)
 
 	// register grpc server to service
 	userSrv.RegisterUserServer(srv, userService)
-	listener, err := net.Listen("tcp", addr)
+	listener, err := net.Listen("tcp", host)
 	if err != nil {
-		logrus.Fatalf("[server.Run] cloud not listen to %s: %v", addr, err)
+		logrus.Fatalf("[server.Run] cloud not listen to %s: %v", host, err)
 	}
-	logrus.Infof("[server.Run] listening on %s\n", addr)
+	logrus.Infof("[server.Run] listening on %s\n", host)
 
 	err = srv.Serve(listener)
 	// if context gets canceled in main (invoked by some SIG)

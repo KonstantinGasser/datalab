@@ -116,6 +116,24 @@ EVENT: MOUSEMOVE<br>
     }
 }
 ```
+
+## Docker-Swarm deployment
+### CI/CD Pipe
+The swarm lives on a Raspberry-PI4 (linux/arm64) consisting out of one node.
+Each service (api,app,user,token,frontend) have their own `Makefile` with the `deploy` target. `make deploy` cross-compilies the executable for `linux/arm64` and builds a docker image also with cross-compilation for `linux/arm64`. Docker cross-compilation is achieved with the `docker buildx build` tool from docker which allows to build images on your local machine for a different OS/Arch. After the build `deploy` pushes the image to the `datalab-registry.dev:5000/<image-name>:<git-commit-hash>` which lives within the `swarm`. From their services can pull the latest images.
+
+## Service - DNS Table
+| Service    | swarm-name   | port in:out | credentials        |
+|------------|--------------|-------------|--------------------|
+| gateway    | gateway      | 8080:8080   |                    |
+| app        | appservice   | 8003:8003   |                    |
+| user       | userservice  | 8001:8001   |                    |
+| token      | tokenservice | 8002:8002   |                    |
+| frontend   | vuefrontend  | 80:80       |                    |
+| mongo-app  | mongoapp     | 27018       | appstorage:secure  |
+| monog-user | mongouser    | 27017       | userstorage:secure |
+
+
 # So fare...
  
 ![](git-resources/demo_img_1.png)

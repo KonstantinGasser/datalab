@@ -6,4 +6,8 @@ COPY ./bin/service .
 
 EXPOSE 8080
 
-CMD ["/usr/bin/service"]
+ENTRYPOINT ["/usr/bin/service", \ 
+                "-host=:8080", \ 
+                "-user-srv=userservice:8001", \  
+                "-app-srv=appservice:8003", \
+                "-token-srv=tokenservice:8002"]

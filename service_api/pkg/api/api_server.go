@@ -11,24 +11,29 @@ import (
 	appSrv "github.com/KonstantinGasser/datalab/protobuf/app_service"
 	tokenSrv "github.com/KonstantinGasser/datalab/protobuf/token_service"
 	userSrv "github.com/KonstantinGasser/datalab/protobuf/user_service"
-	"github.com/KonstantinGasser/datalab/service_api/pkg/grpcC"
 	"github.com/sirupsen/logrus"
 )
 
 const (
-	// AccessControlAllowOrigin describes the allowed request origins
-	AccessControlAllowOrigin = "Access-Control-Allow-Origin"
-	// AccessControlAllowMethods describes the methods allowed by this API
-	AccessControlAllowMethods = "Access-Control-Allow-Methods"
-	// AccessControlAllowHeader describes a header -> ???
-	AccessControlAllowHeader = "Access-Control-Allow-Headers"
+	// accessControlAllowOrigin describes the allowed request origins
+	accessControlAllowOrigin = "Access-Control-Allow-Origin"
+	// accessControlAllowMethods describes the methods allowed by this API
+	accessControlAllowMethods = "Access-Control-Allow-Methods"
+	// accessControlAllowHeader describes a header -> ???
+	accessControlAllowHeader = "Access-Control-Allow-Headers"
 )
 
 // API represents the handler functions and middleware
 type API struct {
-	// Config holds information about
-	// how to handle CORS
-	cors CORSConfig
+	// accessOrigin refers to the AccessControlAllowOrigin Header
+	// which can be set in a request
+	accessOrigin string
+	// accessMethods refers to the AccessControlAllowMethods Header
+	// which can be set in a request
+	accessMethods string
+	// accessHeader refers to the AccessControlAllowHeader Header
+	// which can be set in a request
+	accessHeader string
 	// Route is a mapper between requested URL and handler
 	// allows to add middleware in a nice chained way
 	route func(path string, h http.HandlerFunc)
@@ -44,18 +49,27 @@ type API struct {
 	AppClient      appSrv.AppClient
 }
 
-// CORSConfig specifies it CORS policy of the API-Server
-type CORSConfig struct {
-	Cfgs []struct {
-		Header, Value string
+type ApiConfig func(api *API)
+
+// WithAccessControlOrigin allows to set a custom header for
+// "Access-Control-Allow-Origin": API default is "*"
+func (api *API) WithAccessControlOrigin(opt string) func(api *API) {
+	return func(api *API) {
+		api.accessOrigin = opt
 	}
 }
 
-// New create and returns a new API struct
-func New(cors CORSConfig) API {
-	return API{
-		// CORS specification
-		cors: cors,
+// NewNewDefault create and returns a new API struct
+// A new API will hold following default values for the CORS-Configurations
+// - AccessControlAllowOrigin: "*"
+// - AccessControlAllowMethods: "GET,POST,OPTIONS"
+// - AccessControlAllowHeader: "*"
+func NewDefault(user userSrv.UserClient, app appSrv.AppClient, token tokenSrv.TokenClient) *API {
+	return &API{
+		// accessOrigin's default value will be "*" allowing ALL origins
+		accessOrigin:  "*",
+		accessMethods: "GET,POST,OPTIONS",
+		accessHeader:  "*",
 		// route is a custom function allowing to set path and request handler
 		// for a given route (similar to the http.HandlerFunc). However having it
 		// customs allows to do middleware in a nicer way
@@ -73,18 +87,23 @@ func New(cors CORSConfig) API {
 				w.Write([]byte(`{"status_code": 500, "msg": "an error occurred"}`))
 				return
 			}
-			return
 		},
 		// onError is a custom function returning a given error back as response.
 		// This way code duplication can be avoided
 		onError: func(w http.ResponseWriter, err error, status int) {
 			http.Error(w, err.Error(), status)
-			return
 		},
 		// *** Client Dependencies ***
-		UserClient:     grpcC.NewUserClient(":8001"),
-		TokenSrvClient: grpcC.NewTokenClient(":8002"),
-		AppClient:      grpcC.NewAppClient(":8003"),
+		UserClient:     user,
+		AppClient:      app,
+		TokenSrvClient: token,
+	}
+}
+
+// Apply applies an API-CORS configuration on the API instance
+func (api *API) Apply(opts ...ApiConfig) {
+	for _, opt := range opts {
+		opt(api)
 	}
 }
 

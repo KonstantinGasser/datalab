@@ -4,6 +4,7 @@ WORKDIR /usr/bin
 
 COPY ./bin/service .
 
-EXPOSE 8003
+EXPOSE 8002
 
-CMD ["/usr/bin/service"]
+ENTRYPOINT ["/usr/bin/service", \
+                "-host=:8002"]

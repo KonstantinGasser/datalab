@@ -5,7 +5,6 @@ import (
 	"errors"
 	"time"
 
-	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -41,19 +40,17 @@ type Storage interface {
 }
 
 // New returns a new mongoDB client implementing the Storage interface
-func New(connString string) Storage {
+func New(connString string) (Storage, error) {
 	opts := options.Client().ApplyURI(connString)
 
 	ctx, cancel := context.WithTimeout(context.Background(), connectTimeout)
 	defer cancel()
 	conn, err := mongo.Connect(ctx, opts)
 	if err != nil {
-		logrus.Errorf("[storage.New] could not connect to mongoDB: %v\n", err)
-		return nil
+		return nil, err
 	}
 	if err := conn.Ping(context.TODO(), nil); err != nil {
-		logrus.Errorf("[storage.New] could not ping mongoDB: %v\n", err)
-		return nil
+		return nil, err
 	}
-	return &mongoClient{conn: conn}
+	return &mongoClient{conn: conn}, nil
 }

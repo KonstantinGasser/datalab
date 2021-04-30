@@ -5,7 +5,6 @@ import (
 	tokenSrv "github.com/KonstantinGasser/datalab/protobuf/token_service"
 	userSrv "github.com/KonstantinGasser/datalab/protobuf/user_service"
 	"github.com/KonstantinGasser/datalab/service_app/pkg/app"
-	"github.com/KonstantinGasser/datalab/service_app/pkg/grpcC"
 	"github.com/KonstantinGasser/datalab/service_app/pkg/storage"
 )
 
@@ -18,15 +17,12 @@ type AppService struct {
 	tokenService tokenSrv.TokenClient
 }
 
-func NewAppServer(storage storage.Storage) AppService {
-	app := app.NewApp()
-	userService := grpcC.NewUserClient(":8001")
-	tokenService := grpcC.NewTokenClient(":8002")
+func NewAppServer(store storage.Storage, user userSrv.UserClient, token tokenSrv.TokenClient) AppService {
 	return AppService{
-		storage:      storage,
-		app:          app,
-		userService:  userService,
-		tokenService: tokenService,
+		storage:      store,
+		app:          app.NewApp(),
+		userService:  user,
+		tokenService: token,
 	}
 }
 

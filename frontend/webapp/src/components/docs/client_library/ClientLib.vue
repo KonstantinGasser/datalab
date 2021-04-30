@@ -21,7 +21,7 @@ export default {
         },
     },
     created() {
-        axios.get("http://localhost:8000/markdown/client_lib.md", {
+        axios.get("http://192.168.0.177:8000/markdown/client_lib.md", {
             headers: {
                 // "Cache-Control": "no-cache,max-age=0"
             }

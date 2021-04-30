@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-	address := flag.String("listen-addr", ":8002", "address to run the server on")
+	host := flag.String("host", "localhost:8002", "address to run the server on")
 	flag.Parse()
 
 	// SIG chan to handle interruptions and so on...
@@ -27,5 +27,5 @@ func main() {
 		time.Sleep(time.Second * 1)
 		os.Exit(0)
 	}()
-	logrus.Fatal(server.Run(ctx, *address))
+	logrus.Fatal(server.Run(ctx, *host))
 }

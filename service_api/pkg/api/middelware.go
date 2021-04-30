@@ -21,9 +21,12 @@ const (
 func (api API) WithCors(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// loop over CORS-Config and set headers
-		for _, item := range api.cors.Cfgs {
-			w.Header().Set(item.Header, item.Value)
-		}
+		// for _, item := range api.cors.Cfgs {
+		// 	w.Header().Set(item.Header, item.Value)
+		// }
+		w.Header().Set(accessControlAllowOrigin, api.accessOrigin)
+		w.Header().Set(accessControlAllowMethods, api.accessMethods)
+		w.Header().Set(accessControlAllowHeader, api.accessHeader)
 		// return status OK if requested method is OPTIONS
 		// (used to do pre-flights from browser with POST request)
 		if r.Method == "OPTIONS" {

@@ -13,7 +13,11 @@ import (
 )
 
 func main() {
-	address := flag.String("listen-addr", ":8003", "address to run the server on")
+	host := flag.String("host", "localhost:8003", "address to run the server on")
+	userAddr := flag.String("user-srv", "localhost:8001", "address to connect to user-service")
+	tokenAddr := flag.String("token-srv", "localhost:8002", "address to connect to token-service")
+	dbAddr := flag.String("db-srv", "mongodb://appstorage:secure@192.168.0.177:27018", "address to connect to app-database")
+
 	flag.Parse()
 
 	// SIG chan to handle interruptions and so on...
@@ -27,5 +31,5 @@ func main() {
 		time.Sleep(time.Second * 1)
 		os.Exit(0)
 	}()
-	logrus.Fatal(server.Run(ctx, *address))
+	logrus.Fatal(server.Run(ctx, *host, *userAddr, *tokenAddr, *dbAddr))
 }

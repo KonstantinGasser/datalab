@@ -5,27 +5,33 @@ import (
 	"net/http"
 
 	"github.com/KonstantinGasser/datalab/service_api/pkg/api"
+	"github.com/KonstantinGasser/datalab/service_api/pkg/grpcC"
 	"github.com/sirupsen/logrus"
 )
 
 // Run acts as a run abstraction to start the HTTP-Server
 // and can return an error - which is nice when called
 // from main
-func Run(ctx context.Context, address string) error {
-	// creating new api with configs for CORS settings
-	// due to the pre-flight call via OPTIONS from the browser
-	// setting of allowed-origin, allowed-methods, and allowed-headers
-	// is required
-	srv := api.New(api.CORSConfig{
-		Cfgs: []struct {
-			Header string
-			Value  string
-		}{
-			{Header: api.AccessControlAllowOrigin, Value: "http://localhost:3000"},
-			{Header: api.AccessControlAllowMethods, Value: "GET,POST, OPTIONS"},
-			{Header: api.AccessControlAllowHeader, Value: "*"},
-		},
-	})
+func Run(ctx context.Context, hostAddr, userAddr, appAddr, tokenAddr string) error {
+	// create api dependencies
+	userClient, err := grpcC.NewUserClient(userAddr)
+	if err != nil {
+		logrus.Fatalf("[api.Dependency] could not establish gRPC connection to User-Service:\n\t%v", err)
+	}
+	appClient, err := grpcC.NewAppClient(appAddr)
+	if err != nil {
+		logrus.Fatalf("[api.Dependency] could not establish gRPC connection to App-Service:\n\t%v", err)
+	}
+	tokenClient, err := grpcC.NewTokenClient(tokenAddr)
+	if err != nil {
+		logrus.Fatalf("[api.Dependency] could not establish gRPC connection to Token-Service:\n\t%v", err)
+	}
+	logrus.Info("[api.Dependency] established connection to all services\n")
+	srv := api.NewDefault(userClient, appClient, tokenClient)
+	// override default CORS config for Access-Control-Allow-Origin
+	// TODO: change "*" to proper value once IP:PORT of frontend is clear
+	srv.Apply(srv.WithAccessControlOrigin("*"))
+
 	// route and middleware setup
 	srv.SetUp()
 
@@ -35,8 +41,8 @@ func Run(ctx context.Context, address string) error {
 		<-ctx.Done()
 		logrus.Infof("Server cleaning up...")
 	}()
-	logrus.Infof("[server.Run] listening on %s\n", address)
-	if err := http.ListenAndServe(address, nil); err != nil {
+	logrus.Infof("[server.Run] listening on %s\n", hostAddr)
+	if err := http.ListenAndServe(hostAddr, nil); err != nil {
 		return err
 	}
 	return nil
