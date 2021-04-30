@@ -1,9 +1,9 @@
-FROM golang:1.15
+FROM scratch
 
 WORKDIR /usr/bin
 
-COPY ./bin/service_user .
+COPY ./bin/service .
 
 EXPOSE 8001
 
-CMD ["/usr/bin/service_user"]
+CMD ["/usr/bin/service"]

@@ -1,9 +1,9 @@
-FROM golang:1.15
+FROM scratch
 
 WORKDIR /usr/bin
 
-COPY ./bin/service_api .
+COPY ./bin/service .
 
 EXPOSE 8080
 
-CMD ["/usr/bin/service_api"]
+CMD ["/usr/bin/service"]

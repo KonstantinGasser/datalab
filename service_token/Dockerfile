@@ -1,9 +1,9 @@
-FROM golang:1.15
+FROM scratch
 
 WORKDIR /usr/bin
 
-COPY ./bin/service_token .
+COPY ./bin/service .
 
 EXPOSE 8003
 
-CMD ["/usr/bin/service_token"]
+CMD ["/usr/bin/service"]
