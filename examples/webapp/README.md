@@ -52,9 +52,12 @@ func Run(serverAddress string) error {
 	// create new storage as api dep
 	storage := storage.New("in-memory")
 	// create API instance
-	api := api.New(userSrv, storage)
-	// setup routes and init API
-	api.SetUp()
+	apisrv := api.New(userSrv, storage)
+	apisrv.Apply(api.WithAllowedOrigins("http://localhost:3000"))
+	// add routes to the service as API-Endpoints
+	apisrv.AddRoute("/home", apisrv.HandlerHome, apisrv.WithCors, apisrv.GET)
+	apisrv.AddRoute("/register", apisrv.HandlerRegister, apisrv.WithCors, apisrv.POST)
+	apisrv.AddRoute("/login", apisrv.HandlerLogin, apisrv.WithCors, apisrv.POST)
 
 	log.Printf("starting HTTP-Server on: %s\n", serverAddress)
 	if err := http.Serve(listener, nil); err != nil {
@@ -64,37 +67,36 @@ func Run(serverAddress string) error {
 	return nil
 }
 ```
-First we create a network listener and advise to use "TCP" and the custom server address. Next we create all of the dependencies the API needs - here it is the `UserService` and the in-memory `Storage`. Lastly we start the server by saying
+First we create a network listener and advise to use "TCP" and the custom server address. Creating the `listener` allows us to `defer` the closing of the server when we shut it down. Next, we create all of the dependencies the API needs - here it is the `UserService` and the in-memory `Storage`. We then pass the dependencies to the API constructor to create an API-Server. On that server, we now have the option to override default settings like allowed Origins. To do so, we use the `apisrv.Apply` function, which takes an arbitrary number of Settings in the form of `func(*API)`. To add a new route to the server we use the `apisrv.AddRoute` function which takes a `route` a `http.HandlerFunc` and again an arbitrary number of configurations.
+Lastly, we start the server by saying
 `http.Serve(listener, nil)`.
 
 ## The API
 As for the API, it is a struct which defines the API behavior. Lets have a look at the examples API
 ``` golang
 type API struct {
-	route     func(path string, handler http.HandlerFunc)
 	onError   func(w http.ResponseWriter, code int, err error)
 	onSuccess func(w http.ResponseWriter, code int, data interface{})
 
+	// *** CORS-Configurations ***
+	allowedOrigins []string
+	allowedMethods []string
+	allowedHeaders []string
 	// *** Service Dependencies ***
 	userService user.User
 	// *** Storage Dependency ***
 	storage storage.Storage
 }
 ```
-Here `route` is a  custom function which adds an API-Route to the Web-Server - how that works will be shown below.
-The next two functions are useful in order to not repeat code over and over again. `onError` as the name suggest is used when the response must be an error and likewise the `onSuccess` can be used to return a positive response to the client.
-Both the function accept a `http.ResponseWriter` which is nothing else but the network connection to communicate with the client. Further the functions need a status code which will be returned and for the `onSuccess` function also some data that could be JSON or anything else which needs to be returned to the client.
-
-Lastly the API holds all its dependencies - in this case the UserService and a Storage (both are interfaces and therefore can be replaced by any struct implementing it).
+The two functions are useful in order to not repeat code over and over again. `onError` as the name suggests, is used when the response must be an error - likewise the `onSuccess` can be used to return a positive response to the client.
+Both the function accept a `http.ResponseWriter` which is nothing else but the network connection to communicate with the client. Further, the functions need a status code which will be returned and for the `onSuccess` function also some data that could be JSON or anything else which needs to be returned to the client.
+Next we have the default CORS-Configurations which can we can override with the `Apply` function.
+Lastly, the API holds all its dependencies - in this case, the UserService and a Storage (both are interfaces and therefore can be replaced by any struct implementing it).
 
 ### Creating a new API
 ``` golang
 func New(userService user.User, storage storage.Storage) API {
 	return API{
-		route: func(path string, handler http.HandlerFunc) {
-			log.Printf("[route-%s] mapped to web-server\n", path)
-			http.HandleFunc(path, handler)
-		},
 		onError: func(w http.ResponseWriter, code int, err error) {
 			w.WriteHeader(code)
 			w.Write([]byte(err.Error()))
@@ -106,6 +108,10 @@ func New(userService user.User, storage storage.Storage) API {
 				return
 			}
 		},
+		// *** CORS-Configurations ***
+		allowedOrigins: []string{"*"},
+		allowedMethods: []string{"GET", "POST", "OPTIONS"},
+		allowedHeaders: []string{"*"},
 		// *** Service Dependencies ***
 		userService: userService,
 		// *** Storage Dependency ***
@@ -113,18 +119,9 @@ func New(userService user.User, storage storage.Storage) API {
 	}
 }
 ```
-### Adding routes to the API
-``` golang
-func (api API) SetUp() {
-	api.route("/", api.HandlerHome)
-	api.route("/register", api.HandlerRegister)
-	api.route("/login", api.HandlerLogin)
-}
-```
-Routes can be added by calling the `api.route` function assigning a route and passing in a `http.HandlerFunc` which will handle the incoming request. Every function which has the method signature `HandlerFunc(w http.ResponseWriter, r *http.Request)` may serve as a `http.HandlerFunc` and can be used as value in `api.route`. As you can see the `SetUp` func starts with a capital `S` and will be accessible from outside the `package api` - it will be called in the `cmd/server/sever.go`.
 
 ## Storage dependency
-A good practice for creating a storage dependency is to first create a `interface` for it which allows to use different storages as required.
+A good practice for creating a storage dependency is to first create a `interface` for it, which allows the usage of a different storage, if required.
 ``` golang 
 type Storage interface {
 	Put(ctx context.Context, key string, value interface{}) error
@@ -193,7 +190,7 @@ func (api API) HandlerRegister(w http.ResponseWriter, r *http.Request) {
 	})
 }
 ```
-The first thing we do is declaring a variable (`reqData`) which will hold the request JSON. Notice that `reqData` is of type `user.RegisterRequest` and hence will bind the JSON fields. Next we use the API helper func `decode` to decode the request JSON into the `reqData` - important: notice how the `api.decode` is not returning any data? That is because we are passing in the pointer to the `reqData`. If you feel uncomfortable using pointers you could re-write the function to return the data..but make sure to learn about pointer since Go uses them in quite some places :). After we decoded the JSON data we can forward the request to the user service to perform the registration. The way I have implemented the user service functions their first return parameter will always be a status-code (200, 404, 401, 500) then optional data and lastly an error. If the operation fails I handle the error and let the client know by utilizing the `api.onError` function. If everything works the `api.onSuccess` is used to inform the client.
+The first thing we do is declaring a variable (`reqData`), which will hold the request JSON. Notice that `reqData` is of type `user.RegisterRequest` and hence, will bind to the JSON fields. Next, we use the API helper func `decode` to decode the request JSON into the `reqData` - important: notice how the `api.decode` is not returning any data? That is because we are passing in the pointer to the `reqData`. If you feel uncomfortable using pointer you could re-write the function to return the data. However, make sure to learn about pointer since Go uses them in quite some places :). After decoding the JSON data, we can forward the request to the user service to perform the registration. The way I have implemented the user service functions the first return parameter will always be a status-code (200, 404, 401, 500), then optional data and lastly an error. If the operation fails, I handle the error and let the client know by utilizing the `api.onError` function. If everything works, the `api.onSuccess` is used to inform the client.
 
 
 ## Example in action

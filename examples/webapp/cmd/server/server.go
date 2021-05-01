@@ -21,14 +21,17 @@ func Run(serverAddress string) error {
 		return err
 	}
 
-	// create new user-service as api dep
+	// create new user-service as api dependency
 	userSrv := user.New()
-	// create new storage as api dep
+	// create new storage as api dependency
 	storage := storage.New("in-memory")
 	// create API instance
-	api := api.New(userSrv, storage)
-	// setup routes and init API
-	api.SetUp()
+	apisrv := api.New(userSrv, storage)
+	apisrv.Apply(api.WithAllowedOrigins("http://localhost:3000"))
+	// add routes to the service as API-Endpoints
+	apisrv.AddRoute("/home", apisrv.HandlerHome, apisrv.WithCors, apisrv.GET)
+	apisrv.AddRoute("/register", apisrv.HandlerRegister, apisrv.WithCors, apisrv.POST)
+	apisrv.AddRoute("/login", apisrv.HandlerLogin, apisrv.WithCors, apisrv.POST)
 
 	log.Printf("starting HTTP-Server on: %s\n", serverAddress)
 	if err := http.Serve(listener, nil); err != nil {

@@ -20,10 +20,7 @@ const (
 // 'Access-Control-Allow-Methods' header as specified by the API struct
 func (api API) WithCors(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// loop over CORS-Config and set headers
-		// for _, item := range api.cors.Cfgs {
-		// 	w.Header().Set(item.Header, item.Value)
-		// }
+
 		w.Header().Set(accessControlAllowOrigin, api.accessOrigin)
 		w.Header().Set(accessControlAllowMethods, api.accessMethods)
 		w.Header().Set(accessControlAllowHeader, api.accessHeader)
