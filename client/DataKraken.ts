@@ -223,7 +223,6 @@ export class DataKraken {
         }
     }
 
-
     // Event builds the event as it will be send to the web-socket
     private static Event(type: number, data: any): any {
         return {

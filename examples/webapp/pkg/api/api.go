@@ -99,12 +99,16 @@ func (api *API) AddRoute(route string, h http.HandlerFunc, middleware ...func(ht
 
 	var final = h
 	// reverse middleware func so that the first one gets executed fist
-	for i, j := 0, len(middleware)-1; i < j; i, j = i+1, j-1 {
-		middleware[i], middleware[j] = middleware[j], middleware[i]
+	// for i, j := 0, len(middleware)-1; i < j; i, j = i+1, j-1 {
+	// 	middleware[i], middleware[j] = middleware[j], middleware[i]
+	// }
+
+	for i := len(middleware) - 1; i >= 0; i-- {
+		final = middleware[i](final)
 	}
-	for _, middle := range middleware {
-		final = middle(final)
-	}
+	// for _, middle := range middleware {
+	// 	final = middle(final)
+	// }
 	http.HandleFunc(route, final)
 }
 
