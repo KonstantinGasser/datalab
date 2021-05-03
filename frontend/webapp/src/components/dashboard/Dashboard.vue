@@ -53,7 +53,7 @@ export default {
 <style scoped>
 .app-layout {
   display: grid;
-  grid-template-columns: 200px 1fr;
+  grid-template-columns: 200px minmax(auto, 1100px);
   grid-template-rows: auto 1fr;
   align-items: center;
   justify-content: center;

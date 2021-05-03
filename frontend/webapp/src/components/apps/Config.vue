@@ -1,27 +1,9 @@
 <template>
     <div class="main-cfg">
-        <h1>Funnel Configuration</h1>
-        <div class="view_component">
-            <div class="form-row">
-                <div class="form-col col">
-                    <!-- <small class="info_txt"> -->
-                        In order to track which customer acts in which stage of the funnel,
-                        you must provide information about the stage and their transitions to the next stage 😬
-                    <!-- </small> -->
-                </div>
-            </div>
-            <div class="form-row mt-2">
-                <div class="form-col col">
-                    <strong>"Stage Name"</strong>: is the name you want the stage to have, it has no effect on the logic 
-                    <br>
-                    <strong>"Transition"</strong>: this is <strong>important</strong>. Only with the transition we are able to track when
-                    a customer jumps into the next stage <small>(rn "Transition" must be the name of the HTML-Element)</small> 
-                </div>
-            </div>
-            <div class="mt-3">
-                <div class="d-flex align-center justify-end mb-2">
-                    <button class="btn btn-standard" @click="updateStages">Update</button>
-                </div>
+        <h1 class="d-flex justify-between">Funnel Configuration</h1>
+        <small><span class="link" @click="showCfg('funnel')">how does it work?</span></small>
+        <div class="view_component funnel_view mt-0">
+            <div class="">
                 <div class="form-col col d-flex flex-wrap">
                     <div v-for="f in funnel" :key="f.id" class="d-flex align-center m-1">
                         <div class="funnel">
@@ -34,7 +16,7 @@
                             </div>
                         </div>
                         <div>
-                             <span v-if="f.id < funnel.length - 1" class="icon icon-chevron-right super"></span>
+                             <span v-if="f.id < funnel.length" class="icon icon-chevron-right super"></span>
                          </div>
                     </div>
                      <div class="funnel add-box d-flex align-center justify-even">
@@ -58,14 +40,15 @@
                          </div>
                     </div>
                 </div>
+                <div class="d-flex align-center justify-end">
+                    <button class="btn btn-standard" @click="updateStages">Update</button>
+                </div>
             </div>
         </div>
         <br>
         <h1>Campaign Tracking</h1>
+        <small> <span class="link" @click="showCfg('campaign')">how does it work?</span></small>
         <div class="view_component table-height">
-            <div class="d-flex align-center justify-end mb-2">
-                <button class="btn btn-standard" @click="updateCampaigns">Update</button>
-            </div>
             <table class="table table-borderless">
             <thead>
                 <tr>
@@ -90,13 +73,14 @@
                 </tr> 
             </tbody>
             </table>
+            <div class="d-flex align-center justify-end">
+                <button class="btn btn-standard" @click="updateCampaigns">Update</button>
+            </div>
         </div>
         <br>
         <h1>Interesting Buttons</h1>
+        <small><span class="link" @click="showCfg('btn_time')">how does it work?</span></small>
         <div class="view_component table-height">
-            <div class="d-flex align-center justify-end mb-2">
-                <button class="btn btn-standard" @click="updateBtnTime">Update</button>
-            </div>
             <table class="table table-borderless">
             <thead>
                 <tr>
@@ -121,6 +105,9 @@
                 </tr> 
             </tbody>
             </table>
+            <div class="d-flex align-center justify-end">
+                <button class="btn btn-standard" @click="updateBtnTime">Update</button>
+            </div>
         </div>
     </div>
 </template>
@@ -304,7 +291,11 @@ export default {
                 console.log(res);
                 this.$toast.success("Updated Interesting-Buttons information")
             }).catch(err => this.$toast.error("Could not update Interesting-Buttons information"));
-        }
+        },
+        showCfg(type) {
+            console.log(type);
+            this.$emit("setdoc", type);
+        },
     },
 }
 </script>
@@ -312,7 +303,7 @@ export default {
 <style sceped>
 .main-cfg {
     height: 70vh;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 .view_component {
     margin-top: 15px;
@@ -321,9 +312,14 @@ export default {
     height: max-width;
 }
 
+.funnel_view {
+    background: transparent;
+    border: none;
+}
+
 .table-height {
     max-height: 300px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .v-center {
@@ -359,6 +355,7 @@ td .icon {
     border: none;
     width: 215px;
     max-width: 215px;
+    background: none;
 }
 .add-box:focus,.add-box:hover {
     opacity: 1;

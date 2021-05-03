@@ -162,6 +162,11 @@ input[type="submit"]:hover {
   color: var(--txt-small);
 }
 
+.link {
+  cursor: pointer;
+  color: var(--btn-bg-hover);
+}
+
 .form-control:disabled {
   background-color: #30363D !important;
 }

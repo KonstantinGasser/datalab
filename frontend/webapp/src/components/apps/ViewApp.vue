@@ -22,8 +22,8 @@
                 <hr>
                 <Tabs class="my-2" ref="Tabs" :update="activeTab" :initTab="activeTab" :tabs="tabs" @tabChange="tabChange"/>
                 <General v-if="activeTab === 'Overview'" :app="activeApp" @drop_app="drop_app" :token_placeholder="token_placeholder"/>
-                <Config v-if="activeTab == 'Configuration'" :app_uuid="activeApp.uuid" :app_config="activeApp.app_config" />
-                <DocClient v-if="activeTab === 'Client Library'" :hasToken="false" @goCreateToken="goCreateToken"/>
+                <Config v-if="activeTab == 'Configuration'" :app_uuid="activeApp.uuid" :app_config="activeApp.app_config" @setdoc="setdoc"/>
+                <DocClient v-if="activeTab === 'Documentation'" :hasToken="activeApp?.app_token !== ''" @goCreateToken="goCreateToken"/>
             </div>
             <!-- <TabAppDetails ref="tab_app_token" @drop_app="updateState" v-cloak v-if="activeTab === 'App Details' && !isInCreateMode" :app="activeApp"/> -->
         </div>
@@ -69,7 +69,7 @@
                 activeApp: {},
                 token_placeholder: "Organization-Domain/App-Name",
                 activeTab: "Overview",
-                tabs: [{name:'Overview', emoji: "🎛"},{name:'Configuration', emoji: "⚙️"},{name:'Client Library', emoji: "📓"}]
+                tabs: [{name:'Overview', emoji: "🎛"},{name:'Configuration', emoji: "⚙️"},{name:'Documentation', emoji: "📓"}]
             };
         },
         async created() {
@@ -163,6 +163,9 @@
                     console.log(error);
                 });
             },
+            setdoc(event) {
+                this.activeTab = "Documentation";
+            },
         },
     };
 </script>
@@ -200,7 +203,7 @@ h2 {
     height: max-content;
     min-height: 225px;
     max-height: 100%;
-    overflow-y: scroll;
+    overflow-y: auto;
     border: 1px solid var(--sub-border);
 }
 .app_name_list {
