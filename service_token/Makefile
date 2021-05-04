@@ -9,4 +9,4 @@ deploy:
 	# ============ Push To Registry ============
 	sudo docker push datalab-registry.dev:5000/tokenservice:$(VERSION)_$(TAG)
 	
-	# ============ Deployment <$(VERSION)> DONE ============
+	# ============ Deployment <$(VERSION)_$(TAG)> DONE ============
