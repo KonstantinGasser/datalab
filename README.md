@@ -139,7 +139,7 @@ Each service (api,app,user,token,frontend) have their own `Makefile` with the `d
 | frontend   | vuefrontend  | 80:80       |                    |
 | mongo-app  | appstorage   | 27018       | appstorage:secure  |
 | monog-user | userstorage  | 27017       | userstorage:secure |
-|monog-config| configstorage| 27017       |configstorage:secure|
+|monog-config| configstorage| 27019       |configstorage:secure|
 
 
 
