@@ -2,6 +2,7 @@ package grpcC
 
 import (
 	appSrv "github.com/KonstantinGasser/datalab/protobuf/app_service"
+	configSrv "github.com/KonstantinGasser/datalab/protobuf/config_service"
 	tokenSrv "github.com/KonstantinGasser/datalab/protobuf/token_service"
 	userSrv "github.com/KonstantinGasser/datalab/protobuf/user_service"
 	"google.golang.org/grpc"
@@ -34,5 +35,14 @@ func NewAppClient(listenOn string) (appSrv.AppClient, error) {
 		return nil, err
 	}
 	client := appSrv.NewAppClient(conn)
+	return client, nil
+}
+
+func NewConfigClient(listenOn string) (configSrv.ConfigClient, error) {
+	conn, err := grpc.Dial(listenOn, grpc.WithInsecure())
+	if err != nil {
+		return nil, err
+	}
+	client := configSrv.NewConfigClient(conn)
 	return client, nil
 }

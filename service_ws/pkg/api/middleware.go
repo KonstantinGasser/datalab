@@ -7,7 +7,9 @@ import (
 	"strings"
 	"time"
 
+	tokenSrv "github.com/KonstantinGasser/datalab/protobuf/token_service"
 	"github.com/KonstantinGasser/datalab/utils/unique"
+	"github.com/sirupsen/logrus"
 )
 
 // WithCookie looks-up if a request already has an x-datalab cookie set
@@ -46,11 +48,20 @@ func (api *API) WithAuth(next http.HandlerFunc) http.HandlerFunc {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
-		// TODO: - perform authentication via Token-Service
-		//       - parse required values (meta data for the client)
-
+		// authenticate app-token
+		resp, err := api.tokenSrv.VerifyAppToken(r.Context(), &tokenSrv.VerifyAppTokenRequest{
+			Tracing_ID: "1",
+			Token:      token,
+		})
+		if err != nil {
+			api.onErr(w, http.StatusInternalServerError, "could not authenticate app token")
+			return
+		}
+		claims := resp.GetAppClaims()
+		ctx := context.WithValue(r.Context(), typeKeyClaims(keyClaims), claims)
+		logrus.Infof("App-Claims: %v+", claims)
 		// move to next handler
-		next(w, r)
+		next(w, r.WithContext(ctx))
 	}
 }
 

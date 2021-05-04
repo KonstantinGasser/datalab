@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	tokenSrv "github.com/KonstantinGasser/datalab/protobuf/token_service"
-	"github.com/KonstantinGasser/datalab/service_app/pkg/config"
 	"github.com/KonstantinGasser/datalab/service_app/pkg/errors"
 	"github.com/KonstantinGasser/datalab/service_app/pkg/storage"
 	"github.com/KonstantinGasser/datalab/utils/ctx_value"
@@ -28,13 +27,13 @@ func (app app) GetTokenClaims(ctx context.Context, storage storage.Storage, toke
 			Msg:    "App-Hash do not match",
 		}
 	}
-	if err := config.HasConfig(ctx, storage, appUUID); err != nil {
-		return "", errors.ErrAPI{
-			Status: http.StatusBadRequest,
-			Err:    fmt.Errorf("hasConfig: %w", err),
-			Msg:    "App needs at least on config set",
-		}
-	}
+	// if err := config.HasConfig(ctx, storage, appUUID); err != nil {
+	// 	return "", errors.ErrAPI{
+	// 		Status: http.StatusBadRequest,
+	// 		Err:    fmt.Errorf("hasConfig: %w", err),
+	// 		Msg:    "App needs at least on config set",
+	// 	}
+	// }
 	if err := hasToken(ctx, storage, appUUID); err != nil {
 		return "", errors.ErrAPI{
 			Status: http.StatusBadRequest,

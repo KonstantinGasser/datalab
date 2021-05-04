@@ -17,6 +17,7 @@ func main() {
 	host := flag.String("host", "localhost:8080", "address to run the server on")
 	userAddr := flag.String("user-srv", "localhost:8001", "address to connect to user-service")
 	appAddr := flag.String("app-srv", "localhost:8003", "address to connect to app-service")
+	configAddr := flag.String("config-srv", "localhost:8005", "address to connect to app-service")
 	tokenAddr := flag.String("token-srv", "localhost:8002", "address to connect to token-service")
 	flag.Parse()
 
@@ -32,5 +33,5 @@ func main() {
 		os.Exit(0)
 	}()
 	// call Run abstraction to start the server
-	log.Fatal(server.Run(ctx, *host, *userAddr, *appAddr, *tokenAddr))
+	log.Fatal(server.Run(ctx, *host, *userAddr, *appAddr, *tokenAddr, *configAddr))
 }

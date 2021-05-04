@@ -7,7 +7,7 @@ package app_service;
 service App {
     rpc Create(CreateRequest) returns (CreateResponse) {}
     rpc Delete(DeleteRequest) returns (DeleteResponse) {}
-    rpc UpdateCfg(UpdateCfgRequest) returns (UpdateCfgResponse) {}
+    // rpc UpdateCfg(UpdateCfgRequest) returns (UpdateCfgResponse) {}
 
     rpc GetList(GetListRequest) returns (GetListResponse) {}
     rpc Get(GetRequest) returns (GetResponse) {}
@@ -22,36 +22,21 @@ service App {
 
 }
 
-// RPC UPDATE CONFIG
-message UpdateCfgRequest {
-    string tracing_ID = 1;
-    string caller_uuid = 2;
-    string update_flag = 3;
-    string app_uuid = 4;
-    repeated Funnel stages = 5;
-    repeated Campaign records = 6;
-    repeated BtnTime btn_defs = 7;
-}
-message Funnel {
-    int32 id = 1;
-    string name = 2;
-    string transition = 3;
-}
-message Campaign {
-    int32 id = 1;
-    string name = 2;
-    string prefix = 3;
-}
-message BtnTime {
-    int32 id = 1;
-    string name = 2;
-    string btn_name = 3;
-}
+// // RPC UPDATE CONFIG
+// message UpdateCfgRequest {
+//     string tracing_ID = 1;
+//     string caller_uuid = 2;
+//     string update_flag = 3;
+//     string app_uuid = 4;
+//     repeated Funnel stages = 5;
+//     repeated Campaign records = 6;
+//     repeated BtnTime btn_defs = 7;
+// }
 
-message UpdateCfgResponse {
-    int32 status_code = 1;
-    string msg = 2;
-}
+// message UpdateCfgResponse {
+//     int32 status_code = 1;
+//     string msg = 2;
+// }
 
 // RPC GENERATE TOKEN
 message GenerateTokenRequest {
@@ -155,6 +140,7 @@ message GetResponse {
     int32 status_code = 1;
     string msg = 2;
     ComplexApp app = 3;
+    AppConfig app_config = 4;
 }
 // ***************************
 
@@ -195,13 +181,28 @@ message ComplexApp {
     repeated ComplexUser member = 6;
     repeated string settings = 7;
     string app_token = 8;
-    AppConfig app_config = 9;
+    string config_ref = 9;
 }
 
 message AppConfig {
     repeated Funnel funnel = 1;
     repeated Campaign campaign = 2;
     repeated BtnTime btn_time = 3;
+}
+message Funnel {
+    int32 id = 1;
+    string name = 2;
+    string transition = 3;
+}
+message Campaign {
+    int32 id = 1;
+    string name = 2;
+    string prefix = 3;
+}
+message BtnTime {
+    int32 id = 1;
+    string name = 2;
+    string btn_name = 3;
 }
 
 message SimpleApp {

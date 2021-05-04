@@ -2,6 +2,7 @@ package api
 
 import (
 	appSrv "github.com/KonstantinGasser/datalab/protobuf/app_service"
+	configSrv "github.com/KonstantinGasser/datalab/protobuf/config_service"
 	tokenSrv "github.com/KonstantinGasser/datalab/protobuf/token_service"
 	userSrv "github.com/KonstantinGasser/datalab/protobuf/user_service"
 	"github.com/KonstantinGasser/datalab/service_app/pkg/app"
@@ -13,16 +14,18 @@ type AppService struct {
 	storage storage.Storage
 	app     app.App
 	// *** Service Dependencies ***
-	userService  userSrv.UserClient
-	tokenService tokenSrv.TokenClient
+	userService   userSrv.UserClient
+	configService configSrv.ConfigClient
+	tokenService  tokenSrv.TokenClient
 }
 
-func NewAppServer(store storage.Storage, user userSrv.UserClient, token tokenSrv.TokenClient) AppService {
+func NewAppServer(store storage.Storage, user userSrv.UserClient, configService configSrv.ConfigClient, token tokenSrv.TokenClient) AppService {
 	return AppService{
-		storage:      store,
-		app:          app.NewApp(),
-		userService:  user,
-		tokenService: token,
+		storage:       store,
+		app:           app.NewApp(),
+		userService:   user,
+		configService: configService,
+		tokenService:  token,
 	}
 }
 

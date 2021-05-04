@@ -71,4 +71,6 @@ message UserClaim {
 message AppClaims {
     string app_uuid = 1;
     string orgnAndAppHash = 2;
+    string domain = 3;
+
 }

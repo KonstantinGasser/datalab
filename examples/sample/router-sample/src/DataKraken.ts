@@ -21,7 +21,7 @@ export class DataKraken {
     // the event listener
     constructor(app_token: string) {
 
-        if (!this.sayHello("app_token"))
+        if (!this.sayHello("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjA0MTQ3OTAsImhhc2giOiIyOGQ3NDJjMTFjOTFjMDc4ODg0NzZhZThlNzUxNjJiNDBmZGNiYWU4ZDIyYzUzNTUwYjM0MTZiMTMwYmI2Y2U4IiwiaWF0IjoxNjE5ODA5OTkwLCJpc3MiOiJjb20uZGF0YWxhYi50b2tlbi1zZXJ2aWNlIiwib3JpZ2luIjoiaHR0cDovL3Rlc3QuZGlvIiwic3ViIjoiYmI2YjM2OGEtNDkxZC00NDFlLTlmM2QtZTU3ZjgxZjBhMzc1In0.4WE3FJelUNJOU7t5HRA62MBM5Jhn-5jMd8zTFdbcODI"))
             return
         
         // connect to web socket thou

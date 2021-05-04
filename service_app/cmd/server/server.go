@@ -14,7 +14,7 @@ import (
 
 // Run is a run abstraction for the main function allowing
 // to return an error
-func Run(ctx context.Context, host, userAddr, tokenAddr, dbAddr string) error {
+func Run(ctx context.Context, host, userAddr, tokenAddr, configAddr, dbAddr string) error {
 	srv := grpc.NewServer()
 	// create app-service
 	// create app dependencies
@@ -26,11 +26,15 @@ func Run(ctx context.Context, host, userAddr, tokenAddr, dbAddr string) error {
 	if err != nil {
 		logrus.Fatalf("srv.Dependency] could not establish connection to user-service:\n\t%v", err)
 	}
+	configClient, err := grpcC.NewConfigClient(configAddr)
+	if err != nil {
+		logrus.Fatalf("srv.Dependency] could not establish connection to config-service:\n\t%v", err)
+	}
 	tokenClient, err := grpcC.NewTokenClient(tokenAddr)
 	if err != nil {
 		logrus.Fatalf("srv.Dependency] could not establish connection to token-service:\n\t%v", err)
 	}
-	appService := api.NewAppServer(storage, userClient, tokenClient)
+	appService := api.NewAppServer(storage, userClient, configClient, tokenClient)
 	appSrv.RegisterAppServer(srv, appService)
 
 	listener, err := net.Listen("tcp", host)

@@ -2,7 +2,7 @@
     <div class="main-cfg">
         <h1 class="d-flex justify-between">Funnel Configuration</h1>
         <small><span class="link" @click="showCfg('funnel')">how does it work?</span></small>
-        <div class="view_component funnel_view mt-0">
+        <div class="view_component funnel_view mt-0 pl-0">
             <div class="">
                 <div class="form-col col d-flex flex-wrap">
                     <div v-for="f in funnel" :key="f.id" class="d-flex align-center m-1">
@@ -139,7 +139,7 @@ export default {
         };
     },
     props: {
-        app_uuid: String,
+        config_uuid: String,
         app_config: {
             type: Object,
             default: null,
@@ -201,10 +201,10 @@ export default {
                 }
             }; 
             const payload = {
-                app_uuid: this.$props.app_uuid,
+                config_uuid: this.$props.config_uuid,
                 funnel: this.funnel,
             }
-            axios.post("http://192.168.0.177:8080/api/v2/view/app/update/config?resource=funnel", payload, options).then(res => {
+            axios.post("http://localhost:8080/api/v2/view/config/update?resource=funnel", payload, options).then(res => {
                 console.log(res);
                 this.$toast.success("Updated Funnel information")
             }).catch(err => this.$toast.error("Could not update Funnel information"));
@@ -242,10 +242,10 @@ export default {
                 }
             }; 
             const payload = {
-                app_uuid: this.$props.app_uuid,
+                config_uuid: this.$props.config_uuid,
                 campaign: this.campaign,
             }
-            axios.post("http://192.168.0.177:8080/api/v2/view/app/update/config?resource=campaign", payload, options).then(res => {
+            axios.post("http://localhost:8080/api/v2/view/config/update?resource=campaign", payload, options).then(res => {
                 console.log(res);
                 this.$toast.success("Updated Campaign information")
             }).catch(err => this.$toast.error("Could not update Campaign information"));
@@ -284,10 +284,10 @@ export default {
                 }
             }; 
             const payload = {
-                app_uuid: this.$props.app_uuid,
+                config_uuid: this.$props.config_uuid,
                 btn_time: this.buttons,
             }
-            axios.post("http://192.168.0.177:8080/api/v2/view/app/update/config?resource=btnTime", payload, options).then(res => {
+            axios.post("http://localhost:8080/api/v2/view/config/update?resource=btnTime", payload, options).then(res => {
                 console.log(res);
                 this.$toast.success("Updated Interesting-Buttons information")
             }).catch(err => this.$toast.error("Could not update Interesting-Buttons information"));
@@ -353,8 +353,8 @@ td .icon {
 .add-box {
     opacity: 0.5;
     border: none;
-    width: 215px;
-    max-width: 215px;
+    width: 210px;
+    max-width: 210px;
     background: none;
 }
 .add-box:focus,.add-box:hover {

@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net/http"
 
-	appSrv "github.com/KonstantinGasser/datalab/protobuf/app_service"
+	configSrv "github.com/KonstantinGasser/datalab/protobuf/config_service"
 	"github.com/KonstantinGasser/datalab/utils/ctx_value"
 	"github.com/KonstantinGasser/required"
 	"github.com/sirupsen/logrus"
@@ -22,8 +22,8 @@ func (api API) HandlerAppUpdateConfig(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var payload struct {
-		AppUUID string `json:"app_uuid" required:"yes"`
-		Funnel  []struct {
+		ConfigUUID string `json:"config_uuid" required:"yes"`
+		Funnel     []struct {
 			ID         int32  `json:"id"`
 			Name       string `json:"name"`
 			Transition string `json:"transition"`
@@ -39,6 +39,7 @@ func (api API) HandlerAppUpdateConfig(w http.ResponseWriter, r *http.Request) {
 			BtnName string `json:"btn_name"`
 		} `json:"btn_time"`
 	}
+
 	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
 		logrus.Errorf("<%s>[api.HandlerAppUpdateConfig] could not decode r.Body: %v\n", ctx_value.GetString(r.Context(), "tracingID"), err)
 		api.onError(w, errors.New("could not decode request body"), http.StatusBadRequest)
@@ -50,46 +51,47 @@ func (api API) HandlerAppUpdateConfig(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// updateFlag can be "funnel", "campaign" or "*" (update all)
+	// updateFlag can be "funnel", "campaign" or "btn_time" do we need "*" as wildcard??(update all)
 	updateFlag := api.getQuery(r.URL, "resource")
 
-	var funnelStages = make([]*appSrv.Funnel, len(payload.Funnel))
+	var stages = make([]*configSrv.Funnel, len(payload.Funnel))
 	for i, item := range payload.Funnel {
-		funnelStages[i] = &appSrv.Funnel{
-			Id:         item.ID,
-			Name:       item.Name,
-			Transition: item.Transition,
-		}
+		stages[i] = &configSrv.Funnel{Id: item.ID, Name: item.Name, Transition: item.Transition}
 	}
-	var campaignRecords = make([]*appSrv.Campaign, len(payload.Campaign))
+	var records = make([]*configSrv.Campaign, len(payload.Campaign))
 	for i, item := range payload.Campaign {
-		campaignRecords[i] = &appSrv.Campaign{
-			Id:     item.ID,
-			Name:   item.Name,
-			Prefix: item.Prefix,
-		}
+		records[i] = &configSrv.Campaign{Id: item.ID, Name: item.Name, Prefix: item.Prefix}
 	}
-	var btnDefs = make([]*appSrv.BtnTime, len(payload.BtnTime))
+	var btnDefs = make([]*configSrv.BtnTime, len(payload.BtnTime))
 	for i, item := range payload.BtnTime {
-		btnDefs[i] = &appSrv.BtnTime{
-			Id:      item.ID,
-			Name:    item.Name,
-			BtnName: item.BtnName,
-		}
+		btnDefs[i] = &configSrv.BtnTime{Id: item.ID, Name: item.Name, BtnName: item.BtnName}
 	}
-	resp, err := api.AppClient.UpdateCfg(r.Context(), &appSrv.UpdateCfgRequest{
+	resp, err := api.ConfigClient.Update(r.Context(), &configSrv.UpdateRequest{
 		Tracing_ID: ctx_value.GetString(r.Context(), "tracingID"),
-		CallerUuid: user.GetUuid(),
+		UUID:       payload.ConfigUUID,
 		UpdateFlag: updateFlag,
-		AppUuid:    payload.AppUUID,
-		Stages:     funnelStages,
-		Records:    campaignRecords,
+		Stages:     stages,
+		Records:    records,
 		BtnDefs:    btnDefs,
 	})
 	if err != nil {
-		logrus.Errorf("<%s>[api.HandlerAppUpdateConfig] could not execute grpc call: %v\n", ctx_value.GetString(r.Context(), "tracingID"), err)
+		logrus.Errorf("<%s>[api.HandlerAppUpdateConfig] could not execute grpc.Update call: %v\n", ctx_value.GetString(r.Context(), "tracingID"), err)
 		api.onError(w, errors.New("could not change app configurations"), http.StatusInternalServerError)
 		return
 	}
+	// resp, err := api.AppClient.UpdateCfg(r.Context(), &appSrv.UpdateCfgRequest{
+	// 	Tracing_ID: ctx_value.GetString(r.Context(), "tracingID"),
+	// 	CallerUuid: user.GetUuid(),
+	// 	UpdateFlag: updateFlag,
+	// 	AppUuid:    payload.AppUUID,
+	// 	Stages:     funnelStages,
+	// 	Records:    campaignRecords,
+	// 	BtnDefs:    btnDefs,
+	// })
+	// if err != nil {
+	// 	logrus.Errorf("<%s>[api.HandlerAppUpdateConfig] could not execute grpc call: %v\n", ctx_value.GetString(r.Context(), "tracingID"), err)
+	// 	api.onError(w, errors.New("could not change app configurations"), http.StatusInternalServerError)
+	// 	return
+	// }
 	api.onScucessJSON(w, map[string]interface{}{}, int(resp.GetStatusCode()))
 }

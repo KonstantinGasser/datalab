@@ -17,7 +17,7 @@ import (
 
 // GetByID collects all the app details for a given appUUID
 // it fetches the user data for the owner and all members from the user-service
-func (app app) Get(ctx context.Context, storage storage.Storage, userService userSrv.UserClient, appUUID, callerUUID string) (*appSrv.ComplexApp, errors.ErrApi) {
+func (app app) Get(ctx context.Context, storage storage.Storage, user userSrv.UserClient, appUUID, callerUUID string) (*appSrv.ComplexApp, errors.ErrApi) {
 
 	// search for app_uuid where either owner_uuid or one of the members
 	// match the callerUUID else not permitted
@@ -55,30 +55,7 @@ func (app app) Get(ctx context.Context, storage storage.Storage, userService use
 			Msg:    "Could not get App-Details",
 		}
 	}
-	var funnelStages = make([]*appSrv.Funnel, len(queryData.Configurations.Funnel))
-	for i, item := range queryData.Configurations.Funnel {
-		funnelStages[i] = &appSrv.Funnel{
-			Id:         item.ID,
-			Name:       item.Name,
-			Transition: item.Transition,
-		}
-	}
-	var campaignRecords = make([]*appSrv.Campaign, len(queryData.Configurations.Campaign))
-	for i, item := range queryData.Configurations.Campaign {
-		campaignRecords[i] = &appSrv.Campaign{
-			Id:     item.ID,
-			Name:   item.Name,
-			Prefix: item.Prefix,
-		}
-	}
-	var btnDefs = make([]*appSrv.BtnTime, len(queryData.Configurations.BtnTime))
-	for i, item := range queryData.Configurations.BtnTime {
-		btnDefs[i] = &appSrv.BtnTime{
-			Id:      item.ID,
-			Name:    item.Name,
-			BtnName: item.BtnName,
-		}
-	}
+
 	// prepare data of app append with user data if calls successful
 	var appData *appSrv.ComplexApp = &appSrv.ComplexApp{
 		Uuid:        queryData.UUID,
@@ -86,11 +63,7 @@ func (app app) Get(ctx context.Context, storage storage.Storage, userService use
 		Name:        queryData.AppName,
 		Description: queryData.Description,
 		AppToken:    queryData.AppToken,
-		AppConfig: &appSrv.AppConfig{
-			Funnel:   funnelStages,
-			Campaign: campaignRecords,
-			BtnTime:  btnDefs,
-		},
+		ConfigRef:   queryData.ConfigRef,
 	}
 
 	// fetch user information needed: owner and all members
@@ -101,7 +74,7 @@ func (app app) Get(ctx context.Context, storage storage.Storage, userService use
 	var respUserList *userSrv.GetListResponse
 	var userListErr error
 	go func() {
-		respUserList, userListErr = userService.GetList(ctx, &userSrv.GetListRequest{
+		respUserList, userListErr = user.GetList(ctx, &userSrv.GetListRequest{
 			Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
 			UuidList:   queryData.Member,
 		})
@@ -113,7 +86,7 @@ func (app app) Get(ctx context.Context, storage storage.Storage, userService use
 	var respOwner *userSrv.GetResponse
 	var ownerErr error
 	go func() {
-		respOwner, ownerErr = userService.Get(ctx, &userSrv.GetRequest{
+		respOwner, ownerErr = user.Get(ctx, &userSrv.GetRequest{
 			Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
 			CallerUuid: "", //request.GetCallerUuid(),
 			ForUuid:    queryData.OwnerUUID,

@@ -21,6 +21,12 @@ func (api API) HandlerInitSession(w http.ResponseWriter, r *http.Request) {
 		api.onErr(w, http.StatusBadRequest, "could not decode r.Body")
 		return
 	}
-	// fmt.Printf("Session-Record:\n%+v\n", session)
+
+	claims := r.Context().Value(typeKeyClaims(keyClaims))
+	if claims == nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	// fetch meta data from app service
 	w.WriteHeader(http.StatusOK)
 }

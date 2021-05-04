@@ -45,7 +45,7 @@ export default {
   },
   methods: {
     login() {
-      axios.post('http://192.168.0.177:8080/api/v1/user/login', {
+      axios.post('http://localhost:8080/api/v1/user/login', {
         username: this.input.username,
         password: this.input.password,
       }).then(resp => {

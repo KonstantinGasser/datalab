@@ -22,7 +22,7 @@
                 <hr>
                 <Tabs class="my-2" ref="Tabs" :update="activeTab" :initTab="activeTab" :tabs="tabs" @tabChange="tabChange"/>
                 <General v-if="activeTab === 'Overview'" :app="activeApp" @drop_app="drop_app" :token_placeholder="token_placeholder"/>
-                <Config v-if="activeTab == 'Configuration'" :app_uuid="activeApp.uuid" :app_config="activeApp.app_config" @setdoc="setdoc"/>
+                <Config v-if="activeTab == 'Configuration'" :app_config="activeApp.app_config" :config_uuid="activeApp.config_ref" @setdoc="setdoc"/>
                 <DocClient v-if="activeTab === 'Documentation'" :hasToken="activeApp?.app_token !== ''" @goCreateToken="goCreateToken"/>
             </div>
             <!-- <TabAppDetails ref="tab_app_token" @drop_app="updateState" v-cloak v-if="activeTab === 'App Details' && !isInCreateMode" :app="activeApp"/> -->
@@ -77,6 +77,11 @@
             this.getViewApp().then(data => {
                 this.apps = data.app_list;
                 this.activeApp = data.app_details;
+                this.activeApp["app_config"] = {
+                        "funnel": data.config_funnel,
+                        "campaign": data.config_campaign,
+                        "btn_time": data.config_btn_time,
+                    }
                 if (this.apps == null || this.apps.length === 0) {
                     this.isInCreateMode = true;
                 } else {
@@ -119,6 +124,11 @@
                 this.getViewApp().then(data => {
                     this.apps = data.app_list;
                     this.activeApp = data.app_details;
+                    this.activeApp["app_config"] = {
+                        "funnel": data.config_funnel,
+                        "campaign": data.config_campaign,
+                        "btn_time": data.config_btn_time,
+                    }
                 }).catch(error => {
                     if (error.response.status === 401) {
                         localStorage.removeItem('token');
@@ -138,7 +148,7 @@
                     }
                 };
 
-                const res = await axios.get("http://192.168.0.177:8080/api/v2/view/app/details", options)
+                const res = await axios.get("http://localhost:8080/api/v2/view/app/details", options)
                 if (res.data == null || res.status >= 400) {
                     this.isInCreateMode = true;
                     console.log(this.isInCreateMode);
@@ -154,10 +164,15 @@
                         'Authorization': localStorage.getItem("token"),
                     }
                 };
-                axios.get("http://192.168.0.177:8080/api/v2/view/app/get?uuid="+uuid, options).then(resp => {
+                axios.get("http://localhost:8080/api/v2/view/app/get?uuid="+uuid, options).then(resp => {
                     if (this.isInCreateMode)
                         this.isInCreateMode = !this.isInCreateMode;
                     this.activeApp = resp.data.app;
+                    this.activeApp["app_config"] = {
+                        "funnel": resp.data.config_funnel,
+                        "campaign": resp.data.config_campaign,
+                        "btn_time": resp.data.config_btn_time,
+                    }
                     this.activeTab = "Overview";
                 }).catch(error => {
                     console.log(error);
@@ -192,10 +207,11 @@ h2 {
 }
 .view_app {
     display: grid;
-    grid-template-columns: 245px 1fr;
+    grid-template-columns: 20% 1fr;
     grid-column-gap: 15px;
     height: 100%;
 }
+  
 .app_list {
     background: var(--sub-bg);
     border-radius: 8px;

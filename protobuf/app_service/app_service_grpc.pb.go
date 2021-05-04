@@ -20,7 +20,6 @@ const _ = grpc.SupportPackageIsVersion7
 type AppClient interface {
 	Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateResponse, error)
 	Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
-	UpdateCfg(ctx context.Context, in *UpdateCfgRequest, opts ...grpc.CallOption) (*UpdateCfgResponse, error)
 	GetList(ctx context.Context, in *GetListRequest, opts ...grpc.CallOption) (*GetListResponse, error)
 	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
 	AddMember(ctx context.Context, in *AddMemberRequest, opts ...grpc.CallOption) (*AddMemberResponse, error)
@@ -50,15 +49,6 @@ func (c *appClient) Create(ctx context.Context, in *CreateRequest, opts ...grpc.
 func (c *appClient) Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error) {
 	out := new(DeleteResponse)
 	err := c.cc.Invoke(ctx, "/app_service.App/Delete", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *appClient) UpdateCfg(ctx context.Context, in *UpdateCfgRequest, opts ...grpc.CallOption) (*UpdateCfgResponse, error) {
-	out := new(UpdateCfgResponse)
-	err := c.cc.Invoke(ctx, "/app_service.App/UpdateCfg", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +124,6 @@ func (c *appClient) GenerateToken(ctx context.Context, in *GenerateTokenRequest,
 type AppServer interface {
 	Create(context.Context, *CreateRequest) (*CreateResponse, error)
 	Delete(context.Context, *DeleteRequest) (*DeleteResponse, error)
-	UpdateCfg(context.Context, *UpdateCfgRequest) (*UpdateCfgResponse, error)
 	GetList(context.Context, *GetListRequest) (*GetListResponse, error)
 	Get(context.Context, *GetRequest) (*GetResponse, error)
 	AddMember(context.Context, *AddMemberRequest) (*AddMemberResponse, error)
@@ -154,9 +143,6 @@ func (UnimplementedAppServer) Create(context.Context, *CreateRequest) (*CreateRe
 }
 func (UnimplementedAppServer) Delete(context.Context, *DeleteRequest) (*DeleteResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
-}
-func (UnimplementedAppServer) UpdateCfg(context.Context, *UpdateCfgRequest) (*UpdateCfgResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateCfg not implemented")
 }
 func (UnimplementedAppServer) GetList(context.Context, *GetListRequest) (*GetListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetList not implemented")
@@ -224,24 +210,6 @@ func _App_Delete_Handler(srv interface{}, ctx context.Context, dec func(interfac
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AppServer).Delete(ctx, req.(*DeleteRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _App_UpdateCfg_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateCfgRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AppServer).UpdateCfg(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/app_service.App/UpdateCfg",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AppServer).UpdateCfg(ctx, req.(*UpdateCfgRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -386,10 +354,6 @@ var App_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Delete",
 			Handler:    _App_Delete_Handler,
-		},
-		{
-			MethodName: "UpdateCfg",
-			Handler:    _App_UpdateCfg_Handler,
 		},
 		{
 			MethodName: "GetList",

@@ -12,7 +12,7 @@ import (
 // Run acts as a run abstraction to start the HTTP-Server
 // and can return an error - which is nice when called
 // from main
-func Run(ctx context.Context, hostAddr, userAddr, appAddr, tokenAddr string) error {
+func Run(ctx context.Context, hostAddr, userAddr, appAddr, tokenAddr, configAddr string) error {
 	// create api dependencies
 	userClient, err := grpcC.NewUserClient(userAddr)
 	if err != nil {
@@ -22,12 +22,16 @@ func Run(ctx context.Context, hostAddr, userAddr, appAddr, tokenAddr string) err
 	if err != nil {
 		logrus.Fatalf("[api.Dependency] could not establish gRPC connection to App-Service:\n\t%v", err)
 	}
+	configClient, err := grpcC.NewConfigClient(configAddr)
+	if err != nil {
+		logrus.Fatalf("[api.Dependency] could not establish gRPC connection to Config-Service:\n\t%v", err)
+	}
 	tokenClient, err := grpcC.NewTokenClient(tokenAddr)
 	if err != nil {
 		logrus.Fatalf("[api.Dependency] could not establish gRPC connection to Token-Service:\n\t%v", err)
 	}
 	logrus.Info("[api.Dependency] established connection to all services\n")
-	srv := api.NewDefault(userClient, appClient, tokenClient)
+	srv := api.NewDefault(userClient, appClient, tokenClient, configClient)
 	// override default CORS config for Access-Control-Allow-Origin
 	// TODO: change "*" to proper value once IP:PORT of frontend is clear
 	srv.Apply(srv.WithAccessControlOrigin("*"))
