@@ -7,11 +7,15 @@ Services:
 - UserService: :8001
 - TokenService: :8002
 - AppService: :8003
-(some say they can see a pattern not sure where..must change in future - ok for now)
+- Web-Socket-Events: :8004
+- ConfigService: :8005
+***(some say they can see a pattern not sure where...:D)***
 
 Database server:
 - UserService MongoDB: rasp-1:27017
 - AppService MongoDB: rasp-1:27018
+- ConfigServce MongoDB: rasp-1:27019
+
 
 # Client Library: Data Flow
 The idea of this `README` is to explain how the data collection on the client-side works. Further, the session and data life-cycle will be explained as well as the data format.
