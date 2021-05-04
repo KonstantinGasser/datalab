@@ -21,8 +21,8 @@ export class DataKraken {
     // the event listener
     constructor(app_token: string) {
 
-        // if (!this.sayHello(app_token))
-        //     return
+        if (!this.sayHello("app_token"))
+            return
         
         // connect to web socket thou
         console.log(this.getCampaign())
@@ -48,9 +48,10 @@ export class DataKraken {
         const opts = {
             headers: {
                 "x-datalab-token": token
-            }
+            },
+            withCredentials: true,
         }
-        axios.post("http://localhost:8004/api/v1/hello", {
+        axios.post("http://192.168.0.232:8004/api/v1/hello", {
             referrer: this.getReferrer(),
             meta: this.getDevice(),
         }, opts).then((res: any) => {

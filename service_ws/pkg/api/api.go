@@ -5,22 +5,33 @@ import (
 	"net/http"
 )
 
+// typeKeyCookie is the key to the cookie value in a request
+type typeKeyCookie string
+
+// typeKeyDatalabToken is the header key holding the auth-token
+type typeKeyDatalabToken string
+
 const (
 	// keyCookie is the key to the cookie value in a request
-	keyCookie = "x-datalab"
+	keyCookie = "x-datalab-cookie"
 	// keyDatalabToken is the header key holding the auth-token
 	keyDatalabToken = "x-datalab-token"
-
 	// accessControlAllowOrigin refers to the http.Header
 	accessControlAllowOrigin = "Access-Control-Allow-Origin"
 	// accessControlAllowMethods refers to the http.Header
 	accessControlAllowMethods = "Access-Control-Allow-Methods"
+	// accessControlAllowHeaders refers to the http.Header
+	accessControlAllowHeaders = "Access-Control-Allow-Headers"
+	// accessControlAllowCreds refers to the http.Header
+	accessControlAllowCreds = "Access-Control-Allow-Credentials"
 )
 
 type API struct {
 	// CORS config
-	allowedOrigins []string
-	allowedMethods []string
+	allowedOrigins   []string
+	allowedMethods   []string
+	allowedHeaders   []string
+	allowCredentials bool
 
 	onErr     func(w http.ResponseWriter, code int, err string)
 	onSuccess func(w http.ResponseWriter, code int, data interface{})
@@ -32,8 +43,10 @@ type API struct {
 func New(coordinator string) *API {
 	return &API{
 		// set default CORS config
-		allowedOrigins: []string{"*"},
-		allowedMethods: []string{"GET,POST,OPTIONS"},
+		allowedOrigins:   []string{"*"},
+		allowedMethods:   []string{"GET,POST,OPTIONS"},
+		allowedHeaders:   []string{"*"},
+		allowCredentials: false,
 
 		onErr: func(w http.ResponseWriter, code int, err string) {
 			w.WriteHeader(code)
@@ -79,4 +92,18 @@ func WithAllowedMethods(methods ...string) func(*API) {
 	return func(api *API) {
 		api.allowedMethods = methods
 	}
+}
+
+// WithAllowedHeaders apply the given http.Methods to
+// the allowed Headers on the API
+func WithAllowedHeaders(headers ...string) func(*API) {
+	return func(api *API) {
+		api.allowedHeaders = headers
+	}
+}
+
+// WithAllowedCreds set the response Header of
+// "Access-Control-Allow-Credentials" to true
+func WithAllowedCreds(api *API) {
+	api.allowCredentials = true
 }

@@ -2,8 +2,12 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strings"
+	"time"
+
+	"github.com/KonstantinGasser/datalab/utils/unique"
 )
 
 // WithCookie looks-up if a request already has an x-datalab cookie set
@@ -14,14 +18,20 @@ func (api *API) WithCookie(next http.HandlerFunc) http.HandlerFunc {
 		cookie, err := r.Cookie(keyCookie)
 		if err != nil || cookie.Value == "" {
 			// set new cookie for request
+			uuid, err := unique.UUID()
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+			}
 			c := http.Cookie{
-				Name:  keyCookie,
-				Value: "hello-world",
+				Name:    keyCookie,
+				Value:   uuid,
+				Expires: time.Now().Add(1 * time.Hour),
+				Path:    "/",
 			}
 			http.SetCookie(w, &c)
 		}
 		// pass cookie via context
-		ctx := context.WithValue(r.Context(), keyCookie, cookie)
+		ctx := context.WithValue(r.Context(), typeKeyCookie(keyCookie), cookie)
 		// move to next handler
 		next(w, r.WithContext(ctx))
 	}
@@ -38,8 +48,6 @@ func (api *API) WithAuth(next http.HandlerFunc) http.HandlerFunc {
 		}
 		// TODO: - perform authentication via Token-Service
 		//       - parse required values (meta data for the client)
-		// 		 - issue web-socket ticket
-		//		 - add ticket to context
 
 		// move to next handler
 		next(w, r)
@@ -53,8 +61,17 @@ func (api *API) WithAuth(next http.HandlerFunc) http.HandlerFunc {
 func (api *API) WithCORS(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// set CORS-Header
-		w.Header().Set(accessControlAllowOrigin, strings.Join(api.allowedOrigins, ","))
+		var reqOrigin string = r.Header.Get("Origin")
+		fmt.Println("Origin: ", reqOrigin)
+		for _, origin := range api.allowedOrigins {
+			if reqOrigin == origin {
+				w.Header().Set(accessControlAllowOrigin, reqOrigin)
+			}
+		}
 		w.Header().Set(accessControlAllowMethods, strings.Join(api.allowedMethods, ","))
+		w.Header().Set(accessControlAllowHeaders, strings.Join(api.allowedHeaders, ","))
+		w.Header().Set(accessControlAllowCreds, fmt.Sprintf("%t", api.allowCredentials))
+
 		// check if pre-flight request from browser
 		if r.Method == "OPTIONS" {
 			w.WriteHeader(http.StatusOK)
