@@ -4,9 +4,7 @@ import (
 	"context"
 
 	appSrv "github.com/KonstantinGasser/datalab/protobuf/app_service"
-	tokenSrv "github.com/KonstantinGasser/datalab/protobuf/token_service"
 	userSrv "github.com/KonstantinGasser/datalab/protobuf/user_service"
-	"github.com/KonstantinGasser/datalab/service_app/pkg/config"
 	"github.com/KonstantinGasser/datalab/service_app/pkg/errors"
 	"github.com/KonstantinGasser/datalab/service_app/pkg/storage"
 )
@@ -35,11 +33,8 @@ type App interface {
 	// AddMember appends the member list of an app with the given member
 	AddMember(ctx context.Context, storage storage.Storage, ownerUUID, appUUID string, member []string) errors.ErrApi
 
-	// UpdateConfig updates the app configs for funnel, campaign and btn_time
-	UpdateConfig(ctx context.Context, storage storage.Storage, cfg config.Cfgs, updateFlag string) errors.ErrApi
-
-	// GenerateToken prepares all data required in order to generate an app token for the client library
-	GetTokenClaims(ctx context.Context, storage storage.Storage, tokenSrv tokenSrv.TokenClient, appUUID, callerUUID, orgnAndApp string) (string, errors.ErrApi)
+	// IsAllowedToGenToken
+	IsAllowedToGenToken(ctx context.Context, callerUUID, appUUID string) (bool, errors.ErrApi)
 
 	// HasPermissions verifies that the request caller is allowed to work with the app resource
 	HasPermissions(ctx context.Context, storage storage.Storage, callerUUID, appUUID string) errors.ErrApi

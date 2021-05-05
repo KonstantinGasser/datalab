@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+
+service AppToken {
+    rpc Issue(IssueRequest) returns (IssueResponse) {}
+}
+
+
+message IssueRequest {
+    string tracing_ID = 1;
+    string caller_uuid = 2; 
+    string app_uuid = 3;
+    string app_hash = 4;
+    string app_origin = 5;
+}
+
+message IssueResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    string token = 3;
+}

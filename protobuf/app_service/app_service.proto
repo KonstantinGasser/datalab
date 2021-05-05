@@ -15,57 +15,56 @@ service App {
     rpc AddMember(AddMemberRequest) returns (AddMemberResponse) {}
     rpc RemoveMember(RemoveMemberRequest) returns (RemoveMemberResponse) {}
 
-    rpc CanGenToken(CanGenTokenRequest) returns (CanGenTokenResponse) {}
+    // rpc CanGenToken(CanGenTokenRequest) returns (CanGenTokenResponse) {}
     rpc CanDelApp(CanDelAppRequest) returns (CanDelAppResponse) {}
 
-    rpc GenerateToken(GenerateTokenRequest) returns (GenerateTokenResponse) {}
+    // rpc GenerateToken(GenerateTokenRequest) returns (GenerateTokenResponse) {}
+
+    rpc IsAllowedToGenToken(IsAllowedToGenTokenRequest) returns (IsAllowedToGenTokenResponse) {}
 
 }
 
-// // RPC UPDATE CONFIG
-// message UpdateCfgRequest {
-//     string tracing_ID = 1;
-//     string caller_uuid = 2;
-//     string update_flag = 3;
-//     string app_uuid = 4;
-//     repeated Funnel stages = 5;
-//     repeated Campaign records = 6;
-//     repeated BtnTime btn_defs = 7;
-// }
-
-// message UpdateCfgResponse {
-//     int32 status_code = 1;
-//     string msg = 2;
-// }
-
-// RPC GENERATE TOKEN
-message GenerateTokenRequest {
+message IsAllowedToGenTokenRequest {
     string tracing_ID = 1;
     string caller_uuid = 2;
     string app_uuid = 3;
-    string orgn_domain = 4;
-    string app_name = 5;
 }
 
-message GenerateTokenResponse {
+message IsAllowedToGenTokenResponse {
     int32 status_code = 1;
     string msg = 2;
-    string app_token = 3;
+    bool is_allowed = 3;
 }
+
+
+// RPC GENERATE TOKEN
+// message GenerateTokenRequest {
+//     string tracing_ID = 1;
+//     string caller_uuid = 2;
+//     string app_uuid = 3;
+//     string orgn_domain = 4;
+//     string app_name = 5;
+// }
+
+// message GenerateTokenResponse {
+//     int32 status_code = 1;
+//     string msg = 2;
+//     string app_token = 3;
+// }
 
 // RPC CAN GEN TOKEN
-message CanGenTokenRequest {
-    string tracing_ID = 1;
-    string caller_uuid = 2;
-    string domain_name = 3;
-    string app_name = 4;
-}
+// message CanGenTokenRequest {
+//     string tracing_ID = 1;
+//     string caller_uuid = 2;
+//     string domain_name = 3;
+//     string app_name = 4;
+// }
 
-message CanGenTokenResponse {
-    int32 status_code = 1;
-    string msg = 2;
-    bool can_gen_token = 3;
-}
+// message CanGenTokenResponse {
+//     int32 status_code = 1;
+//     string msg = 2;
+//     bool can_gen_token = 3;
+// }
 // ***************************
 
 // RPC CAN DEL APP

@@ -24,9 +24,9 @@ type AppClient interface {
 	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
 	AddMember(ctx context.Context, in *AddMemberRequest, opts ...grpc.CallOption) (*AddMemberResponse, error)
 	RemoveMember(ctx context.Context, in *RemoveMemberRequest, opts ...grpc.CallOption) (*RemoveMemberResponse, error)
-	CanGenToken(ctx context.Context, in *CanGenTokenRequest, opts ...grpc.CallOption) (*CanGenTokenResponse, error)
+	// rpc CanGenToken(CanGenTokenRequest) returns (CanGenTokenResponse) {}
 	CanDelApp(ctx context.Context, in *CanDelAppRequest, opts ...grpc.CallOption) (*CanDelAppResponse, error)
-	GenerateToken(ctx context.Context, in *GenerateTokenRequest, opts ...grpc.CallOption) (*GenerateTokenResponse, error)
+	IsAllowedToGenToken(ctx context.Context, in *IsAllowedToGenTokenRequest, opts ...grpc.CallOption) (*IsAllowedToGenTokenResponse, error)
 }
 
 type appClient struct {
@@ -91,15 +91,6 @@ func (c *appClient) RemoveMember(ctx context.Context, in *RemoveMemberRequest, o
 	return out, nil
 }
 
-func (c *appClient) CanGenToken(ctx context.Context, in *CanGenTokenRequest, opts ...grpc.CallOption) (*CanGenTokenResponse, error) {
-	out := new(CanGenTokenResponse)
-	err := c.cc.Invoke(ctx, "/app_service.App/CanGenToken", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *appClient) CanDelApp(ctx context.Context, in *CanDelAppRequest, opts ...grpc.CallOption) (*CanDelAppResponse, error) {
 	out := new(CanDelAppResponse)
 	err := c.cc.Invoke(ctx, "/app_service.App/CanDelApp", in, out, opts...)
@@ -109,9 +100,9 @@ func (c *appClient) CanDelApp(ctx context.Context, in *CanDelAppRequest, opts ..
 	return out, nil
 }
 
-func (c *appClient) GenerateToken(ctx context.Context, in *GenerateTokenRequest, opts ...grpc.CallOption) (*GenerateTokenResponse, error) {
-	out := new(GenerateTokenResponse)
-	err := c.cc.Invoke(ctx, "/app_service.App/GenerateToken", in, out, opts...)
+func (c *appClient) IsAllowedToGenToken(ctx context.Context, in *IsAllowedToGenTokenRequest, opts ...grpc.CallOption) (*IsAllowedToGenTokenResponse, error) {
+	out := new(IsAllowedToGenTokenResponse)
+	err := c.cc.Invoke(ctx, "/app_service.App/IsAllowedToGenToken", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -128,9 +119,9 @@ type AppServer interface {
 	Get(context.Context, *GetRequest) (*GetResponse, error)
 	AddMember(context.Context, *AddMemberRequest) (*AddMemberResponse, error)
 	RemoveMember(context.Context, *RemoveMemberRequest) (*RemoveMemberResponse, error)
-	CanGenToken(context.Context, *CanGenTokenRequest) (*CanGenTokenResponse, error)
+	// rpc CanGenToken(CanGenTokenRequest) returns (CanGenTokenResponse) {}
 	CanDelApp(context.Context, *CanDelAppRequest) (*CanDelAppResponse, error)
-	GenerateToken(context.Context, *GenerateTokenRequest) (*GenerateTokenResponse, error)
+	IsAllowedToGenToken(context.Context, *IsAllowedToGenTokenRequest) (*IsAllowedToGenTokenResponse, error)
 	mustEmbedUnimplementedAppServer()
 }
 
@@ -156,14 +147,11 @@ func (UnimplementedAppServer) AddMember(context.Context, *AddMemberRequest) (*Ad
 func (UnimplementedAppServer) RemoveMember(context.Context, *RemoveMemberRequest) (*RemoveMemberResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RemoveMember not implemented")
 }
-func (UnimplementedAppServer) CanGenToken(context.Context, *CanGenTokenRequest) (*CanGenTokenResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CanGenToken not implemented")
-}
 func (UnimplementedAppServer) CanDelApp(context.Context, *CanDelAppRequest) (*CanDelAppResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CanDelApp not implemented")
 }
-func (UnimplementedAppServer) GenerateToken(context.Context, *GenerateTokenRequest) (*GenerateTokenResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GenerateToken not implemented")
+func (UnimplementedAppServer) IsAllowedToGenToken(context.Context, *IsAllowedToGenTokenRequest) (*IsAllowedToGenTokenResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method IsAllowedToGenToken not implemented")
 }
 func (UnimplementedAppServer) mustEmbedUnimplementedAppServer() {}
 
@@ -286,24 +274,6 @@ func _App_RemoveMember_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
-func _App_CanGenToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CanGenTokenRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AppServer).CanGenToken(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/app_service.App/CanGenToken",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AppServer).CanGenToken(ctx, req.(*CanGenTokenRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _App_CanDelApp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CanDelAppRequest)
 	if err := dec(in); err != nil {
@@ -322,20 +292,20 @@ func _App_CanDelApp_Handler(srv interface{}, ctx context.Context, dec func(inter
 	return interceptor(ctx, in, info, handler)
 }
 
-func _App_GenerateToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GenerateTokenRequest)
+func _App_IsAllowedToGenToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IsAllowedToGenTokenRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AppServer).GenerateToken(ctx, in)
+		return srv.(AppServer).IsAllowedToGenToken(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/app_service.App/GenerateToken",
+		FullMethod: "/app_service.App/IsAllowedToGenToken",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AppServer).GenerateToken(ctx, req.(*GenerateTokenRequest))
+		return srv.(AppServer).IsAllowedToGenToken(ctx, req.(*IsAllowedToGenTokenRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -372,16 +342,12 @@ var App_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _App_RemoveMember_Handler,
 		},
 		{
-			MethodName: "CanGenToken",
-			Handler:    _App_CanGenToken_Handler,
-		},
-		{
 			MethodName: "CanDelApp",
 			Handler:    _App_CanDelApp_Handler,
 		},
 		{
-			MethodName: "GenerateToken",
-			Handler:    _App_GenerateToken_Handler,
+			MethodName: "IsAllowedToGenToken",
+			Handler:    _App_IsAllowedToGenToken_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
