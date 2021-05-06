@@ -205,7 +205,7 @@ export default {
                 config_uuid: this.$props.config_uuid,
                 funnel: this.funnel,
             }
-            axios.post("http://localhost:8080/api/v2/view/config/update?resource=funnel", payload, options).then(res => {
+            axios.post("http://192.168.0.177:8080/api/v2/view/config/update?resource=funnel", payload, options).then(res => {
                 console.log(res);
                 this.$toast.success("Updated Funnel information")
             }).catch(err => this.$toast.error("Could not update Funnel information"));
@@ -246,7 +246,7 @@ export default {
                 config_uuid: this.$props.config_uuid,
                 campaign: this.campaign,
             }
-            axios.post("http://localhost:8080/api/v2/view/config/update?resource=campaign", payload, options).then(res => {
+            axios.post("http://192.168.0.177:8080/api/v2/view/config/update?resource=campaign", payload, options).then(res => {
                 console.log(res);
                 this.$toast.success("Updated Campaign information")
             }).catch(err => this.$toast.error("Could not update Campaign information"));
@@ -288,7 +288,7 @@ export default {
                 config_uuid: this.$props.config_uuid,
                 btn_time: this.buttons,
             }
-            axios.post("http://localhost:8080/api/v2/view/config/update?resource=btnTime", payload, options).then(res => {
+            axios.post("http://192.168.0.177:8080/api/v2/view/config/update?resource=btnTime", payload, options).then(res => {
                 console.log(res);
                 this.$toast.success("Updated Interesting-Buttons information")
             }).catch(err => this.$toast.error("Could not update Interesting-Buttons information"));

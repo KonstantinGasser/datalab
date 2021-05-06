@@ -4,8 +4,9 @@ WORKDIR /usr/bin
 
 COPY ./bin/service .
 
-EXPOSE 8005
+EXPOSE 8006
 
 ENTRYPOINT ["/usr/bin/service", \
                 "-host=:8006", \
-                "-db-srv=mongodb://configstorage:secure@192.168.0.177:27019"]
+                "-db-srv=mongodb://apptokenstorage:secure@192.168.0.177:27020", \
+                "-app-srv=appservice:8003"]

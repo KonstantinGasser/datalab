@@ -8,5 +8,5 @@ deploy:
 
 	# ============ Push To Registry ============
 	sudo docker push datalab-registry.dev:5000/frontend:$(VERSION)_$(TAG)
-
+	
 	# ============ Deployment <$(VERSION)_$(TAG)> DONE ============
