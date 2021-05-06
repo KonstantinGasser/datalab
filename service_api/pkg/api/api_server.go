@@ -9,6 +9,7 @@ import (
 	"net/url"
 
 	appSrv "github.com/KonstantinGasser/datalab/protobuf/app_service"
+	apptokenSrv "github.com/KonstantinGasser/datalab/protobuf/apptoken_service"
 	configSrv "github.com/KonstantinGasser/datalab/protobuf/config_service"
 	tokenSrv "github.com/KonstantinGasser/datalab/protobuf/token_service"
 	userSrv "github.com/KonstantinGasser/datalab/protobuf/user_service"
@@ -48,6 +49,7 @@ type API struct {
 	UserClient     userSrv.UserClient
 	TokenSrvClient tokenSrv.TokenClient
 	AppClient      appSrv.AppClient
+	AppTokenClient apptokenSrv.AppTokenClient
 	ConfigClient   configSrv.ConfigClient
 }
 
@@ -66,7 +68,7 @@ func (api *API) WithAccessControlOrigin(opt string) func(api *API) {
 // - AccessControlAllowOrigin: "*"
 // - AccessControlAllowMethods: "GET,POST,OPTIONS"
 // - AccessControlAllowHeader: "*"
-func NewDefault(user userSrv.UserClient, app appSrv.AppClient, token tokenSrv.TokenClient, config configSrv.ConfigClient) *API {
+func NewDefault(user userSrv.UserClient, app appSrv.AppClient, apptoken apptokenSrv.AppTokenClient, token tokenSrv.TokenClient, config configSrv.ConfigClient) *API {
 	return &API{
 		// accessOrigin's default value will be "*" allowing ALL origins
 		accessOrigin:  "*",
@@ -98,6 +100,7 @@ func NewDefault(user userSrv.UserClient, app appSrv.AppClient, token tokenSrv.To
 		// *** Client Dependencies ***
 		UserClient:     user,
 		AppClient:      app,
+		AppTokenClient: apptoken,
 		ConfigClient:   config,
 		TokenSrvClient: token,
 	}

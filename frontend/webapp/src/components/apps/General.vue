@@ -31,7 +31,7 @@
                     </div>
                     <div v-if="app_token || app.app_token" class=""><small>Token expires in {{get_valid_till.days}} days {{get_valid_till.hours}} hours</small></div>
                     <div class="mt-3">
-                        Checkout the <a href="http://192.168.0.177:3000/docs/lib" target="_blank">documentation</a> 
+                        Checkout the <a href="http://localhost:3000/docs/lib" target="_blank">documentation</a> 
                         on how to implement the client side
                     </div>
                 </div>
@@ -115,10 +115,12 @@
                         'Authorization': localStorage.getItem("token"),
                     }
                 };
-                axios.post("http://192.168.0.177:8080/api/v2/view/app/generate/token", {
-                    app_uuid: this.$props.app.uuid,
+                axios.post("http://localhost:8080/api/v2/view/app/generate/token", {
+                    app_uuid: this.$props.app?.uuid,
                     app_name: appOrgn[1],
                     orgn_name: appOrgn[0],
+                    orgn_domain: this.$props.app?.owner?.orgn_domain,
+                    app_url: this.$props.app?.URL,
                 }, options).then(res => {
                     console.log(res);
                     this.app_token = res.data.app_token;
@@ -144,7 +146,7 @@
                         'Authorization': localStorage.getItem("token"),
                     }
                 };
-                axios.post("http://192.168.0.177:8080/api/v2/view/app/delete", {
+                axios.post("http://localhost:8080/api/v2/view/app/delete", {
                         app_uuid: id,
                         orgn_name: appOrgn[0],
                         app_name: appOrgn[1],

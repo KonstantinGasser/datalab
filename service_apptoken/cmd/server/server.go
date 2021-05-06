@@ -6,6 +6,7 @@ import (
 
 	apptokenSrv "github.com/KonstantinGasser/datalab/protobuf/apptoken_service"
 	"github.com/KonstantinGasser/datalab/service_apptoken/pkg/api"
+	"github.com/KonstantinGasser/datalab/service_apptoken/pkg/apptoken"
 	"github.com/KonstantinGasser/datalab/service_apptoken/pkg/grpcC"
 	"github.com/KonstantinGasser/datalab/service_apptoken/pkg/storage"
 	"github.com/sirupsen/logrus"
@@ -17,6 +18,7 @@ import (
 func Run(ctx context.Context, host, appAddr, dbAddr string) error {
 	srv := grpc.NewServer()
 	// create storage dependency
+	apptoken := apptoken.New()
 	storage, err := storage.New(dbAddr)
 	if err != nil {
 		return err
@@ -25,7 +27,7 @@ func Run(ctx context.Context, host, appAddr, dbAddr string) error {
 	if err != nil {
 		return err
 	}
-	apptokenService := api.NewAppTokenServer(appClient, storage)
+	apptokenService := api.NewAppTokenServer(apptoken, appClient, storage)
 	apptokenSrv.RegisterAppTokenServer(srv, apptokenService)
 
 	listener, err := net.Listen("tcp", host)

@@ -148,7 +148,7 @@
                     }
                 };
 
-                const res = await axios.get("http://192.168.0.177:8080/api/v2/view/app/details", options)
+                const res = await axios.get("http://localhost:8080/api/v2/view/app/details", options)
                 if (res.data == null || res.status >= 400) {
                     this.isInCreateMode = true;
                     console.log(this.isInCreateMode);
@@ -164,7 +164,7 @@
                         'Authorization': localStorage.getItem("token"),
                     }
                 };
-                axios.get("http://192.168.0.177:8080/api/v2/view/app/get?uuid="+uuid, options).then(resp => {
+                axios.get("http://localhost:8080/api/v2/view/app/get?uuid="+uuid, options).then(resp => {
                     if (this.isInCreateMode)
                         this.isInCreateMode = !this.isInCreateMode;
                     this.activeApp = resp.data.app;

@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/KonstantinGasser/datalab/service_apptoken/pkg/errors"
 	"github.com/KonstantinGasser/datalab/service_apptoken/pkg/storage"
-	"github.com/KonstantinGasser/datalab/service_config/pkg/errors"
 )
 
 const (

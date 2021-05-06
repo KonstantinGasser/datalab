@@ -48,17 +48,7 @@ func (client mongoClient) FindOne(ctx context.Context, db, collection string, fi
 	if err := coll.FindOne(ctx, filter).Decode(result); err != nil {
 		// Decode will return ErrNoDocuments if the query returns no result
 		// this is less an error but similar to io.EOF and means NoRecoredFound
-		if err == mongo.ErrNoDocuments {
-			return errors.ErrAPI{
-				Status: http.StatusBadGateway,
-				Err:    err,
-				Msg:    "Could not find any document for request",
-			}
-		}
-		return errors.ErrAPI{
-			Status: http.StatusInternalServerError,
-			Err:    err,
-		}
+		return err
 	}
 	return nil
 }

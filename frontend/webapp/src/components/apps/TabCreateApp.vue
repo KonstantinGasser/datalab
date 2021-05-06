@@ -141,7 +141,7 @@
                             'Authorization': localStorage.getItem("token"),
                         }
                     };
-                    await axios.post("http://192.168.0.177:8080/api/v2/view/app/create", {
+                    await axios.post("http://localhost:8080/api/v2/view/app/create", {
                             app_name: this.appName,
                             app_description: this.appDesc,
                             app_member: this.appMember,
