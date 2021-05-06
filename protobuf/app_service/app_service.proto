@@ -28,6 +28,7 @@ message IsAllowedToGenTokenRequest {
     string tracing_ID = 1;
     string caller_uuid = 2;
     string app_uuid = 3;
+    string app_hash = 4;
 }
 
 message IsAllowedToGenTokenResponse {
@@ -36,36 +37,6 @@ message IsAllowedToGenTokenResponse {
     bool is_allowed = 3;
 }
 
-
-// RPC GENERATE TOKEN
-// message GenerateTokenRequest {
-//     string tracing_ID = 1;
-//     string caller_uuid = 2;
-//     string app_uuid = 3;
-//     string orgn_domain = 4;
-//     string app_name = 5;
-// }
-
-// message GenerateTokenResponse {
-//     int32 status_code = 1;
-//     string msg = 2;
-//     string app_token = 3;
-// }
-
-// RPC CAN GEN TOKEN
-// message CanGenTokenRequest {
-//     string tracing_ID = 1;
-//     string caller_uuid = 2;
-//     string domain_name = 3;
-//     string app_name = 4;
-// }
-
-// message CanGenTokenResponse {
-//     int32 status_code = 1;
-//     string msg = 2;
-//     bool can_gen_token = 3;
-// }
-// ***************************
 
 // RPC CAN DEL APP
 message CanDelAppRequest {

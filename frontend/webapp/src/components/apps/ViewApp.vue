@@ -15,7 +15,7 @@
             </div>
         </div>
         <div>
-            <TabCreateApp v-if="isInCreateMode" @createdApp="updateState" />
+            <TabCreateApp v-if="isInCreateMode" @createdApp="updateState" :orgn_domain="activeApp.owner?.orgn_domain" />
             <div v-if="!isInCreateMode">
                 <h1 class="super-lg">{{activeApp.owner?.orgn_domain}}/{{activeApp.name}}</h1>
                 <div class="desc_test">{{activeApp.description}}</div>
@@ -77,6 +77,7 @@
             this.getViewApp().then(data => {
                 this.apps = data.app_list;
                 this.activeApp = data.app_details;
+                this.activeApp["app_token"] = data.app_token;
                 this.activeApp["app_config"] = {
                         "funnel": data.config_funnel,
                         "campaign": data.config_campaign,
@@ -106,6 +107,12 @@
                 this.getViewApp().then(data => {
                     this.apps = data.app_list;
                     this.activeApp = data.app_details;
+                    this.activeApp["app_token"] = data.app_token;
+                    this.activeApp["app_config"] = {
+                        "funnel": data.config_funnel,
+                        "campaign": data.config_campaign,
+                        "btn_time": data.config_btn_time,
+                    }
                     this.isInCreateMode = false;
                 }).catch(error => {
                     if (error.response.status === 401) {
@@ -124,6 +131,7 @@
                 this.getViewApp().then(data => {
                     this.apps = data.app_list;
                     this.activeApp = data.app_details;
+                    this.activeApp["app_token"] = data.app_token;
                     this.activeApp["app_config"] = {
                         "funnel": data.config_funnel,
                         "campaign": data.config_campaign,
@@ -168,6 +176,7 @@
                     if (this.isInCreateMode)
                         this.isInCreateMode = !this.isInCreateMode;
                     this.activeApp = resp.data.app;
+                    this.activeApp["app_token"] = resp.data.app_token;
                     this.activeApp["app_config"] = {
                         "funnel": resp.data.config_funnel,
                         "campaign": resp.data.config_campaign,

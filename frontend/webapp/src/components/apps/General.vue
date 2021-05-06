@@ -1,5 +1,6 @@
 <template>
     <div>
+        <br>
         <h1>App Token</h1>
         <div class="view_component">
             <div class="form-row">
@@ -84,8 +85,8 @@
         props: ['app', 'token_placeholder'],
         computed: {
             token() {
-                if (this.$props.app.app_token) {
-                    return this.$props.app.app_token;
+                if (this.$props.app?.app_token?.token !== "") {
+                    return this.$props.app?.app_token?.token;
                 } 
                 if (this.app_token) {
                     return this.app_token;

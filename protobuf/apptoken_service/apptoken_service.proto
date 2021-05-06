@@ -1,8 +1,10 @@
 syntax = "proto3";
 
+package apptoken_service;
 
 service AppToken {
     rpc Issue(IssueRequest) returns (IssueResponse) {}
+    rpc Get(GetRequest) returns (GetResponse) {}
 }
 
 
@@ -18,4 +20,16 @@ message IssueResponse {
     int32 status_code = 1;
     string msg = 2;
     string token = 3;
+}
+
+message GetRequest {
+    string tracing_ID = 1;
+    string app_uuid = 2;
+}
+
+message GetResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    string token = 3;
+    int64 token_exp = 4;
 }

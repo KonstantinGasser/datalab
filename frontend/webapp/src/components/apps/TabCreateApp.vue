@@ -1,7 +1,8 @@
 <template>
+    <h1 class="super-lg">{{orgn_domain}}/{{appName}}</h1>
     <div class="view_component">
         <div class="d-flex justify-end align-center mt-2">
-            <button class="btn btn-standard" @click="createNewApp()">Create App {{ appName }}</button>
+            <button class="btn btn-standard" @click="createNewApp()">Create App</button>
         </div>
         <div class="form-row w-100">
            <div class="form-group col">
@@ -97,6 +98,7 @@
                 appCfgs: [],
             };
         },
+        props: ["orgn_domain"],
         methods: {
             setConfig(event) {
                 if(!event.checked) {

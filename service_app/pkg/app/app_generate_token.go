@@ -20,10 +20,10 @@ package app
 // 	// 		- app must not have a token already
 // 	// 		- app must have at least one configuration set
 
-// 	if err := matchAppHash(ctx, storage, appUUID, callerUUID, orgnAndApp); err != nil {
+// 	if err := matchingAppHash(ctx, storage, appUUID, callerUUID, orgnAndApp); err != nil {
 // 		return "", errors.ErrAPI{
 // 			Status: http.StatusBadRequest,
-// 			Err:    fmt.Errorf("matchAppHash: %w", err),
+// 			Err:    fmt.Errorf("matchingAppHash: %w", err),
 // 			Msg:    "App-Hash do not match",
 // 		}
 // 	}

@@ -19,6 +19,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AppTokenClient interface {
 	Issue(ctx context.Context, in *IssueRequest, opts ...grpc.CallOption) (*IssueResponse, error)
+	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
 }
 
 type appTokenClient struct {
@@ -31,7 +32,16 @@ func NewAppTokenClient(cc grpc.ClientConnInterface) AppTokenClient {
 
 func (c *appTokenClient) Issue(ctx context.Context, in *IssueRequest, opts ...grpc.CallOption) (*IssueResponse, error) {
 	out := new(IssueResponse)
-	err := c.cc.Invoke(ctx, "/AppToken/Issue", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/apptoken_service.AppToken/Issue", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *appTokenClient) Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error) {
+	out := new(GetResponse)
+	err := c.cc.Invoke(ctx, "/apptoken_service.AppToken/Get", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -43,6 +53,7 @@ func (c *appTokenClient) Issue(ctx context.Context, in *IssueRequest, opts ...gr
 // for forward compatibility
 type AppTokenServer interface {
 	Issue(context.Context, *IssueRequest) (*IssueResponse, error)
+	Get(context.Context, *GetRequest) (*GetResponse, error)
 	mustEmbedUnimplementedAppTokenServer()
 }
 
@@ -52,6 +63,9 @@ type UnimplementedAppTokenServer struct {
 
 func (UnimplementedAppTokenServer) Issue(context.Context, *IssueRequest) (*IssueResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Issue not implemented")
+}
+func (UnimplementedAppTokenServer) Get(context.Context, *GetRequest) (*GetResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
 }
 func (UnimplementedAppTokenServer) mustEmbedUnimplementedAppTokenServer() {}
 
@@ -76,10 +90,28 @@ func _AppToken_Issue_Handler(srv interface{}, ctx context.Context, dec func(inte
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/AppToken/Issue",
+		FullMethod: "/apptoken_service.AppToken/Issue",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AppTokenServer).Issue(ctx, req.(*IssueRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AppToken_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppTokenServer).Get(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/apptoken_service.AppToken/Get",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppTokenServer).Get(ctx, req.(*GetRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -88,12 +120,16 @@ func _AppToken_Issue_Handler(srv interface{}, ctx context.Context, dec func(inte
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var AppToken_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "AppToken",
+	ServiceName: "apptoken_service.AppToken",
 	HandlerType: (*AppTokenServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "Issue",
 			Handler:    _AppToken_Issue_Handler,
+		},
+		{
+			MethodName: "Get",
+			Handler:    _AppToken_Get_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

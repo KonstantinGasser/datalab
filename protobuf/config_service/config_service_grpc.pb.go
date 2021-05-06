@@ -34,7 +34,7 @@ func NewConfigClient(cc grpc.ClientConnInterface) ConfigClient {
 
 func (c *configClient) Init(ctx context.Context, in *InitRequest, opts ...grpc.CallOption) (*InitResponse, error) {
 	out := new(InitResponse)
-	err := c.cc.Invoke(ctx, "/Config/Init", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/config_service.Config/Init", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +43,7 @@ func (c *configClient) Init(ctx context.Context, in *InitRequest, opts ...grpc.C
 
 func (c *configClient) Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error) {
 	out := new(GetResponse)
-	err := c.cc.Invoke(ctx, "/Config/Get", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/config_service.Config/Get", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func (c *configClient) Get(ctx context.Context, in *GetRequest, opts ...grpc.Cal
 
 func (c *configClient) HasConfigs(ctx context.Context, in *HasConfigsRequest, opts ...grpc.CallOption) (*HasConfigsResponse, error) {
 	out := new(HasConfigsResponse)
-	err := c.cc.Invoke(ctx, "/Config/HasConfigs", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/config_service.Config/HasConfigs", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +61,7 @@ func (c *configClient) HasConfigs(ctx context.Context, in *HasConfigsRequest, op
 
 func (c *configClient) Update(ctx context.Context, in *UpdateRequest, opts ...grpc.CallOption) (*UpdateResponse, error) {
 	out := new(UpdateResponse)
-	err := c.cc.Invoke(ctx, "/Config/Update", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/config_service.Config/Update", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +118,7 @@ func _Config_Init_Handler(srv interface{}, ctx context.Context, dec func(interfa
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/Config/Init",
+		FullMethod: "/config_service.Config/Init",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ConfigServer).Init(ctx, req.(*InitRequest))
@@ -136,7 +136,7 @@ func _Config_Get_Handler(srv interface{}, ctx context.Context, dec func(interfac
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/Config/Get",
+		FullMethod: "/config_service.Config/Get",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ConfigServer).Get(ctx, req.(*GetRequest))
@@ -154,7 +154,7 @@ func _Config_HasConfigs_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/Config/HasConfigs",
+		FullMethod: "/config_service.Config/HasConfigs",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ConfigServer).HasConfigs(ctx, req.(*HasConfigsRequest))
@@ -172,7 +172,7 @@ func _Config_Update_Handler(srv interface{}, ctx context.Context, dec func(inter
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/Config/Update",
+		FullMethod: "/config_service.Config/Update",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ConfigServer).Update(ctx, req.(*UpdateRequest))
@@ -184,7 +184,7 @@ func _Config_Update_Handler(srv interface{}, ctx context.Context, dec func(inter
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Config_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "Config",
+	ServiceName: "config_service.Config",
 	HandlerType: (*ConfigServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

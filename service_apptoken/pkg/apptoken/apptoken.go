@@ -16,6 +16,7 @@ const (
 
 type AppToken interface {
 	Issue(ctx context.Context, db storage.Storage, claims TokenClaims) (string, errors.ErrApi)
+	Get(ctx context.Context, db storage.Storage, for_app string) (string, int64, errors.ErrApi)
 }
 
 type TokenClaims struct {

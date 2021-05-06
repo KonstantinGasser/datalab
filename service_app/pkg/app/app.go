@@ -34,7 +34,7 @@ type App interface {
 	AddMember(ctx context.Context, storage storage.Storage, ownerUUID, appUUID string, member []string) errors.ErrApi
 
 	// IsAllowedToGenToken
-	IsAllowedToGenToken(ctx context.Context, callerUUID, appUUID string) (bool, errors.ErrApi)
+	IsAllowedToGenToken(ctx context.Context, storage storage.Storage, callerUUID, appUUID, appHash string) (bool, errors.ErrApi)
 
 	// HasPermissions verifies that the request caller is allowed to work with the app resource
 	HasPermissions(ctx context.Context, storage storage.Storage, callerUUID, appUUID string) errors.ErrApi

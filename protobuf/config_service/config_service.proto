@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+package config_service; 
+
 service Config {
     rpc Init(InitRequest) returns (InitResponse) {}
     rpc Get(GetRequest) returns (GetResponse) {}

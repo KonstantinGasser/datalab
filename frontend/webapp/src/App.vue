@@ -34,7 +34,8 @@
 
 
 html, body {
-    overflow: hidden;
+  height: 100%;
+    /* overflow: hidden; */
     color: var(--main-color);
 }
 body {
@@ -57,9 +58,12 @@ a {
 }
 
 #app {
-  height: 100vh;
+  /* height: 100%; */
+  min-height: 100vh;
+  padding-bottom: 25px;
+  padding-top: 100px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
 
   font-family: 'Signika', sans-serif;

@@ -1,5 +1,6 @@
 <template>
-    <div class="main-cfg">
+    <!-- <div class="main-cfg"> -->
+        <br>
         <h1 class="d-flex justify-between">Funnel Configuration</h1>
         <small><span class="link" @click="showCfg('funnel')">how does it work?</span></small>
         <div class="view_component funnel_view mt-0 pl-0">
@@ -109,7 +110,7 @@
                 <button class="btn btn-standard" @click="updateBtnTime">Update</button>
             </div>
         </div>
-    </div>
+    <!-- </div> -->
 </template>
 
 <script>

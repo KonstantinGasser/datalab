@@ -19,6 +19,7 @@ func (srv AppTokenServer) Issue(ctx context.Context, in *apptokenSrv.IssueReques
 		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
 		CallerUuid: in.GetCallerUuid(),
 		AppUuid:    in.GetAppUuid(),
+		AppHash:    in.GetAppHash(),
 	})
 	if err != nil {
 		logrus.Errorf("<%v>[appService.Issue] could not execute grpc.IsAllowedToGenToken: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
