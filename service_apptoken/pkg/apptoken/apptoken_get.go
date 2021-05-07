@@ -9,15 +9,18 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-func (apt apptoken) Get(ctx context.Context, db storage.Storage, for_app string) (string, int64, errors.ErrApi) {
+func (apt apptoken) Get(ctx context.Context, db storage.Storage, for_app string) (*MetaToken, errors.ErrApi) {
 
 	var storedClaims TokenClaims
 	if err := db.FindOne(ctx, apptokenDB, apptokenColl, bson.M{"_id": for_app}, &storedClaims); err != nil {
-		return "", 0, errors.ErrAPI{
+		return nil, errors.ErrAPI{
 			Status: http.StatusInternalServerError,
 			Msg:    "Could not get App-Token Info",
 			Err:    err,
 		}
 	}
-	return storedClaims.AppToken, storedClaims.Exp.Unix(), nil
+	return &MetaToken{
+		Token: storedClaims.AppToken,
+		Exp:   storedClaims.Exp.Unix(),
+	}, nil
 }

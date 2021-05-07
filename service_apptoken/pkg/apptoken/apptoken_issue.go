@@ -13,12 +13,12 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func (apt apptoken) Issue(ctx context.Context, db storage.Storage, claims TokenClaims) (string, errors.ErrApi) {
+func (apt apptoken) Issue(ctx context.Context, db storage.Storage, claims TokenClaims) (*MetaToken, errors.ErrApi) {
 
 	var storedClaims *TokenClaims = &TokenClaims{}
 	err := db.FindOne(ctx, apptokenDB, apptokenColl, bson.M{"_id": claims.AppUuid}, storedClaims)
 	if err != nil && err != mongo.ErrNoDocuments {
-		return "", errors.ErrAPI{
+		return nil, errors.ErrAPI{
 			Status: http.StatusInternalServerError,
 			Msg:    "Could not Issue App-Token",
 			Err:    err,
@@ -29,7 +29,7 @@ func (apt apptoken) Issue(ctx context.Context, db storage.Storage, claims TokenC
 	if storedClaims.AppToken != "" {
 		overrideOK := apt.canBeOverriden(storedClaims.Exp)
 		if !overrideOK {
-			return "", errors.ErrAPI{
+			return nil, errors.ErrAPI{
 				Status: http.StatusBadRequest,
 				Msg:    "Current App-Token is still valid",
 				Err:    fmt.Errorf("app token must have expired before creating a new one"),
@@ -38,7 +38,7 @@ func (apt apptoken) Issue(ctx context.Context, db storage.Storage, claims TokenC
 		storedClaims.Exp = newExp
 		token, err := tokenissuer.IssueNew(claims.AppUuid, claims.AppHash, claims.AppOrigin, claims.Exp)
 		if err != nil {
-			return "", errors.ErrAPI{
+			return nil, errors.ErrAPI{
 				Status: http.StatusInternalServerError,
 				Msg:    "Could not issue App-Token",
 				Err:    err,
@@ -48,18 +48,18 @@ func (apt apptoken) Issue(ctx context.Context, db storage.Storage, claims TokenC
 		_, err = db.UpdateOne(ctx, apptokenDB, apptokenColl, bson.M{"_id": storedClaims.AppUuid}, bson.D{
 			{Key: "$set", Value: bson.M{"app_token": token, "token_exp": newExp}}}, false)
 		if err != nil {
-			return "", errors.ErrAPI{
+			return nil, errors.ErrAPI{
 				Status: http.StatusInternalServerError,
 				Msg:    "Could not issue App-Token",
 				Err:    err,
 			}
 		}
-		return token, nil
+		return &MetaToken{Token: token, Exp: storedClaims.Exp.Unix()}, nil
 	}
 	// if no app token present issue token right away
 	token, err := tokenissuer.IssueNew(claims.AppUuid, claims.AppHash, claims.AppOrigin, newExp)
 	if err != nil {
-		return "", errors.ErrAPI{
+		return nil, errors.ErrAPI{
 			Status: http.StatusInternalServerError,
 			Msg:    "Could not issue App-Token",
 			Err:    err,
@@ -68,11 +68,11 @@ func (apt apptoken) Issue(ctx context.Context, db storage.Storage, claims TokenC
 	claims.AppToken = token
 	claims.Exp = newExp
 	if err := db.InsertOne(ctx, apptokenDB, apptokenColl, claims); err != nil {
-		return "", errors.ErrAPI{
+		return nil, errors.ErrAPI{
 			Status: http.StatusInternalServerError,
 			Msg:    "Could not issue App-Token",
 			Err:    err,
 		}
 	}
-	return token, nil
+	return &MetaToken{Token: token, Exp: claims.Exp.Unix()}, nil
 }

@@ -1,21 +1,5 @@
 # datalab analysis platform for user activity data
 
-### Infrastructure cheat sheet
-
-Services:
-- APIGateway: :8080
-- UserService: :8001
-- TokenService: :8002
-- AppService: :8003
-- Web-Socket-Events: :8004
-- ConfigService: :8005
-***(some say they can see a pattern not sure where...:D)***
-
-Database server:
-- UserService MongoDB: rasp-1:27017
-- AppService MongoDB: rasp-1:27018
-- ConfigServce MongoDB: rasp-1:27019
-
 
 # Client Library: Data Flow
 The idea of this `README` is to explain how the data collection on the client-side works. Further, the session and data life-cycle will be explained as well as the data format.
@@ -123,23 +107,26 @@ EVENT: MOUSEMOVE<br>
 
 ## Docker-Swarm deployment
 ### CI/CD Pipe
-The swarm lives on a Raspberry-PI4 (linux/arm64) consisting out of one node.
-Each service (api,app,user,token,frontend) have their own `Makefile` with the `deploy` target. `make deploy` cross-compilies the executable for `linux/arm64` and builds a docker image also with cross-compilation for `linux/arm64`. Docker cross-compilation is achieved with the `docker buildx build` tool from docker which allows to build images on your local machine for a different OS/Arch. After the build `deploy` pushes the image to the `datalab-registry.dev:5000/<image-name>:<git-commit-hash>` which lives within the `swarm`. From their services can pull the latest images.
+<!-- The swarm lives on a Raspberry-PI4 (linux/arm64) consisting out of one node.
+Each service (api,app,user,token,frontend) have their own `Makefile` with the `deploy` target. `make deploy` cross-compilies the executable for `linux/arm64` and builds a docker image also with cross-compilation for `linux/arm64`. Docker cross-compilation is achieved with the `docker buildx build` tool from docker which allows to build images on your local machine for a different OS/Arch. After the build `deploy` pushes the image to the `datalab-registry.dev:5000/<image-name>:<git-commit-hash>` which lives within the `swarm`. From their services can pull the latest images. -->
 
 
 
-## Service - DNS Table
-| Service    | swarm-name   | port in:out | credentials        |
-|------------|--------------|-------------|--------------------|
-| gateway    | gateway      | 8080:8080   |                    |
-| app        | appservice   | 8003:8003   |                    |
-| user       | userservice  | 8001:8001   |                    |
-| token      | tokenservice | 8002:8002   |                    |
-| config     | configservice| 8005:8005   |                    |
-| frontend   | vuefrontend  | 80:80       |                    |
-| mongo-app  | appstorage   | 27018       | appstorage:secure  |
-| monog-user | userstorage  | 27017       | userstorage:secure |
-|monog-config| configstorage| 27019       |configstorage:secure|
+## Service - DNS Table (some say they can see a pattern..not sure where??)
+| Service         | swarm-name        | port in:out | credentials            |
+|-----------------|-------------------|-------------|------------------------|
+| gateway         | gateway           | 8080:8080   |                        |
+| app             | appservice        | 8003:8003   |                        |
+| user            | userservice       | 8001:8001   |                        |
+| userauth        | userauth          | 8002:8002   |                        |
+| config          | configservice     | 8005:8005   |                        |
+| apptoken        | apptokenservice   | 8006:8006   |                        |
+| frontend        | vuefrontend       | 80:80       |                        |
+| mongo-app       | appstorage        | 27018       | appstorage:secure      |
+| monog-user      | userstorage       | 27017       | userstorage:secure     |
+| monog-config    | configstorage     | 27019       | configstorage:secure   |
+| monog-apptoken  | apptokenstorage   | 27020       | apptokenstorage:secure |
+| monog-userauth  | userauthstorage   | 27021       | userauthstorage:secure |
 
 
 

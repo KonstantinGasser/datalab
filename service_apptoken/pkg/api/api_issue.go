@@ -33,7 +33,7 @@ func (srv AppTokenServer) Issue(ctx context.Context, in *apptokenSrv.IssueReques
 		return &apptokenSrv.IssueResponse{
 			StatusCode: http.StatusUnauthorized,
 			Msg:        "No permissions to create app token",
-			Token:      "",
+			Token:      nil,
 		}, nil
 	}
 
@@ -47,12 +47,15 @@ func (srv AppTokenServer) Issue(ctx context.Context, in *apptokenSrv.IssueReques
 		return &apptokenSrv.IssueResponse{
 			StatusCode: tokenErr.Code(),
 			Msg:        tokenErr.Info(),
-			Token:      "",
+			Token:      nil,
 		}, nil
 	}
 	return &apptokenSrv.IssueResponse{
 		StatusCode: http.StatusOK,
 		Msg:        "Created App-Token",
-		Token:      token,
+		Token: &apptokenSrv.MetaToken{
+			Token: token,
+			Exp:   12,
+		},
 	}, nil
 }

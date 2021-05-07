@@ -5,6 +5,7 @@ package apptoken_service;
 service AppToken {
     rpc Issue(IssueRequest) returns (IssueResponse) {}
     rpc Get(GetRequest) returns (GetResponse) {}
+    rpc MarkDiry(MarkDiryRequest) returns (MarkDiryResponse) {}
 }
 
 
@@ -19,7 +20,7 @@ message IssueRequest {
 message IssueResponse {
     int32 status_code = 1;
     string msg = 2;
-    string token = 3;
+    MetaToken token = 3;
 }
 
 message GetRequest {
@@ -30,6 +31,22 @@ message GetRequest {
 message GetResponse {
     int32 status_code = 1;
     string msg = 2;
-    string token = 3;
-    int64 token_exp = 4;
+    MetaToken token = 3;
+}
+
+message MarkDiryRequest {
+    string tracing_ID = 1;
+    string for_app = 2;
+    string jwt = 3;
+}
+
+message MarkDiryResponse {
+    int32 status_code = 1;
+    string msg = 2;
+}
+
+
+message MetaToken {
+    string token = 1;
+    int64 exp = 2;
 }

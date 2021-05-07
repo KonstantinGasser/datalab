@@ -4,11 +4,50 @@ package token_service;
 
 
 service Token {
+    rpc Create(CreateRequest) returns (CreateResponse) {}
+    rpc Login(LoginRequest) returns (LoginResponse) {}
+    rpc IsAuthend(IsAuthedRequest) returns (IsAuthedResponse) {} 
+
+    
     rpc IssueUserToken(IssueUserTokenRequest) returns (IssueUserTokenResponse) {}
     rpc VerifyUserToken(VerifyUserTokenRequest) returns (VerifyUserTokenResponse) {}
 
     rpc IssueAppToken(IssueAppTokenRequest) returns (IssueAppTokenResponse) {}
     rpc VerifyAppToken(VerifyAppTokenRequest) returns (VerifyAppTokenResponse) {}
+
+
+}
+
+message CreateRequest {
+    string tracing_ID = 1;
+    string username = 2;
+    string password = 3;
+    string organisation = 4;
+}
+message CreateResponse {
+    int32 status_code = 1;
+    string msg = 2;
+}
+
+message LoginRequest {
+    string tracing_ID = 1;
+    string username = 2; 
+    string password = 3;
+}
+message LoginResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    string jwt = 3;
+}
+
+message IsAuthedRequest {
+    string tracing_ID = 1;
+    string jwt = 2;
+}
+message IsAuthedResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    bool is_authed = 3;
 }
 
 // RPC VERIFY APP TOKEN

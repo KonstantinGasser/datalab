@@ -3,7 +3,7 @@ syntax="proto3";
 package user_service;
 
 service User {
-    rpc Authenticate(AuthenticateRequest) returns (AuthenticateResponse) {}
+    // rpc Authenticate(AuthenticateRequest) returns (AuthenticateResponse) {}
 
     rpc Create(CreateRequest) returns (CreateResponse) {}
     rpc Update(UpdateRequest) returns (UpdateResponse) {}
@@ -17,16 +17,16 @@ service User {
 
 // RPC AUTHENTICATE
 // ***************************
-message AuthenticateRequest {
-    string tracing_ID = 1;
-    string username = 2;
-    string password = 3; 
-}
-message AuthenticateResponse {
-    int32 status_code = 1;
-    string msg = 2;
-    UserTokenClaim user_claims = 3;
-}
+// message AuthenticateRequest {
+//     string tracing_ID = 1;
+//     string username = 2;
+//     string password = 3; 
+// }
+// message AuthenticateResponse {
+//     int32 status_code = 1;
+//     string msg = 2;
+//     UserTokenClaim user_claims = 3;
+// }
 
 // RPC CREATE USER
 message CreateRequest {
@@ -112,7 +112,6 @@ message ComplexUser {
 
 message RegisterUser {
     string username = 1;
-    string password = 2;
     string first_name = 3;
     string last_name = 4; 
     string orgn_domain = 5;

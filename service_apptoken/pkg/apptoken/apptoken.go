@@ -15,8 +15,8 @@ const (
 )
 
 type AppToken interface {
-	Issue(ctx context.Context, db storage.Storage, claims TokenClaims) (string, errors.ErrApi)
-	Get(ctx context.Context, db storage.Storage, for_app string) (string, int64, errors.ErrApi)
+	Issue(ctx context.Context, db storage.Storage, claims TokenClaims) (*MetaToken, errors.ErrApi)
+	Get(ctx context.Context, db storage.Storage, for_app string) (*MetaToken, errors.ErrApi)
 }
 
 type TokenClaims struct {
@@ -25,6 +25,11 @@ type TokenClaims struct {
 	AppOrigin string    `bson:"app_origin" required:"yes"`
 	AppToken  string    `bson:"app_token"`
 	Exp       time.Time `bson:"token_exp"`
+}
+
+type MetaToken struct {
+	Token string
+	Exp   int64
 }
 
 type apptoken struct{}

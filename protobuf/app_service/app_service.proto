@@ -38,7 +38,7 @@ message IsAllowedToGenTokenResponse {
 }
 
 
-// RPC CAN DEL APP
+ // RPC CAN DEL APP
 message CanDelAppRequest {
     string tracing_ID = 1;
     string caller_uuid = 2;
