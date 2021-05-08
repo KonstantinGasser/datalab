@@ -4,9 +4,10 @@
     <div class="app-header">
       <NotificationCenter />
     </div>
-    <ViewApp v-if="active_view === 'view_app'" class="app-view"/>
-    <ViewAccount v-if="active_view == 'view_account'" class="app-view" />
-    <ViewCharts v-if="active_view == 'view_dashboard'" class="app-view" />
+    <ViewApp v-if="active_view === 'view_app'" class="app-view" />
+    <ViewAccount v-if="active_view === 'view_account'" class="app-view" />
+    <ViewCharts v-if="active_view === 'view_dashboard'" class="app-view" />
+    <DocClient v-if="active_view === 'view_docs'" class="app-view" />
   </div>
   <vue-confirm-dialog></vue-confirm-dialog>
 </template>
@@ -18,6 +19,7 @@ import ViewApp from '@/components/apps/ViewApp.vue';
 import ViewAccount from '@/components/account/ViewAccount.vue';
 import ViewCharts from '@/components/charts/ViewCharts';
 import NotificationCenter from '@/components/utils/NotificationCenter';
+import DocClient from '@/components/docs/DocClient';
 
 export default {
   name: 'Dashboard',
@@ -32,6 +34,7 @@ export default {
     ViewCharts,
     ViewAccount,
     NotificationCenter,
+    DocClient,
     SideMenu,
   },
 

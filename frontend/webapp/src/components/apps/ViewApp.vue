@@ -23,7 +23,6 @@
                 <Tabs class="my-2" ref="Tabs" :update="activeTab" :initTab="activeTab" :tabs="tabs" @tabChange="tabChange"/>
                 <General v-if="activeTab === 'Overview'" :app="activeApp" @drop_app="drop_app" :token_placeholder="token_placeholder"/>
                 <Config v-if="activeTab == 'Configuration'" :app_config="activeApp.app_config" :config_uuid="activeApp.config_ref" @setdoc="setdoc"/>
-                <DocClient v-if="activeTab === 'Documentation'" :hasToken="activeApp?.app_token !== ''" @goCreateToken="goCreateToken"/>
             </div>
             <!-- <TabAppDetails ref="tab_app_token" @drop_app="updateState" v-cloak v-if="activeTab === 'App Details' && !isInCreateMode" :app="activeApp"/> -->
         </div>
@@ -36,7 +35,6 @@
     import Tabs from '@/components/utils/Tabs.vue';
     import General from '@/components/apps/General.vue';
     import Config from '@/components/apps/Config';
-    import DocClient from '@/components/apps/DocClient.vue';
     import axios from 'axios';
 
     export default {
@@ -46,7 +44,6 @@
             TabCreateApp,
             General,
             Config,
-            DocClient,
         },
         computed: {
             blockTabs() {
@@ -69,7 +66,7 @@
                 activeApp: {},
                 token_placeholder: "Organization-Domain/App-Name",
                 activeTab: "Overview",
-                tabs: [{name:'Overview', emoji: "🎛"},{name:'Configuration', emoji: "⚙️"},{name:'Documentation', emoji: "📓"}]
+                tabs: [{name:'Overview', emoji: "🎛"},{name:'Configuration', emoji: "⚙️"},]
             };
         },
         async created() {

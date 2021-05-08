@@ -42,7 +42,6 @@ export default {
     data() {
         return {};
     },
-    props: ['hasToken'],
     methods: {
         navCreateToken() {
             this.$emit("goCreateToken");
@@ -60,8 +59,6 @@ export default {
     display: grid;
     grid-template-columns: 25% 1fr;
     column-gap: 0.5em;
-    max-height: 70vh;
-    height: 70vh
 }
 .menu-bar {
     grid-column: 1;

@@ -6,6 +6,7 @@
         <MenuItem @click="setActive('view_dashboard')" :tabName="'view_dashboard'" :item="'Dashboard'" />
         <MenuItem @click="setActive('view_queries')" :tabName="'view_queries'" :item="'Queries'" />
         <MenuItem @click="setActive('view_app')" :tabName="'view_app'" :item="'Apps'" />
+        <MenuItem @click="setActive('view_docs')" :tabName="'view_docs'" :item="'Documentation'" />
         <MenuItem @click="setActive('view_account')" :tabName="'view_account'" :item="'Account'" />
         <!-- <MenuItem @click="setActive('view_settings')" :tabName="'view_settings'" :item="'Settings'" /> -->
       </div>

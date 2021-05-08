@@ -69,7 +69,7 @@
                 <tr>
                     <th class="v-center">{{campaign_count}}</th>
                     <td><input v-model="campaign_name" type="text" placeholder="Name (E-Mail Campaign)" class="form-control border" :class="{'border-danger': campaign_invalid}" ></td>
-                    <td><input v-model="campaign_prefix" type="text" placeholder="Prefix (#prop-email)" class="form-control border" :class="{'border-danger': campaign_invalid}" ></td>
+                    <td><input v-model="campaign_prefix" type="text" placeholder="Prefix (ex. summer-sales)" class="form-control border" :class="{'border-danger': campaign_invalid}" ></td>
                     <td class="v-center"><span class="icon icon-plus hover" @click="addCampaign"></span></td>
                 </tr> 
             </tbody>
@@ -100,8 +100,8 @@
                 </tr>
                 <tr>
                     <th class="v-center">{{button_count}}</th>
-                    <td><input v-model="button_name" type="text" placeholder="Name (Btn-Order)" class="form-control border" :class="{'border-danger': button_invalid}" ></td>
-                    <td><input v-model="button_btn" type="text" placeholder="Btn (btn_order)" class="form-control border" :class="{'border-danger': button_invalid}" ></td>
+                    <td><input v-model="button_name" type="text" placeholder="Name (ex. Btn-Order)" class="form-control border" :class="{'border-danger': button_invalid}" ></td>
+                    <td><input v-model="button_btn" type="text" placeholder="Btn (ex. btn_order)" class="form-control border" :class="{'border-danger': button_invalid}" ></td>
                     <td class="v-center"><span class="icon icon-plus hover" @click="addBtnTime"></span></td>
                 </tr> 
             </tbody>
