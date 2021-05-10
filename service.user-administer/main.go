@@ -8,7 +8,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/KonstantinGasser/datalab/service_user/cmd/server"
+	"github.com/KonstantinGasser/datalab/service.user-administer/cmd/server"
 	"github.com/sirupsen/logrus"
 )
 

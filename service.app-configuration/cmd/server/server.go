@@ -6,7 +6,7 @@ import (
 
 	"github.com/KonstantinGasser/datalab/service.app-configuration/domain"
 	"github.com/KonstantinGasser/datalab/service.app-configuration/handler"
-	configsvc "github.com/KonstantinGasser/datalab/service.app-configuration/proto"
+	"github.com/KonstantinGasser/datalab/service.app-configuration/proto"
 	"github.com/KonstantinGasser/datalab/service.app-configuration/repo"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
@@ -23,7 +23,7 @@ func Run(ctx context.Context, host, dbAddr string) error {
 	}
 	domain := domain.NewAppConfigLogic(repo)
 	configService := handler.NewHandler(domain)
-	configsvc.RegisterAppConfigurationServer(srv, configService)
+	proto.RegisterAppConfigurationServer(srv, configService)
 
 	listener, err := net.Listen("tcp", host)
 	if err != nil {
