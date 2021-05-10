@@ -4,11 +4,11 @@ import (
 	"context"
 	"net"
 
+	"github.com/KonstantinGasser/datalab/service.app-token-issuer/domain"
+	"github.com/KonstantinGasser/datalab/service.app-token-issuer/grpc_adapter"
+	"github.com/KonstantinGasser/datalab/service.app-token-issuer/handler"
 	"github.com/KonstantinGasser/datalab/service.app-token-issuer/proto"
-	"github.com/KonstantinGasser/datalab/service_apptoken/pkg/api"
-	"github.com/KonstantinGasser/datalab/service_apptoken/pkg/apptoken"
-	"github.com/KonstantinGasser/datalab/service_apptoken/pkg/grpcC"
-	"github.com/KonstantinGasser/datalab/service_apptoken/pkg/storage"
+	"github.com/KonstantinGasser/datalab/service.app-token-issuer/repo"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )
@@ -18,16 +18,16 @@ import (
 func Run(ctx context.Context, host, appAddr, dbAddr string) error {
 	srv := grpc.NewServer()
 	// create storage dependency
-	apptoken := apptoken.New()
-	storage, err := storage.New(dbAddr)
+	repo, err := repo.NewMongoDB(dbAddr)
 	if err != nil {
 		return err
 	}
-	appClient, err := grpcC.NewAppClient(appAddr)
+	appadminClient, err := grpc_adapter.NewAppAdministerClient(appAddr)
 	if err != nil {
 		return err
 	}
-	apptokenService := api.NewAppTokenServer(apptoken, appClient, storage)
+	domain := domain.NewAppTokenLogic(repo, appadminClient)
+	apptokenService := handler.NewHandler(domain)
 	proto.RegisterAppTokenIssuerServer(srv, apptokenService)
 
 	listener, err := net.Listen("tcp", host)

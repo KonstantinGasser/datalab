@@ -5,7 +5,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-func NewAppClient(listenOn string) (appsvc.AppAdministerClient, error) {
+func NewAppAdministerClient(listenOn string) (appsvc.AppAdministerClient, error) {
 	conn, err := grpc.Dial(listenOn, grpc.WithInsecure())
 	if err != nil {
 		return nil, err
