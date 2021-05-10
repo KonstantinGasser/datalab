@@ -18,9 +18,9 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserAuthenticationClient interface {
-	Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateResponse, error)
+	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
-	IsAuthend(ctx context.Context, in *IsAuthedRequest, opts ...grpc.CallOption) (*IsAuthedResponse, error)
+	IsAuthed(ctx context.Context, in *IsAuthedRequest, opts ...grpc.CallOption) (*IsAuthedResponse, error)
 }
 
 type userAuthenticationClient struct {
@@ -31,9 +31,9 @@ func NewUserAuthenticationClient(cc grpc.ClientConnInterface) UserAuthentication
 	return &userAuthenticationClient{cc}
 }
 
-func (c *userAuthenticationClient) Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateResponse, error) {
-	out := new(CreateResponse)
-	err := c.cc.Invoke(ctx, "/auth_proto.UserAuthentication/Create", in, out, opts...)
+func (c *userAuthenticationClient) Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error) {
+	out := new(RegisterResponse)
+	err := c.cc.Invoke(ctx, "/auth_proto.UserAuthentication/Register", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -49,9 +49,9 @@ func (c *userAuthenticationClient) Login(ctx context.Context, in *LoginRequest, 
 	return out, nil
 }
 
-func (c *userAuthenticationClient) IsAuthend(ctx context.Context, in *IsAuthedRequest, opts ...grpc.CallOption) (*IsAuthedResponse, error) {
+func (c *userAuthenticationClient) IsAuthed(ctx context.Context, in *IsAuthedRequest, opts ...grpc.CallOption) (*IsAuthedResponse, error) {
 	out := new(IsAuthedResponse)
-	err := c.cc.Invoke(ctx, "/auth_proto.UserAuthentication/IsAuthend", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/auth_proto.UserAuthentication/IsAuthed", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -62,9 +62,9 @@ func (c *userAuthenticationClient) IsAuthend(ctx context.Context, in *IsAuthedRe
 // All implementations must embed UnimplementedUserAuthenticationServer
 // for forward compatibility
 type UserAuthenticationServer interface {
-	Create(context.Context, *CreateRequest) (*CreateResponse, error)
+	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
-	IsAuthend(context.Context, *IsAuthedRequest) (*IsAuthedResponse, error)
+	IsAuthed(context.Context, *IsAuthedRequest) (*IsAuthedResponse, error)
 	mustEmbedUnimplementedUserAuthenticationServer()
 }
 
@@ -72,14 +72,14 @@ type UserAuthenticationServer interface {
 type UnimplementedUserAuthenticationServer struct {
 }
 
-func (UnimplementedUserAuthenticationServer) Create(context.Context, *CreateRequest) (*CreateResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
+func (UnimplementedUserAuthenticationServer) Register(context.Context, *RegisterRequest) (*RegisterResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
 }
 func (UnimplementedUserAuthenticationServer) Login(context.Context, *LoginRequest) (*LoginResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
 }
-func (UnimplementedUserAuthenticationServer) IsAuthend(context.Context, *IsAuthedRequest) (*IsAuthedResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method IsAuthend not implemented")
+func (UnimplementedUserAuthenticationServer) IsAuthed(context.Context, *IsAuthedRequest) (*IsAuthedResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method IsAuthed not implemented")
 }
 func (UnimplementedUserAuthenticationServer) mustEmbedUnimplementedUserAuthenticationServer() {}
 
@@ -94,20 +94,20 @@ func RegisterUserAuthenticationServer(s grpc.ServiceRegistrar, srv UserAuthentic
 	s.RegisterService(&UserAuthentication_ServiceDesc, srv)
 }
 
-func _UserAuthentication_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateRequest)
+func _UserAuthentication_Register_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegisterRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserAuthenticationServer).Create(ctx, in)
+		return srv.(UserAuthenticationServer).Register(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/auth_proto.UserAuthentication/Create",
+		FullMethod: "/auth_proto.UserAuthentication/Register",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserAuthenticationServer).Create(ctx, req.(*CreateRequest))
+		return srv.(UserAuthenticationServer).Register(ctx, req.(*RegisterRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -130,20 +130,20 @@ func _UserAuthentication_Login_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserAuthentication_IsAuthend_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserAuthentication_IsAuthed_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(IsAuthedRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserAuthenticationServer).IsAuthend(ctx, in)
+		return srv.(UserAuthenticationServer).IsAuthed(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/auth_proto.UserAuthentication/IsAuthend",
+		FullMethod: "/auth_proto.UserAuthentication/IsAuthed",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserAuthenticationServer).IsAuthend(ctx, req.(*IsAuthedRequest))
+		return srv.(UserAuthenticationServer).IsAuthed(ctx, req.(*IsAuthedRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -156,16 +156,16 @@ var UserAuthentication_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*UserAuthenticationServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Create",
-			Handler:    _UserAuthentication_Create_Handler,
+			MethodName: "Register",
+			Handler:    _UserAuthentication_Register_Handler,
 		},
 		{
 			MethodName: "Login",
 			Handler:    _UserAuthentication_Login_Handler,
 		},
 		{
-			MethodName: "IsAuthend",
-			Handler:    _UserAuthentication_IsAuthend_Handler,
+			MethodName: "IsAuthed",
+			Handler:    _UserAuthentication_IsAuthed_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -5,18 +5,18 @@ package auth_proto;
 option go_package = "github.com/KonstantinGasser/datalab/service.user-authentication/proto";
 
 service UserAuthentication {
-    rpc Create(CreateRequest) returns (CreateResponse) {}
+    rpc Register(RegisterRequest) returns (RegisterResponse) {}
     rpc Login(LoginRequest) returns (LoginResponse) {}
-    rpc IsAuthend(IsAuthedRequest) returns (IsAuthedResponse) {} 
+    rpc IsAuthed(IsAuthedRequest) returns (IsAuthedResponse) {} 
 }
 
-message CreateRequest {
+message RegisterRequest {
     string tracing_ID = 1;
     string username = 2;
     string password = 3;
     string organisation = 4;
 }
-message CreateResponse {
+message RegisterResponse {
     int32 status_code = 1;
     string msg = 2;
 }
@@ -40,4 +40,10 @@ message IsAuthedResponse {
     int32 status_code = 1;
     string msg = 2;
     bool is_authed = 3;
+    Claims claims = 4;
+}
+
+message Claims {
+    string uuid = 1;
+    string organization = 2;
 }

@@ -122,11 +122,11 @@ Each service (api,app,user,token,frontend) have their own `Makefile` with the `d
 | config          | configservice     | 8005:8005   |                        |
 | apptoken        | apptokenservice   | 8006:8006   |                        |
 | frontend        | vuefrontend       | 80:80       |                        |
-| mongo-app       | appstorage        | 27018       | appstorage:secure      |
-| monog-user      | userstorage       | 27017       | userstorage:secure     |
-| monog-config    | configstorage     | 27019       | configstorage:secure   |
-| monog-apptoken  | apptokenstorage   | 27020       | apptokenstorage:secure |
-| monog-userauth  | userauthstorage   | 27021       | userauthstorage:secure |
+| mongo-app       | appstorage        | 27018:27017 | appstorage:secure      |
+| monog-user      | userstorage       | 27017:27017 | userstorage:secure     |
+| monog-config    | configstorage     | 27019:27017 | configstorage:secure   |
+| monog-apptoken  | apptokenstorage   | 27020:27017 | apptokenstorage:secure |
+| monog-userauth  | userauthstorage   | 27021:27017 | userauthstorage:secure |
 
 
 
