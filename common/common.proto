@@ -25,7 +25,7 @@ message AppMetaInfo {
     string uuid = 2;
 }
 
-message ConfigInfo {
+message AppConfigInfo {
     repeated Funnel funnel = 1;
     repeated Campaign campaign = 2;
     repeated BtnTime btn_time = 3;

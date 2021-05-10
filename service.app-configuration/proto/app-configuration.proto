@@ -10,7 +10,6 @@ service AppConfiguration {
     rpc Init(InitRequest) returns (InitResponse) {}
     rpc Get(GetRequest) returns (GetResponse) {}
     rpc Update(UpdateRequest) returns (UpdateResponse) {}
-    rpc HasConfigs(HasConfigsRequest) returns (HasConfigsResponse) {}
 }
 
 
@@ -21,7 +20,6 @@ message InitRequest {
 message InitResponse {
     int32 status_code = 1;
     string msg = 2;
-    string UUID = 3;
 }
 
 message GetRequest {
@@ -31,17 +29,7 @@ message GetRequest {
 message GetResponse {
     int32 status_code = 1;
     string msg = 2;
-    common.ConfigInfo configs = 3;
-}
-
-message HasConfigsRequest {
-    string tracing_ID = 1;
-    string UUID = 2;
-}
-message HasConfigsResponse {
-    int32 status_code = 1;
-    string msg = 2;
-    bool ok = 3;
+    common.AppConfigInfo configs = 3;
 }
 
 message UpdateRequest {
@@ -51,21 +39,6 @@ message UpdateRequest {
     repeated common.Funnel stages = 4;
     repeated common.Campaign records = 5;
     repeated common.BtnTime btn_defs = 6;
-}
-message Funnel {
-    int32 id = 1;
-    string name = 2;
-    string transition = 3;
-}
-message Campaign {
-    int32 id = 1;
-    string name = 2;
-    string prefix = 3;
-}
-message BtnTime {
-    int32 id = 1;
-    string name = 2;
-    string btn_name = 3;
 }
 message UpdateResponse {
     int32 status_code = 1;

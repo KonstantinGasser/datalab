@@ -21,7 +21,6 @@ type AppConfigurationClient interface {
 	Init(ctx context.Context, in *InitRequest, opts ...grpc.CallOption) (*InitResponse, error)
 	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
 	Update(ctx context.Context, in *UpdateRequest, opts ...grpc.CallOption) (*UpdateResponse, error)
-	HasConfigs(ctx context.Context, in *HasConfigsRequest, opts ...grpc.CallOption) (*HasConfigsResponse, error)
 }
 
 type appConfigurationClient struct {
@@ -59,15 +58,6 @@ func (c *appConfigurationClient) Update(ctx context.Context, in *UpdateRequest, 
 	return out, nil
 }
 
-func (c *appConfigurationClient) HasConfigs(ctx context.Context, in *HasConfigsRequest, opts ...grpc.CallOption) (*HasConfigsResponse, error) {
-	out := new(HasConfigsResponse)
-	err := c.cc.Invoke(ctx, "/config_proto.AppConfiguration/HasConfigs", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // AppConfigurationServer is the server API for AppConfiguration service.
 // All implementations must embed UnimplementedAppConfigurationServer
 // for forward compatibility
@@ -75,7 +65,6 @@ type AppConfigurationServer interface {
 	Init(context.Context, *InitRequest) (*InitResponse, error)
 	Get(context.Context, *GetRequest) (*GetResponse, error)
 	Update(context.Context, *UpdateRequest) (*UpdateResponse, error)
-	HasConfigs(context.Context, *HasConfigsRequest) (*HasConfigsResponse, error)
 	mustEmbedUnimplementedAppConfigurationServer()
 }
 
@@ -91,9 +80,6 @@ func (UnimplementedAppConfigurationServer) Get(context.Context, *GetRequest) (*G
 }
 func (UnimplementedAppConfigurationServer) Update(context.Context, *UpdateRequest) (*UpdateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
-}
-func (UnimplementedAppConfigurationServer) HasConfigs(context.Context, *HasConfigsRequest) (*HasConfigsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method HasConfigs not implemented")
 }
 func (UnimplementedAppConfigurationServer) mustEmbedUnimplementedAppConfigurationServer() {}
 
@@ -162,24 +148,6 @@ func _AppConfiguration_Update_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AppConfiguration_HasConfigs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(HasConfigsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AppConfigurationServer).HasConfigs(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/config_proto.AppConfiguration/HasConfigs",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AppConfigurationServer).HasConfigs(ctx, req.(*HasConfigsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // AppConfiguration_ServiceDesc is the grpc.ServiceDesc for AppConfiguration service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -198,10 +166,6 @@ var AppConfiguration_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Update",
 			Handler:    _AppConfiguration_Update_Handler,
-		},
-		{
-			MethodName: "HasConfigs",
-			Handler:    _AppConfiguration_HasConfigs_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

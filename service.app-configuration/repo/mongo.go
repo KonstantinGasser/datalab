@@ -1,11 +1,12 @@
-package storage
+package repo
 
 import (
 	"context"
 	"net/http"
 	"reflect"
+	"time"
 
-	"github.com/KonstantinGasser/datalab/service_config/pkg/errors"
+	"github.com/KonstantinGasser/datalab/service.app-configuration/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -15,6 +16,21 @@ import (
 // storage option
 type mongoClient struct {
 	conn *mongo.Client
+}
+
+func NewMongoDB(addr string) (Repo, error) {
+	opts := options.Client().ApplyURI(addr)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+	conn, err := mongo.Connect(ctx, opts)
+	if err != nil {
+		return nil, err
+	}
+	if err := conn.Ping(context.TODO(), nil); err != nil {
+		return nil, err
+	}
+	return &mongoClient{conn: conn}, nil
 }
 
 // FindAll takes in a query, a db and collection name
