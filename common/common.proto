@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+package common;
+
+option go_package = "github.com/KonstantinGasser/datalab/common";
+
+
+message Hello {
+    string msg = 1;
+    int32 code = 2;
+}
+
+
+message AppInfo {
+    string uuid = 1;
+    string name = 2;
+    string URL = 3;
+    string description = 4;
+    UserInfo owner = 5;
+    repeated string member = 6;
+}
+
+message AppMetaInfo {
+    string name = 1;
+    string uuid = 2;
+}
+
+message ConfigInfo {
+    repeated Funnel funnel = 1;
+    repeated Campaign campaign = 2;
+    repeated BtnTime btn_time = 3;
+}
+message Funnel {
+    int32 id = 1;
+    string name = 2;
+    string transition = 3;
+}
+message Campaign {
+    int32 id = 1;
+    string name = 2;
+    string prefix = 3;
+}
+message BtnTime {
+    int32 id = 1;
+    string name = 2;
+    string btn_name = 3;
+}
+
+message UserInfo {
+    string uuid = 1;
+    string username = 2;
+    string first_name = 3;
+    string last_name = 4;
+    string orgn_domain = 5;
+    string orgn_position = 6;
+    string profile_img_url = 7;
+}
+
+message UserMetaInfo {
+    string uuid = 1;
+    string username = 2;
+}
+
+message AppTokenInfo {
+    string token = 1;
+    int64 exp = 2;
+}

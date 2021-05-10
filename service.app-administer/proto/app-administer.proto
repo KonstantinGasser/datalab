@@ -1,0 +1,90 @@
+syntax = "proto3";
+
+
+package app_proto;
+option go_package = "github.com/KonstantinGasser/datalab/service.app-administer/proto";
+
+import "common/common.proto";
+
+service AppAdminister {
+    rpc Create(CreateRequest) returns (CreateResponse) {}
+    rpc Delete(DeleteRequest) returns (DeleteResponse) {}
+    rpc Get(GetRequest) returns (GetResponse) {}
+    rpc GetList(GetListRequest) returns (GetListResponse) {}
+    rpc MayAcquireToken(MayAcquireTokenRequest) returns (MayAcquireTokenResponse) {}
+}
+
+
+// RPC CREATE APP
+message CreateRequest {
+    string tracing_ID = 1;
+    string owner_uuid = 2;
+    string name = 3;
+    string organization = 4;
+    string description = 5;
+    string app_url = 6;
+    repeated string member = 7;
+    repeated string settings = 8;
+}
+message CreateResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    string app_uuid = 3;
+}
+// ***************************
+
+// RPC DELETE APP
+message DeleteRequest {
+    string tracing_ID = 1;
+    string app_uuid = 2;
+    string app_name = 3;
+    string orgn_name = 4;
+    string caller_uuid = 5;
+}
+
+message DeleteResponse {
+    int32 status_code = 1;
+    string msg = 2;
+}
+// ***************************
+
+// RPC GET APP LIST
+message GetListRequest {
+    string tracing_ID = 1;
+    string caller_uuid = 2;
+}
+message GetListResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    repeated common.AppMetaInfo app_list = 3;
+}
+// ***************************
+
+// RPC GET APP
+message GetRequest {
+    string tracing_ID = 1;
+    string app_uuid = 2;
+    string caller_uuid = 3;
+}
+
+message GetResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    common.AppInfo app = 3;
+    common.ConfigInfo app_config = 4;
+    common.AppTokenInfo app_token = 5;
+}
+// ***************************
+
+message MayAcquireTokenRequest {
+    string tracing_ID = 1;
+    string caller_uuid = 2;
+    string app_uuid = 3;
+    string app_hash = 4;
+}
+
+message MayAcquireTokenResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    bool is_allowed = 3;
+}

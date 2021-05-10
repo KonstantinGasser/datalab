@@ -2,6 +2,10 @@ syntax = "proto3";
 
 package app_service;
 
+import "protobuf/common/common.proto";
+
+option go_package = "service.app-administer/proto";
+
 // name App is suffixion since the protoc code gen will add *Server / *Client 
 // in code: AppServer & AppClient instead of AppServiceServer & AppServiceClient
 service App {
@@ -29,6 +33,7 @@ message IsAllowedToGenTokenRequest {
     string caller_uuid = 2;
     string app_uuid = 3;
     string app_hash = 4;
+    common.Hello msg = 5;
 }
 
 message IsAllowedToGenTokenResponse {

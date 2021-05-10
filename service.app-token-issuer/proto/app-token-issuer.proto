@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package issuer_proto;
+
+option go_package = "github.com/KonstantinGasser/datalab/service.app-token-issuer/proto";
+import "common/common.proto";
+
+service AppTokenIssuer {
+    rpc Issue(IssueRequest) returns (IssueResponse) {}
+    rpc Get(GetRequest) returns (GetResponse) {}
+    rpc MarkDirty(MarkDirtyRequest) returns (MarkDirtyResponse) {}
+}
+
+message IssueRequest {
+    string tracing_ID = 1;
+    string caller_uuid = 2; 
+    string app_uuid = 3;
+    string app_hash = 4;
+    string app_origin = 5;
+}
+
+message IssueResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    common.AppTokenInfo token = 3;
+}
+
+message GetRequest {
+    string tracing_ID = 1;
+    string app_uuid = 2;
+}
+
+message GetResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    common.AppTokenInfo token = 3;
+}
+
+message MarkDirtyRequest {
+    string tracing_ID = 1;
+    string for_app = 2;
+    string jwt = 3;
+}
+
+message MarkDirtyResponse {
+    int32 status_code = 1;
+    string msg = 2;
+}
