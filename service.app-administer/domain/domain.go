@@ -22,7 +22,7 @@ import (
 type AppAdmin interface {
 	Create(ctx context.Context, in *proto.CreateRequest) (string, errors.ErrApi)
 	Delete(ctx context.Context, in *proto.DeleteRequest) errors.ErrApi
-	GetSingle(ctx context.Context, in *proto.GetRequest) (*common.AppInfo, *common.ConfigInfo, *common.AppTokenInfo, errors.ErrApi)
+	GetSingle(ctx context.Context, in *proto.GetRequest) (*common.AppInfo, *common.AppConfigInfo, *common.AppTokenInfo, errors.ErrApi)
 	GetMultiple(ctx context.Context, in *proto.GetListRequest) ([]*common.AppMetaInfo, errors.ErrApi)
 	MayAcquireToken(ctx context.Context, in *proto.MayAcquireTokenRequest) errors.ErrApi
 }
@@ -86,7 +86,7 @@ func (svc appadmin) Delete(ctx context.Context, in *proto.DeleteRequest) errors.
 	return nil
 }
 
-func (svc appadmin) GetSingle(ctx context.Context, in *proto.GetRequest) (*common.AppInfo, *common.ConfigInfo, *common.AppTokenInfo, errors.ErrApi) {
+func (svc appadmin) GetSingle(ctx context.Context, in *proto.GetRequest) (*common.AppInfo, *common.AppConfigInfo, *common.AppTokenInfo, errors.ErrApi) {
 
 	var wg sync.WaitGroup
 	wg.Add(1)

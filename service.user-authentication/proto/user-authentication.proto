@@ -19,6 +19,7 @@ message RegisterRequest {
 message RegisterResponse {
     int32 status_code = 1;
     string msg = 2;
+    string user_uuid = 3;
 }
 
 message LoginRequest {

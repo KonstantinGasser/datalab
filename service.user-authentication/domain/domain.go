@@ -12,7 +12,7 @@ import (
 )
 
 type UserAuthLogic interface {
-	RegisterNewUser(ctx context.Context, in *proto.RegisterRequest) errors.ErrApi
+	RegisterNewUser(ctx context.Context, in *proto.RegisterRequest) (string, errors.ErrApi)
 	LoginUser(ctx context.Context, in *proto.LoginRequest) (string, errors.ErrApi)
 	IsAuthenticated(ctx context.Context, in *proto.IsAuthedRequest) (*proto.Claims, errors.ErrApi)
 }
@@ -27,16 +27,30 @@ func NewUserAuthLogic(repo repo.Repo) UserAuthLogic {
 	}
 }
 
-func (svc userauthlogic) RegisterNewUser(ctx context.Context, in *proto.RegisterRequest) errors.ErrApi {
-	err := register.NewUser(ctx, svc.repo, in)
+func (svc userauthlogic) RegisterNewUser(ctx context.Context, in *proto.RegisterRequest) (string, errors.ErrApi) {
+	uuid, err := register.NewUser(ctx, svc.repo, in)
 	if err != nil {
-		return errors.ErrAPI{
+		if err == register.ErrUserAlreadyExists {
+			return "", errors.ErrAPI{
+				Status: http.StatusBadRequest,
+				Msg:    "Username already exists",
+				Err:    err,
+			}
+		}
+		if err == register.ErrInvalidOrgnName {
+			return "", errors.ErrAPI{
+				Status: http.StatusBadRequest,
+				Msg:    "Organization Name must not contain a forward-slash",
+				Err:    err,
+			}
+		}
+		return "", errors.ErrAPI{
 			Status: http.StatusInternalServerError,
 			Msg:    "Could not create User-Account",
 			Err:    err,
 		}
 	}
-	return nil
+	return uuid, nil
 }
 
 func (svc userauthlogic) LoginUser(ctx context.Context, in *proto.LoginRequest) (string, errors.ErrApi) {

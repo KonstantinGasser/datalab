@@ -1,9 +1,0 @@
-syntax = "proto3";
-
-package common;
-option go_package = "github.com/KonstantinGasser/datalab/common";
-
-message Hello {
-    string msg = 1; 
-    int32 code = 2;
-}

@@ -15,7 +15,7 @@ func (handler Handler) Login(ctx context.Context, in *proto.LoginRequest) (*prot
 
 	token, err := handler.domain.LoginUser(ctx, in)
 	if err != nil {
-		logrus.Infof("<%v>[service.user-authentication.Login] could not authenticate user: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
+		logrus.Errorf("<%v>[service.user-authentication.Login] could not authenticate user: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
 		return &proto.LoginResponse{
 			StatusCode: err.Code(),
 			Msg:        err.Info(),

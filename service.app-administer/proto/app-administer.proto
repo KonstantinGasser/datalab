@@ -71,7 +71,7 @@ message GetResponse {
     int32 status_code = 1;
     string msg = 2;
     common.AppInfo app = 3;
-    common.ConfigInfo app_config = 4;
+    common.AppConfigInfo app_config = 4;
     common.AppTokenInfo app_token = 5;
 }
 // ***************************

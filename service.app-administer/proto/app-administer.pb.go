@@ -516,11 +516,11 @@ type GetResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	StatusCode int32                `protobuf:"varint,1,opt,name=status_code,json=statusCode,proto3" json:"status_code,omitempty"`
-	Msg        string               `protobuf:"bytes,2,opt,name=msg,proto3" json:"msg,omitempty"`
-	App        *common.AppInfo      `protobuf:"bytes,3,opt,name=app,proto3" json:"app,omitempty"`
-	AppConfig  *common.ConfigInfo   `protobuf:"bytes,4,opt,name=app_config,json=appConfig,proto3" json:"app_config,omitempty"`
-	AppToken   *common.AppTokenInfo `protobuf:"bytes,5,opt,name=app_token,json=appToken,proto3" json:"app_token,omitempty"`
+	StatusCode int32                 `protobuf:"varint,1,opt,name=status_code,json=statusCode,proto3" json:"status_code,omitempty"`
+	Msg        string                `protobuf:"bytes,2,opt,name=msg,proto3" json:"msg,omitempty"`
+	App        *common.AppInfo       `protobuf:"bytes,3,opt,name=app,proto3" json:"app,omitempty"`
+	AppConfig  *common.AppConfigInfo `protobuf:"bytes,4,opt,name=app_config,json=appConfig,proto3" json:"app_config,omitempty"`
+	AppToken   *common.AppTokenInfo  `protobuf:"bytes,5,opt,name=app_token,json=appToken,proto3" json:"app_token,omitempty"`
 }
 
 func (x *GetResponse) Reset() {
@@ -576,7 +576,7 @@ func (x *GetResponse) GetApp() *common.AppInfo {
 	return nil
 }
 
-func (x *GetResponse) GetAppConfig() *common.ConfigInfo {
+func (x *GetResponse) GetAppConfig() *common.AppConfigInfo {
 	if x != nil {
 		return x.AppConfig
 	}
@@ -869,13 +869,13 @@ var file_service_app_administer_proto_app_administer_proto_goTypes = []interface
 	(*MayAcquireTokenResponse)(nil), // 9: proto.MayAcquireTokenResponse
 	(*common.AppMetaInfo)(nil),      // 10: common.AppMetaInfo
 	(*common.AppInfo)(nil),          // 11: common.AppInfo
-	(*common.ConfigInfo)(nil),       // 12: common.ConfigInfo
+	(*common.AppConfigInfo)(nil),    // 12: common.AppConfigInfo
 	(*common.AppTokenInfo)(nil),     // 13: common.AppTokenInfo
 }
 var file_service_app_administer_proto_app_administer_proto_depIdxs = []int32{
 	10, // 0: proto.GetListResponse.app_list:type_name -> common.AppMetaInfo
 	11, // 1: proto.GetResponse.app:type_name -> common.AppInfo
-	12, // 2: proto.GetResponse.app_config:type_name -> common.ConfigInfo
+	12, // 2: proto.GetResponse.app_config:type_name -> common.AppConfigInfo
 	13, // 3: proto.GetResponse.app_token:type_name -> common.AppTokenInfo
 	0,  // 4: proto.AppAdminister.Create:input_type -> proto.CreateRequest
 	2,  // 5: proto.AppAdminister.Delete:input_type -> proto.DeleteRequest

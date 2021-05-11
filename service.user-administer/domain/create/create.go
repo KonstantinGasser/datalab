@@ -10,7 +10,6 @@ import (
 	"github.com/KonstantinGasser/datalab/service.user-administer/domain/types"
 	"github.com/KonstantinGasser/datalab/service.user-administer/proto"
 	"github.com/KonstantinGasser/datalab/service.user-administer/repo"
-	"github.com/KonstantinGasser/datalab/utils/unique"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -33,13 +32,8 @@ func User(ctx context.Context, repo repo.Repo, in *proto.CreateRequest) error {
 		return ErrUserNameTaken
 	}
 
-	uuid, err := unique.UUID()
-	if err != nil {
-		return err
-	}
-
 	var newUser = types.UserInfo{
-		Uuid:          uuid,
+		Uuid:          user.GetUuid(),
 		Username:      strings.TrimSpace(user.GetUsername()),
 		FirstName:     strings.TrimSpace(user.GetFirstName()),
 		LastName:      strings.TrimSpace(user.GetLastName()),

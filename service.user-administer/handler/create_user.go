@@ -15,6 +15,7 @@ func (handler Handler) Create(ctx context.Context, in *proto.CreateRequest) (*pr
 
 	err := handler.domain.CreateUser(ctx, in)
 	if err != nil {
+		logrus.Errorf("<%v>[service.user-administer.Create] could not create user account: %v\n", ctx_value.GetString(ctx, "tracingID"), err.Error())
 		return &proto.CreateResponse{
 			StatusCode: err.Code(),
 			Msg:        err.Info(),

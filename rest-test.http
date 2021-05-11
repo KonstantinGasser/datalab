@@ -1,0 +1,21 @@
+POST http://localhost:8080/api/v1/user/register HTTP/1.1
+content-type: application/json
+
+{
+    "username": "konsti",
+    "first_name": "Konstantin",
+    "last_name":  "Gasser",
+    "password": "hello",
+    "orgn_domain": "datalab",
+    "orgn_position": "Software Engineer"
+}
+
+###
+
+POST http://localhost:8080/api/v1/user/login HTTP/1.1
+content-type: application/json
+
+{
+    "username": "konsti",
+    "password": "hello"
+}

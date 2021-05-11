@@ -13,15 +13,18 @@ func (handler Handler) Register(ctx context.Context, in *proto.RegisterRequest) 
 	ctx = ctx_value.AddValue(ctx, "tracingID", in.GetTracing_ID())
 	logrus.Infof("<%v>[service.user-authentication.Register] received request\n", ctx_value.GetString(ctx, "tracingID"))
 
-	err := handler.domain.RegisterNewUser(ctx, in)
+	uuid, err := handler.domain.RegisterNewUser(ctx, in)
 	if err != nil {
+		logrus.Infof("<%v>[service.user-authentication.Register] could not register user account: %v\n", ctx_value.GetString(ctx, "tracingID"), err.Error())
 		return &proto.RegisterResponse{
 			StatusCode: err.Code(),
 			Msg:        err.Info(),
+			UserUuid:   "",
 		}, nil
 	}
 	return &proto.RegisterResponse{
 		StatusCode: http.StatusOK,
 		Msg:        "User-Account created",
+		UserUuid:   uuid,
 	}, nil
 }

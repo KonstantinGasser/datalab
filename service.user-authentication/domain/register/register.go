@@ -9,36 +9,47 @@ import (
 	"github.com/KonstantinGasser/datalab/service.user-authentication/config"
 	"github.com/KonstantinGasser/datalab/service.user-authentication/domain/types"
 	"github.com/KonstantinGasser/datalab/service.user-authentication/proto"
+	"github.com/KonstantinGasser/datalab/utils/hash"
 	"github.com/KonstantinGasser/datalab/utils/unique"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
 var (
 	ErrUserAlreadyExists = fmt.Errorf("user with this username already exists")
+	ErrInvalidOrgnName   = fmt.Errorf("organization name must not contain a forward-slash")
 )
 
-func NewUser(ctx context.Context, repo repo.Repo, in *proto.RegisterRequest) error {
+func NewUser(ctx context.Context, repo repo.Repo, in *proto.RegisterRequest) (string, error) {
+
+	if !orgnNameAllowed(in.GetOrganisation()) {
+		return "", ErrInvalidOrgnName
+	}
+
 	exists, err := repo.Exists(ctx, config.UserAuthDB, config.UserAuthColl, bson.M{"username": in.GetUsername()})
 	if err != nil {
-		return err
+		return "", err
 	}
 	if exists {
-		return ErrUserAlreadyExists
+		return "", ErrUserAlreadyExists
 	}
 
 	uuid, err := unique.UUID()
 	if err != nil {
-		return err
+		return "", err
+	}
+	hashedPassword, err := hash.FromPassword([]byte(strings.TrimSpace(in.GetPassword())))
+	if err != nil {
+		return "", err
 	}
 	var newUser = types.UserAuthInfo{
 		Uuid:         uuid,
 		Username:     strings.TrimSpace(in.GetUsername()),
 		Organization: strings.TrimSpace(in.GetOrganisation()),
-		Password:     strings.TrimSpace(in.GetPassword()),
+		Password:     hashedPassword,
 	}
 	err = repo.InsertOne(ctx, config.UserAuthDB, config.UserAuthColl, newUser)
 	if err != nil {
-		return err
+		return "", err
 	}
-	return nil
+	return uuid, nil
 }
