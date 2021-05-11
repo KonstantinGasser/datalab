@@ -19,6 +19,8 @@ type GatewayLogic interface {
 
 	GetUserProfile(ctx context.Context, uuid string) (*common.UserInfo, errors.ErrApi)
 	UpdateUserProfile(ctx context.Context, uuid string, form UserUpdateForm) errors.ErrApi
+
+	CreateApp(ctx context.Context, uuid, organization string, form CreateAppForm) (string, errors.ErrApi)
 }
 
 type gatewaylogic struct {

@@ -35,7 +35,12 @@ type appadmin struct {
 }
 
 func NewAppLogic(repo repo.Repo, user usersvc.UserAdministerClient, config cfgsvc.AppConfigurationClient, token aptissuer.AppTokenIssuerClient) AppAdmin {
-	return &appadmin{}
+	return &appadmin{
+		repo:        repo,
+		userSvc:     user,
+		configSvc:   config,
+		tkissuerSvc: token,
+	}
 }
 
 // Create handles the creation of a new app coordinating the initialization of the app-config

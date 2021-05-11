@@ -1,6 +1,6 @@
 package config
 
 const (
-	cfgDB   = "datalab_appconfig"
-	cfgColl = "config"
+	CfgDB   = "datalab_appconfig"
+	CfgColl = "config"
 )

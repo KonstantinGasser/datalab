@@ -9,6 +9,8 @@ import (
 	"github.com/KonstantinGasser/datalab/service.app-administer/proto"
 	"github.com/KonstantinGasser/datalab/service.app-administer/repo"
 	"github.com/KonstantinGasser/datalab/utils/unique"
+	"github.com/KonstantinGasser/required"
+	"github.com/sirupsen/logrus"
 )
 
 // App creates a instance of types.App generates the App-Uuid and the App-Hash
@@ -30,7 +32,10 @@ func App(ctx context.Context, repo repo.Repo, in *proto.CreateRequest) (string, 
 		Member:      nil,
 		AppHash:     appHash,
 	}
-
+	if err := required.Atomic(&app); err != nil {
+		required.Debug(&app).Pretty()
+	}
+	logrus.Warn(app)
 	if err := repo.InsertOne(ctx, config.AppDB, config.AppColl, app); err != nil {
 		return "", err
 	}

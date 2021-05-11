@@ -2,6 +2,7 @@ package repo
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"reflect"
 	"time"
@@ -87,22 +88,18 @@ func (client mongoClient) InsertOne(ctx context.Context, db, collection string, 
 	var data interface{} = query
 	var err error
 	if reflect.ValueOf(query).Kind() == reflect.Struct {
+		fmt.Println("1")
 		data, err = bson.Marshal(query)
+		fmt.Println("2")
 		if err != nil {
-			return errors.ErrAPI{
-				Status: http.StatusInternalServerError,
-				Err:    err,
-			}
+			return err
 		}
 	}
-
+	fmt.Println("3")
 	coll := client.conn.Database(db).Collection(collection)
 	_, err = coll.InsertOne(ctx, data)
 	if err != nil {
-		return errors.ErrAPI{
-			Status: http.StatusInternalServerError,
-			Err:    err,
-		}
+		return err
 	}
 	return nil
 }
