@@ -67,14 +67,17 @@ func Run(ctx context.Context, hostAddr, userAddr, appAddr, apptokenAddr, tokenAd
 		gatewaysvc.WithCors,
 		gatewaysvc.WithAuth,
 	)
-	gatewaysvc.Register("/api/v1/app/details", gatewaysvc.GetAppDetails,
+	gatewaysvc.Register("/api/v1/app/get", gatewaysvc.GetAppDetails,
+		gatewaysvc.WithTracing,
+		gatewaysvc.WithCors,
+		gatewaysvc.WithAuth,
+	)
+	gatewaysvc.Register("/api/v1/app/getall", gatewaysvc.GetAppList,
 		gatewaysvc.WithTracing,
 		gatewaysvc.WithCors,
 		gatewaysvc.WithAuth,
 	)
 
-	// gatewaysvc.Register("api/v1/app/details", nil)
-	// gatewaysvc.Register("api/v1/app/get", nil)
 	// gatewaysvc.Register("api/v1/app/create", nil)
 	// gatewaysvc.Register("api/v1/app/delete", nil)
 

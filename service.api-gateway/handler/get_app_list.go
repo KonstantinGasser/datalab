@@ -7,21 +7,22 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func (handler *Handler) GetUserProfile(w http.ResponseWriter, r *http.Request) {
-	logrus.Infof("<%v>[handler.GetUserProfile] received request: %v\n", ctx_value.GetString(r.Context(), "tracingID"), r.Host)
+func (handler *Handler) GetAppList(w http.ResponseWriter, r *http.Request) {
+	logrus.Infof("<%v>[handler.GetAppList] received request: %v\n", ctx_value.GetString(r.Context(), "tracingID"), r.Host)
 
 	user := ctx_value.GetAuthedUser(r.Context())
 	if user == nil {
 		handler.onError(w, "User not authenticated", http.StatusUnauthorized)
 		return
 	}
-	userInfo, err := handler.domain.GetUserProfile(r.Context(), user.Uuid)
+	apps, err := handler.domain.GetAppList(r.Context(), user.Uuid)
 	if err != nil {
+		logrus.Errorf("<%v>[handler.GetAppList] could not get app list: %v\n", ctx_value.GetString(r.Context(), "tracingID"), err.Error())
 		handler.onError(w, err.Info(), int(err.Code()))
 		return
 	}
 	handler.onSuccessJSON(w, map[string]interface{}{
 		"status": http.StatusOK,
-		"user":   userInfo,
+		"apps":   apps,
 	}, http.StatusOK)
 }

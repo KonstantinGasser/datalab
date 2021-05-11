@@ -22,6 +22,7 @@ type GatewayLogic interface {
 
 	CreateApp(ctx context.Context, uuid, organization string, form CreateAppForm) (string, errors.ErrApi)
 	GetAppDetails(ctx context.Context, userUuid, appUuid string) (*common.AppInfo, errors.ErrApi)
+	GetAppList(ctx context.Context, uuid string) ([]*common.AppMetaInfo, errors.ErrApi)
 }
 
 type gatewaylogic struct {

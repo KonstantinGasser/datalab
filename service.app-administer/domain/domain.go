@@ -47,6 +47,13 @@ func NewAppLogic(repo repo.Repo, user usersvc.UserAdministerClient, config cfgsv
 func (svc appadmin) Create(ctx context.Context, in *proto.CreateRequest) (string, errors.ErrApi) {
 	appUuid, err := create.App(ctx, svc.repo, in)
 	if err != nil {
+		if err == create.ErrAppNameExists {
+			return "", errors.ErrAPI{
+				Status: http.StatusBadRequest,
+				Msg:    "App Name already used",
+				Err:    err,
+			}
+		}
 		return "", errors.ErrAPI{
 			Status: http.StatusInternalServerError,
 			Msg:    "Could not create new App",

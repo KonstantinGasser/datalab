@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	appsvc "github.com/KonstantinGasser/datalab/service.app-administer/proto"
@@ -39,6 +40,13 @@ func (svc gatewaylogic) CreateApp(ctx context.Context, uuid, organization string
 			Status: http.StatusInternalServerError,
 			Msg:    "Could not create App",
 			Err:    err,
+		}
+	}
+	if resp.GetStatusCode() != http.StatusOK {
+		return "", errors.ErrAPI{
+			Status: resp.GetStatusCode(),
+			Msg:    resp.GetMsg(),
+			Err:    fmt.Errorf("could not create app"),
 		}
 	}
 	return resp.GetAppUuid(), nil

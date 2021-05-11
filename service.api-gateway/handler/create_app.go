@@ -23,5 +23,5 @@ func (handler *Handler) CreateApp(w http.ResponseWriter, r *http.Request) {
 		handler.onError(w, err.Info(), int(err.Code()))
 		return
 	}
-	handler.onSuccessJSON(w, map[string]string{"msg": "User-Profile updated", "uuid": uuid}, http.StatusOK)
+	handler.onSuccessJSON(w, map[string]string{"msg": "App created", "uuid": uuid}, http.StatusOK)
 }

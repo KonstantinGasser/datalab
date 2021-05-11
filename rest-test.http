@@ -52,6 +52,11 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjA3NTczMTcsImlh
 }
 
 ###
-GET http://localhost:8080/api/v1/app/details?app=c5f9aa56-d140-4b8c-8110-62478f9ef7c7 HTTP/1.1
+GET http://localhost:8080/api/v1/app/get?app=c5f9aa56-d140-4b8c-8110-62478f9ef7c7 HTTP/1.1
+content-type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjA3NTczMTcsImlhdCI6ImNvbS5kYXRhbGFiLnNlcnZpY2UudXNlci1hdXRoZW50aWNhdGlvbiIsIm9yZ24iOiJkYXRhbGFiIiwic3ViIjoiNGVkZjg1ZTktYzE2NC00NTYzLWIxMjEtYWY0M2IwYzI3M2NjIn0.PNSyajwFsIBQ-5LYJKFVtZ78WEpvOYU50nlCbYS54Bc
+
+###
+GET http://localhost:8080/api/v1/app/getall HTTP/1.1
 content-type: application/json
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjA3NTczMTcsImlhdCI6ImNvbS5kYXRhbGFiLnNlcnZpY2UudXNlci1hdXRoZW50aWNhdGlvbiIsIm9yZ24iOiJkYXRhbGFiIiwic3ViIjoiNGVkZjg1ZTktYzE2NC00NTYzLWIxMjEtYWY0M2IwYzI3M2NjIn0.PNSyajwFsIBQ-5LYJKFVtZ78WEpvOYU50nlCbYS54Bc

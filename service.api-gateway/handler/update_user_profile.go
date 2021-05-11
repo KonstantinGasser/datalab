@@ -18,6 +18,10 @@ func (handler *Handler) UpdateUserProfile(w http.ResponseWriter, r *http.Request
 	}
 
 	user := ctx_value.GetAuthedUser(r.Context())
+	if user == nil {
+		handler.onError(w, "User not authenticated", http.StatusUnauthorized)
+		return
+	}
 	err := handler.domain.UpdateUserProfile(r.Context(), user.Uuid, form)
 	if err != nil {
 		logrus.Infof("<%v>[handler.UpdateUserProfile] could not update profile: %v\n", ctx_value.GetString(r.Context(), "tracingID"), err.Error())
