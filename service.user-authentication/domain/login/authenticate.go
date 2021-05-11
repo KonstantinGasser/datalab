@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/KonstantinGasser/datalab/common"
 	"github.com/KonstantinGasser/datalab/service.user-authentication/domain/login/jwts"
-	"github.com/KonstantinGasser/datalab/service.user-authentication/proto"
 )
 
 var (
@@ -13,7 +13,7 @@ var (
 	ErrCorruptedToken = fmt.Errorf("jwt-token does no longer confirm with specifications")
 )
 
-func IsLoggedIn(ctx context.Context, token string) (*proto.Claims, error) {
+func IsLoggedIn(ctx context.Context, token string) (*common.TokenClaims, error) {
 	rawClaims, err := jwts.GetJWTClaims(token)
 	if err != nil {
 		if err == jwts.ErrInvalidJWT {
@@ -30,7 +30,7 @@ func IsLoggedIn(ctx context.Context, token string) (*proto.Claims, error) {
 	if !ok {
 		return nil, ErrCorruptedToken
 	}
-	return &proto.Claims{
+	return &common.TokenClaims{
 		Uuid:         uuid,
 		Organization: organization,
 	}, nil

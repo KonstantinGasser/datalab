@@ -3,6 +3,7 @@ package domain
 import (
 	"context"
 
+	"github.com/KonstantinGasser/datalab/common"
 	appsvc "github.com/KonstantinGasser/datalab/service.app-administer/proto"
 	cfgsvc "github.com/KonstantinGasser/datalab/service.app-configuration/proto"
 	"github.com/KonstantinGasser/datalab/service.app-token-issuer/errors"
@@ -14,6 +15,9 @@ import (
 type GatewayLogic interface {
 	RegisterUser(ctx context.Context, form RegisterForm) errors.ErrApi
 	LoginUser(ctx context.Context, form LoginForm) (string, errors.ErrApi)
+	IsLoggedIn(ctx context.Context, token string) (*common.TokenClaims, errors.ErrApi)
+
+	GetUserProfile(ctx context.Context, uuid string) (*common.UserInfo, errors.ErrApi)
 }
 
 type gatewaylogic struct {

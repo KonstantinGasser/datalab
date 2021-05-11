@@ -41,8 +41,20 @@ func Run(ctx context.Context, hostAddr, userAddr, appAddr, apptokenAddr, tokenAd
 	logrus.Info("[api.Dependency] established connection to all services\n")
 	gatewaysvc.Apply(handler.WithAllowedOrigins("http://localhost:3000", "*"))
 
-	gatewaysvc.Register("/api/v1/user/register", gatewaysvc.RegisterUser)
-	gatewaysvc.Register("/api/v1/user/login", gatewaysvc.LoginUser)
+	gatewaysvc.Register("/api/v1/user/register", gatewaysvc.RegisterUser,
+		gatewaysvc.WithTracing,
+		gatewaysvc.WithCors,
+	)
+	gatewaysvc.Register("/api/v1/user/login", gatewaysvc.LoginUser,
+		gatewaysvc.WithTracing,
+		gatewaysvc.WithCors,
+	)
+
+	gatewaysvc.Register("/api/v1/user/profile", gatewaysvc.GetUserProfile,
+		gatewaysvc.WithTracing,
+		gatewaysvc.WithCors,
+		gatewaysvc.WithAuth,
+	)
 
 	// gatewaysvc.Register("api/v1/user/account", nil)
 	// gatewaysvc.Register("api/v1/user/account/update", nil)

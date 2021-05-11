@@ -65,3 +65,8 @@ message AppTokenInfo {
     string token = 1;
     int64 exp = 2;
 }
+
+message TokenClaims {
+    string uuid = 1;
+    string organization = 2;
+}

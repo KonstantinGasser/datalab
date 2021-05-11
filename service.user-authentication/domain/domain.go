@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/KonstantinGasser/datalab/common"
 	"github.com/KonstantinGasser/datalab/service.app-configuration/errors"
 	"github.com/KonstantinGasser/datalab/service.user-authentication/domain/login"
 	"github.com/KonstantinGasser/datalab/service.user-authentication/domain/register"
@@ -14,7 +15,7 @@ import (
 type UserAuthLogic interface {
 	RegisterNewUser(ctx context.Context, in *proto.RegisterRequest) (string, errors.ErrApi)
 	LoginUser(ctx context.Context, in *proto.LoginRequest) (string, errors.ErrApi)
-	IsAuthenticated(ctx context.Context, in *proto.IsAuthedRequest) (*proto.Claims, errors.ErrApi)
+	IsAuthenticated(ctx context.Context, in *proto.IsAuthedRequest) (*common.TokenClaims, errors.ErrApi)
 }
 
 type userauthlogic struct {
@@ -74,7 +75,7 @@ func (svc userauthlogic) LoginUser(ctx context.Context, in *proto.LoginRequest) 
 	return token, nil
 }
 
-func (svc userauthlogic) IsAuthenticated(ctx context.Context, in *proto.IsAuthedRequest) (*proto.Claims, errors.ErrApi) {
+func (svc userauthlogic) IsAuthenticated(ctx context.Context, in *proto.IsAuthedRequest) (*common.TokenClaims, errors.ErrApi) {
 	claims, err := login.IsLoggedIn(ctx, in.GetJwt())
 	if err != nil {
 		if err == login.ErrCorruptedToken || err == login.ErrInvalidToken {

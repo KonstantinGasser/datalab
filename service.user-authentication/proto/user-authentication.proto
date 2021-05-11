@@ -3,6 +3,7 @@ syntax = "proto3";
 package auth_proto;
 
 option go_package = "github.com/KonstantinGasser/datalab/service.user-authentication/proto";
+import "common/common.proto";
 
 service UserAuthentication {
     rpc Register(RegisterRequest) returns (RegisterResponse) {}
@@ -41,10 +42,6 @@ message IsAuthedResponse {
     int32 status_code = 1;
     string msg = 2;
     bool is_authed = 3;
-    Claims claims = 4;
+    common.TokenClaims claims = 4;
 }
 
-message Claims {
-    string uuid = 1;
-    string organization = 2;
-}
