@@ -2,12 +2,14 @@ package domain
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/KonstantinGasser/datalab/common"
 	"github.com/KonstantinGasser/datalab/service.app-administer/domain/create"
 	"github.com/KonstantinGasser/datalab/service.app-administer/domain/delete"
 	"github.com/KonstantinGasser/datalab/service.app-administer/domain/get"
+	"github.com/KonstantinGasser/datalab/service.app-administer/domain/pool"
 	"github.com/KonstantinGasser/datalab/service.app-administer/domain/token"
 	"github.com/KonstantinGasser/datalab/service.app-administer/errors"
 	"github.com/KonstantinGasser/datalab/service.app-administer/proto"
@@ -15,7 +17,6 @@ import (
 	cfgsvc "github.com/KonstantinGasser/datalab/service.app-configuration/proto"
 	aptissuer "github.com/KonstantinGasser/datalab/service.app-token-issuer/proto"
 	usersvc "github.com/KonstantinGasser/datalab/service.user-administer/proto"
-	"github.com/sirupsen/logrus"
 )
 
 type AppAdmin interface {
@@ -107,22 +108,27 @@ func (svc appadmin) GetSingle(ctx context.Context, in *proto.GetRequest) (*commo
 			Err:    err,
 		}
 	}
-	cfgresp, err := svc.configSvc.Get(
-		ctx,
-		&cfgsvc.GetRequest{Tracing_ID: in.GetTracing_ID(), ForUuid: in.GetAppUuid()},
-	)
-	if err != nil {
-		logrus.Warnf("<%v>[domain.GetSingle] could not get app config data")
-	}
-	tokenresp, err := svc.tkissuerSvc.Get(
-		ctx,
-		&aptissuer.GetRequest{Tracing_ID: in.GetTracing_ID(), AppUuid: in.GetAppUuid()},
-	)
-	if err != nil {
-		logrus.Warnf("<%v>[domain.GetSingle] could not get app token data")
-	}
 
-	return app, cfgresp.GetConfigs(), tokenresp.GetToken(), nil
+	jobs, results := pool.New(ctx, 2)
+	jobs <- func() (interface{}, error) {
+		val, err := svc.configSvc.Get(
+			ctx,
+			&cfgsvc.GetRequest{Tracing_ID: in.GetTracing_ID(), ForUuid: in.GetAppUuid()},
+		)
+		return val, err
+	}
+	jobs <- func() (interface{}, error) {
+		val, err := svc.tkissuerSvc.Get(
+			ctx,
+			&aptissuer.GetRequest{Tracing_ID: in.GetTracing_ID(), AppUuid: in.GetAppUuid()},
+		)
+		return val, err
+	}
+	close(jobs)
+	for result := range results {
+		fmt.Println(result)
+	}
+	return app, nil, nil, nil
 }
 
 func (svc appadmin) GetMultiple(ctx context.Context, in *proto.GetListRequest) ([]*common.AppMetaInfo, errors.ErrApi) {
