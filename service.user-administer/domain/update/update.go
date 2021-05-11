@@ -21,7 +21,13 @@ func User(ctx context.Context, repo repo.Repo, in *proto.UpdateRequest) error {
 		OrgnPosition:  user.GetOrgnPosition(),
 		ProfileImgURL: user.GetProfileImgUrl(),
 	}
-	_, err := repo.UpdateOne(ctx, config.UserDB, config.UserColl, bson.M{"_id": in.GetCallerUuid()}, updateableInfo, false)
+	query := bson.D{
+		{
+			Key:   "$set",
+			Value: updateableInfo,
+		},
+	}
+	_, err := repo.UpdateOne(ctx, config.UserDB, config.UserColl, bson.M{"_id": in.GetCallerUuid()}, query, false)
 	if err != nil {
 		return err
 	}

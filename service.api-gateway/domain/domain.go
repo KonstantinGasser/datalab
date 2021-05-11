@@ -18,6 +18,7 @@ type GatewayLogic interface {
 	IsLoggedIn(ctx context.Context, token string) (*common.TokenClaims, errors.ErrApi)
 
 	GetUserProfile(ctx context.Context, uuid string) (*common.UserInfo, errors.ErrApi)
+	UpdateUserProfile(ctx context.Context, uuid string, form UserUpdateForm) errors.ErrApi
 }
 
 type gatewaylogic struct {
