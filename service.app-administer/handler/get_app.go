@@ -16,6 +16,7 @@ func (handler Handler) Get(ctx context.Context, in *proto.GetRequest) (*proto.Ge
 
 	app, cfg, token, err := handler.domain.GetSingle(ctx, in)
 	if err != nil {
+		logrus.Errorf("<%v>[service.app-administer.Get] could not get app info: %v\n", ctx_value.GetString(ctx, "tracingID"), err.Error())
 		return &proto.GetResponse{
 			StatusCode: err.Code(),
 			Msg:        err.Info(),

@@ -2,9 +2,7 @@ package domain
 
 import (
 	"context"
-	"fmt"
 	"net/http"
-	"sync"
 
 	"github.com/KonstantinGasser/datalab/common"
 	"github.com/KonstantinGasser/datalab/service.app-administer/domain/create"
@@ -17,6 +15,7 @@ import (
 	cfgsvc "github.com/KonstantinGasser/datalab/service.app-configuration/proto"
 	aptissuer "github.com/KonstantinGasser/datalab/service.app-token-issuer/proto"
 	usersvc "github.com/KonstantinGasser/datalab/service.user-administer/proto"
+	"github.com/sirupsen/logrus"
 )
 
 type AppAdmin interface {
@@ -93,27 +92,6 @@ func (svc appadmin) Delete(ctx context.Context, in *proto.DeleteRequest) errors.
 
 func (svc appadmin) GetSingle(ctx context.Context, in *proto.GetRequest) (*common.AppInfo, *common.AppConfigInfo, *common.AppTokenInfo, errors.ErrApi) {
 
-	var wg sync.WaitGroup
-	wg.Add(1)
-	var cfgResp *cfgsvc.GetResponse
-	var cfgErr error
-	go func() {
-		cfgResp, cfgErr = svc.configSvc.Get(ctx, &cfgsvc.GetRequest{Tracing_ID: in.GetTracing_ID(), ForUuid: in.GetAppUuid()})
-	}()
-
-	wg.Add(1)
-	var aptResp *aptissuer.GetResponse
-	var aptErr error
-	go func() {
-		aptResp, aptErr = svc.tkissuerSvc.Get(ctx, &aptissuer.GetRequest{Tracing_ID: in.GetTracing_ID(), AppUuid: in.GetAppUuid()})
-	}()
-	if cfgErr != nil || aptErr != nil {
-		return nil, nil, nil, errors.ErrAPI{
-			Status: http.StatusInternalServerError,
-			Msg:    "Could not get App Information",
-			Err:    fmt.Errorf("%v | %v", cfgErr, aptErr),
-		}
-	}
 	app, err := get.Single(ctx, svc.repo, in)
 	if err != nil {
 		return nil, nil, nil, errors.ErrAPI{
@@ -122,7 +100,22 @@ func (svc appadmin) GetSingle(ctx context.Context, in *proto.GetRequest) (*commo
 			Err:    err,
 		}
 	}
-	return app, cfgResp.GetConfigs(), aptResp.GetToken(), nil
+	cfgresp, err := svc.configSvc.Get(
+		ctx,
+		&cfgsvc.GetRequest{Tracing_ID: in.GetTracing_ID(), ForUuid: in.GetAppUuid()},
+	)
+	if err != nil {
+		logrus.Warnf("<%v>[domain.GetSingle] could not get app config data")
+	}
+	tokenresp, err := svc.tkissuerSvc.Get(
+		ctx,
+		&aptissuer.GetRequest{Tracing_ID: in.GetTracing_ID(), AppUuid: in.GetAppUuid()},
+	)
+	if err != nil {
+		logrus.Warnf("<%v>[domain.GetSingle] could not get app token data")
+	}
+
+	return app, cfgresp.GetConfigs(), tokenresp.GetToken(), nil
 }
 
 func (svc appadmin) GetMultiple(ctx context.Context, in *proto.GetListRequest) ([]*common.AppMetaInfo, errors.ErrApi) {

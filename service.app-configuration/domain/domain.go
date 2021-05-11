@@ -13,7 +13,6 @@ import (
 	"github.com/KonstantinGasser/datalab/service.app-configuration/errors"
 	"github.com/KonstantinGasser/datalab/service.app-configuration/proto"
 	"github.com/KonstantinGasser/datalab/service.app-configuration/repo"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type AppConfig interface {
@@ -46,7 +45,7 @@ func (svc appconfig) InitConfigs(ctx context.Context, in *proto.InitRequest) err
 func (svc appconfig) GetConfigs(ctx context.Context, in *proto.GetRequest) (*common.AppConfigInfo, errors.ErrApi) {
 	cfgs, err := get.Configs(ctx, svc.repo, in)
 	if err != nil {
-		if err == mongo.ErrNoDocuments {
+		if err == get.ErrNotFound {
 			return nil, errors.ErrAPI{
 				Status: http.StatusNotFound,
 				Msg:    "Could not find any related App-Configs",

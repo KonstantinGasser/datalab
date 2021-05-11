@@ -34,5 +34,6 @@ func Single(ctx context.Context, repo repo.Repo, in *proto.GetRequest) (*common.
 		URL:         app.URL,
 		Description: app.Description,
 		Member:      app.Member,
+		Owner:       app.OwnerUuid,
 	}, nil
 }

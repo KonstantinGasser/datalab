@@ -11,7 +11,6 @@ import (
 	"github.com/KonstantinGasser/datalab/service.app-token-issuer/domain/issue"
 	"github.com/KonstantinGasser/datalab/service.app-token-issuer/proto"
 	"github.com/KonstantinGasser/datalab/service.app-token-issuer/repo"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type AppTokenIssuer interface {
@@ -53,7 +52,7 @@ func (svc apptokenissuer) IssueToken(ctx context.Context, in *proto.IssueRequest
 func (svc apptokenissuer) GetToken(ctx context.Context, in *proto.GetRequest) (*common.AppTokenInfo, errors.ErrApi) {
 	token, err := get.Token(ctx, svc.repo, in.GetAppUuid())
 	if err != nil {
-		if err == mongo.ErrNoDocuments {
+		if err == get.ErrNotFound {
 			return nil, errors.ErrAPI{
 				Status: http.StatusNotFound,
 				Msg:    "Could not find App-Token",

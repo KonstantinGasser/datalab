@@ -2,6 +2,7 @@ package get
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/KonstantinGasser/datalab/common"
 	"github.com/KonstantinGasser/datalab/service.app-configuration/domain/types"
@@ -9,12 +10,20 @@ import (
 	"github.com/KonstantinGasser/datalab/service.app-configuration/repo"
 	"github.com/KonstantinGasser/datalab/service.app-token-issuer/config"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+)
+
+var (
+	ErrNotFound = fmt.Errorf("could not find any data")
 )
 
 func Configs(ctx context.Context, repo repo.Repo, in *proto.GetRequest) (*common.AppConfigInfo, error) {
 	var cfg types.ConfigInfo
 	err := repo.FindOne(ctx, config.TokenDB, config.TokenColl, bson.M{"_id": in.GetForUuid()}, &cfg)
 	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, ErrNotFound
+		}
 		return nil, err
 	}
 

@@ -16,7 +16,7 @@ message AppInfo {
     string name = 2;
     string URL = 3;
     string description = 4;
-    UserInfo owner = 5;
+    string owner = 5;
     repeated string member = 6;
 }
 
