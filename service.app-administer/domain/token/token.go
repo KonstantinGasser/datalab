@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/KonstantinGasser/datalab/service.app-administer/domain/hasher"
 	"github.com/KonstantinGasser/datalab/service.app-administer/domain/permissions"
 	"github.com/KonstantinGasser/datalab/service.app-administer/proto"
 	"github.com/KonstantinGasser/datalab/service.app-administer/repo"
@@ -12,18 +11,22 @@ import (
 
 var (
 	ErrNotAuthorized = fmt.Errorf("caller is not authorized to perform the action")
+	ErrNotFound      = fmt.Errorf("could not find any related app")
 )
 
 func MayAcquire(ctx context.Context, repo repo.Repo, in *proto.MayAcquireTokenRequest) (bool, error) {
-
+	fmt.Printf("%v+\n", in)
 	if err := permissions.IsOwner(ctx, repo, in.GetCallerUuid(), in.GetAppUuid()); err != nil {
 		if err == permissions.ErrNotAuthorized {
 			return false, ErrNotAuthorized
 		}
 		return false, err
 	}
-	if err := hasher.Compare(ctx, repo, in.GetAppHash(), in.GetAppUuid()); err != nil {
-		if err == hasher.ErrHashMisMatch {
+	if err := permissions.IsCorrectHash(ctx, repo, in.GetAppUuid(), in.GetAppHash()); err != nil {
+		if err == permissions.ErrNotFound {
+			return false, ErrNotFound
+		}
+		if err == permissions.ErrNotAuthorized {
 			return false, ErrNotAuthorized
 		}
 		return false, err

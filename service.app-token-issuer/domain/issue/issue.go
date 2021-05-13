@@ -43,7 +43,12 @@ func Token(ctx context.Context, repo repo.Repo, in *proto.IssueRequest) (*common
 			return nil, err
 		}
 		stored.AppToken = token
-		_, err = repo.UpdateOne(ctx, config.TokenDB, config.TokenColl, bson.M{"_id": stored.AppUuid}, stored, false)
+		_, err = repo.UpdateOne(ctx, config.TokenDB, config.TokenColl, bson.M{"_id": stored.AppUuid}, bson.D{
+			{
+				Key:   "$set",
+				Value: stored,
+			},
+		}, false)
 		if err != nil {
 			return nil, err
 		}
@@ -65,7 +70,7 @@ func Token(ctx context.Context, repo repo.Repo, in *proto.IssueRequest) (*common
 		return nil, err
 	}
 	newToken.AppToken = token
-	_, err = repo.UpdateOne(ctx, config.TokenDB, config.TokenColl, bson.M{"_id": newToken.AppUuid}, newToken, false)
+	err = repo.InsertOne(ctx, config.TokenDB, config.TokenColl, newToken)
 	if err != nil {
 		return nil, err
 	}

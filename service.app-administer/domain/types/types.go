@@ -9,7 +9,7 @@ type AppInfo struct {
 	OrgnDomain  string   `bson:"orgn_domain" required:"yes"`
 	Description string   `bson:"description"`
 	Member      []string `bson:"member"`
-	AppHash     string   `bson:"orgn_and_app_hash"`
+	AppHash     string   `bson:"app_hash"`
 }
 
 type AppMetaInfo struct {

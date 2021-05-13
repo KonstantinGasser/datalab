@@ -3,11 +3,9 @@ package repo
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"reflect"
 	"time"
 
-	"github.com/KonstantinGasser/datalab/service.app-administer/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -41,16 +39,10 @@ func (client mongoClient) FindMany(ctx context.Context, db, collection string, f
 
 	cur, err := coll.Find(ctx, filter)
 	if err != nil {
-		return errors.ErrAPI{
-			Status: http.StatusInternalServerError,
-			Err:    err,
-		}
+		return err
 	}
 	if err = cur.All(ctx, result); err != nil {
-		return errors.ErrAPI{
-			Status: http.StatusInternalServerError,
-			Err:    err,
-		}
+		return err
 	}
 	return nil
 }
@@ -66,16 +58,9 @@ func (client mongoClient) FindOne(ctx context.Context, db, collection string, fi
 		// Decode will return ErrNoDocuments if the query returns no result
 		// this is less an error but similar to io.EOF and means NoRecoredFound
 		if err == mongo.ErrNoDocuments {
-			return errors.ErrAPI{
-				Status: http.StatusBadGateway,
-				Err:    err,
-				Msg:    "Could not find any document for request",
-			}
+			return err
 		}
-		return errors.ErrAPI{
-			Status: http.StatusInternalServerError,
-			Err:    err,
-		}
+		return err
 	}
 	return nil
 }
@@ -110,10 +95,7 @@ func (client mongoClient) DeleteOne(ctx context.Context, db, collection string, 
 	coll := client.conn.Database(db).Collection(collection)
 
 	if _, err := coll.DeleteOne(ctx, filter); err != nil {
-		return errors.ErrAPI{
-			Status: http.StatusInternalServerError,
-			Err:    err,
-		}
+		return err
 	}
 	return nil
 }
@@ -127,20 +109,14 @@ func (client mongoClient) UpdateOne(ctx context.Context, db, collection string, 
 	if reflect.ValueOf(query).Kind() == reflect.Struct {
 		data, err = bson.Marshal(query)
 		if err != nil {
-			return 0, errors.ErrAPI{
-				Status: http.StatusInternalServerError,
-				Err:    err,
-			}
+			return 0, err
 		}
 	}
 
 	coll := client.conn.Database(db).Collection(collection)
 	updated, err := coll.UpdateOne(ctx, filter, data, &options.UpdateOptions{Upsert: &upsert})
 	if err != nil {
-		return int(updated.ModifiedCount), errors.ErrAPI{
-			Status: http.StatusInternalServerError,
-			Err:    err,
-		}
+		return int(updated.ModifiedCount), err
 	}
 	return int(updated.ModifiedCount), nil
 }
@@ -155,12 +131,9 @@ func (client mongoClient) Exists(ctx context.Context, db, collection string, fil
 		// Decode will return ErrNoDocuments if the query returns no result
 		// this is less an error but similar to io.EOF and means NoRecoredFound
 		if err == mongo.ErrNoDocuments {
-			return false, nil
+			return false, err
 		}
-		return false, errors.ErrAPI{
-			Status: http.StatusInternalServerError,
-			Err:    err,
-		}
+		return false, err
 	}
 	if len(records) == 0 {
 		return false, nil

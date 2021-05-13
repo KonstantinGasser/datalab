@@ -139,6 +139,9 @@ func (svc appadmin) GetMultiple(ctx context.Context, in *proto.GetListRequest) (
 func (svc appadmin) MayAcquireToken(ctx context.Context, in *proto.MayAcquireTokenRequest) errors.ErrApi {
 	ok, err := token.MayAcquire(ctx, svc.repo, in)
 	if err != nil {
+		if err == token.ErrNotFound {
+			return errors.ErrAPI{Status: http.StatusBadRequest, Msg: "Could not find request App information", Err: err}
+		}
 		if err == token.ErrNotAuthorized {
 			return errors.ErrAPI{Status: http.StatusUnauthorized, Msg: "Missing permission to acquire token", Err: err}
 		}

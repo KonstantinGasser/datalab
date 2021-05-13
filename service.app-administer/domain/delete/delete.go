@@ -4,8 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/KonstantinGasser/datalab/hasher"
 	"github.com/KonstantinGasser/datalab/service.app-administer/config"
-	"github.com/KonstantinGasser/datalab/service.app-administer/domain/hasher"
+	"github.com/KonstantinGasser/datalab/service.app-administer/domain/permissions"
 	"github.com/KonstantinGasser/datalab/service.app-administer/domain/types"
 	"github.com/KonstantinGasser/datalab/service.app-administer/proto"
 	"github.com/KonstantinGasser/datalab/service.app-administer/repo"
@@ -20,8 +21,8 @@ var (
 // to be performed
 func App(ctx context.Context, repo repo.Repo, in *proto.DeleteRequest) (*types.AppInfo, error) {
 	hash := hasher.Build(in.GetAppName(), in.GetOrgnName())
-	if err := hasher.Compare(ctx, repo, hash, in.GetAppUuid()); err != nil {
-		if err == hasher.ErrHashMisMatch {
+	if err := permissions.IsCorrectHash(ctx, repo, in.GetAppUuid(), hash); err != nil {
+		if err == permissions.ErrNotAuthorized {
 			return nil, ErrNoPermissions
 		}
 		return nil, err

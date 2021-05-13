@@ -15,6 +15,7 @@ func (handler Handler) MayAcquireToken(ctx context.Context, in *proto.MayAcquire
 	logrus.Infof("<%v>[service.app-administer.MayAcquireToken] received request\n", ctx_value.GetString(ctx, "tracingID"))
 
 	if err := handler.domain.MayAcquireToken(ctx, in); err != nil {
+		logrus.Infof("<%v>[service.app-administer.MayAcquireToken] could not verify if ok: %v\n", ctx_value.GetString(ctx, "tracingID"), err.Error())
 		return &proto.MayAcquireTokenResponse{
 			StatusCode: err.Code(),
 			Msg:        err.Info(),

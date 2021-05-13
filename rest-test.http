@@ -22,12 +22,12 @@ content-type: application/json
 ###
 GET http://localhost:8080/api/v1/user/profile HTTP/1.1
 content-type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjA3NzIyODYsImlhdCI6ImNvbS5kYXRhbGFiLnNlcnZpY2UudXNlci1hdXRoZW50aWNhdGlvbiIsIm9yZ24iOiJkYXRhbGFiIiwic3ViIjoiNGVkZjg1ZTktYzE2NC00NTYzLWIxMjEtYWY0M2IwYzI3M2NjIn0.eA5B2F_Bp-TeULPXTgL3YUYCnWy5dZz-eJX8DQs2L7c
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjA5MjQwMjIsImlhdCI6ImNvbS5kYXRhbGFiLnNlcnZpY2UudXNlci1hdXRoZW50aWNhdGlvbiIsIm9yZ24iOiJkYXRhbGFiIiwic3ViIjoiNGVkZjg1ZTktYzE2NC00NTYzLWIxMjEtYWY0M2IwYzI3M2NjIn0.7-54ZKMOiyZLfP4OEGMP-JfoRlGdhAvXyB0ThELn-sE
 
 ###
 POST http://localhost:8080/api/v1/user/profile/update HTTP/1.1
 content-type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjA3NzIyODYsImlhdCI6ImNvbS5kYXRhbGFiLnNlcnZpY2UudXNlci1hdXRoZW50aWNhdGlvbiIsIm9yZ24iOiJkYXRhbGFiIiwic3ViIjoiNGVkZjg1ZTktYzE2NC00NTYzLWIxMjEtYWY0M2IwYzI3M2NjIn0.eA5B2F_Bp-TeULPXTgL3YUYCnWy5dZz-eJX8DQs2L7c
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjA5MjQwMjIsImlhdCI6ImNvbS5kYXRhbGFiLnNlcnZpY2UudXNlci1hdXRoZW50aWNhdGlvbiIsIm9yZ24iOiJkYXRhbGFiIiwic3ViIjoiNGVkZjg1ZTktYzE2NC00NTYzLWIxMjEtYWY0M2IwYzI3M2NjIn0.7-54ZKMOiyZLfP4OEGMP-JfoRlGdhAvXyB0ThELn-sE
 
 {
     "first_name": "Konstantin",
@@ -39,20 +39,32 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjA3NzIyODYsImlh
 ###
 POST http://localhost:8080/api/v1/app/create HTTP/1.1
 content-type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjA3NzIyODYsImlhdCI6ImNvbS5kYXRhbGFiLnNlcnZpY2UudXNlci1hdXRoZW50aWNhdGlvbiIsIm9yZ24iOiJkYXRhbGFiIiwic3ViIjoiNGVkZjg1ZTktYzE2NC00NTYzLWIxMjEtYWY0M2IwYzI3M2NjIn0.eA5B2F_Bp-TeULPXTgL3YUYCnWy5dZz-eJX8DQs2L7c
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjA5MjQwMjIsImlhdCI6ImNvbS5kYXRhbGFiLnNlcnZpY2UudXNlci1hdXRoZW50aWNhdGlvbiIsIm9yZ24iOiJkYXRhbGFiIiwic3ViIjoiNGVkZjg1ZTktYzE2NC00NTYzLWIxMjEtYWY0M2IwYzI3M2NjIn0.7-54ZKMOiyZLfP4OEGMP-JfoRlGdhAvXyB0ThELn-sE
 
 {
-    "app_name": "TestApp#3",
+    "app_name": "TestApp#4",
     "app_URL":  "http://test.io",
     "app_description": "This is an test app lol"
 }
 
 ###
-GET http://localhost:8080/api/v1/app/get?app=23e9813a-83e4-47a3-b001-9ab3ece530bc HTTP/1.1
+GET http://localhost:8080/api/v1/app/get?app=60e1adce-564e-4b80-ae15-fbaec4b4e235 HTTP/1.1
 content-type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjA3NzIyODYsImlhdCI6ImNvbS5kYXRhbGFiLnNlcnZpY2UudXNlci1hdXRoZW50aWNhdGlvbiIsIm9yZ24iOiJkYXRhbGFiIiwic3ViIjoiNGVkZjg1ZTktYzE2NC00NTYzLWIxMjEtYWY0M2IwYzI3M2NjIn0.eA5B2F_Bp-TeULPXTgL3YUYCnWy5dZz-eJX8DQs2L7c
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjA5MjQwMjIsImlhdCI6ImNvbS5kYXRhbGFiLnNlcnZpY2UudXNlci1hdXRoZW50aWNhdGlvbiIsIm9yZ24iOiJkYXRhbGFiIiwic3ViIjoiNGVkZjg1ZTktYzE2NC00NTYzLWIxMjEtYWY0M2IwYzI3M2NjIn0.7-54ZKMOiyZLfP4OEGMP-JfoRlGdhAvXyB0ThELn-sE
 
 ###
 GET http://localhost:8080/api/v1/app/getall HTTP/1.1
 content-type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjA3NzIyODYsImlhdCI6ImNvbS5kYXRhbGFiLnNlcnZpY2UudXNlci1hdXRoZW50aWNhdGlvbiIsIm9yZ24iOiJkYXRhbGFiIiwic3ViIjoiNGVkZjg1ZTktYzE2NC00NTYzLWIxMjEtYWY0M2IwYzI3M2NjIn0.eA5B2F_Bp-TeULPXTgL3YUYCnWy5dZz-eJX8DQs2L7c
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjA5MjQwMjIsImlhdCI6ImNvbS5kYXRhbGFiLnNlcnZpY2UudXNlci1hdXRoZW50aWNhdGlvbiIsIm9yZ24iOiJkYXRhbGFiIiwic3ViIjoiNGVkZjg1ZTktYzE2NC00NTYzLWIxMjEtYWY0M2IwYzI3M2NjIn0.7-54ZKMOiyZLfP4OEGMP-JfoRlGdhAvXyB0ThELn-sE
+
+###
+POST http://localhost:8080/api/v1/app/token/create HTTP/1.1
+content-type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjA5MjQwMjIsImlhdCI6ImNvbS5kYXRhbGFiLnNlcnZpY2UudXNlci1hdXRoZW50aWNhdGlvbiIsIm9yZ24iOiJkYXRhbGFiIiwic3ViIjoiNGVkZjg1ZTktYzE2NC00NTYzLWIxMjEtYWY0M2IwYzI3M2NjIn0.7-54ZKMOiyZLfP4OEGMP-JfoRlGdhAvXyB0ThELn-sE
+
+{
+    "app_name": "TestApp#3",
+    "app_uuid": "60e1adce-564e-4b80-ae15-fbaec4b4e235",
+    "owner_domain": "datalab",
+    "app_origin": "http://test.io"
+}
