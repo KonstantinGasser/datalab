@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/KonstantinGasser/datalab/service.user-authentication/proto"
@@ -14,6 +15,7 @@ func (handler Handler) IsAuthed(ctx context.Context, in *proto.IsAuthedRequest) 
 	logrus.Infof("<%v>[service.user-authentication.IsAuthed] received request\n", ctx_value.GetString(ctx, "tracingID"))
 
 	claims, err := handler.domain.IsAuthenticated(ctx, in)
+	fmt.Println(claims)
 	if err != nil {
 		return &proto.IsAuthedResponse{
 			StatusCode: err.Code(),

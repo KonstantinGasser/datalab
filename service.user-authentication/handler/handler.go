@@ -11,6 +11,7 @@ type Handler struct {
 	// *** Service Dependencies ***
 }
 
+// NewHandler returns a new *Handler wrapping the domain logic
 func NewHandler(domain domain.UserAuthLogic) *Handler {
 	return &Handler{
 		domain: domain,

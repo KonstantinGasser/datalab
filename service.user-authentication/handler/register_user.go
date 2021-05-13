@@ -9,6 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// Register is the gRPC Entry-point to register (create) a new user record
 func (handler Handler) Register(ctx context.Context, in *proto.RegisterRequest) (*proto.RegisterResponse, error) {
 	ctx = ctx_value.AddValue(ctx, "tracingID", in.GetTracing_ID())
 	logrus.Infof("<%v>[service.user-authentication.Register] received request\n", ctx_value.GetString(ctx, "tracingID"))

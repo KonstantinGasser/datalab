@@ -2,14 +2,12 @@ package domain
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"github.com/KonstantinGasser/datalab/common"
 	"github.com/KonstantinGasser/datalab/service.app-administer/domain/create"
 	"github.com/KonstantinGasser/datalab/service.app-administer/domain/delete"
 	"github.com/KonstantinGasser/datalab/service.app-administer/domain/get"
-	"github.com/KonstantinGasser/datalab/service.app-administer/domain/pool"
 	"github.com/KonstantinGasser/datalab/service.app-administer/domain/token"
 	"github.com/KonstantinGasser/datalab/service.app-administer/errors"
 	"github.com/KonstantinGasser/datalab/service.app-administer/proto"
@@ -19,10 +17,11 @@ import (
 	usersvc "github.com/KonstantinGasser/datalab/service.user-administer/proto"
 )
 
+// AppAdmin is the interface for this service implemented all the service logic
 type AppAdmin interface {
 	Create(ctx context.Context, in *proto.CreateRequest) (string, errors.ErrApi)
 	Delete(ctx context.Context, in *proto.DeleteRequest) errors.ErrApi
-	GetSingle(ctx context.Context, in *proto.GetRequest) (*common.AppInfo, *common.AppConfigInfo, *common.AppTokenInfo, errors.ErrApi)
+	GetSingle(ctx context.Context, in *proto.GetRequest) (*common.AppInfo, errors.ErrApi)
 	GetMultiple(ctx context.Context, in *proto.GetListRequest) ([]*common.AppMetaInfo, errors.ErrApi)
 	MayAcquireToken(ctx context.Context, in *proto.MayAcquireTokenRequest) errors.ErrApi
 }
@@ -61,6 +60,8 @@ func (svc appadmin) Create(ctx context.Context, in *proto.CreateRequest) (string
 			Err:    err,
 		}
 	}
+	// forward uuid of app to app-config service in order for it
+	// to create a record to store app-configurations
 	if resp, err := svc.configSvc.Init(ctx, &cfgsvc.InitRequest{
 		Tracing_ID: in.GetTracing_ID(),
 		ForApp:     appUuid,
@@ -83,6 +84,7 @@ func (svc appadmin) Create(ctx context.Context, in *proto.CreateRequest) (string
 	return appUuid, nil
 }
 
+// Delete removes an existing App-Record from the database
 func (svc appadmin) Delete(ctx context.Context, in *proto.DeleteRequest) errors.ErrApi {
 
 	_, err := delete.App(ctx, svc.repo, in)
@@ -98,39 +100,21 @@ func (svc appadmin) Delete(ctx context.Context, in *proto.DeleteRequest) errors.
 	return nil
 }
 
-func (svc appadmin) GetSingle(ctx context.Context, in *proto.GetRequest) (*common.AppInfo, *common.AppConfigInfo, *common.AppTokenInfo, errors.ErrApi) {
-
+// GetSingle fetches all data belonging to the app data
+func (svc appadmin) GetSingle(ctx context.Context, in *proto.GetRequest) (*common.AppInfo, errors.ErrApi) {
 	app, err := get.Single(ctx, svc.repo, in)
 	if err != nil {
-		return nil, nil, nil, errors.ErrAPI{
+		return nil, errors.ErrAPI{
 			Status: http.StatusInternalServerError,
 			Msg:    "Could not get App Information",
 			Err:    err,
 		}
 	}
-
-	jobs, results := pool.New(ctx, 2)
-	jobs <- func() (interface{}, error) {
-		val, err := svc.configSvc.Get(
-			ctx,
-			&cfgsvc.GetRequest{Tracing_ID: in.GetTracing_ID(), ForUuid: in.GetAppUuid()},
-		)
-		return val, err
-	}
-	jobs <- func() (interface{}, error) {
-		val, err := svc.tkissuerSvc.Get(
-			ctx,
-			&aptissuer.GetRequest{Tracing_ID: in.GetTracing_ID(), AppUuid: in.GetAppUuid()},
-		)
-		return val, err
-	}
-	close(jobs)
-	for result := range results {
-		fmt.Println(result)
-	}
-	return app, nil, nil, nil
+	return app, nil
 }
 
+// GetMultiple fetches all Apps related to the user asking for the data. The list contains
+// only a minimal view with app-name and app-uuid
 func (svc appadmin) GetMultiple(ctx context.Context, in *proto.GetListRequest) ([]*common.AppMetaInfo, errors.ErrApi) {
 
 	apps, err := get.Multiple(ctx, svc.repo, in)
@@ -151,6 +135,7 @@ func (svc appadmin) GetMultiple(ctx context.Context, in *proto.GetListRequest) (
 	return apps, nil
 }
 
+// MayAcquireToken verifies that the user trying to create an app token is allowed to do so
 func (svc appadmin) MayAcquireToken(ctx context.Context, in *proto.MayAcquireTokenRequest) errors.ErrApi {
 	ok, err := token.MayAcquire(ctx, svc.repo, in)
 	if err != nil {

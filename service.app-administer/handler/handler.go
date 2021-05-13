@@ -8,6 +8,7 @@ import (
 	usersvc "github.com/KonstantinGasser/datalab/service.user-administer/proto"
 )
 
+// Handler implements the grpc Service interface
 type Handler struct {
 	proto.UnimplementedAppAdministerServer
 	domain domain.AppAdmin

@@ -21,7 +21,9 @@ type GatewayLogic interface {
 	UpdateUserProfile(ctx context.Context, uuid string, form UserUpdateForm) errors.ErrApi
 
 	CreateApp(ctx context.Context, uuid, organization string, form CreateAppForm) (string, errors.ErrApi)
-	GetAppDetails(ctx context.Context, userUuid, appUuid string) (*common.AppInfo, errors.ErrApi)
+	GetAppInfo(ctx context.Context, userUuid, appUuid string) (*common.AppInfo, errors.ErrApi)
+	GetAppConfig(ctx context.Context, uuid string) (*common.AppConfigInfo, errors.ErrApi)
+	GetAppToken(ctx context.Context, uuid string) (*common.AppTokenInfo, errors.ErrApi)
 	GetAppList(ctx context.Context, uuid string) ([]*common.AppMetaInfo, errors.ErrApi)
 }
 

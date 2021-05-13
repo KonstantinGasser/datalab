@@ -19,8 +19,8 @@ var (
 	ErrInvalidOrgnName   = fmt.Errorf("organization name must not contain a forward-slash")
 )
 
+// NewUser registers a new user in the database
 func NewUser(ctx context.Context, repo repo.Repo, in *proto.RegisterRequest) (string, error) {
-
 	if !orgnNameAllowed(in.GetOrganisation()) {
 		return "", ErrInvalidOrgnName
 	}

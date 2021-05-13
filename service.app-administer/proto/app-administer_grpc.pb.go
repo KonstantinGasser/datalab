@@ -35,7 +35,7 @@ func NewAppAdministerClient(cc grpc.ClientConnInterface) AppAdministerClient {
 
 func (c *appAdministerClient) Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateResponse, error) {
 	out := new(CreateResponse)
-	err := c.cc.Invoke(ctx, "/proto.AppAdminister/Create", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/app_proto.AppAdminister/Create", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +44,7 @@ func (c *appAdministerClient) Create(ctx context.Context, in *CreateRequest, opt
 
 func (c *appAdministerClient) Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error) {
 	out := new(DeleteResponse)
-	err := c.cc.Invoke(ctx, "/proto.AppAdminister/Delete", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/app_proto.AppAdminister/Delete", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func (c *appAdministerClient) Delete(ctx context.Context, in *DeleteRequest, opt
 
 func (c *appAdministerClient) Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error) {
 	out := new(GetResponse)
-	err := c.cc.Invoke(ctx, "/proto.AppAdminister/Get", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/app_proto.AppAdminister/Get", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func (c *appAdministerClient) Get(ctx context.Context, in *GetRequest, opts ...g
 
 func (c *appAdministerClient) GetList(ctx context.Context, in *GetListRequest, opts ...grpc.CallOption) (*GetListResponse, error) {
 	out := new(GetListResponse)
-	err := c.cc.Invoke(ctx, "/proto.AppAdminister/GetList", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/app_proto.AppAdminister/GetList", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +71,7 @@ func (c *appAdministerClient) GetList(ctx context.Context, in *GetListRequest, o
 
 func (c *appAdministerClient) MayAcquireToken(ctx context.Context, in *MayAcquireTokenRequest, opts ...grpc.CallOption) (*MayAcquireTokenResponse, error) {
 	out := new(MayAcquireTokenResponse)
-	err := c.cc.Invoke(ctx, "/proto.AppAdminister/MayAcquireToken", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/app_proto.AppAdminister/MayAcquireToken", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -132,7 +132,7 @@ func _AppAdminister_Create_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.AppAdminister/Create",
+		FullMethod: "/app_proto.AppAdminister/Create",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AppAdministerServer).Create(ctx, req.(*CreateRequest))
@@ -150,7 +150,7 @@ func _AppAdminister_Delete_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.AppAdminister/Delete",
+		FullMethod: "/app_proto.AppAdminister/Delete",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AppAdministerServer).Delete(ctx, req.(*DeleteRequest))
@@ -168,7 +168,7 @@ func _AppAdminister_Get_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.AppAdminister/Get",
+		FullMethod: "/app_proto.AppAdminister/Get",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AppAdministerServer).Get(ctx, req.(*GetRequest))
@@ -186,7 +186,7 @@ func _AppAdminister_GetList_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.AppAdminister/GetList",
+		FullMethod: "/app_proto.AppAdminister/GetList",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AppAdministerServer).GetList(ctx, req.(*GetListRequest))
@@ -204,7 +204,7 @@ func _AppAdminister_MayAcquireToken_Handler(srv interface{}, ctx context.Context
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.AppAdminister/MayAcquireToken",
+		FullMethod: "/app_proto.AppAdminister/MayAcquireToken",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AppAdministerServer).MayAcquireToken(ctx, req.(*MayAcquireTokenRequest))
@@ -216,7 +216,7 @@ func _AppAdminister_MayAcquireToken_Handler(srv interface{}, ctx context.Context
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var AppAdminister_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "proto.AppAdminister",
+	ServiceName: "app_proto.AppAdminister",
 	HandlerType: (*AppAdministerServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

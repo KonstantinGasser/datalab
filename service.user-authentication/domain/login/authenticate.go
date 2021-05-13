@@ -13,6 +13,8 @@ var (
 	ErrCorruptedToken = fmt.Errorf("jwt-token does no longer confirm with specifications")
 )
 
+// IsLoggedIn verifies the authentic of the JWT in order to tell if it is a
+// valid token
 func IsLoggedIn(ctx context.Context, token string) (*common.TokenClaims, error) {
 	rawClaims, err := jwts.GetJWTClaims(token)
 	if err != nil {

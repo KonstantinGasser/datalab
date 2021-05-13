@@ -17,7 +17,7 @@ import (
 func Run(ctx context.Context, host, dbAddr string) error {
 
 	srv := grpc.NewServer()
-	// create tokenService implementing the grpc.TokenServiceServer methods
+
 	repo, err := repo.NewMongoDB(dbAddr)
 	if err != nil {
 		return err

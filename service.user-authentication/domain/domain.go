@@ -12,6 +12,7 @@ import (
 	"github.com/KonstantinGasser/datalab/service.user-authentication/repo"
 )
 
+// UserAuthLogic is the interface for this service
 type UserAuthLogic interface {
 	RegisterNewUser(ctx context.Context, in *proto.RegisterRequest) (string, errors.ErrApi)
 	LoginUser(ctx context.Context, in *proto.LoginRequest) (string, errors.ErrApi)
@@ -28,6 +29,7 @@ func NewUserAuthLogic(repo repo.Repo) UserAuthLogic {
 	}
 }
 
+// RegisterNewUser coordinates the use-case of registering a new user
 func (svc userauthlogic) RegisterNewUser(ctx context.Context, in *proto.RegisterRequest) (string, errors.ErrApi) {
 	uuid, err := register.NewUser(ctx, svc.repo, in)
 	if err != nil {
@@ -54,6 +56,7 @@ func (svc userauthlogic) RegisterNewUser(ctx context.Context, in *proto.Register
 	return uuid, nil
 }
 
+// LoginUser coordinates the use-case of login in a user
 func (svc userauthlogic) LoginUser(ctx context.Context, in *proto.LoginRequest) (string, errors.ErrApi) {
 	token, err := login.User(ctx, svc.repo, in)
 	if err != nil {
@@ -75,6 +78,7 @@ func (svc userauthlogic) LoginUser(ctx context.Context, in *proto.LoginRequest) 
 	return token, nil
 }
 
+// IsAuthenticated handles logic concerning the authentication of a user
 func (svc userauthlogic) IsAuthenticated(ctx context.Context, in *proto.IsAuthedRequest) (*common.TokenClaims, errors.ErrApi) {
 	claims, err := login.IsLoggedIn(ctx, in.GetJwt())
 	if err != nil {

@@ -17,9 +17,10 @@ import (
 
 var (
 	ErrAppNameExists = fmt.Errorf("app name already exists but must be unique")
+	ErrMissingFields = fmt.Errorf("app struct is missing mandatory fields")
 )
 
-// App creates a instance of types.App generates the App-Uuid and the App-Hash
+// App creates a instance of types.App, generates the App-Uuid and the App-Hash
 // and inserts the new App into the database
 func App(ctx context.Context, repo repo.Repo, in *proto.CreateRequest) (string, error) {
 
@@ -46,8 +47,10 @@ func App(ctx context.Context, repo repo.Repo, in *proto.CreateRequest) (string, 
 		Member:      nil,
 		AppHash:     appHash,
 	}
+	// before inserting the app ensure that the assertion to check
+	// if all mandatory fields does not fail - if so returns an ErrMissingFields
 	if err := required.Atomic(&app); err != nil {
-		required.Debug(&app).Pretty()
+		return "", ErrMissingFields
 	}
 	logrus.Warn(app)
 	if err := repo.InsertOne(ctx, config.AppDB, config.AppColl, app); err != nil {

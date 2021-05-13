@@ -14,7 +14,7 @@ func (handler Handler) Get(ctx context.Context, in *proto.GetRequest) (*proto.Ge
 	ctx = ctx_value.AddValue(ctx, "tracingID", in.GetTracing_ID())
 	logrus.Infof("<%v>[service.app-administer.Get] received request\n", ctx_value.GetString(ctx, "tracingID"))
 
-	app, cfg, token, err := handler.domain.GetSingle(ctx, in)
+	app, err := handler.domain.GetSingle(ctx, in)
 	if err != nil {
 		logrus.Errorf("<%v>[service.app-administer.Get] could not get app info: %v\n", ctx_value.GetString(ctx, "tracingID"), err.Error())
 		return &proto.GetResponse{
@@ -26,7 +26,5 @@ func (handler Handler) Get(ctx context.Context, in *proto.GetRequest) (*proto.Ge
 		StatusCode: http.StatusOK,
 		Msg:        "Collected App Information",
 		App:        app,
-		AppConfig:  cfg,
-		AppToken:   token,
 	}, nil
 }
