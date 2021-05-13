@@ -70,12 +70,12 @@ func (svc appconfig) UpdateConfig(ctx context.Context, in *proto.UpdateRequest) 
 		for i, item := range in.GetStages() {
 			cfg[i] = types.Stage{ID: item.Id, Name: item.Name, Transition: item.Transition}
 		}
-	case "campaign":
+	case "record":
 		cfg = make([]types.Config, len(in.GetRecords()))
 		for i, item := range in.GetRecords() {
 			cfg[i] = types.Record{ID: item.Id, Name: item.Name, Prefix: item.Prefix}
 		}
-	case "btnTime":
+	case "btn_defs":
 		cfg = make([]types.Config, len(in.GetBtnDefs()))
 		for i, item := range in.GetBtnDefs() {
 			cfg[i] = types.BtnDef{ID: item.Id, Name: item.Name, BtnName: item.BtnName}
@@ -90,6 +90,13 @@ func (svc appconfig) UpdateConfig(ctx context.Context, in *proto.UpdateRequest) 
 
 	err := update.ByFlag(ctx, svc.repo, in.GetUpdateFlag(), in.GetUUID(), cfg)
 	if err != nil {
+		if err == update.ErrInvalidFlag {
+			return errors.ErrAPI{
+				Status: http.StatusBadRequest,
+				Msg:    "Provided update flag is invalid",
+				Err:    err,
+			}
+		}
 		return errors.ErrAPI{
 			Status: http.StatusInternalServerError,
 			Msg:    "Could not update config",

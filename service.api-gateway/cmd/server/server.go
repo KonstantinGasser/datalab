@@ -85,6 +85,12 @@ func Run(ctx context.Context, hostAddr, userAddr, appAddr, apptokenAddr, tokenAd
 		gatewaysvc.WithAppPermissions,
 	)
 
+	gatewaysvc.Register("/api/v1/app/config/upsert", gatewaysvc.UpdateAppConfig,
+		gatewaysvc.WithTracing,
+		gatewaysvc.WithCors,
+		gatewaysvc.WithAuth,
+	)
+
 	// gatewaysvc.Register("api/v1/app/create", nil)
 	// gatewaysvc.Register("api/v1/app/delete", nil)
 
