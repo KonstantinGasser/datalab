@@ -49,3 +49,7 @@ func NewGatewayLogic(appC appsvc.AppAdministerClient, apptokenC apptokensvc.AppT
 		userauthClient:  userauthC,
 	}
 }
+
+type AppMetaData struct {
+	Uuid, Origin, Hash string
+}

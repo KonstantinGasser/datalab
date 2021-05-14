@@ -5,10 +5,10 @@ import (
 	"fmt"
 
 	"github.com/KonstantinGasser/datalab/common"
+	"github.com/KonstantinGasser/datalab/service.app-configuration/config"
 	"github.com/KonstantinGasser/datalab/service.app-configuration/domain/types"
 	"github.com/KonstantinGasser/datalab/service.app-configuration/proto"
 	"github.com/KonstantinGasser/datalab/service.app-configuration/repo"
-	"github.com/KonstantinGasser/datalab/service.app-token-issuer/config"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -19,7 +19,7 @@ var (
 
 func Configs(ctx context.Context, repo repo.Repo, in *proto.GetRequest) (*common.AppConfigInfo, error) {
 	var cfg types.ConfigInfo
-	err := repo.FindOne(ctx, config.TokenDB, config.TokenColl, bson.M{"_id": in.GetForUuid()}, &cfg)
+	err := repo.FindOne(ctx, config.CfgDB, config.CfgColl, bson.M{"_id": in.GetForUuid()}, &cfg)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, ErrNotFound

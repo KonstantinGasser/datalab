@@ -11,6 +11,9 @@ import (
 func (handler *Handler) UpdateAppConfig(w http.ResponseWriter, r *http.Request) {
 	logrus.Infof("<%v>[handler.UpdateAppConfig] received request: %v\n", ctx_value.GetString(r.Context(), "tracingID"), r.Host)
 
+	// flag describes which part of the configuration should be updated
+	flag := r.URL.Query().Get("flag")
+
 	var form domain.UpdateConfigForm
 	if err := handler.decode(r.Body, &form); err != nil {
 		logrus.Errorf("<%v>[handler.UpdateAppConfig] could not decode r.Body: %v\n", ctx_value.GetString(r.Context(), "tracingID"), err)
@@ -18,7 +21,6 @@ func (handler *Handler) UpdateAppConfig(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	flag := r.URL.Query().Get("flag")
 	err := handler.domain.UpdateAppConfig(r.Context(), form, flag)
 	if err != nil {
 		logrus.Errorf("<%v>[handler.UpdateAppConfig] could not update config: %v\n", ctx_value.GetString(r.Context(), "tracingID"), err.Error())

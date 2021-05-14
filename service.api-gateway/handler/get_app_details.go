@@ -33,10 +33,15 @@ func (handler *Handler) GetAppDetails(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		logrus.Warnf("<%v>[handler.GetAppDetails] could not get app config: %v\n", ctx_value.GetString(r.Context(), "tracingID"), err.Error())
 	}
+	owner, err := handler.domain.GetUserProfile(r.Context(), app.Owner)
+	if err != nil {
+		logrus.Warnf("<%v>[handler.GetAppDetails] could not get app owner: %v\n", ctx_value.GetString(r.Context(), "tracingID"), err.Error())
+	}
 	handler.onSuccessJSON(w, map[string]interface{}{
 		"status": http.StatusOK,
 		"app":    app,
 		"config": config,
 		"token":  token,
+		"owner":  owner,
 	}, http.StatusOK)
 }

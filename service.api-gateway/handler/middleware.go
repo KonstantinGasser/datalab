@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/KonstantinGasser/datalab/hasher"
+	"github.com/KonstantinGasser/datalab/service.api-gateway/domain"
 	"github.com/KonstantinGasser/datalab/utils/ctx_value"
 	"github.com/gofrs/uuid"
 	"github.com/sirupsen/logrus"
@@ -58,11 +59,17 @@ func (handler *Handler) WithAppPermissions(next http.HandlerFunc) http.HandlerFu
 			return
 		}
 		// TODO don't like this: sharing of data should be done differently!
-		ctx := context.WithValue(r.Context(), "app.meta", map[string]string{
-			"appOrigin": payload.AppOrigin,
-			"appUuid":   payload.AppUuid,
-			"appHash":   hasher.Build(payload.AppName, payload.Orgn),
+		ctx := context.WithValue(r.Context(), "app.meta", domain.AppMetaData{
+			Uuid:   payload.AppUuid,
+			Origin: payload.AppOrigin,
+			Hash:   hasher.Build(payload.AppName, payload.Orgn),
 		})
+		// map[string]string{
+		// 	"appOrigin": payload.AppOrigin,
+		// 	"appUuid":   payload.AppUuid,
+		// 	"appHash":   hasher.Build(payload.AppName, payload.Orgn),
+		// }
+		// )
 		// serve next request
 		next(w, r.WithContext(ctx))
 	}

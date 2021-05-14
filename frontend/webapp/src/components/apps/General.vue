@@ -30,9 +30,9 @@
                             <button class="btn btn-standard" @click="copyTokenToClipboard()" type="button">Copy</button>
                         </div>
                     </div>
-                    <div v-if="app_token || app.app_token" class=""><small>Token expires in {{get_valid_till.days}} days {{get_valid_till.hours}} hours</small></div>
+                    <div v-if="app_token || app?.token?.token" class=""><small>Token expires in {{get_valid_till.days}} days {{get_valid_till.hours}} hours</small></div>
                     <div class="mt-3">
-                        Checkout the <a href="http://192.168.0.177:3000/docs/lib" target="_blank">documentation</a> 
+                        Checkout the <a href="http://localhost:3000/docs/lib" target="_blank">documentation</a> 
                         on how to implement the client side
                     </div>
                 </div>
@@ -77,7 +77,7 @@
                 app_token: null,
                 new_img_url: null,
                 header_name: "",
-                valid_till: new Date().setDate(new Date().getDate() + 7),
+                valid_till: null,
                 valid_days: null,
                 valid_hours: null,
             };
@@ -85,8 +85,9 @@
         props: ['app', 'token_placeholder'],
         computed: {
             token() {
-                if (this.$props.app?.app_token?.token !== "") {
-                    return this.$props.app?.app_token?.token;
+                console.log(this.$props.app?.token)
+                if (this.$props.app?.token?.token !== null || this.$props.app?.token?.token !== "") {
+                    return this.$props.app?.token?.token;
                 } 
                 if (this.app_token) {
                     return this.app_token;
@@ -94,9 +95,15 @@
                 return "";
                 },
             get_valid_till() {
-                const total = Math.abs(this.valid_hours - new Date()) / 1000;
+                if (this.$props.app?.token?.exp === undefined || this.$props.app?.token?.exp === null){
+                    console.log("no exp")
+                    return
+                }
+
+                const total = Math.abs(this.$props.app?.token?.exp*1000 - new Date().getTime());
                 const hours = Math.floor( (total/(1000*60*60)) % 24 );
                 const days = Math.floor( total/(1000*60*60*24) );
+                console.log({days: days, hours: hours})
                 return {days: days, hours: hours};
             },
         },
@@ -116,18 +123,18 @@
                         'Authorization': localStorage.getItem("token"),
                     }
                 };
-                axios.post("http://192.168.0.177:8080/api/v2/view/app/generate/token", {
-                    app_uuid: this.$props.app?.uuid,
+                console.log(this.$props.app.app)
+                axios.post("http://localhost:8080/api/v1/app/token/create", {
+                    app_uuid: this.$props.app?.app?.uuid,
                     app_name: appOrgn[1],
-                    orgn_name: appOrgn[0],
-                    orgn_domain: this.$props.app?.owner?.orgn_domain,
-                    app_url: this.$props.app?.URL,
+                    owner_domain: appOrgn[0],
+                    app_origin: this.$props.app?.app?.URL,
                 }, options).then(res => {
                     console.log(res);
-                    this.app_token = res.data.app_token;
-                    this.$toast.success(res.data.msg);
+                    this.app_token = res.data.app_token?.token;
+                    this.$toast.success("App Token generated");
                 }).catch(err => {
-                    this.$toast.warning(err.response.data.msg);
+                    this.$toast.warning(err.response.data);
                 });
             },
             deleteApp(id) {
@@ -147,7 +154,7 @@
                         'Authorization': localStorage.getItem("token"),
                     }
                 };
-                axios.post("http://192.168.0.177:8080/api/v2/view/app/delete", {
+                axios.post("http://localhost:8080/api/v2/view/app/delete", {
                         app_uuid: id,
                         orgn_name: appOrgn[0],
                         app_name: appOrgn[1],

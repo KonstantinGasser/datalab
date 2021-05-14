@@ -70,12 +70,12 @@ func (svc appconfig) UpdateConfig(ctx context.Context, in *proto.UpdateRequest) 
 		for i, item := range in.GetStages() {
 			cfg[i] = types.Stage{ID: item.Id, Name: item.Name, Transition: item.Transition}
 		}
-	case "record":
+	case "campaign":
 		cfg = make([]types.Config, len(in.GetRecords()))
 		for i, item := range in.GetRecords() {
 			cfg[i] = types.Record{ID: item.Id, Name: item.Name, Prefix: item.Prefix}
 		}
-	case "btn_defs":
+	case "btn_time":
 		cfg = make([]types.Config, len(in.GetBtnDefs()))
 		for i, item := range in.GetBtnDefs() {
 			cfg[i] = types.BtnDef{ID: item.Id, Name: item.Name, BtnName: item.BtnName}

@@ -8,7 +8,7 @@
                 <p class="info-text" v-if="app_list == null || app_list.length === 0">
                     Mhm looks like you do not have any apps yet - <a @click="modeCreateApp()">go create one!</a>
                 </p>
-                <div class="app-name d-flex justify-start align-center" v-for="app in app_list" :key="app.uuid" @click="getAppDetails(app.uuid)">
+                <div :class="{selected: selectedApp===app.uuid}" class="app-name d-flex justify-start align-center" v-for="app in app_list" :key="app.uuid" @click="loadApp(app.uuid)">
                     <span class="dots medium-font" >{{ app.name }}</span>
                     <!-- <span class="icon icon-delete hover big" @click="removeApp(app.uuid)"></span> -->
                 </div>
@@ -17,14 +17,13 @@
         <div>
             <TabCreateApp v-if="isInCreateMode" @createdApp="updateState" :orgn_domain="activeApp.owner?.orgn_domain" />
             <div v-if="!isInCreateMode">
-                <h1 class="super-lg">{{activeApp.owner?.orgn_domain}}/{{activeApp.name}}</h1>
+                <h1 class="super-lg">{{activeApp.owner?.orgn_domain}}/{{activeApp.app?.name}}</h1>
                 <div class="desc_test">{{activeApp.description}}</div>
                 <hr>
                 <Tabs class="my-2" ref="Tabs" :update="activeTab" :initTab="activeTab" :tabs="tabs" @tabChange="tabChange"/>
                 <General v-if="activeTab === 'Overview'" :app="activeApp" @drop_app="drop_app" :token_placeholder="token_placeholder"/>
-                <Config v-if="activeTab == 'Configuration'" :app_config="activeApp.app_config" :config_uuid="activeApp.config_ref" @setdoc="setdoc"/>
+                <Config v-if="activeTab == 'Configuration'" :app_config="activeApp.config" :app_uuid="activeApp?.app?.uuid" @setdoc="setdoc"/>
             </div>
-            <!-- <TabAppDetails ref="tab_app_token" @drop_app="updateState" v-cloak v-if="activeTab === 'App Details' && !isInCreateMode" :app="activeApp"/> -->
         </div>
     </div>
 </template>
@@ -58,6 +57,7 @@
         },
         data() {
             return {
+                selectedApp: null,
                 isInCreateMode: false,
                 activeTab: 'App Details',
                 tabsBlocked: false,
@@ -70,78 +70,69 @@
             };
         },
         async created() {
-            // fetch initial data
-            this.getViewApp().then(data => {
-                this.apps = data.app_list;
-                this.activeApp = data.app_details;
-                this.activeApp["app_token"] = data.app_token;
-                this.activeApp["app_config"] = {
-                        "funnel": data.config_funnel,
-                        "campaign": data.config_campaign,
-                        "btn_time": data.config_btn_time,
-                    }
-                if (this.apps == null || this.apps.length === 0) {
-                    this.isInCreateMode = true;
-                } else {
-                    this.isInCreateMode = false;
-                }
-            }).catch(err => {
-               if (err.response.status === 401) {
-                        localStorage.removeItem('token');
-                        this.$router.replace({ name: 'login' });
-                }
+            // fetch initial data of app list
+            const init_data = await this.getAppList();
+            if (init_data.apps === undefined || init_data.apps === null || init_data.apps.length <= 0) {
+                this.apps = [];
                 this.isInCreateMode = true;
-            });
-            
+            }
+            else {
+                this.apps = init_data.apps.reverse();
+                const init_app = await this.getApp(this.apps[0].uuid);
+                this.activeApp = init_app;
+                this.selectedApp = this.activeApp?.app?.uuid;
+                console.log(this.activeApp);
+                this.isInCreateMode = false;
+            }    
         },
         props: ['status'],
         methods: {
+            async loadApp(uuid) {
+                const data = await this.getApp(uuid);
+                if (data.app === undefined || data.app == null) {
+                    return
+                }
+                this.activeApp = data;
+                this.selectedApp = data.app?.uuid;
+                this.activeTab = "Overview";
+            },
+            async getAppList() {
+                let options = {
+                    headers: {
+                        'Authorization': localStorage.getItem("token"),
+                    }
+                };
+                const resp = await axios.get("http://localhost:8080/api/v1/app/getall", options)
+                if (resp.status != 200) {
+                    this.$toast.error(resp.data);
+                }
+                return resp.data
+            },
+            async getApp(uuid) {
+                let options = {
+                    headers: {
+                        'Authorization': localStorage.getItem("token"),
+                    }
+                };
+                const resp = await axios.get("http://localhost:8080/api/v1/app/get?app="+uuid, options)
+                if (resp.status != 200) {
+                    this.$toast.error(resp.data);
+                }
+                return resp.data
+            },
             tabChange(tab) {
                 this.activeTab = tab;
             },
-            updateState(event) {
-                // update app list on the left to show newly created app
-                this.getViewApp().then(data => {
-                    this.apps = data.app_list;
-                    this.activeApp = data.app_details;
-                    this.activeApp["app_token"] = data.app_token;
-                    this.activeApp["app_config"] = {
-                        "funnel": data.config_funnel,
-                        "campaign": data.config_campaign,
-                        "btn_time": data.config_btn_time,
-                    }
-                    this.isInCreateMode = false;
-                }).catch(error => {
-                    if (error.response.status === 401) {
-                        localStorage.removeItem('token');
-                        this.$router.replace({ name: 'login' });
-                    }
-                    console.log(error);
-                    this.$toast.error("could not refresh app list");
-                });
-                
-                
+            async updateState(event) {
+                console.log(event)
+                const init_data = await this.getAppList();
+                this.apps = init_data.apps;
+                const init_app = await this.getApp(event.app_uuid);
+                this.activeApp = init_app;
+                this.selectedApp = event.app_uuid;
+                this.isInCreateMode = false; 
             },
             drop_app() {
-                this.isInCreateMode = true;
-                this.apps = this.apps.filter(item => item.uuid != event.app_uuid);
-                this.getViewApp().then(data => {
-                    this.apps = data.app_list;
-                    this.activeApp = data.app_details;
-                    this.activeApp["app_token"] = data.app_token;
-                    this.activeApp["app_config"] = {
-                        "funnel": data.config_funnel,
-                        "campaign": data.config_campaign,
-                        "btn_time": data.config_btn_time,
-                    }
-                }).catch(error => {
-                    if (error.response.status === 401) {
-                        localStorage.removeItem('token');
-                        this.$router.replace({ name: 'login' });
-                    }
-                    console.log(error);
-                    this.$toast.error("could not refresh app list");
-                });
             },
             modeCreateApp() {
                 this.isInCreateMode = true;
@@ -153,7 +144,7 @@
                     }
                 };
 
-                const res = await axios.get("http://192.168.0.177:8080/api/v2/view/app/details", options)
+                const res = await axios.get("http://localhost:8080/api/v2/view/app/details", options)
                 if (res.data == null || res.status >= 400) {
                     this.isInCreateMode = true;
                     console.log(this.isInCreateMode);
@@ -169,7 +160,7 @@
                         'Authorization': localStorage.getItem("token"),
                     }
                 };
-                axios.get("http://192.168.0.177:8080/api/v2/view/app/get?uuid="+uuid, options).then(resp => {
+                axios.get("http://localhost:8080/api/v2/view/app/get?uuid="+uuid, options).then(resp => {
                     if (this.isInCreateMode)
                         this.isInCreateMode = !this.isInCreateMode;
                     this.activeApp = resp.data.app;
@@ -233,9 +224,7 @@ h2 {
     padding: 0 7px;
 }
 .app-name {
-    background: var(--gradient-green);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent; 
+    color: var(--h-color);
     font-size: 16px;
     font-weight: bold;
     padding: 5px;
@@ -247,6 +236,10 @@ h2 {
 }
 .app-name:hover {
     cursor: pointer;
-    text-decoration: underline;
+    color: var(--menu-bg);
+}
+.selected {
+    background: var(--sub-border) !important;
+    color: var(--menu-bg);
 }
 </style>

@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 
+	"github.com/KonstantinGasser/datalab/service.api-gateway/domain"
 	"github.com/KonstantinGasser/datalab/utils/ctx_value"
 	"github.com/sirupsen/logrus"
 )
@@ -12,11 +13,16 @@ func (handler *Handler) CreateAppToken(w http.ResponseWriter, r *http.Request) {
 
 	var user = ctx_value.GetAuthedUser(r.Context())
 	// TODO: pass appMeta info from middleware permissions in a cleaner form
-	var appMeta = r.Context().Value("app.meta").(map[string]string)
+	appMeta, ok := r.Context().Value("app.meta").(domain.AppMetaData)
+	if !ok {
+		logrus.Errorf("<%v>[handler.CreateAppToken] could not get app meta data from ctx\n", ctx_value.GetString(r.Context(), "tracingID"))
+		handler.onError(w, "App Permission check failed", http.StatusInternalServerError)
+		return
+	}
 
-	token, err := handler.domain.CreateAppToken(r.Context(), user.GetUuid(), appMeta["appUuid"], appMeta["appOrigin"], appMeta["appHash"])
+	token, err := handler.domain.CreateAppToken(r.Context(), user.GetUuid(), appMeta.Uuid, appMeta.Origin, appMeta.Hash)
 	if err != nil {
-		logrus.Errorf("<%v>[handler.CreateAppToken] could not create app token: %v", ctx_value.GetString(r.Context(), "tracingID"), err)
+		logrus.Errorf("<%v>[handler.CreateAppToken] could not create app token: %v\n", ctx_value.GetString(r.Context(), "tracingID"), err)
 		handler.onError(w, err.Info(), int(err.Code()))
 		return
 	}

@@ -16,7 +16,7 @@ func (handler Handler) Create(ctx context.Context, in *proto.CreateRequest) (*pr
 
 	appUuid, err := handler.domain.Create(ctx, in)
 	if err != nil {
-		logrus.Infof("<%v>[service.app-administer.Create] could not create app: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
+		logrus.Errorf("<%v>[service.app-administer.Create] could not create app: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
 		return &proto.CreateResponse{
 			StatusCode: err.Code(),
 			Msg:        err.Info(),

@@ -143,20 +143,18 @@
                             'Authorization': localStorage.getItem("token"),
                         }
                     };
-                    await axios.post("http://192.168.0.177:8080/api/v2/view/app/create", {
+                    await axios.post("http://localhost:8080/api/v1/app/create", {
                             app_name: this.appName,
                             app_description: this.appDesc,
-                            app_member: this.appMember,
-                            app_settings: this.appCfgs,
-                            app_url: this.appURL,
+                            app_URL: this.appURL,
                         }, options
                     ).then((resp) => {
                         console.log("Resp ",resp);
                         this.$toast.success("App " + this.appName + " has been created");
-                        this.$emit("createdApp", {"type": "show_app", "app_uuid": resp.data.app_uuid});
+                        this.$emit("createdApp", {"type": "show_app", "app_uuid": resp.data.uuid});
                     }).catch(err => {
                         console.log(err)
-                        this.$toast.error(err.response.data.msg);
+                        this.$toast.error(err.response.data);
                         return;
                     });
                 }

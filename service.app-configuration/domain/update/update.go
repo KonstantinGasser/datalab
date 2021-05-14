@@ -11,16 +11,22 @@ import (
 )
 
 var (
-	ErrInvalidFlag = fmt.Errorf("provided update flag is invalid")
+	ErrInvalidFlag     = fmt.Errorf("provided update flag is invalid")
+	ErrUpdateOfNilData = fmt.Errorf("provided data would replace current data with nil")
 )
 
 func ByFlag(ctx context.Context, repo repo.Repo, flag string, uuid string, cfg []types.Config) error {
+
+	// check if the data matches the flag. Reason, if flag is set to one value but the passed data
+	// describes a different config - the data behind the flag in the database will be overwritten with nil.
+	// example: flag: funnel, types.ConfigInfo.Funnel = nil but types.ConfigInfo.Campaign = [{},{}]
+	//		=> database record of config.funnel will be $set to nil since types.ConfigInfo.Funnel is nil
 	switch flag {
 	case "funnel":
 		break
-	case "record":
+	case "campaign":
 		break
-	case "btn_defs":
+	case "btn_time":
 		break
 	default:
 		return ErrInvalidFlag
@@ -30,10 +36,11 @@ func ByFlag(ctx context.Context, repo repo.Repo, flag string, uuid string, cfg [
 		bson.D{
 			{
 				Key: "$set",
-				Value: bson.D{{
-					Key:   flag,
-					Value: cfg,
-				},
+				Value: bson.D{
+					{
+						Key:   flag,
+						Value: cfg,
+					},
 				},
 			},
 		}, false)

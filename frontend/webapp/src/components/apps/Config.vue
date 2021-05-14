@@ -4,6 +4,9 @@
         <h1 class="d-flex justify-between">Funnel Configuration</h1>
         <small><span class="link" @click="showCfg('funnel')">how does it work?</span></small>
         <div class="view_component funnel_view mt-0 pl-0">
+            <div class="d-flex align-center justify-end">
+                    <button class="btn btn-standard" @click="updateStages">Update</button>
+                </div>
             <div class="">
                 <div class="form-col col d-flex flex-wrap">
                     <div v-for="f in funnel" :key="f.id" class="d-flex align-center m-1">
@@ -41,15 +44,15 @@
                          </div>
                     </div>
                 </div>
-                <div class="d-flex align-center justify-end">
-                    <button class="btn btn-standard" @click="updateStages">Update</button>
-                </div>
             </div>
         </div>
         <br>
         <h1>Campaign Tracking</h1>
         <small> <span class="link" @click="showCfg('campaign')">how does it work?</span></small>
         <div class="view_component table-height">
+            <div class="d-flex align-center justify-end">
+                <button class="btn btn-standard" @click="updateCampaigns">Update</button>
+            </div>
             <table class="table table-borderless">
             <thead>
                 <tr>
@@ -74,14 +77,14 @@
                 </tr> 
             </tbody>
             </table>
-            <div class="d-flex align-center justify-end">
-                <button class="btn btn-standard" @click="updateCampaigns">Update</button>
-            </div>
         </div>
         <br>
         <h1>Interesting Buttons</h1>
         <small><span class="link" @click="showCfg('btn_time')">how does it work?</span></small>
         <div class="view_component table-height">
+            <div class="d-flex align-center justify-end">
+                <button class="btn btn-standard" @click="updateBtnTime">Update</button>
+            </div>
             <table class="table table-borderless">
             <thead>
                 <tr>
@@ -106,9 +109,6 @@
                 </tr> 
             </tbody>
             </table>
-            <div class="d-flex align-center justify-end">
-                <button class="btn btn-standard" @click="updateBtnTime">Update</button>
-            </div>
         </div>
     <!-- </div> -->
 </template>
@@ -144,10 +144,15 @@ export default {
         app_config: {
             type: Object,
             default: null,
-        }
+        },
+        app_uuid: {
+            type: String,
+            default: null,
+        },
 
     },
     mounted() {
+        console.log("Configs", this.$props.app_config);
         if (this.$props.app_config === null || Object.keys(this.$props.app_config).length === 0){
             this.funnel = [];
             this.funnel_count = 1;
@@ -202,13 +207,13 @@ export default {
                 }
             }; 
             const payload = {
-                config_uuid: this.$props.config_uuid,
-                funnel: this.funnel,
+                app_uuid: this.$props.app_uuid,
+                stages: this.funnel,
             }
-            axios.post("http://192.168.0.177:8080/api/v2/view/config/update?resource=funnel", payload, options).then(res => {
+            axios.post("http://localhost:8080/api/v1/app/config/upsert?flag=funnel", payload, options).then(res => {
                 console.log(res);
                 this.$toast.success("Updated Funnel information")
-            }).catch(err => this.$toast.error("Could not update Funnel information"));
+            }).catch(err => this.$toast.error(err.response.data));
         },
         addCampaign() {
             if (this.campaign_invalid) this.campaign_invalid = false;
@@ -243,13 +248,13 @@ export default {
                 }
             }; 
             const payload = {
-                config_uuid: this.$props.config_uuid,
-                campaign: this.campaign,
+                app_uuid: this.$props.app_uuid,
+                records: this.campaign,
             }
-            axios.post("http://192.168.0.177:8080/api/v2/view/config/update?resource=campaign", payload, options).then(res => {
+            axios.post("http://localhost:8080/api/v1/app/config/upsert?flag=campaign", payload, options).then(res => {
                 console.log(res);
                 this.$toast.success("Updated Campaign information")
-            }).catch(err => this.$toast.error("Could not update Campaign information"));
+            }).catch(err => this.$toast.error(err.response.data));
         },
 
         addBtnTime() {
@@ -285,13 +290,13 @@ export default {
                 }
             }; 
             const payload = {
-                config_uuid: this.$props.config_uuid,
-                btn_time: this.buttons,
+                app_uuid: this.$props.app_uuid,
+                btn_defs: this.buttons,
             }
-            axios.post("http://192.168.0.177:8080/api/v2/view/config/update?resource=btnTime", payload, options).then(res => {
+            axios.post("http://localhost:8080/api/v1/app/config/upsert?flag=btn_time", payload, options).then(res => {
                 console.log(res);
                 this.$toast.success("Updated Interesting-Buttons information")
-            }).catch(err => this.$toast.error("Could not update Interesting-Buttons information"));
+            }).catch(err => this.$toast.error(err.response.data));
         },
         showCfg(type) {
             console.log(type);

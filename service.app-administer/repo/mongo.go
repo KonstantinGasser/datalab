@@ -2,7 +2,6 @@ package repo
 
 import (
 	"context"
-	"fmt"
 	"reflect"
 	"time"
 
@@ -55,11 +54,6 @@ func (client mongoClient) FindOne(ctx context.Context, db, collection string, fi
 	coll := client.conn.Database(db).Collection(collection)
 
 	if err := coll.FindOne(ctx, filter).Decode(result); err != nil {
-		// Decode will return ErrNoDocuments if the query returns no result
-		// this is less an error but similar to io.EOF and means NoRecoredFound
-		if err == mongo.ErrNoDocuments {
-			return err
-		}
 		return err
 	}
 	return nil
@@ -73,14 +67,11 @@ func (client mongoClient) InsertOne(ctx context.Context, db, collection string, 
 	var data interface{} = query
 	var err error
 	if reflect.ValueOf(query).Kind() == reflect.Struct {
-		fmt.Println("1")
 		data, err = bson.Marshal(query)
-		fmt.Println("2")
 		if err != nil {
 			return err
 		}
 	}
-	fmt.Println("3")
 	coll := client.conn.Database(db).Collection(collection)
 	_, err = coll.InsertOne(ctx, data)
 	if err != nil {
@@ -128,10 +119,8 @@ func (client mongoClient) Exists(ctx context.Context, db, collection string, fil
 
 	var records bson.M
 	if err := coll.FindOne(ctx, filter).Decode(&records); err != nil {
-		// Decode will return ErrNoDocuments if the query returns no result
-		// this is less an error but similar to io.EOF and means NoRecoredFound
 		if err == mongo.ErrNoDocuments {
-			return false, err
+			return false, nil
 		}
 		return false, err
 	}
