@@ -40,7 +40,9 @@ type gatewaylogic struct {
 	userauthClient  userauthsvc.UserAuthenticationClient
 }
 
-func NewGatewayLogic(appC appsvc.AppAdministerClient, apptokenC apptokensvc.AppTokenIssuerClient, appcfgC cfgsvc.AppConfigurationClient, userC usersvc.UserAdministerClient, userauthC userauthsvc.UserAuthenticationClient) GatewayLogic {
+func NewGatewayLogic(appC appsvc.AppAdministerClient, apptokenC apptokensvc.AppTokenIssuerClient,
+	appcfgC cfgsvc.AppConfigurationClient, userC usersvc.UserAdministerClient,
+	userauthC userauthsvc.UserAuthenticationClient) GatewayLogic {
 	return &gatewaylogic{
 		appClient:       appC,
 		apptokenClient:  apptokenC,

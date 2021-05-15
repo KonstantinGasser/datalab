@@ -4,7 +4,7 @@ import (
 	cfgsvc "github.com/KonstantinGasser/datalab/service.app-configuration/proto"
 	aptissuer "github.com/KonstantinGasser/datalab/service.app-token-issuer/proto"
 	usersvc "github.com/KonstantinGasser/datalab/service.user-administer/proto"
-	permsvc "github.com/KonstantinGasser/datalab/service.user-permissions/proto"
+	userauthsvc "github.com/KonstantinGasser/datalab/service.user-authentication/proto"
 	"google.golang.org/grpc"
 )
 
@@ -37,11 +37,11 @@ func NewAppTokenIssuerClient(listenOn string) (aptissuer.AppTokenIssuerClient, e
 	return client, nil
 }
 
-func NewUserPermissionsClient(listenOn string) (permsvc.UserPermissionsClient, error) {
+func NewUserAuthClient(listenOn string) (userauthsvc.UserAuthenticationClient, error) {
 	conn, err := grpc.Dial(listenOn, grpc.WithInsecure())
 	if err != nil {
 		return nil, err
 	}
-	client := permsvc.NewUserPermissionsClient(conn)
+	client := userauthsvc.NewUserAuthenticationClient(conn)
 	return client, nil
 }

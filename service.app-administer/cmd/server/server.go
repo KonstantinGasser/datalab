@@ -16,7 +16,7 @@ import (
 
 // Run is a run abstraction for the main function allowing
 // to return an error
-func Run(ctx context.Context, host, userAddr, tokenAddr, configAddr, permiAddr, dbAddr string) error {
+func Run(ctx context.Context, host, userAddr, tokenAddr, configAddr, authAddr, dbAddr string) error {
 	srv := grpc.NewServer()
 	// create app-service
 	// create app dependencies
@@ -36,11 +36,11 @@ func Run(ctx context.Context, host, userAddr, tokenAddr, configAddr, permiAddr, 
 	if err != nil {
 		return err
 	}
-	permissionClient, err := grpc_adapter.NewUserPermissionsClient(permiAddr)
+	userauthClient, err := grpc_adapter.NewUserAuthClient(authAddr)
 	if err != nil {
 		return err
 	}
-	appLogic := domain.NewAppLogic(repo, userClient, configClient, tokenClient, permissionClient)
+	appLogic := domain.NewAppLogic(repo, userClient, configClient, tokenClient, userauthClient)
 	appadminSvc := handler.NewHandler(appLogic)
 	proto.RegisterAppAdministerServer(srv, appadminSvc)
 

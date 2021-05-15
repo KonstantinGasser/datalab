@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/KonstantinGasser/datalab/common"
@@ -15,7 +16,7 @@ import (
 	cfgsvc "github.com/KonstantinGasser/datalab/service.app-configuration/proto"
 	aptissuer "github.com/KonstantinGasser/datalab/service.app-token-issuer/proto"
 	usersvc "github.com/KonstantinGasser/datalab/service.user-administer/proto"
-	permsvc "github.com/KonstantinGasser/datalab/service.user-permissions/proto"
+	userauthsvc "github.com/KonstantinGasser/datalab/service.user-authentication/proto"
 )
 
 // AppAdmin is the interface for this service implemented all the service logic
@@ -28,20 +29,22 @@ type AppAdmin interface {
 }
 
 type appadmin struct {
-	userSvc       usersvc.UserAdministerClient
-	configSvc     cfgsvc.AppConfigurationClient
-	tkissuerSvc   aptissuer.AppTokenIssuerClient
-	permissionSvc permsvc.UserPermissionsClient
-	repo          repo.Repo
+	userSvc     usersvc.UserAdministerClient
+	configSvc   cfgsvc.AppConfigurationClient
+	tkissuerSvc aptissuer.AppTokenIssuerClient
+	userauthSvc userauthsvc.UserAuthenticationClient
+	repo        repo.Repo
 }
 
-func NewAppLogic(repo repo.Repo, user usersvc.UserAdministerClient, config cfgsvc.AppConfigurationClient, token aptissuer.AppTokenIssuerClient, permissions permsvc.UserPermissionsClient) AppAdmin {
+func NewAppLogic(repo repo.Repo,
+	user usersvc.UserAdministerClient, config cfgsvc.AppConfigurationClient,
+	token aptissuer.AppTokenIssuerClient, userauth userauthsvc.UserAuthenticationClient) AppAdmin {
 	return &appadmin{
-		repo:          repo,
-		userSvc:       user,
-		configSvc:     config,
-		tkissuerSvc:   token,
-		permissionSvc: permissions,
+		repo:        repo,
+		userSvc:     user,
+		configSvc:   config,
+		tkissuerSvc: token,
+		userauthSvc: userauth,
 	}
 }
 
@@ -85,27 +88,28 @@ func (svc appadmin) Create(ctx context.Context, in *proto.CreateRequest) (string
 			Err:    err,
 		}
 	}
-	// respPerm, err := svc.permissionSvc.Init(ctx, &permsvc.InitRequest{
-	// 	Tracing_ID: in.GetTracing_ID(),
-	// 	UserUuid:   in.GetOwnerUuid(),
-	// 	UserOrgn:   in.GetOrganization(),
-	// })
-	// if err != nil || respPerm.GetStatusCode() != http.StatusOK {
-	// 	// if the init of the app-config service fails the created app must be deleted
-	// 	// to avoid an inconsistent state of the system
-	// 	if err := create.CompensateApp(ctx, svc.repo, appUuid); err != nil {
-	// 		return "", errors.ErrAPI{
-	// 			Status: http.StatusInternalServerError,
-	// 			Msg:    "Could not rollback creation of App",
-	// 			Err:    err,
-	// 		}
-	// 	}
-	// 	return "", errors.ErrAPI{
-	// 		Status: http.StatusInternalServerError,
-	// 		Msg:    "Could not create new App",
-	// 		Err:    err,
-	// 	}
-	// }
+	respPermissions, err := svc.userauthSvc.AddAppAccess(ctx, &userauthsvc.AddAppAccessRequest{
+		Tracing_ID: in.GetTracing_ID(),
+		UserUuid:   in.GetOwnerUuid(),
+		AppUuid:    appUuid,
+		AppRole:    common.AppRole_OWNER,
+	})
+	if err != nil || respPermissions.GetStatusCode() != http.StatusOK {
+		// if the init of the app-config service fails the created app must be deleted
+		// to avoid an inconsistent state of the system
+		if err := create.CompensateApp(ctx, svc.repo, appUuid); err != nil {
+			return "", errors.ErrAPI{
+				Status: http.StatusInternalServerError,
+				Msg:    "Could not rollback creation of App",
+				Err:    err,
+			}
+		}
+		return "", errors.ErrAPI{
+			Status: http.StatusInternalServerError,
+			Msg:    "Could not create new App",
+			Err:    fmt.Errorf("could not compensate created app and role back: %v", err),
+		}
+	}
 	return appUuid, nil
 }
 

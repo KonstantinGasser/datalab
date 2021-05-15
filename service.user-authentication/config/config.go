@@ -5,4 +5,6 @@ const (
 	UserAuthDB = "datalab_userauth"
 	// UserAuthColl is the collection name within the MongoDB database
 	UserAuthColl = "userauth"
+
+	UserPermissionColl = "userpermissions"
 )

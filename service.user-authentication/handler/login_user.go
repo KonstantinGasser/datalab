@@ -9,7 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// Login is the gRPC Entry-point to login (authenticate) a user by its credentials
+// Login is the gRPC Entry-point to login (authenticate) a user by its credentials (username,password)
 func (handler Handler) Login(ctx context.Context, in *proto.LoginRequest) (*proto.LoginResponse, error) {
 	ctx = ctx_value.AddValue(ctx, "tracingID", in.GetTracing_ID())
 	logrus.Infof("<%v>[service.user-authentication.Login] received request\n", ctx_value.GetString(ctx, "tracingID"))

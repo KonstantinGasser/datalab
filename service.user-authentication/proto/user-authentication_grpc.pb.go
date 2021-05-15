@@ -21,6 +21,7 @@ type UserAuthenticationClient interface {
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 	IsAuthed(ctx context.Context, in *IsAuthedRequest, opts ...grpc.CallOption) (*IsAuthedResponse, error)
+	AddAppAccess(ctx context.Context, in *AddAppAccessRequest, opts ...grpc.CallOption) (*AddAppAccessResponse, error)
 }
 
 type userAuthenticationClient struct {
@@ -58,6 +59,15 @@ func (c *userAuthenticationClient) IsAuthed(ctx context.Context, in *IsAuthedReq
 	return out, nil
 }
 
+func (c *userAuthenticationClient) AddAppAccess(ctx context.Context, in *AddAppAccessRequest, opts ...grpc.CallOption) (*AddAppAccessResponse, error) {
+	out := new(AddAppAccessResponse)
+	err := c.cc.Invoke(ctx, "/auth_proto.UserAuthentication/AddAppAccess", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserAuthenticationServer is the server API for UserAuthentication service.
 // All implementations must embed UnimplementedUserAuthenticationServer
 // for forward compatibility
@@ -65,6 +75,7 @@ type UserAuthenticationServer interface {
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
 	IsAuthed(context.Context, *IsAuthedRequest) (*IsAuthedResponse, error)
+	AddAppAccess(context.Context, *AddAppAccessRequest) (*AddAppAccessResponse, error)
 	mustEmbedUnimplementedUserAuthenticationServer()
 }
 
@@ -80,6 +91,9 @@ func (UnimplementedUserAuthenticationServer) Login(context.Context, *LoginReques
 }
 func (UnimplementedUserAuthenticationServer) IsAuthed(context.Context, *IsAuthedRequest) (*IsAuthedResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method IsAuthed not implemented")
+}
+func (UnimplementedUserAuthenticationServer) AddAppAccess(context.Context, *AddAppAccessRequest) (*AddAppAccessResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddAppAccess not implemented")
 }
 func (UnimplementedUserAuthenticationServer) mustEmbedUnimplementedUserAuthenticationServer() {}
 
@@ -148,6 +162,24 @@ func _UserAuthentication_IsAuthed_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserAuthentication_AddAppAccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddAppAccessRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserAuthenticationServer).AddAppAccess(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/auth_proto.UserAuthentication/AddAppAccess",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserAuthenticationServer).AddAppAccess(ctx, req.(*AddAppAccessRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserAuthentication_ServiceDesc is the grpc.ServiceDesc for UserAuthentication service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -166,6 +198,10 @@ var UserAuthentication_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "IsAuthed",
 			Handler:    _UserAuthentication_IsAuthed_Handler,
+		},
+		{
+			MethodName: "AddAppAccess",
+			Handler:    _UserAuthentication_AddAppAccess_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

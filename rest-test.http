@@ -2,7 +2,7 @@ POST http://localhost:8080/api/v1/user/register HTTP/1.1
 content-type: application/json
 
 {
-    "username": "konstiGasser",
+    "username": "konstiGasser4",
     "first_name": "Konstantin",
     "last_name":  "Gasser",
     "password": "hello",
@@ -15,19 +15,19 @@ POST http://localhost:8080/api/v1/user/login HTTP/1.1
 content-type: application/json
 
 {
-    "username": "konsti",
+    "username": "konstiGasser4",
     "password": "hello"
 }
 
 ###
 GET http://localhost:8080/api/v1/user/profile HTTP/1.1
 content-type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjExMDUwMTksImlhdCI6ImNvbS5kYXRhbGFiLnNlcnZpY2UudXNlci1hdXRoZW50aWNhdGlvbiIsIm9yZ24iOiJkYXRhbGFiIiwic3ViIjoiNGVkZjg1ZTktYzE2NC00NTYzLWIxMjEtYWY0M2IwYzI3M2NjIn0.Zkb_UMph82AVstybd-Ko0OFPSSGtuLcvpymifiRZJfU
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjExMDg1NzUsImlhdCI6ImNvbS5kYXRhbGFiLnNlcnZpY2UudXNlci1hdXRoZW50aWNhdGlvbiIsIm9yZ24iOiJkYXRhbGFiLmRldiIsInN1YiI6ImUwODZlMjYyLWQzMGItNGIwNy04ZjVlLWE1YjBjNDczZTAyNyJ9.f4nfy3inWkasTTIsG4INmrrIEI-kRPXCvjOj_PYcIcs
 
 ###
 POST http://localhost:8080/api/v1/user/profile/update HTTP/1.1
 content-type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjExMDUwMTksImlhdCI6ImNvbS5kYXRhbGFiLnNlcnZpY2UudXNlci1hdXRoZW50aWNhdGlvbiIsIm9yZ24iOiJkYXRhbGFiIiwic3ViIjoiNGVkZjg1ZTktYzE2NC00NTYzLWIxMjEtYWY0M2IwYzI3M2NjIn0.Zkb_UMph82AVstybd-Ko0OFPSSGtuLcvpymifiRZJfU
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjExMDg1NzUsImlhdCI6ImNvbS5kYXRhbGFiLnNlcnZpY2UudXNlci1hdXRoZW50aWNhdGlvbiIsIm9yZ24iOiJkYXRhbGFiLmRldiIsInN1YiI6ImUwODZlMjYyLWQzMGItNGIwNy04ZjVlLWE1YjBjNDczZTAyNyJ9.f4nfy3inWkasTTIsG4INmrrIEI-kRPXCvjOj_PYcIcs
 
 {
     "first_name": "Konstantin",
@@ -39,10 +39,10 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjExMDUwMTksImlh
 ###
 POST http://localhost:8080/api/v1/app/create HTTP/1.1
 content-type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjExMDUwMTksImlhdCI6ImNvbS5kYXRhbGFiLnNlcnZpY2UudXNlci1hdXRoZW50aWNhdGlvbiIsIm9yZ24iOiJkYXRhbGFiIiwic3ViIjoiNGVkZjg1ZTktYzE2NC00NTYzLWIxMjEtYWY0M2IwYzI3M2NjIn0.Zkb_UMph82AVstybd-Ko0OFPSSGtuLcvpymifiRZJfU
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjExMDg1NzUsImlhdCI6ImNvbS5kYXRhbGFiLnNlcnZpY2UudXNlci1hdXRoZW50aWNhdGlvbiIsIm9yZ24iOiJkYXRhbGFiLmRldiIsInN1YiI6ImUwODZlMjYyLWQzMGItNGIwNy04ZjVlLWE1YjBjNDczZTAyNyJ9.f4nfy3inWkasTTIsG4INmrrIEI-kRPXCvjOj_PYcIcs
 
 {
-    "app_name": "TestApp#1",
+    "app_name": "TestApp#01",
     "app_URL":  "http://test.io",
     "app_description": "Testing User Permissions"
 }
@@ -50,17 +50,17 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjExMDUwMTksImlh
 ###
 GET http://localhost:8080/api/v1/app/get?app=bfe25db8-2513-4d7e-a45f-953b55f5a256 HTTP/1.1
 content-type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjExMDUwMTksImlhdCI6ImNvbS5kYXRhbGFiLnNlcnZpY2UudXNlci1hdXRoZW50aWNhdGlvbiIsIm9yZ24iOiJkYXRhbGFiIiwic3ViIjoiNGVkZjg1ZTktYzE2NC00NTYzLWIxMjEtYWY0M2IwYzI3M2NjIn0.Zkb_UMph82AVstybd-Ko0OFPSSGtuLcvpymifiRZJfU
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjExMDg1NzUsImlhdCI6ImNvbS5kYXRhbGFiLnNlcnZpY2UudXNlci1hdXRoZW50aWNhdGlvbiIsIm9yZ24iOiJkYXRhbGFiLmRldiIsInN1YiI6ImUwODZlMjYyLWQzMGItNGIwNy04ZjVlLWE1YjBjNDczZTAyNyJ9.f4nfy3inWkasTTIsG4INmrrIEI-kRPXCvjOj_PYcIcs
 
 ###
 GET http://localhost:8080/api/v1/app/getall HTTP/1.1
 content-type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjExMDUwMTksImlhdCI6ImNvbS5kYXRhbGFiLnNlcnZpY2UudXNlci1hdXRoZW50aWNhdGlvbiIsIm9yZ24iOiJkYXRhbGFiIiwic3ViIjoiNGVkZjg1ZTktYzE2NC00NTYzLWIxMjEtYWY0M2IwYzI3M2NjIn0.Zkb_UMph82AVstybd-Ko0OFPSSGtuLcvpymifiRZJfU
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjExMDg1NzUsImlhdCI6ImNvbS5kYXRhbGFiLnNlcnZpY2UudXNlci1hdXRoZW50aWNhdGlvbiIsIm9yZ24iOiJkYXRhbGFiLmRldiIsInN1YiI6ImUwODZlMjYyLWQzMGItNGIwNy04ZjVlLWE1YjBjNDczZTAyNyJ9.f4nfy3inWkasTTIsG4INmrrIEI-kRPXCvjOj_PYcIcs
 
 ###
 POST http://localhost:8080/api/v1/app/token/create HTTP/1.1
 content-type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjExMDUwMTksImlhdCI6ImNvbS5kYXRhbGFiLnNlcnZpY2UudXNlci1hdXRoZW50aWNhdGlvbiIsIm9yZ24iOiJkYXRhbGFiIiwic3ViIjoiNGVkZjg1ZTktYzE2NC00NTYzLWIxMjEtYWY0M2IwYzI3M2NjIn0.Zkb_UMph82AVstybd-Ko0OFPSSGtuLcvpymifiRZJfU
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjExMDg1NzUsImlhdCI6ImNvbS5kYXRhbGFiLnNlcnZpY2UudXNlci1hdXRoZW50aWNhdGlvbiIsIm9yZ24iOiJkYXRhbGFiLmRldiIsInN1YiI6ImUwODZlMjYyLWQzMGItNGIwNy04ZjVlLWE1YjBjNDczZTAyNyJ9.f4nfy3inWkasTTIsG4INmrrIEI-kRPXCvjOj_PYcIcs
 
 {
     "app_name": "TestApp#2",
@@ -72,7 +72,7 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjExMDUwMTksImlh
 ###
 POST http://localhost:8080/api/v1/app/config/upsert?flag=funnel HTTP/1.1
 content-type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjExMDUwMTksImlhdCI6ImNvbS5kYXRhbGFiLnNlcnZpY2UudXNlci1hdXRoZW50aWNhdGlvbiIsIm9yZ24iOiJkYXRhbGFiIiwic3ViIjoiNGVkZjg1ZTktYzE2NC00NTYzLWIxMjEtYWY0M2IwYzI3M2NjIn0.Zkb_UMph82AVstybd-Ko0OFPSSGtuLcvpymifiRZJfU
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjExMDg1NzUsImlhdCI6ImNvbS5kYXRhbGFiLnNlcnZpY2UudXNlci1hdXRoZW50aWNhdGlvbiIsIm9yZ24iOiJkYXRhbGFiLmRldiIsInN1YiI6ImUwODZlMjYyLWQzMGItNGIwNy04ZjVlLWE1YjBjNDczZTAyNyJ9.f4nfy3inWkasTTIsG4INmrrIEI-kRPXCvjOj_PYcIcs
 
 {
     "app_uuid": "5317be1b-7f22-46c5-a145-9bbf72b6ef4c",
@@ -98,7 +98,7 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjExMDUwMTksImlh
 ###
 POST http://localhost:8080/api/v1/app/config/upsert?flag=campaign HTTP/1.1
 content-type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjExMDUwMTksImlhdCI6ImNvbS5kYXRhbGFiLnNlcnZpY2UudXNlci1hdXRoZW50aWNhdGlvbiIsIm9yZ24iOiJkYXRhbGFiIiwic3ViIjoiNGVkZjg1ZTktYzE2NC00NTYzLWIxMjEtYWY0M2IwYzI3M2NjIn0.Zkb_UMph82AVstybd-Ko0OFPSSGtuLcvpymifiRZJfU
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjExMDg1NzUsImlhdCI6ImNvbS5kYXRhbGFiLnNlcnZpY2UudXNlci1hdXRoZW50aWNhdGlvbiIsIm9yZ24iOiJkYXRhbGFiLmRldiIsInN1YiI6ImUwODZlMjYyLWQzMGItNGIwNy04ZjVlLWE1YjBjNDczZTAyNyJ9.f4nfy3inWkasTTIsG4INmrrIEI-kRPXCvjOj_PYcIcs
 
 {
     "app_uuid": "5317be1b-7f22-46c5-a145-9bbf72b6ef4c",
@@ -114,7 +114,7 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjExMDUwMTksImlh
 ###
 POST http://localhost:8080/api/v1/app/config/upsert?flag=btn_time HTTP/1.1
 content-type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjExMDUwMTksImlhdCI6ImNvbS5kYXRhbGFiLnNlcnZpY2UudXNlci1hdXRoZW50aWNhdGlvbiIsIm9yZ24iOiJkYXRhbGFiIiwic3ViIjoiNGVkZjg1ZTktYzE2NC00NTYzLWIxMjEtYWY0M2IwYzI3M2NjIn0.Zkb_UMph82AVstybd-Ko0OFPSSGtuLcvpymifiRZJfU
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjExMDg1NzUsImlhdCI6ImNvbS5kYXRhbGFiLnNlcnZpY2UudXNlci1hdXRoZW50aWNhdGlvbiIsIm9yZ24iOiJkYXRhbGFiLmRldiIsInN1YiI6ImUwODZlMjYyLWQzMGItNGIwNy04ZjVlLWE1YjBjNDczZTAyNyJ9.f4nfy3inWkasTTIsG4INmrrIEI-kRPXCvjOj_PYcIcs
 
 {
     "app_uuid": "5317be1b-7f22-46c5-a145-9bbf72b6ef4c",

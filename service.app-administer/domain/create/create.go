@@ -11,7 +11,6 @@ import (
 	"github.com/KonstantinGasser/datalab/service.app-administer/repo"
 	"github.com/KonstantinGasser/datalab/utils/unique"
 	"github.com/KonstantinGasser/required"
-	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -45,7 +44,6 @@ func App(ctx context.Context, repo repo.Repo, in *proto.CreateRequest) (string, 
 		OwnerUuid:   in.GetOwnerUuid(),
 		OrgnDomain:  in.GetOrganization(),
 		Description: in.GetDescription(),
-		Member:      nil,
 		AppHash:     appHash,
 	}
 	// before inserting the app ensure that the assertion to check
@@ -53,7 +51,6 @@ func App(ctx context.Context, repo repo.Repo, in *proto.CreateRequest) (string, 
 	if err := required.Atomic(&app); err != nil {
 		return "", ErrMissingFields
 	}
-	logrus.Warn(app)
 	if err := repo.InsertOne(ctx, config.AppDB, config.AppColl, app); err != nil {
 		return "", err
 	}

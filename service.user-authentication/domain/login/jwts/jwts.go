@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/KonstantinGasser/datalab/service.user-authentication/domain/types"
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
@@ -22,12 +23,13 @@ var (
 
 // IssueUser takes in arguments for the token of the user
 // returning a JWT with exp set to expTime and the data passed in
-func Issue(uuid, organization string) (string, error) {
+func Issue(uuid, organization string, permissions []types.AppPermission) (string, error) {
 	claims := jwt.MapClaims{
 		"sub":  uuid,
 		"orgn": organization,
 		"iat":  issuerUser,
 		"exp":  time.Now().Add(expTimeUser).Unix(),
+		"apps": permissions,
 	}
 
 	_token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

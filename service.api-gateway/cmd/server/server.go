@@ -35,6 +35,7 @@ func Run(ctx context.Context, hostAddr, userAddr, appAddr, apptokenAddr, tokenAd
 	if err != nil {
 		return err
 	}
+
 	domain := domain.NewGatewayLogic(appClient, apptokenClient, appconfigClient, userClient, userauthClient)
 
 	gatewaysvc := handler.NewHandler(domain)

@@ -2,7 +2,6 @@ package domain
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"github.com/KonstantinGasser/datalab/common"
@@ -57,19 +56,6 @@ func (svc useradminlogic) CreateUser(ctx context.Context, in *proto.CreateReques
 			Msg:    "Could not create User-Account",
 			Err:    err,
 		}
-	}
-	resp, err := svc.permissions.Init(ctx, &permissionssvc.InitRequest{
-		Tracing_ID: in.GetTracing_ID(),
-		UserUuid:   in.GetUser().GetUuid(),
-		UserOrgn:   in.GetUser().GetOrgnDomain()},
-	)
-	if err != nil {
-		_ = create.Compansate(ctx, svc.repo, in.GetUser().GetUuid())
-		return errors.ErrAPI{Status: http.StatusInternalServerError, Msg: "Could not init User Permissions", Err: err}
-	}
-	if resp.GetStatusCode() != http.StatusOK {
-		_ = create.Compansate(ctx, svc.repo, in.GetUser().GetUuid())
-		return errors.ErrAPI{Status: resp.GetStatusCode(), Msg: resp.GetMsg(), Err: fmt.Errorf("%s", resp.GetMsg())}
 	}
 	return nil
 }

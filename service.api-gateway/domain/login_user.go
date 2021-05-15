@@ -25,6 +25,7 @@ func (svc gatewaylogic) LoginUser(ctx context.Context, form LoginForm) (string, 
 			Err:    err,
 		}
 	}
+
 	loginResp, err := svc.userauthClient.Login(ctx, &authproto.LoginRequest{
 		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
 		Username:   form.Username,

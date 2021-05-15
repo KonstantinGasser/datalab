@@ -107,7 +107,7 @@ func (client mongoClient) UpdateOne(ctx context.Context, db, collection string, 
 	coll := client.conn.Database(db).Collection(collection)
 	updated, err := coll.UpdateOne(ctx, filter, data, &options.UpdateOptions{Upsert: &upsert})
 	if err != nil {
-		return int(updated.ModifiedCount), err
+		return 0, err
 	}
 	return int(updated.ModifiedCount), nil
 }

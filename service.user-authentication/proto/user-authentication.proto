@@ -8,7 +8,8 @@ import "common/common.proto";
 service UserAuthentication {
     rpc Register(RegisterRequest) returns (RegisterResponse) {}
     rpc Login(LoginRequest) returns (LoginResponse) {}
-    rpc IsAuthed(IsAuthedRequest) returns (IsAuthedResponse) {} 
+    rpc IsAuthed(IsAuthedRequest) returns (IsAuthedResponse) {}
+    rpc AddAppAccess(AddAppAccessRequest) returns (AddAppAccessResponse) {} 
 }
 
 message RegisterRequest {
@@ -43,5 +44,16 @@ message IsAuthedResponse {
     string msg = 2;
     bool is_authed = 3;
     common.TokenClaims claims = 4;
+}
+
+message AddAppAccessRequest {
+    string tracing_ID = 1;
+    string user_uuid = 2;
+    string app_uuid = 3;
+    common.AppRole app_role = 4;
+}
+message AddAppAccessResponse {
+    int32 status_code = 1; 
+    string msg = 2;
 }
 

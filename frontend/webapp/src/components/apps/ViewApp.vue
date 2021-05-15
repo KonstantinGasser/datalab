@@ -139,11 +139,11 @@
                 this.activeTab = tab;
             },
             async updateState(event) {
-                console.log(event)
                 const init_data = await this.getAppList();
                 this.apps = init_data.apps;
                 const init_app = await this.getApp(event.app_uuid);
                 this.activeApp = init_app;
+                this.activeTab = "Overview";
                 this.selectedApp = event.app_uuid;
                 this.isInCreateMode = false; 
             },

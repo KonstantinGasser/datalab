@@ -49,7 +49,16 @@ func NewUser(ctx context.Context, repo repo.Repo, in *proto.RegisterRequest) (st
 	}
 	err = repo.InsertOne(ctx, config.UserAuthDB, config.UserAuthColl, newUser)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("insert-user: %w", err)
+	}
+	var newPermissions = types.Permissions{
+		UserUuid: uuid,
+		UserOrgn: in.GetOrganisation(),
+		Apps:     []types.AppPermission{},
+	}
+	err = repo.InsertOne(ctx, config.UserAuthDB, config.UserPermissionColl, newPermissions)
+	if err != nil {
+		return "", fmt.Errorf("insert-permissions: %w", err)
 	}
 	return uuid, nil
 }

@@ -15,8 +15,9 @@ import (
 )
 
 var (
-	ErrUserNotFound  = fmt.Errorf("could not find any user")
-	ErrWrongPassword = fmt.Errorf("provided password does not match records")
+	ErrUserNotFound        = fmt.Errorf("could not find any user")
+	ErrPermissionsNotFound = fmt.Errorf("could not find user permissions")
+	ErrWrongPassword       = fmt.Errorf("provided password does not match records")
 )
 
 // User checks if the provided user credentials match with the database records
@@ -34,7 +35,16 @@ func User(ctx context.Context, repo repo.Repo, in *proto.LoginRequest) (string, 
 		return "", ErrWrongPassword
 	}
 
-	token, err := jwts.Issue(foundUser.Uuid, foundUser.Organization)
+	var foundPermissions types.Permissions
+	err = repo.FindOne(ctx, config.UserAuthDB, config.UserPermissionColl, bson.M{"_id": foundUser.Uuid}, &foundPermissions)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return "", ErrPermissionsNotFound
+		}
+		return "", err
+	}
+
+	token, err := jwts.Issue(foundUser.Uuid, foundUser.Organization, foundPermissions.Apps)
 	if err != nil {
 		return "", err
 	}
