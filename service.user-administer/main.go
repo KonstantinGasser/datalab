@@ -14,6 +14,7 @@ import (
 
 func main() {
 	host := flag.String("host", "localhost:8001", "address to run the server on")
+	permissionsAddr := flag.String("permissions-srv", "localhost:8007", "address to connect to user-permissions-service")
 	dbAddr := flag.String("db-srv", "mongodb://userstorage:secure@192.168.0.177:27017", "address to connect to app-database")
 	flag.Parse()
 
@@ -28,5 +29,5 @@ func main() {
 		time.Sleep(time.Second * 1)
 		os.Exit(0)
 	}()
-	logrus.Fatal(server.Run(ctx, *host, *dbAddr))
+	logrus.Fatal(server.Run(ctx, *host, *permissionsAddr, *dbAddr))
 }

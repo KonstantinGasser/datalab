@@ -17,12 +17,20 @@
         <div>
             <TabCreateApp v-if="isInCreateMode" @createdApp="updateState" :orgn_domain="activeApp.owner?.orgn_domain" />
             <div v-if="!isInCreateMode">
-                <h1 class="super-lg">{{activeApp.owner?.orgn_domain}}/{{activeApp.app?.name}}</h1>
+                <h1 class="super-lg d-flex align-center">{{activeApp.owner?.orgn_domain}}/{{activeApp.app?.name}} 
+                    <div  v-if="!app_unsaved" class="saved d-flex align-center justify-center">
+                        <div>Saved</div>
+                    </div>
+                    <div  v-if="app_unsaved" class="unsaved d-flex align-center justify-center">
+                        <div>Unsaved Changes</div>
+                    </div>
+                </h1>
                 <div class="desc_test">{{activeApp.description}}</div>
                 <hr>
                 <Tabs class="my-2" ref="Tabs" :update="activeTab" :initTab="activeTab" :tabs="tabs" @tabChange="tabChange"/>
                 <General v-if="activeTab === 'Overview'" :app="activeApp" @drop_app="drop_app" :token_placeholder="token_placeholder"/>
-                <Config v-if="activeTab == 'Configuration'" :app_config="activeApp.config" :app_uuid="activeApp?.app?.uuid" @setdoc="setdoc"/>
+                <Config v-if="activeTab == 'Configuration'" @appchange="markUnsaved" :app_config="activeApp.config" :app_uuid="activeApp?.app?.uuid" @setdoc="setdoc"/>
+                <InviteMember v-if="activeTab == 'Invite'" :app_uuid="activeApp?.app?.uuid" />
             </div>
         </div>
     </div>
@@ -34,6 +42,7 @@
     import Tabs from '@/components/utils/Tabs.vue';
     import General from '@/components/apps/General.vue';
     import Config from '@/components/apps/Config';
+    import InviteMember from '@/components/apps/InviteMember';
     import axios from 'axios';
 
     export default {
@@ -43,6 +52,7 @@
             TabCreateApp,
             General,
             Config,
+            InviteMember,
         },
         computed: {
             blockTabs() {
@@ -64,9 +74,14 @@
                 newApp: { name: '' },
                 apps: [],
                 activeApp: {},
+                app_unsaved: false,
                 token_placeholder: "Organization-Domain/App-Name",
                 activeTab: "Overview",
-                tabs: [{name:'Overview', emoji: "🎛"},{name:'Configuration', emoji: "⚙️"},]
+                tabs: [
+                        {name:'Overview', emoji: "🎛"},
+                        {name:'Configuration', emoji: "⚙️"},
+                        {name:'Invite', emoji: "✉️"},
+                    ]
             };
         },
         async created() {
@@ -131,6 +146,9 @@
                 this.activeApp = init_app;
                 this.selectedApp = event.app_uuid;
                 this.isInCreateMode = false; 
+            },
+            markUnsaved(value) {
+                this.app_unsaved = value;
             },
             drop_app() {
             },
@@ -226,7 +244,6 @@ h2 {
 .app-name {
     color: var(--h-color);
     font-size: 16px;
-    font-weight: bold;
     padding: 5px;
     margin: 5px 0;
     border-radius: 8px;
@@ -241,5 +258,34 @@ h2 {
 .selected {
     background: var(--sub-border) !important;
     color: var(--menu-bg);
+}
+
+.saved {
+    margin-left: 15px;
+    width: auto;
+    height: 25px;
+    border-radius: 8px;
+    background: var(--menu-bg);
+    padding: 5px 15px;
+}
+
+.saved div {
+    color: var(--sub-bg);
+    font-size: 16px;
+    font-weight: bold;
+}
+.unsaved {
+    margin-left: 15px;
+    width: auto;
+    height: 25px;
+    border-radius: 8px;
+    background: orange;
+    padding: 5px 15px;
+}
+
+.unsaved div {
+    color: var(--sub-bg);
+    font-size: 16px;
+    font-weight: bold;
 }
 </style>

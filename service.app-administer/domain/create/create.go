@@ -28,7 +28,6 @@ func App(ctx context.Context, repo repo.Repo, in *proto.CreateRequest) (string, 
 	exists, err := repo.Exists(ctx, config.AppDB, config.AppColl,
 		bson.M{"name": in.GetName(), "owner_uuid": in.GetOwnerUuid()})
 	if err != nil && err != mongo.ErrNilDocument {
-		fmt.Println("why???")
 		return "", err
 	}
 	if exists {

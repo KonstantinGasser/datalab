@@ -20,3 +20,7 @@ user-admin:
 user-auth:
 	protoc -I. --go_out=$(GOPATH)/src service.user-authentication/proto/user-authentication.proto common/common.proto
 	protoc -I. --go-grpc_out=$(GOPATH)/src service.user-authentication/proto/user-authentication.proto common/common.proto
+
+user-permissions:
+	protoc -I. --go_out=$(GOPATH)/src service.user-permissions/proto/user-permissions.proto common/common.proto
+	protoc -I. --go-grpc_out=$(GOPATH)/src service.user-permissions/proto/user-permissions.proto common/common.proto

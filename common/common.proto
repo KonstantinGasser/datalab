@@ -69,4 +69,21 @@ message AppTokenInfo {
 message TokenClaims {
     string uuid = 1;
     string organization = 2;
+    UserPermissions permissions = 3;
+}
+
+message UserPermissions {
+    repeated AppPermission apps = 1;
+}
+
+enum AppRole {
+    OWNER = 0;
+    EDITOR = 1;
+    VIEWER = 2;
+
+}
+
+message AppPermission {
+    string app_uuid = 1;
+    AppRole role = 2;
 }

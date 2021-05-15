@@ -5,6 +5,7 @@ import (
 	"net"
 
 	"github.com/KonstantinGasser/datalab/service.user-administer/domain"
+	"github.com/KonstantinGasser/datalab/service.user-administer/grpc_adapter"
 	"github.com/KonstantinGasser/datalab/service.user-administer/handler"
 	"github.com/KonstantinGasser/datalab/service.user-administer/proto"
 	"github.com/KonstantinGasser/datalab/service.user-administer/repo"
@@ -13,14 +14,18 @@ import (
 )
 
 // Run is a run-abstraction for the main func
-func Run(ctx context.Context, host, dbAddr string) error {
+func Run(ctx context.Context, host, permissionsAddr, dbAddr string) error {
 	srv := grpc.NewServer()
 	// create storage dependency
 	repo, err := repo.NewMongoDB(dbAddr)
 	if err != nil {
 		return err
 	}
-	domain := domain.NewUserAdminLogic(repo)
+	permissionClient, err := grpc_adapter.NewUserPermissionsClient(permissionsAddr)
+	if err != nil {
+		return err
+	}
+	domain := domain.NewUserAdminLogic(repo, permissionClient)
 	userAdminSvc := handler.NewHandler(domain)
 	proto.RegisterUserAdministerServer(srv, userAdminSvc)
 

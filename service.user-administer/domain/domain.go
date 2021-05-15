@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/KonstantinGasser/datalab/common"
@@ -11,6 +12,7 @@ import (
 	"github.com/KonstantinGasser/datalab/service.user-administer/domain/update"
 	"github.com/KonstantinGasser/datalab/service.user-administer/proto"
 	"github.com/KonstantinGasser/datalab/service.user-administer/repo"
+	permissionssvc "github.com/KonstantinGasser/datalab/service.user-permissions/proto"
 )
 
 type UserAdminLogic interface {
@@ -21,12 +23,14 @@ type UserAdminLogic interface {
 }
 
 type useradminlogic struct {
-	repo repo.Repo
+	permissions permissionssvc.UserPermissionsClient
+	repo        repo.Repo
 }
 
-func NewUserAdminLogic(repo repo.Repo) UserAdminLogic {
+func NewUserAdminLogic(repo repo.Repo, permissions permissionssvc.UserPermissionsClient) UserAdminLogic {
 	return &useradminlogic{
-		repo: repo,
+		permissions: permissions,
+		repo:        repo,
 	}
 }
 
@@ -53,6 +57,19 @@ func (svc useradminlogic) CreateUser(ctx context.Context, in *proto.CreateReques
 			Msg:    "Could not create User-Account",
 			Err:    err,
 		}
+	}
+	resp, err := svc.permissions.Init(ctx, &permissionssvc.InitRequest{
+		Tracing_ID: in.GetTracing_ID(),
+		UserUuid:   in.GetUser().GetUuid(),
+		UserOrgn:   in.GetUser().GetOrgnDomain()},
+	)
+	if err != nil {
+		_ = create.Compansate(ctx, svc.repo, in.GetUser().GetUuid())
+		return errors.ErrAPI{Status: http.StatusInternalServerError, Msg: "Could not init User Permissions", Err: err}
+	}
+	if resp.GetStatusCode() != http.StatusOK {
+		_ = create.Compansate(ctx, svc.repo, in.GetUser().GetUuid())
+		return errors.ErrAPI{Status: resp.GetStatusCode(), Msg: resp.GetMsg(), Err: fmt.Errorf("%s", resp.GetMsg())}
 	}
 	return nil
 }

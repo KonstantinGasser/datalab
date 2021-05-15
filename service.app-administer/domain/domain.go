@@ -15,6 +15,7 @@ import (
 	cfgsvc "github.com/KonstantinGasser/datalab/service.app-configuration/proto"
 	aptissuer "github.com/KonstantinGasser/datalab/service.app-token-issuer/proto"
 	usersvc "github.com/KonstantinGasser/datalab/service.user-administer/proto"
+	permsvc "github.com/KonstantinGasser/datalab/service.user-permissions/proto"
 )
 
 // AppAdmin is the interface for this service implemented all the service logic
@@ -27,18 +28,20 @@ type AppAdmin interface {
 }
 
 type appadmin struct {
-	userSvc     usersvc.UserAdministerClient
-	configSvc   cfgsvc.AppConfigurationClient
-	tkissuerSvc aptissuer.AppTokenIssuerClient
-	repo        repo.Repo
+	userSvc       usersvc.UserAdministerClient
+	configSvc     cfgsvc.AppConfigurationClient
+	tkissuerSvc   aptissuer.AppTokenIssuerClient
+	permissionSvc permsvc.UserPermissionsClient
+	repo          repo.Repo
 }
 
-func NewAppLogic(repo repo.Repo, user usersvc.UserAdministerClient, config cfgsvc.AppConfigurationClient, token aptissuer.AppTokenIssuerClient) AppAdmin {
+func NewAppLogic(repo repo.Repo, user usersvc.UserAdministerClient, config cfgsvc.AppConfigurationClient, token aptissuer.AppTokenIssuerClient, permissions permsvc.UserPermissionsClient) AppAdmin {
 	return &appadmin{
-		repo:        repo,
-		userSvc:     user,
-		configSvc:   config,
-		tkissuerSvc: token,
+		repo:          repo,
+		userSvc:       user,
+		configSvc:     config,
+		tkissuerSvc:   token,
+		permissionSvc: permissions,
 	}
 }
 
@@ -62,10 +65,11 @@ func (svc appadmin) Create(ctx context.Context, in *proto.CreateRequest) (string
 	}
 	// forward uuid of app to app-config service in order for it
 	// to create a record to store app-configurations
-	if resp, err := svc.configSvc.Init(ctx, &cfgsvc.InitRequest{
+	respCfg, err := svc.configSvc.Init(ctx, &cfgsvc.InitRequest{
 		Tracing_ID: in.GetTracing_ID(),
 		ForApp:     appUuid,
-	}); err != nil || resp.GetStatusCode() != http.StatusOK {
+	})
+	if err != nil || respCfg.GetStatusCode() != http.StatusOK {
 		// if the init of the app-config service fails the created app must be deleted
 		// to avoid an inconsistent state of the system
 		if err := create.CompensateApp(ctx, svc.repo, appUuid); err != nil {
@@ -81,6 +85,27 @@ func (svc appadmin) Create(ctx context.Context, in *proto.CreateRequest) (string
 			Err:    err,
 		}
 	}
+	// respPerm, err := svc.permissionSvc.Init(ctx, &permsvc.InitRequest{
+	// 	Tracing_ID: in.GetTracing_ID(),
+	// 	UserUuid:   in.GetOwnerUuid(),
+	// 	UserOrgn:   in.GetOrganization(),
+	// })
+	// if err != nil || respPerm.GetStatusCode() != http.StatusOK {
+	// 	// if the init of the app-config service fails the created app must be deleted
+	// 	// to avoid an inconsistent state of the system
+	// 	if err := create.CompensateApp(ctx, svc.repo, appUuid); err != nil {
+	// 		return "", errors.ErrAPI{
+	// 			Status: http.StatusInternalServerError,
+	// 			Msg:    "Could not rollback creation of App",
+	// 			Err:    err,
+	// 		}
+	// 	}
+	// 	return "", errors.ErrAPI{
+	// 		Status: http.StatusInternalServerError,
+	// 		Msg:    "Could not create new App",
+	// 		Err:    err,
+	// 	}
+	// }
 	return appUuid, nil
 }
 

@@ -1,5 +1,5 @@
 <template>
-    <!-- <div class="main-cfg"> -->
+    <div class="">
         <br>
         <h1 class="d-flex justify-between">Funnel Configuration</h1>
         <small><span class="link" @click="showCfg('funnel')">how does it work?</span></small>
@@ -110,7 +110,7 @@
             </tbody>
             </table>
         </div>
-    <!-- </div> -->
+    </div>
 </template>
 
 <script>
@@ -137,6 +137,7 @@ export default {
             button_btn: null,
             buttons_count: 0,
             button_invalid: false,
+            unsaved_changes: false,
         };
     },
     props: {
@@ -172,6 +173,9 @@ export default {
         this.buttons_count = this.buttons.length + 1;
     },
     computed: {
+        unsavedChanges() {
+            console.log(this.unsaved_changes);
+        }
     },
     methods: {
         addStage() {
@@ -191,6 +195,7 @@ export default {
             this.stage_name = null;
             this.stage_transition = null;
             this.funnel_count++;
+            this.$emit("appchange", true);
         },
         removeStage(id) {
             console.log(id);
@@ -199,6 +204,7 @@ export default {
                 item.id = i+1;
             });
             this.funnel_count--;
+            this.$emit("appchange", true);
         },
         updateStages() {
             let options = {
@@ -212,7 +218,8 @@ export default {
             }
             axios.post("http://localhost:8080/api/v1/app/config/upsert?flag=funnel", payload, options).then(res => {
                 console.log(res);
-                this.$toast.success("Updated Funnel information")
+                this.$toast.success("Updated Funnel information");
+                this.$emit("appchange", false);
             }).catch(err => this.$toast.error(err.response.data));
         },
         addCampaign() {
@@ -233,6 +240,7 @@ export default {
             this.campaign_name = null;
             this.campaign_prefix = null;
             this.campaign_count++;
+            this.$emit("appchange", true);
         },
         removeCampaign(id) {
             this.campaign = this.campaign.filter(item => item.id != id);
@@ -240,6 +248,7 @@ export default {
                 item.id = i+1;
             });
             this.campaign_count--;
+            this.$emit("appchange", true);
         },
         updateCampaigns() {
             let options = {
@@ -253,7 +262,8 @@ export default {
             }
             axios.post("http://localhost:8080/api/v1/app/config/upsert?flag=campaign", payload, options).then(res => {
                 console.log(res);
-                this.$toast.success("Updated Campaign information")
+                this.$toast.success("Updated Campaign information");
+                this.$emit("appchange", false);
             }).catch(err => this.$toast.error(err.response.data));
         },
 
@@ -275,6 +285,7 @@ export default {
             this.button_name = null;
             this.button_btn = null;
             this.buttons_count++;
+            this.$emit("appchange", true);
         },
         removeBtnTime(id) {
             this.buttons = this.buttons.filter(item => item.id != id);
@@ -282,6 +293,7 @@ export default {
                 item.id = i+1;
             });
             this.buttons_count--;
+            this.$emit("appchange", true);
         },
         updateBtnTime() {
             let options = {
@@ -295,7 +307,8 @@ export default {
             }
             axios.post("http://localhost:8080/api/v1/app/config/upsert?flag=btn_time", payload, options).then(res => {
                 console.log(res);
-                this.$toast.success("Updated Interesting-Buttons information")
+                this.$toast.success("Updated Interesting-Buttons information");
+                this.$emit("appchange", false);
             }).catch(err => this.$toast.error(err.response.data));
         },
         showCfg(type) {
@@ -367,8 +380,11 @@ td .icon {
     opacity: 1;
 }
 
-
 .trash-span {
     height: 14px;
+}
+
+.unsaved-changes {
+    border: 1px solid orange;
 }
 </style>

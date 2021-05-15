@@ -113,20 +113,22 @@ Each service (api,app,user,token,frontend) have their own `Makefile` with the `d
 
 
 ## Service - DNS Table (some say they can see a pattern..not sure where??)
-| Service         | swarm-name        | port in:out | credentials            |
-|-----------------|-------------------|-------------|------------------------|
-| gateway         | gateway           | 8080:8080   |                        |
-| app             | appservice        | 8003:8003   |                        |
-| user            | userservice       | 8001:8001   |                        |
-| userauth        | userauth          | 8002:8002   |                        |
-| config          | configservice     | 8005:8005   |                        |
-| apptoken        | apptokenservice   | 8006:8006   |                        |
-| frontend        | vuefrontend       | 80:80       |                        |
-| mongo-app       | appstorage        | 27018:27017 | appstorage:secure      |
-| monog-user      | userstorage       | 27017:27017 | userstorage:secure     |
-| monog-config    | configstorage     | 27019:27017 | configstorage:secure   |
-| monog-apptoken  | apptokenstorage   | 27020:27017 | apptokenstorage:secure |
-| monog-userauth  | userauthstorage   | 27021:27017 | userauthstorage:secure |
+| Service               | swarm-name           | port in:out | credentials                |
+|-----------------------|----------------------|-------------|----------------------------|
+| gateway               | gateway              | 8080:8080   |                            |
+| app                   | appservice           | 8003:8003   |                            |
+| user                  | userservice          | 8001:8001   |                            |
+| userauth              | userauth             | 8002:8002   |                            |
+| config                | configservice        | 8005:8005   |                            |
+| apptoken              | apptokenservice      | 8006:8006   |                            |
+| apppermisson          | apppermissonservice  | 8007:8007   |                            |
+| frontend              | vuefrontend          | 80:80       |                            |
+| mongo-app             | appstorage           | 27018:27017 | appstorage:secure          |
+| monog-user            | userstorage          | 27017:27017 | userstorage:secure         |
+| monog-config          | configstorage        | 27019:27017 | configstorage:secure       |
+| mongo-app             | appstorage           | 27018:27017 | appstorage:secure          |
+| monog-userauth        | userauthstorage      | 27021:27017 | userauthstorage:secure     |
+| monog-userpermissions | userpermissonstorage | 27022:27017 | userpermissonstorage:secure|
 
 
 
