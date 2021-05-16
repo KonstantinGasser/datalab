@@ -10,6 +10,7 @@ service UserAdminister {
     rpc Create(CreateRequest) returns (CreateResponse) {}
     rpc Update(UpdateRequest) returns (UpdateResponse) {}
     rpc Get(GetRequest) returns (GetResponse) {}
+    rpc GetColleagues(GetColleaguesRequest) returns (GetColleaguesResponse) {}
     rpc GetList(GetListRequest) returns (GetListResponse) {}
 }
 
@@ -58,6 +59,18 @@ message GetResponse {
     string msg = 2;
     common.UserInfo user = 3;
 }
+
+message GetColleaguesRequest {
+    string tracing_ID = 1;
+    string user_uuid = 2;
+}
+
+message GetColleaguesResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    repeated common.UserInfo colleagues = 3;
+}
+
 
 message UpdatableUser {
     string first_name = 1; 

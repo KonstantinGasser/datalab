@@ -21,6 +21,7 @@ type UserAdministerClient interface {
 	Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateResponse, error)
 	Update(ctx context.Context, in *UpdateRequest, opts ...grpc.CallOption) (*UpdateResponse, error)
 	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
+	GetColleagues(ctx context.Context, in *GetColleaguesRequest, opts ...grpc.CallOption) (*GetColleaguesResponse, error)
 	GetList(ctx context.Context, in *GetListRequest, opts ...grpc.CallOption) (*GetListResponse, error)
 }
 
@@ -59,6 +60,15 @@ func (c *userAdministerClient) Get(ctx context.Context, in *GetRequest, opts ...
 	return out, nil
 }
 
+func (c *userAdministerClient) GetColleagues(ctx context.Context, in *GetColleaguesRequest, opts ...grpc.CallOption) (*GetColleaguesResponse, error) {
+	out := new(GetColleaguesResponse)
+	err := c.cc.Invoke(ctx, "/user_proto.UserAdminister/GetColleagues", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *userAdministerClient) GetList(ctx context.Context, in *GetListRequest, opts ...grpc.CallOption) (*GetListResponse, error) {
 	out := new(GetListResponse)
 	err := c.cc.Invoke(ctx, "/user_proto.UserAdminister/GetList", in, out, opts...)
@@ -75,6 +85,7 @@ type UserAdministerServer interface {
 	Create(context.Context, *CreateRequest) (*CreateResponse, error)
 	Update(context.Context, *UpdateRequest) (*UpdateResponse, error)
 	Get(context.Context, *GetRequest) (*GetResponse, error)
+	GetColleagues(context.Context, *GetColleaguesRequest) (*GetColleaguesResponse, error)
 	GetList(context.Context, *GetListRequest) (*GetListResponse, error)
 	mustEmbedUnimplementedUserAdministerServer()
 }
@@ -91,6 +102,9 @@ func (UnimplementedUserAdministerServer) Update(context.Context, *UpdateRequest)
 }
 func (UnimplementedUserAdministerServer) Get(context.Context, *GetRequest) (*GetResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
+}
+func (UnimplementedUserAdministerServer) GetColleagues(context.Context, *GetColleaguesRequest) (*GetColleaguesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetColleagues not implemented")
 }
 func (UnimplementedUserAdministerServer) GetList(context.Context, *GetListRequest) (*GetListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetList not implemented")
@@ -162,6 +176,24 @@ func _UserAdminister_Get_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserAdminister_GetColleagues_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetColleaguesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserAdministerServer).GetColleagues(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user_proto.UserAdminister/GetColleagues",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserAdministerServer).GetColleagues(ctx, req.(*GetColleaguesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _UserAdminister_GetList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetListRequest)
 	if err := dec(in); err != nil {
@@ -198,6 +230,10 @@ var UserAdminister_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Get",
 			Handler:    _UserAdminister_Get_Handler,
+		},
+		{
+			MethodName: "GetColleagues",
+			Handler:    _UserAdminister_GetColleagues_Handler,
 		},
 		{
 			MethodName: "GetList",

@@ -57,6 +57,12 @@ func Run(ctx context.Context, hostAddr, userAddr, appAddr, apptokenAddr, tokenAd
 		gatewaysvc.WithAuth,
 	)
 
+	gatewaysvc.Register("/api/v1/user/profile/colleagues", gatewaysvc.GetUserColleagues,
+		gatewaysvc.WithTracing,
+		gatewaysvc.WithCors,
+		gatewaysvc.WithAuth,
+	)
+
 	gatewaysvc.Register("/api/v1/user/profile/update", gatewaysvc.UpdateUserProfile,
 		gatewaysvc.WithTracing,
 		gatewaysvc.WithCors,

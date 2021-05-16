@@ -75,6 +75,7 @@
                 delete_app_verify: null,
                 verified: false,
                 app_token: null,
+                token_exp: null,
                 new_img_url: null,
                 header_name: "",
                 valid_till: null,
@@ -95,15 +96,18 @@
                 return "";
                 },
             get_valid_till() {
-                if (this.$props.app?.token?.exp === undefined || this.$props.app?.token?.exp === null){
-                    console.log("no exp")
-                    return
+                const exp = this.$props.app?.token?.exp;
+                if (exp === undefined || exp === null){
+                    if (this.token_exp !== null) {
+                        exp = this.token_exp;
+                    } else {
+                        return
+                    }
                 }
 
-                const total = Math.abs(this.$props.app?.token?.exp*1000 - new Date().getTime());
+                const total = Math.abs(exp*1000 - new Date().getTime());
                 const hours = Math.floor( (total/(1000*60*60)) % 24 );
                 const days = Math.floor( total/(1000*60*60*24) );
-                console.log({days: days, hours: hours})
                 return {days: days, hours: hours};
             },
         },
@@ -132,6 +136,7 @@
                 }, options).then(res => {
                     console.log(res);
                     this.app_token = res.data.app_token?.token;
+                    this.token_exp = res.data.app_token?.exp;
                     this.$toast.success("App Token generated");
                 }).catch(err => {
                     this.$toast.warning(err.response.data);

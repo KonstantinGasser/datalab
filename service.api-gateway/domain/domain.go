@@ -18,6 +18,7 @@ type GatewayLogic interface {
 	IsLoggedIn(ctx context.Context, token string) (*common.TokenClaims, errors.ErrApi)
 
 	GetUserProfile(ctx context.Context, uuid string) (*common.UserInfo, errors.ErrApi)
+	GetColleagues(ctx context.Context, userUuid string) ([]*common.UserInfo, errors.ErrApi)
 	UpdateUserProfile(ctx context.Context, uuid string, form UserUpdateForm) errors.ErrApi
 
 	CreateApp(ctx context.Context, uuid, organization string, form CreateAppForm) (string, errors.ErrApi)
