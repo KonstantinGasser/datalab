@@ -9,7 +9,11 @@ import (
 func (handler *Handler) HandlerOpenSocket(w http.ResponseWriter, r *http.Request) {
 	logrus.Infof("<%v>[service.eventmanager-live.OpenSocket] received request\n", r.Host)
 
-	ticket := r.URL.Query().Get("ticket")
+	ticket, ok := r.Context().Value(typeKeyTicket(keyTicket)).(string)
+	if !ok {
+		handler.onErr(w, http.StatusUnauthorized, "web-socket ticket not present")
+		return
+	}
 	if ticket == "" {
 		handler.onErr(w, http.StatusUnauthorized, "web-socket ticket not present")
 		return

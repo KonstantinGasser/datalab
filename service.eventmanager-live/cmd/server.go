@@ -31,11 +31,12 @@ func Run(host, appTokenAddr, appConfigAddr string) error {
 
 	svc.Register("/api/v1/hello", svc.HandlerInitSession,
 		svc.WithCORS,
-		svc.WithAuth,
+		svc.WithTokenAuth,
 		svc.WithCookie,
 	)
 	svc.Register("/api/v1/event/live", svc.HandlerOpenSocket,
 		svc.WithCORS,
+		svc.WithTicketAuth,
 	)
 
 	listener, err := net.Listen("tcp", host)

@@ -77,7 +77,6 @@ func (svc eventlogic) OpenSocket(ctx context.Context, ticket string, w http.Resp
 			Err:    err,
 		}
 	}
-	fmt.Printf("Conn: %+v\n", conn)
 	conn.WriteMessage(websocket.TextMessage, []byte("Hello World"))
 	return nil
 }

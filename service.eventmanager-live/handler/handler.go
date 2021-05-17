@@ -11,6 +11,7 @@ import (
 // typeKeyCookie is the key to the cookie value in a request
 type typeKeyCookie string
 type typeKeyClaims string
+type typeKeyTicket string
 
 // typeKeyDatalabToken is the header key holding the auth-token
 type typeKeyDatalabToken string
@@ -20,6 +21,8 @@ const (
 	keyCookie = "x-datalab-cookie"
 	// keyClaims is the key in the context for the app claims
 	keyClaims = "claims"
+	// keyTicket is the key in the context holding the web-socket jwt-ticket
+	keyTicket = "wsTicket"
 	// keyDatalabToken is the header key holding the auth-token
 	keyDatalabToken = "x-datalab-token"
 	// accessControlAllowOrigin refers to the http.Header

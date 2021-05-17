@@ -8,6 +8,7 @@ import (
 	"time"
 
 	apptokenissuer "github.com/KonstantinGasser/datalab/service.app-token-issuer/proto"
+	"github.com/KonstantinGasser/datalab/service.eventmanager-live/jwts"
 	"github.com/sirupsen/logrus"
 
 	"github.com/KonstantinGasser/datalab/utils/unique"
@@ -45,7 +46,7 @@ func (handler *Handler) WithCookie(next http.HandlerFunc) http.HandlerFunc {
 
 // WithAuth looks-up if the request has the x-datalab-token set. If not returns a
 // http.StatusUnauthorized else authenticates the token
-func (handler *Handler) WithAuth(next http.HandlerFunc) http.HandlerFunc {
+func (handler *Handler) WithTokenAuth(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		token := r.Header.Get(keyDatalabToken)
 		if token == "" {
@@ -74,6 +75,25 @@ func (handler *Handler) WithAuth(next http.HandlerFunc) http.HandlerFunc {
 			AppOrigin: resp.GetAppOrigin(),
 		})
 		// move to next handler
+		next(w, r.WithContext(ctx))
+	}
+}
+
+// WithTicketAuth looks for the from this service issued web-socket ticket
+// and validates the ticket - if of it passed the request forward to the next caller
+// else returns with a http error
+func (handler *Handler) WithTicketAuth(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ticket := r.URL.Query().Get("ticket")
+		if ticket == "" {
+			handler.onErr(w, http.StatusUnauthorized, "no ws ticket found")
+			return
+		}
+		if err := jwts.Validate(ticket); err != nil {
+			handler.onErr(w, http.StatusUnauthorized, "not authorized")
+			return
+		}
+		ctx := context.WithValue(r.Context(), typeKeyTicket(keyTicket), ticket)
 		next(w, r.WithContext(ctx))
 	}
 }
