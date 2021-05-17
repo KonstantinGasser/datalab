@@ -7,7 +7,13 @@ enum EVENT {
     ELEMENT_CLICK,
 }
 
-export class DataKraken {    
+enum LISTENER {
+    CLICK = "click",
+    HOVER = "mouseover",
+}
+
+export class DataKraken {   
+    private API_WS = "ws://localhost:8004/api/v1/event/live?ticket=" 
     private URL_RATE: number = 1000
     private URL_TIME: number = new Date().getTime()
     private CURRENT_URL: string = history.state.current
@@ -17,13 +23,22 @@ export class DataKraken {
 
     private WS_TICKET: string = ""
 
+    private WEB_SOCKET: any
+
     // TODO: struct how the init of the class must look like when to init the session, the web socket
     // the event listener
     constructor(app_token: string) {
         this.sayHello(app_token).then(ok => {
             if (!ok)
                 return
-            this.attach("mouseover", this.onHover)
+
+            this.WEB_SOCKET = this.open(this.WS_TICKET)
+            if (this.WEB_SOCKET === null)
+                return
+
+            this.attach(LISTENER.HOVER, this.onHover)
+            this.attach(LISTENER.CLICK, this.onClick)
+            this.urlListener()
         })
 
     }
@@ -53,9 +68,20 @@ export class DataKraken {
         resp.data?.btn_defs.forEach((def:any) => {
             this.BTN_DEFS.push(def.btn_name)
         })
-        this.WS_TICKET = ""
+        this.WS_TICKET = resp.data?.ticket
 
         return true
+    }
+
+    private open(ticket: string): any {
+        const ws = new WebSocket(this.API_WS+ticket)
+        ws.onerror = function(err: any){
+            console.log(err)
+        }
+        ws.onmessage = function(msg: any){
+            console.log(msg)
+        }
+        return ws
     }
 
     // functions for events

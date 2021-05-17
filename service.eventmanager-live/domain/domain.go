@@ -9,10 +9,21 @@ import (
 	"github.com/KonstantinGasser/datalab/service.app-configuration/errors"
 	appconfigsc "github.com/KonstantinGasser/datalab/service.app-configuration/proto"
 	"github.com/KonstantinGasser/datalab/service.eventmanager-live/domain/types"
+	"github.com/KonstantinGasser/datalab/service.eventmanager-live/jwts"
+	"github.com/gorilla/websocket"
 )
 
+var upgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
+}
+
 type EventLogic interface {
-	InitSession(ctx context.Context, session types.SessionStart) (*common.AppConfigInfo, errors.ErrApi)
+	InitSession(ctx context.Context, session types.SessionStart) (*common.AppConfigInfo, string, errors.ErrApi)
+	OpenSocket(ctx context.Context, ticket string, w http.ResponseWriter, r *http.Request) errors.ErrApi
 }
 
 type eventlogic struct {
@@ -25,25 +36,48 @@ func NewEventLogic(appConfigSvc appconfigsc.AppConfigurationClient) EventLogic {
 	}
 }
 
-func (svc eventlogic) InitSession(ctx context.Context, session types.SessionStart) (*common.AppConfigInfo, errors.ErrApi) {
+func (svc eventlogic) InitSession(ctx context.Context, session types.SessionStart) (*common.AppConfigInfo, string, errors.ErrApi) {
 
 	resp, err := svc.appConfigSvc.Get(ctx, &appconfigsc.GetRequest{
 		Tracing_ID: "1",
 		ForUuid:    session.AppUuid,
 	})
 	if err != nil {
-		return nil, errors.ErrAPI{
+		return nil, "", errors.ErrAPI{
 			Status: http.StatusInternalServerError,
 			Msg:    "could not load config information",
 			Err:    err,
 		}
 	}
 	if resp.GetStatusCode() != http.StatusOK {
-		return nil, errors.ErrAPI{
+		return nil, "", errors.ErrAPI{
 			Status: resp.GetStatusCode(),
 			Msg:    resp.GetMsg(),
 			Err:    fmt.Errorf("%s", resp.GetMsg()),
 		}
 	}
-	return resp.GetConfigs(), nil
+	ticket, err := jwts.WebSocketTicket(session.Cookie)
+	if err != nil {
+		return nil, "", errors.ErrAPI{
+			Status: http.StatusInternalServerError,
+			Msg:    "could not load config information",
+			Err:    err,
+		}
+	}
+	return resp.GetConfigs(), ticket, nil
+}
+
+func (svc eventlogic) OpenSocket(ctx context.Context, ticket string, w http.ResponseWriter, r *http.Request) errors.ErrApi {
+
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		return errors.ErrAPI{
+			Status: http.StatusInternalServerError,
+			Msg:    "Could not establish web-socket connection",
+			Err:    err,
+		}
+	}
+	fmt.Printf("Conn: %+v\n", conn)
+	conn.WriteMessage(websocket.TextMessage, []byte("Hello World"))
+	return nil
 }

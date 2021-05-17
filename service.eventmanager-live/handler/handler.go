@@ -70,8 +70,8 @@ func New(appTokenSvc apptokenissuer.AppTokenIssuerClient, domain domain.EventLog
 	}
 }
 
-// Route allows to add a new route to the API-Server while also applying passed middleware to the route
-func (handler *Handler) Route(route string, h http.HandlerFunc, middleware ...func(http.HandlerFunc) http.HandlerFunc) {
+// Register allows to add a new route to the API-Server while also applying passed middleware to the route
+func (handler *Handler) Register(route string, h http.HandlerFunc, middleware ...func(http.HandlerFunc) http.HandlerFunc) {
 	// apply set middleware to http route
 	var final = h
 	for i := len(middleware) - 1; i >= 0; i-- {

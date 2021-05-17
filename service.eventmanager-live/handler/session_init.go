@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/KonstantinGasser/datalab/service.eventmanager-live/domain/types"
@@ -34,9 +33,9 @@ func (handler *Handler) HandlerInitSession(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	session.Cookie = cookie.Value
-	fmt.Printf("Claims: %+v\nData: %+v\n", claims, session)
 
-	config, err := handler.domain.InitSession(r.Context(), session)
+	// request config meta data required to map HTML DOM elements to specific Event-Listener
+	config, ticket, err := handler.domain.InitSession(r.Context(), session)
 	if err != nil {
 		logrus.Errorf("<%v>[service.eventmanager-live.InitSession] could not init session: %v\n", r.Host, err)
 		handler.onErr(w, int(err.Code()), err.Info())
@@ -45,5 +44,6 @@ func (handler *Handler) HandlerInitSession(w http.ResponseWriter, r *http.Reques
 	// fetch meta data from app service
 	handler.onSuccess(w, http.StatusOK, map[string]interface{}{
 		"btn_defs": config.GetBtnTime(),
+		"ticket":   ticket,
 	})
 }
