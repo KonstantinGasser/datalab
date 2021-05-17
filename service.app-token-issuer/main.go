@@ -14,7 +14,7 @@ import (
 
 func main() {
 	host := flag.String("host", "localhost:8006", "address to run the server on")
-	dbAddr := flag.String("db-srv", "mongodb://apptokenstorage:secure@192.168.0.177:27020", "address to connect to apptoken-database")
+	dbAddr := flag.String("db-srv", "mongodb://apptokenissuer:secure@192.168.0.177:27020", "address to connect to apptoken-database")
 	appAddr := flag.String("app-srv", "localhost:8003", "address to connect to app-service")
 	flag.Parse()
 

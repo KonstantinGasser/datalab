@@ -8,6 +8,7 @@ EXPOSE 8003
 
 ENTRYPOINT ["/usr/bin/service", \
                 "-host=:8003", \
-                "-user-srv=userservice:8001", \
-                "-token-srv=tokenservice:8002", \
-                "-db-srv=mongodb://appstorage:secure@192.168.0.177:27018"]
+                "-user-srv=service-user-administer:8001", \
+                "-permissions-srv=service-user-authentication:8002", \
+                "-config-srv=service-app-configuration:8005", \
+                "-db-srv=mongodb://appadminstorage:secure@192.168.0.179:27018"]

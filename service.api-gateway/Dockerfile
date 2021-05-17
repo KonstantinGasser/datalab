@@ -8,8 +8,8 @@ EXPOSE 8080
 
 ENTRYPOINT ["/usr/bin/service", \ 
                 "-host=:8080", \ 
-                "-user-srv=userservice:8001", \  
-                "-app-srv=appservice:8003", \
-                "-apptoken-srv=apptokenservice:8006", \
-                "-config-srv=configservice:8005", \
-                "-token-srv=tokenservice:8002"]
+                "-user-srv=service-user-administer:8001", \  
+                "-app-srv=service-app-administer:8003", \
+                "-apptoken-srv=service-app-tokenissuer:8006", \
+                "-config-srv=service-app-configuration:8005", \
+                "-token-srv=service-user-authentication:8002"]

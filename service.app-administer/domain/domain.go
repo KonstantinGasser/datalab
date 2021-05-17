@@ -14,7 +14,6 @@ import (
 	"github.com/KonstantinGasser/datalab/service.app-administer/proto"
 	"github.com/KonstantinGasser/datalab/service.app-administer/repo"
 	cfgsvc "github.com/KonstantinGasser/datalab/service.app-configuration/proto"
-	aptissuer "github.com/KonstantinGasser/datalab/service.app-token-issuer/proto"
 	usersvc "github.com/KonstantinGasser/datalab/service.user-administer/proto"
 	userauthsvc "github.com/KonstantinGasser/datalab/service.user-authentication/proto"
 )
@@ -31,19 +30,17 @@ type AppAdmin interface {
 type appadmin struct {
 	userSvc     usersvc.UserAdministerClient
 	configSvc   cfgsvc.AppConfigurationClient
-	tkissuerSvc aptissuer.AppTokenIssuerClient
 	userauthSvc userauthsvc.UserAuthenticationClient
 	repo        repo.Repo
 }
 
 func NewAppLogic(repo repo.Repo,
 	user usersvc.UserAdministerClient, config cfgsvc.AppConfigurationClient,
-	token aptissuer.AppTokenIssuerClient, userauth userauthsvc.UserAuthenticationClient) AppAdmin {
+	userauth userauthsvc.UserAuthenticationClient) AppAdmin {
 	return &appadmin{
 		repo:        repo,
 		userSvc:     user,
 		configSvc:   config,
-		tkissuerSvc: token,
 		userauthSvc: userauth,
 	}
 }

@@ -40,7 +40,7 @@ func Run(ctx context.Context, hostAddr, userAddr, appAddr, apptokenAddr, tokenAd
 
 	gatewaysvc := handler.NewHandler(domain)
 	logrus.Info("[api.Dependency] established connection to all services\n")
-	gatewaysvc.Apply(handler.WithAllowedOrigins("http://localhost:3000"))
+	gatewaysvc.Apply(handler.WithAllowedOrigins("http://datalab"))
 
 	gatewaysvc.Register("/api/v1/user/register", gatewaysvc.RegisterUser,
 		gatewaysvc.WithTracing,

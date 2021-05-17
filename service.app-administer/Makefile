@@ -4,14 +4,15 @@ deploy:
 	GOOS=linux GOARCH=arm64 go build -o bin/service
 	
 	# ============ Docker Build: STARTING ============
-	sudo docker buildx build --platform linux/arm64 -t datalab-registry.dev:5000/appservice:$(VERSION)_$(TAG) --load .
+	sudo docker buildx build --platform linux/arm64 -t datalab-registry.dev:5000/service.app.administer:$(VERSION)_$(tag) --load .
 	
 	# ============ Push To Registry ============
-	sudo docker push datalab-registry.dev:5000/appservice:$(VERSION)_$(TAG)
+	sudo docker push datalab-registry.dev:5000/service.app.administer:$(VERSION)_$(tag)
 	
-	# ============ Deployment <$(VERSION)_$(TAG)> DONE ============
+	# ============ Deployment <$(VERSION)_$(tag)> DONE ============
 
 
-proto-types:
-	cd ..
-	protoc -I. --go_out=. service.app-administer/proto/test.proto common2/common.proto
+protobuf:
+	protoc -I. --go_out=$(GOPATH)/src service.app-administer/proto/app-administer.proto common/common.proto
+	protoc -I. --go-grpc_out=$(GOPATH)/src service.app-administer/proto/app-administer.proto common/common.proto
+

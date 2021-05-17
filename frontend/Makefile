@@ -4,9 +4,9 @@ deploy:
 	cd ./webapp && npm run build
 
 	# ============ Docker Build: STARTING ============
-	sudo docker buildx build --platform linux/arm64 -t datalab-registry.dev:5000/frontend:$(VERSION)_$(TAG) .
+	sudo docker buildx build --platform linux/arm64 -t datalab-registry.dev:5000/service.forntend.web:$(VERSION)_$(tag) .
 
 	# ============ Push To Registry ============
-	sudo docker push datalab-registry.dev:5000/frontend:$(VERSION)_$(TAG)
+	sudo docker push datalab-registry.dev:5000/service.forntend.web:$(VERSION)_$(tag)
 	
-	# ============ Deployment <$(VERSION)_$(TAG)> DONE ============
+	# ============ Deployment <$(VERSION)_$(tag)> DONE ============

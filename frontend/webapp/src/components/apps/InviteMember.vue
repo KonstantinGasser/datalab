@@ -45,7 +45,7 @@ export default {
                 'Authorization': localStorage.getItem("token"),
             }
         };
-        const resp = await axios.get("http://localhost:8080/api/v1/user/profile/colleagues", options);
+        const resp = await axios.get("http://192.168.0.177:8080/api/v1/user/profile/colleagues", options);
         if (resp.status != 200) {
             this.$toast.error("Could not fetch Your Colleagues");
             return;
