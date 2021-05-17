@@ -4,32 +4,36 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/KonstantinGasser/datalab/service_ws/pkg/api"
-	"github.com/KonstantinGasser/datalab/service_ws/pkg/grpcC"
+	"github.com/KonstantinGasser/datalab/service.eventmanager-live/domain"
+	"github.com/KonstantinGasser/datalab/service.eventmanager-live/grpcC"
+	"github.com/KonstantinGasser/datalab/service.eventmanager-live/handler"
 	"github.com/sirupsen/logrus"
 )
 
-func Run(host, tokenAddr, appAddr string) error {
-	tokenSrv, err := grpcC.NewTokenClient(tokenAddr)
+func Run(host, appTokenAddr, appConfigAddr string) error {
+
+	appTokenSvc, err := grpcC.NewTokenClient(appTokenAddr)
 	if err != nil {
 		return err
 	}
-	appSrv, err := grpcC.NewAppClient(appAddr)
+	appConfigSvc, err := grpcC.NewConfigClient(appConfigAddr)
 	if err != nil {
 		return err
 	}
 
-	apisrv := api.New(tokenSrv, appSrv, "")
-	apisrv.Apply(
-		api.WithAllowedOrgins("http://localhost:3000", "http://127.0.0.1:3000", "http://192.168.0.232:3000"),
-		api.WithAllowedHeaders("x-datalab-token", "content-type"),
-		api.WithAllowedCreds)
+	domain := domain.NewEventLogic(appConfigSvc)
+	svc := handler.New(appTokenSvc, domain)
+	svc.Apply(
+		handler.WithAllowedOrgins("http://localhost:3000", "http://127.0.0.1:3000", "http://192.168.0.232:3000"),
+		handler.WithAllowedHeaders("x-datalab-token", "content-type"),
+		handler.WithAllowedCreds,
+	)
 
-	apisrv.Route("/api/v1/hello",
-		apisrv.HandlerInitSession,
-		apisrv.WithCORS,
-		apisrv.WithAuth,
-		apisrv.WithCookie)
+	svc.Route("/api/v1/hello", svc.HandlerInitSession,
+		svc.WithCORS,
+		svc.WithAuth,
+		svc.WithCookie,
+	)
 
 	listener, err := net.Listen("tcp", host)
 	if err != nil {

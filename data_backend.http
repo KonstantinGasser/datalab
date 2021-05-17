@@ -1,0 +1,16 @@
+POST http://localhost:8004/api/v1/hello HTTP/1.1
+content-type: application/json
+Origin: http://datalab
+x-datalab-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOiIyMDIxLTA1LTI0VDA5OjA1OjExLjM1MjUwMjU0OFoiLCJoYXNoIjoiNGNhZDMyZjM1ZDVjYzk4MzRhYzdiZGMxMzhkZTY1ZmQwYzE0MjkxNWRmNjc1ZjA0YjU3NGQ4ZGQ5NmE1YTE1NSIsImlhdCI6MTYyMTI0MjMxMSwiaXNzIjoiY29tLmRhdGFsYWIudG9rZW4tc2VydmljZSIsIm9yaWdpbiI6Imh0dHA6Ly90ZXN0LmlvIiwic3ViIjoiY2JkODRlNjItY2IzZC00MjE3LWEzNjctMGUzNDNjYmI1YmMwIn0.tu8FtG5iKcseTSrp0AeufKzo1ykEiJ1duh9rv5IE0Jk
+
+{
+    "meta": {
+        "OS": {
+            "name": "MacOS",
+            "version": "12.0.4"
+        },
+        "browser": "Google Chrome",
+        "device": "Laptop"
+    },
+    "referrer": "http://google.com"
+}

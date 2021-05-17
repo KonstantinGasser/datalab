@@ -7,6 +7,7 @@ import "common/common.proto";
 
 service AppTokenIssuer {
     rpc Issue(IssueRequest) returns (IssueResponse) {}
+    rpc Validate(ValidateRequest) returns (ValidateResponse) {}
     rpc Get(GetRequest) returns (GetResponse) {}
     rpc MarkDirty(MarkDirtyRequest) returns (MarkDirtyResponse) {}
 }
@@ -45,4 +46,16 @@ message MarkDirtyRequest {
 message MarkDirtyResponse {
     int32 status_code = 1;
     string msg = 2;
+}
+
+message ValidateRequest {
+    string tracing_ID = 1;
+    string app_token = 2;
+}
+
+message ValidateResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    string app_uuid = 3;
+    string app_origin = 4;
 }

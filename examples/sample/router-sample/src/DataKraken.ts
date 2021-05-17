@@ -13,28 +13,19 @@ export class DataKraken {
     private CURRENT_URL: string = history.state.current
 
     private LAST_CLICK: number = new Date().getTime()
-    private BTN_DEFS: Array<string> =  ["checkout"]
+    private BTN_DEFS: Array<string> = []
 
     private WS_TICKET: string = ""
 
     // TODO: struct how the init of the class must look like when to init the session, the web socket
     // the event listener
     constructor(app_token: string) {
+        this.sayHello(app_token).then(ok => {
+            if (!ok)
+                return
+            this.attach("mouseover", this.onHover)
+        })
 
-        if (!this.sayHello("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjA0MTQ3OTAsImhhc2giOiIyOGQ3NDJjMTFjOTFjMDc4ODg0NzZhZThlNzUxNjJiNDBmZGNiYWU4ZDIyYzUzNTUwYjM0MTZiMTMwYmI2Y2U4IiwiaWF0IjoxNjE5ODA5OTkwLCJpc3MiOiJjb20uZGF0YWxhYi50b2tlbi1zZXJ2aWNlIiwib3JpZ2luIjoiaHR0cDovL3Rlc3QuZGlvIiwic3ViIjoiYmI2YjM2OGEtNDkxZC00NDFlLTlmM2QtZTU3ZjgxZjBhMzc1In0.4WE3FJelUNJOU7t5HRA62MBM5Jhn-5jMd8zTFdbcODI"))
-            return
-        
-        // connect to web socket thou
-        console.log(this.getCampaign())
-        this.attach("click", this.onClick)
-        this.attach("mouseover", this.onHover)
-        this.urlListener()
-
-        // this.APP_TOKEN = app_token
-        // this.attach("mouseover", this.onHover)
-        // this.attach("click", this.onClick)
-        // this.urlListener()
-        // console.log(this.getDevice())
     }
 
     // sayHello initializes the client session passing basic client information to the
@@ -44,28 +35,27 @@ export class DataKraken {
     // the web-socket connection further, the response holds meat-data such as button-definitions.
     // If the authentication fails or the server fails respond (including re-tries) the function returns a -1
     // indicating to not do anything further.
-    private sayHello(token: string): boolean {
+    private async sayHello(token: string): Promise<any> {
         const opts = {
             headers: {
                 "x-datalab-token": token
             },
             withCredentials: true,
         }
-        axios.post("http://192.168.0.232:8004/api/v1/hello", {
+        const resp: any = await axios.post("http://localhost:8004/api/v1/hello", {
             referrer: this.getReferrer(),
             meta: this.getDevice(),
-        }, opts).then((res: any) => {
-            if (res.status != 200)
-                return false
-            const data: any = res.data
-            this.BTN_DEFS = data.btn_defs
-            this.WS_TICKET = data.ticket
-            return true
-        }).catch((err: any) => {
-            console.log(err)
-            // TODO: what should happen on-error. Re-Tries? How Many?
+        }, opts)
+        
+        if (resp.status != 200)
+            return false
+        
+        resp.data?.btn_defs.forEach((def:any) => {
+            this.BTN_DEFS.push(def.btn_name)
         })
-        return false
+        this.WS_TICKET = ""
+
+        return true
     }
 
     // functions for events
@@ -80,6 +70,7 @@ export class DataKraken {
     // attach adds a given event and function to the root document and binding
     // the function to "this"
     private attach(event_name: string, fn: any) {
+        console.log("Attaching: ", event_name)
         document.addEventListener(event_name, fn.bind(this))
     }
     // getReferrer returns the page this one was referenced by.
@@ -160,7 +151,6 @@ export class DataKraken {
         // lookup if target is listed as watcher
         if (!this.BTN_DEFS.includes(event.target.name))
             return
-        console.log(event)
         const event_start: number = new Date().getTime()
         // only one follow-up event must be satisfied. After the "click" event
         // the "mouseleave" event must be ignored and vice-versa

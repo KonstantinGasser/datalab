@@ -19,6 +19,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AppTokenIssuerClient interface {
 	Issue(ctx context.Context, in *IssueRequest, opts ...grpc.CallOption) (*IssueResponse, error)
+	Validate(ctx context.Context, in *ValidateRequest, opts ...grpc.CallOption) (*ValidateResponse, error)
 	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
 	MarkDirty(ctx context.Context, in *MarkDirtyRequest, opts ...grpc.CallOption) (*MarkDirtyResponse, error)
 }
@@ -34,6 +35,15 @@ func NewAppTokenIssuerClient(cc grpc.ClientConnInterface) AppTokenIssuerClient {
 func (c *appTokenIssuerClient) Issue(ctx context.Context, in *IssueRequest, opts ...grpc.CallOption) (*IssueResponse, error) {
 	out := new(IssueResponse)
 	err := c.cc.Invoke(ctx, "/issuer_proto.AppTokenIssuer/Issue", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *appTokenIssuerClient) Validate(ctx context.Context, in *ValidateRequest, opts ...grpc.CallOption) (*ValidateResponse, error) {
+	out := new(ValidateResponse)
+	err := c.cc.Invoke(ctx, "/issuer_proto.AppTokenIssuer/Validate", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -63,6 +73,7 @@ func (c *appTokenIssuerClient) MarkDirty(ctx context.Context, in *MarkDirtyReque
 // for forward compatibility
 type AppTokenIssuerServer interface {
 	Issue(context.Context, *IssueRequest) (*IssueResponse, error)
+	Validate(context.Context, *ValidateRequest) (*ValidateResponse, error)
 	Get(context.Context, *GetRequest) (*GetResponse, error)
 	MarkDirty(context.Context, *MarkDirtyRequest) (*MarkDirtyResponse, error)
 	mustEmbedUnimplementedAppTokenIssuerServer()
@@ -74,6 +85,9 @@ type UnimplementedAppTokenIssuerServer struct {
 
 func (UnimplementedAppTokenIssuerServer) Issue(context.Context, *IssueRequest) (*IssueResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Issue not implemented")
+}
+func (UnimplementedAppTokenIssuerServer) Validate(context.Context, *ValidateRequest) (*ValidateResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Validate not implemented")
 }
 func (UnimplementedAppTokenIssuerServer) Get(context.Context, *GetRequest) (*GetResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
@@ -108,6 +122,24 @@ func _AppTokenIssuer_Issue_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AppTokenIssuerServer).Issue(ctx, req.(*IssueRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AppTokenIssuer_Validate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ValidateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppTokenIssuerServer).Validate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/issuer_proto.AppTokenIssuer/Validate",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppTokenIssuerServer).Validate(ctx, req.(*ValidateRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -158,6 +190,10 @@ var AppTokenIssuer_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Issue",
 			Handler:    _AppTokenIssuer_Issue_Handler,
+		},
+		{
+			MethodName: "Validate",
+			Handler:    _AppTokenIssuer_Validate_Handler,
 		},
 		{
 			MethodName: "Get",

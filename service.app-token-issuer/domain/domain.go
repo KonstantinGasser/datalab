@@ -9,12 +9,14 @@ import (
 	appsvc "github.com/KonstantinGasser/datalab/service.app-administer/proto"
 	"github.com/KonstantinGasser/datalab/service.app-token-issuer/domain/get"
 	"github.com/KonstantinGasser/datalab/service.app-token-issuer/domain/issue"
+	"github.com/KonstantinGasser/datalab/service.app-token-issuer/domain/validate"
 	"github.com/KonstantinGasser/datalab/service.app-token-issuer/proto"
 	"github.com/KonstantinGasser/datalab/service.app-token-issuer/repo"
 )
 
 type AppTokenIssuer interface {
 	IssueToken(ctx context.Context, in *proto.IssueRequest) (*common.AppTokenInfo, errors.ErrApi)
+	ValidateToken(ctx context.Context, in *proto.ValidateRequest) (string, string, errors.ErrApi)
 	GetToken(ctx context.Context, in *proto.GetRequest) (*common.AppTokenInfo, errors.ErrApi)
 }
 
@@ -47,6 +49,18 @@ func (svc apptokenissuer) IssueToken(ctx context.Context, in *proto.IssueRequest
 		}
 	}
 	return token, nil
+}
+
+func (svc apptokenissuer) ValidateToken(ctx context.Context, in *proto.ValidateRequest) (string, string, errors.ErrApi) {
+	appUuid, appOrigin, err := validate.Token(ctx, in.GetAppToken())
+	if err != nil {
+		return "", "", errors.ErrAPI{
+			Status: http.StatusUnauthorized,
+			Msg:    "App Token invalid",
+			Err:    err,
+		}
+	}
+	return appUuid, appOrigin, nil
 }
 
 func (svc apptokenissuer) GetToken(ctx context.Context, in *proto.GetRequest) (*common.AppTokenInfo, errors.ErrApi) {

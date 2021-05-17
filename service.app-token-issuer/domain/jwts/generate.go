@@ -12,6 +12,16 @@ const (
 	secretAppToken = "secure"
 )
 
+var (
+	ErrInvalidJWT = fmt.Errorf("jwt is no longer valid")
+	ErrJWTParse   = fmt.Errorf("could not parse jwt token")
+	ErrCorruptJWT = fmt.Errorf("jwt could not be parsed (JWT might be corrupted)")
+)
+
+type AppClaims struct {
+	AppUuid, AppOrigin string
+}
+
 func Generate(appUuid, origin, appHash string, exp time.Time) (string, error) {
 	claims := jwt.MapClaims{
 		"sub":    appUuid,
@@ -29,4 +39,32 @@ func Generate(appUuid, origin, appHash string, exp time.Time) (string, error) {
 	}
 	return token, nil
 
+}
+
+func Claims(tokenString string) (*AppClaims, error) {
+	token, err := verifyToken(tokenString, secretAppToken)
+	if err != nil {
+		return nil, err
+	}
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok && !token.Valid {
+		return nil, ErrInvalidJWT
+	}
+	return &AppClaims{
+		AppUuid:   claims["sub"].(string),
+		AppOrigin: claims["origin"].(string),
+	}, nil
+}
+
+func verifyToken(tokenString, secret string) (*jwt.Token, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, ErrCorruptJWT
+		}
+		return []byte(secret), nil
+	})
+	if err != nil {
+		return nil, ErrJWTParse
+	}
+	return token, nil
 }
