@@ -14,7 +14,7 @@ enum LISTENER {
 
 export class DataKraken {   
     private API_WS = "ws://localhost:8004/api/v1/event/live?ticket=" 
-    private URL_RATE: number = 1000
+    private URL_TIMEOUT_RATE: number = 1000
     private URL_TIME: number = new Date().getTime()
     private CURRENT_URL: string = history.state.current
 
@@ -141,7 +141,7 @@ export class DataKraken {
                  })
             console.log(data_point)
             this.CURRENT_URL = history.state.current
-        }, this.URL_RATE)
+        }, this.URL_TIMEOUT_RATE)
     }
 
     // onClick captures any click event

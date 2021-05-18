@@ -5,16 +5,28 @@
         </div> -->
         <div class="view_component">
             <h2>Invite Colleagues</h2>
+            <div class="d-flex align-center justify-end">
+                <button class="btn btn-standard" >Invite</button>
+            </div>
             <br>
-            <div v-for="item in colleagues" :key="item.uuid" class="t-row d-flex align-center justify-between">
-                <div class="username">@{{item.username}}</div>
-                <div>{{item.orgn_position}}</div>
-                <div>
-                    <select class="custom-select">
-                        <option selected>App Role</option>
-                        <option value="1">Editor</option>
-                        <option value="2">Viewer</option>
-                    </select>
+            <div class="d-flex justify-evenly flex-wrap">
+                <div v-for="item in colleagues" :key="item.uuid" class="t-row d-flex align-center justify-between">
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" :id="'check_'+item.uuid">
+                        <label class="custom-control-label" :for="'check_'+item.uuid"></label>
+                    </div>
+                    <div>
+                        <div class="username">@{{item.username}}</div>
+                        <div>{{item.first_name}}</div>
+                    </div>
+                    <div>{{item.orgn_position}}</div>
+                    <div>
+                        <select class="custom-select">
+                            <option selected>App Role</option>
+                            <option value="1">Editor</option>
+                            <option value="2">Viewer</option>
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>
@@ -64,6 +76,7 @@ export default {
     color: #000;
 }
 .username {
-    font-weight: bolder;
+    font-weight: 400;
+    font-size: 16px;
 }
 </style>

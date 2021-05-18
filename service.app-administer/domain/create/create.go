@@ -45,6 +45,7 @@ func App(ctx context.Context, repo repo.Repo, in *proto.CreateRequest) (string, 
 		OrgnDomain:  in.GetOrganization(),
 		Description: in.GetDescription(),
 		AppHash:     appHash,
+		Invites:     make([]types.Invites, 0),
 	}
 	// before inserting the app ensure that the assertion to check
 	// if all mandatory fields does not fail - if so returns an ErrMissingFields

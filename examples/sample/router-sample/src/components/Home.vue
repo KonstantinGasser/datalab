@@ -1,8 +1,8 @@
 <template>
     <div>
-        <button name="checkout" onmouseenter="this" onmouseleave="this">Checkout</button>
+        <button name="btn_add_to" onmouseenter="this" onmouseleave="this">Checkout</button>
         <button name="btn_order">Add to basket</button>
-        <input type="submit"  value="submit" name="submit-btn" id="">
+        <input type="submit"  value="submit" name="btn_buy" id="">
         <button @click="clicked">Click Me!</button>
     </div>
 </template>

@@ -79,7 +79,7 @@ a {
 .view_component {
   background: var(--sub-bg);
   border: 1px solid var(--sub-border);
-  max-width: 90vh;
+  /* max-width: 90vh; */
 }
 
 .scroll_view {

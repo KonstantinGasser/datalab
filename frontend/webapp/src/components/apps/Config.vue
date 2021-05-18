@@ -137,7 +137,9 @@ export default {
             button_btn: null,
             buttons_count: 0,
             button_invalid: false,
-            unsaved_changes: false,
+            unsaved_funnel: [],
+            unsaved_campaign: [],
+            unsaved_btn: [],
         };
     },
     props: {
@@ -153,7 +155,6 @@ export default {
 
     },
     mounted() {
-        console.log("Configs", this.$props.app_config);
         if (this.$props.app_config === null || Object.keys(this.$props.app_config).length === 0){
             this.funnel = [];
             this.funnel_count = 1;
@@ -173,9 +174,6 @@ export default {
         this.buttons_count = this.buttons.length + 1;
     },
     computed: {
-        unsavedChanges() {
-            console.log(this.unsaved_changes);
-        }
     },
     methods: {
         addStage() {
@@ -187,6 +185,9 @@ export default {
                 return
             }
 
+            // mark unsaved changes of this element
+            this.unsaved_funnel.push(this.funnel_count)
+            console.log("added unsave: ", this.unsaved_funnel)
             this.funnel.push({
                 id: this.funnel_count,
                 name: this.stage_name,
@@ -195,16 +196,26 @@ export default {
             this.stage_name = null;
             this.stage_transition = null;
             this.funnel_count++;
+
             this.$emit("appchange", true);
         },
         removeStage(id) {
-            console.log(id);
+            if (this.unsaved_funnel.length === 0) {
+                this.$emit("appchange", true);
+            } else {
+                this.unsaved_funnel = this.unsaved_funnel.filter(item => item !== this.funnel_count-1)
+                if (this.unsaved_funnel.length > 0) {
+                    this.$emit("appchange", true);
+                } else {
+                    this.$emit("appchange", false);
+                }
+            }
+            
             this.funnel = this.funnel.filter(item => item.id != id);
             this.funnel.forEach((item,i) => {
                 item.id = i+1;
             });
-            this.funnel_count--;
-            this.$emit("appchange", true);
+            this.funnel_count--;  
         },
         updateStages() {
             let options = {
@@ -230,6 +241,8 @@ export default {
                 this.campaign_invalid = true;
                 return
             }
+            // mark unsaved changes of this element
+            this.unsaved_campaign.push(this.campaign_count)
             this.campaign.push(
                 {
                     id: this.campaign_count,
@@ -243,12 +256,21 @@ export default {
             this.$emit("appchange", true);
         },
         removeCampaign(id) {
+            if (this.unsaved_campaign.length === 0) {
+                this.$emit("appchange", true);
+            } else {
+                this.unsaved_campaign = this.unsaved_campaign.filter(item => item !== this.campaign_count-1)
+                if (this.unsaved_campaign.length > 0) {
+                    this.$emit("appchange", true);
+                } else {
+                    this.$emit("appchange", false);
+                }
+            }
             this.campaign = this.campaign.filter(item => item.id != id);
             this.campaign.forEach((item,i) => {
                 item.id = i+1;
             });
             this.campaign_count--;
-            this.$emit("appchange", true);
         },
         updateCampaigns() {
             let options = {
@@ -275,7 +297,8 @@ export default {
                 this.button_invalid = true;
                 return
             }
-
+            // mark unsaved changes of this element
+            this.unsaved_btn.push(this.buttons_count)
             this.buttons.push({
                 id: this.buttons_count,
                 name: this.button_name,
@@ -288,12 +311,21 @@ export default {
             this.$emit("appchange", true);
         },
         removeBtnTime(id) {
+            if (this.unsaved_btn.length === 0) {
+                this.$emit("appchange", true);
+            } else {
+                this.unsaved_btn = this.unsaved_btn.filter(item => item !== this.buttons_count-1)
+                if (this.unsaved_btn.length > 0) {
+                    this.$emit("appchange", true);
+                } else {
+                    this.$emit("appchange", false);
+                }
+            }
             this.buttons = this.buttons.filter(item => item.id != id);
             this.buttons.forEach((item,i) => {
                 item.id = i+1;
             });
             this.buttons_count--;
-            this.$emit("appchange", true);
         },
         updateBtnTime() {
             let options = {

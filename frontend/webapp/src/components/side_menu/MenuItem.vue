@@ -3,6 +3,7 @@
         <div class="menu_text">
             {{ item }}
         </div>
+        <span v-if="bubble && notifications > 0" class="bubble"><i class="icon icon-bell"></i></span>
     </div>
 </template>
 
@@ -17,13 +18,17 @@ export default {
   props: {
       item: String,
       tabName: String,
+      bubble: Boolean,
   },
   methods: {
   },
   computed: {
       isActive() {
           return this.$props.tabName === this.$store.state.activeTab;
-      }
+      },
+      notifications() {
+          return this.$store.state.notifications.length;
+      },
   },
 };
 </script>
@@ -52,6 +57,7 @@ export default {
     color: var(--h-color);
     font-size: 20px;
     text-align: left;
+    position: relative;
 }
 .menu_item:hover .menu_text {
     background: var(--gradient-green);
@@ -67,5 +73,19 @@ export default {
     background: var(--gradient-green);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+}
+
+.bubble {
+    width: 25px;
+    height: 25px;
+    position: absolute;
+    margin-left: 125px;
+    margin-top: -25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: red;
+    border-radius: 50%;
+    color: white
 }
 </style>
