@@ -15,8 +15,7 @@ var (
 )
 
 func MayAcquire(ctx context.Context, repo repo.Repo, in *proto.MayAcquireTokenRequest) (bool, error) {
-	fmt.Printf("%v+\n", in)
-	if err := permissions.IsOwner(ctx, repo, in.GetCallerUuid(), in.GetAppUuid()); err != nil {
+	if err := permissions.IsOwner(ctx, repo, in.GetUserClaims().GetUuid(), in.GetAppUuid()); err != nil {
 		if err == permissions.ErrNotAuthorized {
 			return false, ErrNotAuthorized
 		}

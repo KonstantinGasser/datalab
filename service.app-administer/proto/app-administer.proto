@@ -12,20 +12,42 @@ service AppAdminister {
     rpc Get(GetRequest) returns (GetResponse) {}
     rpc GetList(GetListRequest) returns (GetListResponse) {}
     rpc Invite(InviteRequest) returns (InviteResponse) {}
+    rpc AcceptInvite(AcceptInviteRequest) returns (AcceptInviteResponse) {}
+    rpc RejectInvite(RejectInviteRequest) returns (RejectInviteResponse) {}
     rpc MayAcquireToken(MayAcquireTokenRequest) returns (MayAcquireTokenResponse) {}
 }
 
 
+message AcceptInviteRequest {
+    string tracing_ID = 1;
+    common.UserTokenClaims user_claims = 2;
+    string app_uuid = 3;
+}
+
+message AcceptInviteResponse {
+    int32 status_code = 1;
+    string msg = 2;
+}
+message RejectInviteRequest {
+    string tracing_ID = 1;
+    common.UserTokenClaims user_claims = 2;
+    string app_uuid = 3;
+    string invited_uuid = 4;
+}
+message RejectInviteResponse {
+    int32 status_code = 1;
+    string msg = 2;
+}
+
 // RPC CREATE APP
 message CreateRequest {
     string tracing_ID = 1;
-    string owner_uuid = 2;
-    string name = 3;
-    string organization = 4;
-    string description = 5;
-    string app_url = 6;
-    repeated string member = 7;
-    repeated string settings = 8;
+    string user_uuid = 2;
+    string owner_uuid = 3;
+    string name = 4;
+    string organization = 5;
+    string description = 6;
+    string app_url = 7;
 }
 message CreateResponse {
     int32 status_code = 1;
@@ -37,10 +59,10 @@ message CreateResponse {
 // RPC DELETE APP
 message DeleteRequest {
     string tracing_ID = 1;
-    string app_uuid = 2;
-    string app_name = 3;
-    string orgn_name = 4;
-    string caller_uuid = 5;
+    common.UserTokenClaims user_claims = 2;
+    string app_uuid = 3;
+    string app_name = 4;
+    string orgn_name = 5;
 }
 
 message DeleteResponse {
@@ -52,7 +74,7 @@ message DeleteResponse {
 // RPC GET APP LIST
 message GetListRequest {
     string tracing_ID = 1;
-    string caller_uuid = 2;
+    common.UserTokenClaims user_claims = 2;
 }
 message GetListResponse {
     int32 status_code = 1;
@@ -64,8 +86,9 @@ message GetListResponse {
 // RPC GET APP
 message GetRequest {
     string tracing_ID = 1;
-    string app_uuid = 2;
-    string caller_uuid = 3;
+    common.UserTokenClaims user_claims = 2;
+    string app_uuid = 3;
+    
 }
 
 message GetResponse {
@@ -77,7 +100,7 @@ message GetResponse {
 
 message MayAcquireTokenRequest {
     string tracing_ID = 1;
-    string caller_uuid = 2;
+    common.UserTokenClaims user_claims = 2;
     string app_uuid = 3;
     string app_hash = 4;
 }
@@ -90,8 +113,8 @@ message MayAcquireTokenResponse {
 
 message InviteRequest {
     string tracing_ID = 1;
-    string app_uuid = 2;
-    string owner_uuid = 3;
+    common.UserTokenClaims user_claims = 2;
+    string app_uuid = 3;
     string user_uuid = 4;
 }
 message InviteResponse {

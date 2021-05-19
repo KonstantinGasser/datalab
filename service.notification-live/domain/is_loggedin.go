@@ -10,7 +10,7 @@ import (
 	"github.com/KonstantinGasser/datalab/utils/ctx_value"
 )
 
-func (svc notificationlogic) IsLoggedIn(ctx context.Context, token string) (*common.TokenClaims, errors.ErrApi) {
+func (svc notificationlogic) IsLoggedIn(ctx context.Context, token string) (*common.UserTokenClaims, errors.ErrApi) {
 
 	resp, err := svc.userauthClient.IsAuthed(ctx, &authproto.IsAuthedRequest{
 		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),

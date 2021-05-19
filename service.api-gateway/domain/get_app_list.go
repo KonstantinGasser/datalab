@@ -15,7 +15,7 @@ func (svc gatewaylogic) GetAppList(ctx context.Context, uuid string) ([]*common.
 
 	resp, err := svc.appClient.GetList(ctx, &appsvc.GetListRequest{
 		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
-		CallerUuid: uuid,
+		UserClaims: ctx_value.GetAuthedUser(ctx),
 	})
 	if err != nil {
 		return nil, errors.ErrAPI{
@@ -28,7 +28,7 @@ func (svc gatewaylogic) GetAppList(ctx context.Context, uuid string) ([]*common.
 		return nil, errors.ErrAPI{
 			Status: resp.GetStatusCode(),
 			Msg:    resp.GetMsg(),
-			Err:    fmt.Errorf("could not get app list"),
+			Err:    fmt.Errorf("%v", resp.GetMsg()),
 		}
 	}
 	return resp.GetAppList(), nil

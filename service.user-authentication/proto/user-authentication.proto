@@ -43,7 +43,7 @@ message IsAuthedResponse {
     int32 status_code = 1;
     string msg = 2;
     bool is_authed = 3;
-    common.TokenClaims claims = 4;
+    common.UserTokenClaims claims = 4;
 }
 
 message AddAppAccessRequest {
@@ -55,5 +55,6 @@ message AddAppAccessRequest {
 message AddAppAccessResponse {
     int32 status_code = 1; 
     string msg = 2;
+    string updated_token = 3;
 }
 

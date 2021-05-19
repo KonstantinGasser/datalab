@@ -3,8 +3,12 @@ package permissions
 import (
 	"context"
 	"fmt"
+	"net/http"
 
+	"github.com/KonstantinGasser/datalab/common"
 	"github.com/KonstantinGasser/datalab/service.app-administer/config"
+	"github.com/KonstantinGasser/datalab/service.app-administer/domain/types"
+	"github.com/KonstantinGasser/datalab/service.app-administer/errors"
 	"github.com/KonstantinGasser/datalab/service.app-administer/repo"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -14,9 +18,10 @@ var (
 	ErrNotAuthorized  = fmt.Errorf("caller is not authorized to perform the action")
 	ErrNotFound       = fmt.Errorf("could not find app information")
 	ErrNoAppHashFound = fmt.Errorf("could not find any app hash for app uuid")
+	ErrNoAppsFound    = fmt.Errorf("could not find any apps the user is allowed to have access to")
 )
 
-func IsOwner(ctx context.Context, repo repo.Repo, callerUuid, appUuid string) error {
+func IsOwner(ctx context.Context, repo repo.Repo, callerUuid, appUuid string) errors.ErrApi {
 	filter := bson.D{
 		{
 			Key: "$and",
@@ -28,10 +33,141 @@ func IsOwner(ctx context.Context, repo repo.Repo, callerUuid, appUuid string) er
 	}
 	ok, err := repo.Exists(ctx, config.AppDB, config.AppColl, filter)
 	if err != nil {
-		return err
+		return errors.ErrAPI{
+			Status: http.StatusInternalServerError,
+			Msg:    "Could not check if owner of app",
+			Err:    err,
+		}
 	}
 	if !ok {
-		return ErrNotAuthorized
+		return errors.ErrAPI{
+			Status: http.StatusUnauthorized,
+			Msg:    "User is not owner of app",
+			Err:    fmt.Errorf("user is not owner of app"),
+		}
+	}
+	return nil
+}
+
+func IsMember(ctx context.Context, repo repo.Repo, permissions *common.UserTokenClaims, appUuid string) errors.ErrApi {
+	filter := bson.D{
+		{
+			Key: "$and",
+			Value: bson.A{
+				bson.D{
+					{Key: "_id", Value: appUuid},
+				},
+				bson.D{
+					{
+						Key: "$and",
+						Value: bson.A{
+							bson.D{{Key: "member.uuid", Value: permissions.GetUuid()}},
+							bson.D{{Key: "member.status", Value: types.InviteAccepted}},
+						},
+					},
+				},
+			},
+		},
+	}
+	ok, err := repo.Exists(ctx, config.AppDB, config.AppColl, filter)
+	if err != nil {
+		return errors.ErrAPI{
+			Status: http.StatusInternalServerError,
+			Msg:    "Could not check if member of app",
+			Err:    err,
+		}
+	}
+	if !ok {
+		return errors.ErrAPI{
+			Status: http.StatusUnauthorized,
+			Msg:    "User is not member of App",
+			Err:    fmt.Errorf("user is not member of app"),
+		}
+	}
+	return nil
+}
+
+func IsOwnerOrMember(ctx context.Context, repo repo.Repo, permission *common.UserTokenClaims, appUuid string) errors.ErrApi {
+	fmt.Println("permissions: ", permission)
+	fmt.Println("appUuid: ", appUuid)
+	filter := bson.D{
+		{
+			Key: "$and",
+			Value: bson.A{
+				bson.M{"_id": appUuid},
+				bson.D{
+					{
+						Key: "$or",
+						Value: bson.A{
+							bson.D{{Key: "owner_uuid", Value: permission.GetUuid()}},
+							bson.D{
+								{
+									Key: "$and",
+									Value: bson.A{
+										bson.D{{Key: "member.uuid", Value: permission.GetUuid()}},
+										bson.D{{Key: "member.status", Value: types.InviteAccepted}},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	ok, err := repo.Exists(ctx, config.AppDB, config.AppColl, filter)
+	fmt.Printf("Exists? : %v - %v\n", ok, err)
+	if err != nil {
+		return errors.ErrAPI{
+			Status: http.StatusInternalServerError,
+			Msg:    "Could not check if owner of app",
+			Err:    err,
+		}
+	}
+	if !ok {
+		return errors.ErrAPI{
+			Status: http.StatusUnauthorized,
+			Msg:    "User has must be owner or member of App",
+			Err:    fmt.Errorf("could not find any related app"),
+		}
+	}
+	return nil
+}
+
+func HasInvite(ctx context.Context, repo repo.Repo, permissions *common.UserTokenClaims, appUuid string) errors.ErrApi {
+	filter := bson.D{
+		{
+			Key: "$and",
+			Value: bson.A{
+				bson.D{
+					{Key: "_id", Value: appUuid},
+				},
+				bson.D{
+					{
+						Key: "$and",
+						Value: bson.A{
+							bson.D{{Key: "member.uuid", Value: permissions.GetUuid()}},
+							bson.D{{Key: "member.status", Value: types.InvitePending}},
+						},
+					},
+				},
+			},
+		},
+	}
+	ok, err := repo.Exists(ctx, config.AppDB, config.AppColl, filter)
+	if err != nil {
+		return errors.ErrAPI{
+			Status: http.StatusInternalServerError,
+			Msg:    "Could not check if user has invitation for app",
+			Err:    err,
+		}
+	}
+	if !ok {
+		return errors.ErrAPI{
+			Status: http.StatusUnauthorized,
+			Msg:    "User is not listed as invite",
+			Err:    fmt.Errorf("could find invite for user"),
+		}
 	}
 	return nil
 }
@@ -60,4 +196,54 @@ func IsCorrectHash(ctx context.Context, repo repo.Repo, appUuid, hash string) er
 		return ErrNotAuthorized
 	}
 	return nil
+}
+
+// CanAccess looks up all apps the current user has permissions to access
+func CanAccess(ctx context.Context, repo repo.Repo, permissions *common.UserTokenClaims) ([]string, errors.ErrApi) {
+	// filters for all apps where user is either owner or
+	// is listed as member in app - returning only the app uuids
+	fmt.Printf("claims: %v\n", permissions.GetUuid())
+	filter := bson.D{
+		{
+			Key: "$or",
+			Value: bson.A{
+				bson.D{
+					{
+						Key:   "owner_uuid",
+						Value: permissions.GetUuid(),
+					},
+				},
+				bson.D{
+					{
+						Key: "$and",
+						Value: bson.A{
+							bson.D{{Key: "member.uuid", Value: permissions.GetUuid()}},
+							bson.D{{Key: "member.status", Value: types.InviteAccepted}},
+						},
+					},
+				},
+			},
+		},
+	}
+	var allowedApps []types.AppInfo
+	err := repo.FindMany(ctx, config.AppDB, config.AppColl, filter, &allowedApps)
+	if err != nil {
+		return nil, errors.ErrAPI{
+			Status: http.StatusInternalServerError,
+			Msg:    "Could not query for allowed apps",
+			Err:    err,
+		}
+	}
+	if len(allowedApps) == 0 || allowedApps == nil {
+		return nil, errors.ErrAPI{
+			Status: http.StatusUnauthorized,
+			Msg:    "User has no access for this App",
+			Err:    err,
+		}
+	}
+	var appUuids = make([]string, len(allowedApps))
+	for i, item := range allowedApps {
+		appUuids[i] = item.Uuid
+	}
+	return appUuids, nil
 }

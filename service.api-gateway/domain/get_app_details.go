@@ -14,8 +14,8 @@ import (
 func (svc gatewaylogic) GetAppInfo(ctx context.Context, userUuid, appUuid string) (*common.AppInfo, errors.ErrApi) {
 	resp, err := svc.appClient.Get(ctx, &appsvc.GetRequest{
 		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
+		UserClaims: ctx_value.GetAuthedUser(ctx),
 		AppUuid:    appUuid,
-		CallerUuid: userUuid,
 	})
 	if err != nil {
 		return nil, errors.ErrAPI{

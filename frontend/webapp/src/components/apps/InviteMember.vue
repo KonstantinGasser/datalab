@@ -18,6 +18,8 @@
                         <div class="px-1">
                             <button v-if="item.status === undefined" class="btn accept" @click="invite(item)">invite</button>
                             <div  v-if="item.status === 1" class="invited pending">Pending</div>
+                            <div  v-if="item.status === 2" class="invited accepted">Accepted</div>
+                            <div  v-if="item.status === 3" class="invited rejected">Rejected</div>
                         </div>
                     </div>
                 </div>
@@ -173,4 +175,15 @@ export default {
     background: #f7fd0450;
     border: 1px solid #f7fd04;
 }
+.accepted {
+    background: #10d57450;
+    border: 1px solid #10d574;
+}
+
+.rejected {
+    background: #d9042975;
+    border: 1px solid #d90429;
+}
+
+
 </style>

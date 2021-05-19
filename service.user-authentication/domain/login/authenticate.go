@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/KonstantinGasser/datalab/common"
-	"github.com/KonstantinGasser/datalab/service.user-authentication/domain/login/jwts"
+	"github.com/KonstantinGasser/datalab/service.user-authentication/jwts"
 )
 
 var (
@@ -15,7 +15,7 @@ var (
 
 // IsLoggedIn verifies the authentic of the JWT in order to tell if it is a
 // valid token
-func IsLoggedIn(ctx context.Context, token string) (*common.TokenClaims, error) {
+func IsLoggedIn(ctx context.Context, token string) (*common.UserTokenClaims, error) {
 	rawClaims, err := jwts.GetJWTClaims(token)
 	if err != nil {
 		if err == jwts.ErrInvalidJWT {
@@ -32,8 +32,23 @@ func IsLoggedIn(ctx context.Context, token string) (*common.TokenClaims, error) 
 	if !ok {
 		return nil, ErrCorruptedToken
 	}
-	return &common.TokenClaims{
+	permissions := rawClaims["apps"].([]interface{})
+	if !ok {
+		return nil, ErrCorruptedToken
+	}
+	var appPermissions = make([]*common.AppPermission, len(permissions))
+	if len(permissions) != 0 {
+		for i, item := range permissions {
+			tmp := item.(map[string]interface{})
+			appPermissions[i] = &common.AppPermission{
+				AppUuid: tmp["app_uuid"].(string),
+				Role:    common.AppRole(tmp["role"].(float64)),
+			}
+		}
+	}
+	return &common.UserTokenClaims{
 		Uuid:         uuid,
 		Organization: organization,
+		Permissions:  &common.UserPermissions{Apps: appPermissions},
 	}, nil
 }

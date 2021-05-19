@@ -23,6 +23,8 @@ type AppAdministerClient interface {
 	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
 	GetList(ctx context.Context, in *GetListRequest, opts ...grpc.CallOption) (*GetListResponse, error)
 	Invite(ctx context.Context, in *InviteRequest, opts ...grpc.CallOption) (*InviteResponse, error)
+	AcceptInvite(ctx context.Context, in *AcceptInviteRequest, opts ...grpc.CallOption) (*AcceptInviteResponse, error)
+	RejectInvite(ctx context.Context, in *RejectInviteRequest, opts ...grpc.CallOption) (*RejectInviteResponse, error)
 	MayAcquireToken(ctx context.Context, in *MayAcquireTokenRequest, opts ...grpc.CallOption) (*MayAcquireTokenResponse, error)
 }
 
@@ -79,6 +81,24 @@ func (c *appAdministerClient) Invite(ctx context.Context, in *InviteRequest, opt
 	return out, nil
 }
 
+func (c *appAdministerClient) AcceptInvite(ctx context.Context, in *AcceptInviteRequest, opts ...grpc.CallOption) (*AcceptInviteResponse, error) {
+	out := new(AcceptInviteResponse)
+	err := c.cc.Invoke(ctx, "/app_proto.AppAdminister/AcceptInvite", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *appAdministerClient) RejectInvite(ctx context.Context, in *RejectInviteRequest, opts ...grpc.CallOption) (*RejectInviteResponse, error) {
+	out := new(RejectInviteResponse)
+	err := c.cc.Invoke(ctx, "/app_proto.AppAdminister/RejectInvite", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *appAdministerClient) MayAcquireToken(ctx context.Context, in *MayAcquireTokenRequest, opts ...grpc.CallOption) (*MayAcquireTokenResponse, error) {
 	out := new(MayAcquireTokenResponse)
 	err := c.cc.Invoke(ctx, "/app_proto.AppAdminister/MayAcquireToken", in, out, opts...)
@@ -97,6 +117,8 @@ type AppAdministerServer interface {
 	Get(context.Context, *GetRequest) (*GetResponse, error)
 	GetList(context.Context, *GetListRequest) (*GetListResponse, error)
 	Invite(context.Context, *InviteRequest) (*InviteResponse, error)
+	AcceptInvite(context.Context, *AcceptInviteRequest) (*AcceptInviteResponse, error)
+	RejectInvite(context.Context, *RejectInviteRequest) (*RejectInviteResponse, error)
 	MayAcquireToken(context.Context, *MayAcquireTokenRequest) (*MayAcquireTokenResponse, error)
 	mustEmbedUnimplementedAppAdministerServer()
 }
@@ -119,6 +141,12 @@ func (UnimplementedAppAdministerServer) GetList(context.Context, *GetListRequest
 }
 func (UnimplementedAppAdministerServer) Invite(context.Context, *InviteRequest) (*InviteResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Invite not implemented")
+}
+func (UnimplementedAppAdministerServer) AcceptInvite(context.Context, *AcceptInviteRequest) (*AcceptInviteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AcceptInvite not implemented")
+}
+func (UnimplementedAppAdministerServer) RejectInvite(context.Context, *RejectInviteRequest) (*RejectInviteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RejectInvite not implemented")
 }
 func (UnimplementedAppAdministerServer) MayAcquireToken(context.Context, *MayAcquireTokenRequest) (*MayAcquireTokenResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method MayAcquireToken not implemented")
@@ -226,6 +254,42 @@ func _AppAdminister_Invite_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AppAdminister_AcceptInvite_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AcceptInviteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppAdministerServer).AcceptInvite(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/app_proto.AppAdminister/AcceptInvite",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppAdministerServer).AcceptInvite(ctx, req.(*AcceptInviteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AppAdminister_RejectInvite_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RejectInviteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppAdministerServer).RejectInvite(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/app_proto.AppAdminister/RejectInvite",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppAdministerServer).RejectInvite(ctx, req.(*RejectInviteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _AppAdminister_MayAcquireToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(MayAcquireTokenRequest)
 	if err := dec(in); err != nil {
@@ -270,6 +334,14 @@ var AppAdminister_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Invite",
 			Handler:    _AppAdminister_Invite_Handler,
+		},
+		{
+			MethodName: "AcceptInvite",
+			Handler:    _AppAdminister_AcceptInvite_Handler,
+		},
+		{
+			MethodName: "RejectInvite",
+			Handler:    _AppAdminister_RejectInvite_Handler,
 		},
 		{
 			MethodName: "MayAcquireToken",

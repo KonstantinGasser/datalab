@@ -16,6 +16,7 @@ func (handler Handler) GetList(ctx context.Context, in *proto.GetListRequest) (*
 
 	apps, err := handler.domain.GetMultiple(ctx, in)
 	if err != nil {
+		logrus.Errorf("<%v>[service.app-administer.GetList] could not get list: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
 		return &proto.GetListResponse{
 			StatusCode: err.Code(),
 			Msg:        err.Info(),

@@ -89,7 +89,6 @@ func Run(ctx context.Context, hostAddr, userAddr, appAddr, apptokenAddr, tokenAd
 		gatewaysvc.WithTracing,
 		gatewaysvc.WithCors,
 		gatewaysvc.WithAuth,
-		gatewaysvc.WithAppPermissions,
 	)
 
 	gatewaysvc.Register("/api/v1/app/config/upsert", gatewaysvc.UpdateAppConfig,
@@ -98,6 +97,11 @@ func Run(ctx context.Context, hostAddr, userAddr, appAddr, apptokenAddr, tokenAd
 		gatewaysvc.WithAuth,
 	)
 	gatewaysvc.Register("/api/v1/app/member/invite", gatewaysvc.InviteUserToApp,
+		gatewaysvc.WithTracing,
+		gatewaysvc.WithCors,
+		gatewaysvc.WithAuth,
+	)
+	gatewaysvc.Register("/api/v1/app/member/invite/accept", gatewaysvc.AcceptInvite,
 		gatewaysvc.WithTracing,
 		gatewaysvc.WithCors,
 		gatewaysvc.WithAuth,

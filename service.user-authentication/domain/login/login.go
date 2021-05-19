@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/KonstantinGasser/datalab/service.user-authentication/config"
-	"github.com/KonstantinGasser/datalab/service.user-authentication/domain/login/jwts"
 	"github.com/KonstantinGasser/datalab/service.user-authentication/domain/types"
+	"github.com/KonstantinGasser/datalab/service.user-authentication/jwts"
 	"github.com/KonstantinGasser/datalab/service.user-authentication/proto"
 	"github.com/KonstantinGasser/datalab/service.user-authentication/repo"
 	"github.com/KonstantinGasser/datalab/utils/hash"

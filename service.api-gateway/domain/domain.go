@@ -15,7 +15,7 @@ import (
 type GatewayLogic interface {
 	RegisterUser(ctx context.Context, form RegisterForm) errors.ErrApi
 	LoginUser(ctx context.Context, form LoginForm) (string, errors.ErrApi)
-	IsLoggedIn(ctx context.Context, token string) (*common.TokenClaims, errors.ErrApi)
+	IsLoggedIn(ctx context.Context, token string) (*common.UserTokenClaims, errors.ErrApi)
 
 	GetUserProfile(ctx context.Context, uuid string) (*common.UserInfo, errors.ErrApi)
 	GetColleagues(ctx context.Context, userUuid string) ([]*common.UserInfo, errors.ErrApi)
@@ -33,6 +33,7 @@ type GatewayLogic interface {
 	GetAppConfig(ctx context.Context, uuid string) (*common.AppConfigInfo, errors.ErrApi)
 
 	InviteToAppProcess(ctx context.Context, form InviteForm) errors.ErrApi
+	AcceptInvite(ctx context.Context, form AcceptInviteForm) (string, errors.ErrApi)
 }
 
 type gatewaylogic struct {

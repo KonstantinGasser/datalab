@@ -6,15 +6,25 @@ import (
 	"github.com/KonstantinGasser/datalab/common"
 	"github.com/KonstantinGasser/datalab/service.app-administer/config"
 	"github.com/KonstantinGasser/datalab/service.app-administer/domain/types"
-	"github.com/KonstantinGasser/datalab/service.app-administer/proto"
 	"github.com/KonstantinGasser/datalab/service.app-administer/repo"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-func Multiple(ctx context.Context, repo repo.Repo, in *proto.GetListRequest) ([]*common.AppMetaInfo, error) {
+func Multiple(ctx context.Context, repo repo.Repo, appUuids ...string) ([]*common.AppMetaInfo, error) {
 
+	filter := bson.D{
+		{
+			Key: "_id",
+			Value: bson.D{
+				{
+					Key:   "$in",
+					Value: appUuids,
+				},
+			},
+		},
+	}
 	var data []types.AppMetaInfo
-	err := repo.FindMany(ctx, config.AppDB, config.AppColl, bson.M{"owner_uuid": in.GetCallerUuid()}, &data)
+	err := repo.FindMany(ctx, config.AppDB, config.AppColl, filter, &data)
 	if err != nil {
 		return nil, ErrNotFound
 	}

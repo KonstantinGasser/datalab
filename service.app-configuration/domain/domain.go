@@ -8,6 +8,7 @@ import (
 	"github.com/KonstantinGasser/datalab/common"
 	"github.com/KonstantinGasser/datalab/service.app-configuration/domain/get"
 	"github.com/KonstantinGasser/datalab/service.app-configuration/domain/initialize"
+	"github.com/KonstantinGasser/datalab/service.app-configuration/domain/permissions"
 	"github.com/KonstantinGasser/datalab/service.app-configuration/domain/types"
 	"github.com/KonstantinGasser/datalab/service.app-configuration/domain/update"
 	"github.com/KonstantinGasser/datalab/service.app-configuration/errors"
@@ -43,6 +44,11 @@ func (svc appconfig) InitConfigs(ctx context.Context, in *proto.InitRequest) err
 }
 
 func (svc appconfig) GetConfigs(ctx context.Context, in *proto.GetRequest) (*common.AppConfigInfo, errors.ErrApi) {
+
+	permissionErr := permissions.CanAccess(ctx, svc.repo, in.GetUserClaims(), in.GetAppUuid())
+	if permissionErr != nil {
+		return nil, permissionErr
+	}
 	cfgs, err := get.Configs(ctx, svc.repo, in)
 	if err != nil {
 		if err == get.ErrNotFound {
@@ -62,7 +68,12 @@ func (svc appconfig) GetConfigs(ctx context.Context, in *proto.GetRequest) (*com
 }
 
 func (svc appconfig) UpdateConfig(ctx context.Context, in *proto.UpdateRequest) errors.ErrApi {
+	permissionErr := permissions.CanAccess(ctx, svc.repo, in.GetUserClaims(), in.GetAppUuid())
+	if permissionErr != nil {
+		return permissionErr
+	}
 
+	// translate from protobuf to mongo document struct
 	var cfg []types.Config
 	switch in.GetUpdateFlag() {
 	case "funnel":
@@ -88,7 +99,7 @@ func (svc appconfig) UpdateConfig(ctx context.Context, in *proto.UpdateRequest) 
 		}
 	}
 
-	err := update.ByFlag(ctx, svc.repo, in.GetUpdateFlag(), in.GetUUID(), cfg)
+	err := update.ByFlag(ctx, svc.repo, in.GetUpdateFlag(), in.GetAppUuid(), cfg)
 	if err != nil {
 		if err == update.ErrInvalidFlag {
 			return errors.ErrAPI{

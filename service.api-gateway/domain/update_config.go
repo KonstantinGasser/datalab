@@ -22,7 +22,8 @@ func (svc gatewaylogic) UpdateAppConfig(ctx context.Context, form UpdateConfigFo
 
 	resp, err := svc.appconfigClient.Update(ctx, &cfgsvc.UpdateRequest{
 		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
-		UUID:       form.Uuid,
+		AppUuid:    form.Uuid,
+		UserClaims: ctx_value.GetAuthedUser(ctx),
 		UpdateFlag: flag,
 		Stages:     form.Stages,
 		Records:    form.Records,

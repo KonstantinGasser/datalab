@@ -10,6 +10,7 @@ import (
 	"github.com/KonstantinGasser/datalab/service.app-administer/domain/delete"
 	"github.com/KonstantinGasser/datalab/service.app-administer/domain/get"
 	"github.com/KonstantinGasser/datalab/service.app-administer/domain/invite"
+	"github.com/KonstantinGasser/datalab/service.app-administer/domain/permissions"
 	"github.com/KonstantinGasser/datalab/service.app-administer/domain/token"
 	"github.com/KonstantinGasser/datalab/service.app-administer/errors"
 	"github.com/KonstantinGasser/datalab/service.app-administer/proto"
@@ -27,6 +28,7 @@ type AppAdmin interface {
 	GetMultiple(ctx context.Context, in *proto.GetListRequest) ([]*common.AppMetaInfo, errors.ErrApi)
 	MayAcquireToken(ctx context.Context, in *proto.MayAcquireTokenRequest) errors.ErrApi
 	InviteToApp(ctx context.Context, in *proto.InviteRequest) (string, string, errors.ErrApi)
+	AcceptInvite(ctx context.Context, in *proto.AcceptInviteRequest) errors.ErrApi
 }
 
 type appadmin struct {
@@ -65,6 +67,7 @@ func (svc appadmin) Create(ctx context.Context, in *proto.CreateRequest) (string
 			Err:    err,
 		}
 	}
+	// this will go to kafka at some point in time
 	// forward uuid of app to app-config service in order for it
 	// to create a record to store app-configurations
 	respCfg, err := svc.configSvc.Init(ctx, &cfgsvc.InitRequest{
@@ -87,6 +90,7 @@ func (svc appadmin) Create(ctx context.Context, in *proto.CreateRequest) (string
 			Err:    err,
 		}
 	}
+	// this will go to kafka at some point in time
 	respPermissions, err := svc.userauthSvc.AddAppAccess(ctx, &userauthsvc.AddAppAccessRequest{
 		Tracing_ID: in.GetTracing_ID(),
 		UserUuid:   in.GetOwnerUuid(),
@@ -114,7 +118,9 @@ func (svc appadmin) Create(ctx context.Context, in *proto.CreateRequest) (string
 
 // Delete removes an existing App-Record from the database
 func (svc appadmin) Delete(ctx context.Context, in *proto.DeleteRequest) errors.ErrApi {
-
+	if err := permissions.IsOwner(ctx, svc.repo, in.GetUserClaims().GetUuid(), in.GetAppUuid()); err != nil {
+		return err
+	}
 	_, err := delete.App(ctx, svc.repo, in)
 	if err != nil {
 		if err == delete.ErrNoPermissions {
@@ -130,8 +136,18 @@ func (svc appadmin) Delete(ctx context.Context, in *proto.DeleteRequest) errors.
 
 // GetSingle fetches all data belonging to the app data
 func (svc appadmin) GetSingle(ctx context.Context, in *proto.GetRequest) (*common.AppInfo, errors.ErrApi) {
+	if permissionErr := permissions.IsOwnerOrMember(ctx, svc.repo, in.GetUserClaims(), in.GetAppUuid()); permissionErr != nil {
+		return nil, permissionErr
+	}
 	app, err := get.Single(ctx, svc.repo, in.GetAppUuid())
 	if err != nil {
+		if err == get.ErrNotFound {
+			return nil, errors.ErrAPI{
+				Status: http.StatusNotFound,
+				Msg:    "Could not find App Information",
+				Err:    err,
+			}
+		}
 		return nil, errors.ErrAPI{
 			Status: http.StatusInternalServerError,
 			Msg:    "Could not get App Information",
@@ -144,8 +160,12 @@ func (svc appadmin) GetSingle(ctx context.Context, in *proto.GetRequest) (*commo
 // GetMultiple fetches all Apps related to the user asking for the data. The list contains
 // only a minimal view with app-name and app-uuid
 func (svc appadmin) GetMultiple(ctx context.Context, in *proto.GetListRequest) ([]*common.AppMetaInfo, errors.ErrApi) {
+	appUuids, permissionErr := permissions.CanAccess(ctx, svc.repo, in.GetUserClaims())
+	if permissionErr != nil {
+		return nil, permissionErr
+	}
 
-	apps, err := get.Multiple(ctx, svc.repo, in)
+	apps, err := get.Multiple(ctx, svc.repo, appUuids...)
 	if err != nil {
 		if err == get.ErrNotFound {
 			return nil, errors.ErrAPI{
@@ -182,7 +202,11 @@ func (svc appadmin) MayAcquireToken(ctx context.Context, in *proto.MayAcquireTok
 }
 
 func (svc appadmin) InviteToApp(ctx context.Context, in *proto.InviteRequest) (string, string, errors.ErrApi) {
-	err := invite.ToApp(ctx, svc.repo, in.GetUserUuid(), in.GetOwnerUuid(), in.GetAppUuid())
+	permissionErr := permissions.IsOwner(ctx, svc.repo, in.GetUserClaims().GetUuid(), in.GetAppUuid())
+	if permissionErr != nil {
+		return "", "", permissionErr
+	}
+	err := invite.ToApp(ctx, svc.repo, in.GetUserUuid(), in.GetUserClaims().GetUuid(), in.GetAppUuid())
 	if err != nil {
 		if err == invite.ErrNoAppFound {
 			return "", "", errors.ErrAPI{
@@ -206,4 +230,21 @@ func (svc appadmin) InviteToApp(ctx context.Context, in *proto.InviteRequest) (s
 		}
 	}
 	return app.Name, app.Owner, nil
+}
+
+func (svc appadmin) AcceptInvite(ctx context.Context, in *proto.AcceptInviteRequest) errors.ErrApi {
+	permissionErr := permissions.HasInvite(ctx, svc.repo, in.GetUserClaims(), in.GetAppUuid())
+	if permissionErr != nil {
+		return permissionErr
+	}
+
+	err := invite.Accept(ctx, svc.repo, in.GetAppUuid(), in.GetUserClaims().GetUuid())
+	if err != nil {
+		return errors.ErrAPI{
+			Status: http.StatusInternalServerError,
+			Msg:    "Could not update invite status to accepted",
+			Err:    err,
+		}
+	}
+	return nil
 }

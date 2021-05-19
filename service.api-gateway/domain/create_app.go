@@ -33,7 +33,6 @@ func (svc gatewaylogic) CreateApp(ctx context.Context, uuid, organization string
 		Organization: organization,
 		Description:  form.Description,
 		AppUrl:       form.URL,
-		Member:       nil,
 	})
 	if err != nil {
 		return "", errors.ErrAPI{

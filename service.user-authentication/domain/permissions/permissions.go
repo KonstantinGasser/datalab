@@ -9,7 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-func UpdateAppAccess(ctx context.Context, repo repo.Repo, userUuid string, permssions types.AppPermission) error {
+func UpdateAppAccess(ctx context.Context, repo repo.Repo, userUuid string, permssions types.AppPermission) (*types.Permissions, error) {
 
 	query := bson.D{
 		{
@@ -22,8 +22,14 @@ func UpdateAppAccess(ctx context.Context, repo repo.Repo, userUuid string, perms
 	filter := bson.M{"_id": userUuid}
 	_, err := repo.UpdateOne(ctx, config.UserAuthDB, config.UserPermissionColl, filter, query, false)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	var newPermissions types.Permissions
+	err = repo.FindOne(ctx, config.UserAuthDB, config.UserPermissionColl, bson.M{"_id": userUuid}, &newPermissions)
+	if err != nil {
+		return nil, err
+	}
+
+	return &newPermissions, nil
 }

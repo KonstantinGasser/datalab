@@ -14,7 +14,8 @@ import (
 func (svc gatewaylogic) GetAppConfig(ctx context.Context, uuid string) (*common.AppConfigInfo, errors.ErrApi) {
 	resp, err := svc.appconfigClient.Get(ctx, &appconfig.GetRequest{
 		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
-		ForUuid:    uuid,
+		UserClaims: ctx_value.GetAuthedUser(ctx),
+		AppUuid:    uuid,
 	})
 	if err != nil {
 		return nil, errors.ErrAPI{

@@ -19,7 +19,7 @@ var (
 
 func Configs(ctx context.Context, repo repo.Repo, in *proto.GetRequest) (*common.AppConfigInfo, error) {
 	var cfg types.ConfigInfo
-	err := repo.FindOne(ctx, config.CfgDB, config.CfgColl, bson.M{"_id": in.GetForUuid()}, &cfg)
+	err := repo.FindOne(ctx, config.CfgDB, config.CfgColl, bson.M{"_id": in.GetAppUuid()}, &cfg)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, ErrNotFound

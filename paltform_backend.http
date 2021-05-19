@@ -1,8 +1,8 @@
-POST http://192.168.0.179:8080/api/v1/user/register HTTP/1.1
+POST http://localhost:8080/api/v1/user/register HTTP/1.1
 content-type: application/json
 
 {
-    "username": "dummy",
+    "username": "dummy1",
     "first_name": "Konstantin",
     "last_name":  "Gasser",
     "password": "hello",
@@ -11,28 +11,28 @@ content-type: application/json
 }
 
 ###
-POST http://192.168.0.179:8080/api/v1/user/login HTTP/1.1
+POST http://localhost:8080/api/v1/user/login HTTP/1.1
 content-type: application/json
 
 {
-    "username": "dummy",
+    "username": "dummy1",
     "password": "hello"
 }
 
 ###
-GET http://192.168.0.179:8080/api/v1/user/profile HTTP/1.1
+GET http://localhost:8080/api/v1/user/profile HTTP/1.1
 content-type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbeyJhcHBfdXVpZCI6ImNiZDg0ZTYyLWNiM2QtNDIxNy1hMzY3LTBlMzQzY2JiNWJjMCIsInJvbGUiOjB9LHsiYXBwX3V1aWQiOiIyNjkyMDQyZS1kZjhmLTQ1YTQtYTUwZC1mZGMwODI4NzgyZDYiLCJyb2xlIjowfV0sImV4cCI6MTYyMTM1NjU4MiwiaWF0IjoiY29tLmRhdGFsYWIuc2VydmljZS51c2VyLWF1dGhlbnRpY2F0aW9uIiwib3JnbiI6ImRhdGFsYWIuZGV2Iiwic3ViIjoiNWJjNTRhODYtN2Q5ZS00MDllLWI4NzctN2MxN2VmNDg0NDE0In0.5CmSVSaLa-CNNngNlD6E_YNaiHMuCnbkbAiEJWP53L8
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbeyJhcHBfdXVpZCI6ImQ2NGZmYjdlLWQzODQtNDEyOC04Yjc4LWNlMWQwYTk2OTM1YSIsInJvbGUiOjB9XSwiZXhwIjoxNjIxNDYzNTU1LCJpYXQiOiJjb20uZGF0YWxhYi5zZXJ2aWNlLnVzZXItYXV0aGVudGljYXRpb24iLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiI3MGVkMTZmMi04YmYwLTQ3ZjctYmU0Mi02Y2YwMTIwMjE5MmUifQ.Cia4cN92Eo5iIbOkxjCLwaKeh2FnoNcF6B-qtFLAfjw
 
 ###
-GET http://192.168.0.179:8080/api/v1/user/profile/colleagues HTTP/1.1
+GET http://localhost:8080/api/v1/user/profile/colleagues HTTP/1.1
 content-type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbXSwiZXhwIjoxNjIxMjU0MDk5LCJpYXQiOiJjb20uZGF0YWxhYi5zZXJ2aWNlLnVzZXItYXV0aGVudGljYXRpb24iLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiI1YmM1NGE4Ni03ZDllLTQwOWUtYjg3Ny03YzE3ZWY0ODQ0MTQifQ.oxQK9xlFBKE8fFBpv8PKupXcGts10y2TYSeGkor9DeI
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbeyJhcHBfdXVpZCI6ImQ2NGZmYjdlLWQzODQtNDEyOC04Yjc4LWNlMWQwYTk2OTM1YSIsInJvbGUiOjB9XSwiZXhwIjoxNjIxNDYzNTU1LCJpYXQiOiJjb20uZGF0YWxhYi5zZXJ2aWNlLnVzZXItYXV0aGVudGljYXRpb24iLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiI3MGVkMTZmMi04YmYwLTQ3ZjctYmU0Mi02Y2YwMTIwMjE5MmUifQ.Cia4cN92Eo5iIbOkxjCLwaKeh2FnoNcF6B-qtFLAfjw
 
 ###
-POST http://192.168.0.179:8080/api/v1/user/profile/update HTTP/1.1
+POST http://localhost:8080/api/v1/user/profile/update HTTP/1.1
 content-type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbXSwiZXhwIjoxNjIxMjU0MDk5LCJpYXQiOiJjb20uZGF0YWxhYi5zZXJ2aWNlLnVzZXItYXV0aGVudGljYXRpb24iLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiI1YmM1NGE4Ni03ZDllLTQwOWUtYjg3Ny03YzE3ZWY0ODQ0MTQifQ.oxQK9xlFBKE8fFBpv8PKupXcGts10y2TYSeGkor9DeI
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbeyJhcHBfdXVpZCI6ImQ2NGZmYjdlLWQzODQtNDEyOC04Yjc4LWNlMWQwYTk2OTM1YSIsInJvbGUiOjB9XSwiZXhwIjoxNjIxNDYzNTU1LCJpYXQiOiJjb20uZGF0YWxhYi5zZXJ2aWNlLnVzZXItYXV0aGVudGljYXRpb24iLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiI3MGVkMTZmMi04YmYwLTQ3ZjctYmU0Mi02Y2YwMTIwMjE5MmUifQ.Cia4cN92Eo5iIbOkxjCLwaKeh2FnoNcF6B-qtFLAfjw
 
 {
     "first_name": "Konstantin",
@@ -42,30 +42,30 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbXSwiZXhwIjoxNjIx
 }
 
 ###
-POST http://192.168.0.179:8080/api/v1/app/create HTTP/1.1
+POST http://localhost:8080/api/v1/app/create HTTP/1.1
 content-type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbXSwiZXhwIjoxNjIxMjU0MDk5LCJpYXQiOiJjb20uZGF0YWxhYi5zZXJ2aWNlLnVzZXItYXV0aGVudGljYXRpb24iLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiI1YmM1NGE4Ni03ZDllLTQwOWUtYjg3Ny03YzE3ZWY0ODQ0MTQifQ.oxQK9xlFBKE8fFBpv8PKupXcGts10y2TYSeGkor9DeI
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbeyJhcHBfdXVpZCI6ImQ2NGZmYjdlLWQzODQtNDEyOC04Yjc4LWNlMWQwYTk2OTM1YSIsInJvbGUiOjB9XSwiZXhwIjoxNjIxNDYzNTU1LCJpYXQiOiJjb20uZGF0YWxhYi5zZXJ2aWNlLnVzZXItYXV0aGVudGljYXRpb24iLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiI3MGVkMTZmMi04YmYwLTQ3ZjctYmU0Mi02Y2YwMTIwMjE5MmUifQ.Cia4cN92Eo5iIbOkxjCLwaKeh2FnoNcF6B-qtFLAfjw
 
 {
-    "app_name": "dummy#2",
-    "app_URL":  "http://dummy.io",
-    "app_description": "Data Backend session init test"
+    "app_name": "dummy#1",
+    "app_URL":  "http://dummy#1.io",
+    "app_description": "App Test #1"
 }
 
 ###
-GET http://192.168.0.179:8080/api/v1/app/get?app=2692042e-df8f-45a4-a50d-fdc0828782d6 HTTP/1.1
+GET http://localhost:8080/api/v1/app/get?app=d64ffb7e-d384-4128-8b78-ce1d0a96935a HTTP/1.1
 content-type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbXSwiZXhwIjoxNjIxMjU0MDk5LCJpYXQiOiJjb20uZGF0YWxhYi5zZXJ2aWNlLnVzZXItYXV0aGVudGljYXRpb24iLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiI1YmM1NGE4Ni03ZDllLTQwOWUtYjg3Ny03YzE3ZWY0ODQ0MTQifQ.oxQK9xlFBKE8fFBpv8PKupXcGts10y2TYSeGkor9DeI
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbeyJhcHBfdXVpZCI6ImQ2NGZmYjdlLWQzODQtNDEyOC04Yjc4LWNlMWQwYTk2OTM1YSIsInJvbGUiOjB9XSwiZXhwIjoxNjIxNDYzNTU1LCJpYXQiOiJjb20uZGF0YWxhYi5zZXJ2aWNlLnVzZXItYXV0aGVudGljYXRpb24iLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiI3MGVkMTZmMi04YmYwLTQ3ZjctYmU0Mi02Y2YwMTIwMjE5MmUifQ.Cia4cN92Eo5iIbOkxjCLwaKeh2FnoNcF6B-qtFLAfjw
 
 ###
-GET http://192.168.0.179:8080/api/v1/app/getall HTTP/1.1
+GET http://localhost:8080/api/v1/app/getall HTTP/1.1
 content-type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbXSwiZXhwIjoxNjIxMjU0MDk5LCJpYXQiOiJjb20uZGF0YWxhYi5zZXJ2aWNlLnVzZXItYXV0aGVudGljYXRpb24iLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiI1YmM1NGE4Ni03ZDllLTQwOWUtYjg3Ny03YzE3ZWY0ODQ0MTQifQ.oxQK9xlFBKE8fFBpv8PKupXcGts10y2TYSeGkor9DeI
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbeyJhcHBfdXVpZCI6ImQ2NGZmYjdlLWQzODQtNDEyOC04Yjc4LWNlMWQwYTk2OTM1YSIsInJvbGUiOjB9XSwiZXhwIjoxNjIxNDYzNTU1LCJpYXQiOiJjb20uZGF0YWxhYi5zZXJ2aWNlLnVzZXItYXV0aGVudGljYXRpb24iLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiI3MGVkMTZmMi04YmYwLTQ3ZjctYmU0Mi02Y2YwMTIwMjE5MmUifQ.Cia4cN92Eo5iIbOkxjCLwaKeh2FnoNcF6B-qtFLAfjw
 
 ###
-POST http://192.168.0.179:8080/api/v1/app/token/create HTTP/1.1
+POST http://localhost:8080/api/v1/app/token/create HTTP/1.1
 content-type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbXSwiZXhwIjoxNjIxMjU0MDk5LCJpYXQiOiJjb20uZGF0YWxhYi5zZXJ2aWNlLnVzZXItYXV0aGVudGljYXRpb24iLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiI1YmM1NGE4Ni03ZDllLTQwOWUtYjg3Ny03YzE3ZWY0ODQ0MTQifQ.oxQK9xlFBKE8fFBpv8PKupXcGts10y2TYSeGkor9DeI
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbeyJhcHBfdXVpZCI6ImQ2NGZmYjdlLWQzODQtNDEyOC04Yjc4LWNlMWQwYTk2OTM1YSIsInJvbGUiOjB9XSwiZXhwIjoxNjIxNDYzNTU1LCJpYXQiOiJjb20uZGF0YWxhYi5zZXJ2aWNlLnVzZXItYXV0aGVudGljYXRpb24iLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiI3MGVkMTZmMi04YmYwLTQ3ZjctYmU0Mi02Y2YwMTIwMjE5MmUifQ.Cia4cN92Eo5iIbOkxjCLwaKeh2FnoNcF6B-qtFLAfjw
 
 {
     "app_name": "dummy#2",
@@ -75,9 +75,9 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbXSwiZXhwIjoxNjIx
 }
 
 ###
-POST http://192.168.0.179:8080/api/v1/app/config/upsert?flag=funnel HTTP/1.1
+POST http://localhost:8080/api/v1/app/config/upsert?flag=funnel HTTP/1.1
 content-type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbXSwiZXhwIjoxNjIxMjU0MDk5LCJpYXQiOiJjb20uZGF0YWxhYi5zZXJ2aWNlLnVzZXItYXV0aGVudGljYXRpb24iLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiI1YmM1NGE4Ni03ZDllLTQwOWUtYjg3Ny03YzE3ZWY0ODQ0MTQifQ.oxQK9xlFBKE8fFBpv8PKupXcGts10y2TYSeGkor9DeI
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbeyJhcHBfdXVpZCI6ImQ2NGZmYjdlLWQzODQtNDEyOC04Yjc4LWNlMWQwYTk2OTM1YSIsInJvbGUiOjB9XSwiZXhwIjoxNjIxNDYzNTU1LCJpYXQiOiJjb20uZGF0YWxhYi5zZXJ2aWNlLnVzZXItYXV0aGVudGljYXRpb24iLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiI3MGVkMTZmMi04YmYwLTQ3ZjctYmU0Mi02Y2YwMTIwMjE5MmUifQ.Cia4cN92Eo5iIbOkxjCLwaKeh2FnoNcF6B-qtFLAfjw
 
 {
     "app_uuid": "cbd84e62-cb3d-4217-a367-0e343cbb5bc0",
@@ -101,9 +101,9 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbXSwiZXhwIjoxNjIx
 }
 
 ###
-POST http://192.168.0.179:8080/api/v1/app/config/upsert?flag=campaign HTTP/1.1
+POST http://localhost:8080/api/v1/app/config/upsert?flag=campaign HTTP/1.1
 content-type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbXSwiZXhwIjoxNjIxMjU0MDk5LCJpYXQiOiJjb20uZGF0YWxhYi5zZXJ2aWNlLnVzZXItYXV0aGVudGljYXRpb24iLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiI1YmM1NGE4Ni03ZDllLTQwOWUtYjg3Ny03YzE3ZWY0ODQ0MTQifQ.oxQK9xlFBKE8fFBpv8PKupXcGts10y2TYSeGkor9DeI
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbeyJhcHBfdXVpZCI6ImQ2NGZmYjdlLWQzODQtNDEyOC04Yjc4LWNlMWQwYTk2OTM1YSIsInJvbGUiOjB9XSwiZXhwIjoxNjIxNDYzNTU1LCJpYXQiOiJjb20uZGF0YWxhYi5zZXJ2aWNlLnVzZXItYXV0aGVudGljYXRpb24iLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiI3MGVkMTZmMi04YmYwLTQ3ZjctYmU0Mi02Y2YwMTIwMjE5MmUifQ.Cia4cN92Eo5iIbOkxjCLwaKeh2FnoNcF6B-qtFLAfjw
 
 {
     "app_uuid": "cbd84e62-cb3d-4217-a367-0e343cbb5bc0",
@@ -117,9 +117,125 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbXSwiZXhwIjoxNjIx
 }
 
 ###
-POST http://192.168.0.179:8080/api/v1/app/config/upsert?flag=btn_time HTTP/1.1
+POST http://localhost:8080/api/v1/app/config/upsert?flag=btn_time HTTP/1.1
 content-type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbXSwiZXhwIjoxNjIxMjU0MDk5LCJpYXQiOiJjb20uZGF0YWxhYi5zZXJ2aWNlLnVzZXItYXV0aGVudGljYXRpb24iLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiI1YmM1NGE4Ni03ZDllLTQwOWUtYjg3Ny03YzE3ZWY0ODQ0MTQifQ.oxQK9xlFBKE8fFBpv8PKupXcGts10y2TYSeGkor9DeI
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbeyJhcHBfdXVpZCI6ImQ2NGZmYjdlLWQzODQtNDEyOC04Yjc4LWNlMWQwYTk2OTM1YSIsInJvbGUiOjB9XSwiZXhwIjoxNjIxNDYzNTU1LCJpYXQiOiJjb20uZGF0YWxhYi5zZXJ2aWNlLnVzZXItYXV0aGVudGljYXRpb24iLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiI3MGVkMTZmMi04YmYwLTQ3ZjctYmU0Mi02Y2YwMTIwMjE5MmUifQ.Cia4cN92Eo5iIbOkxjCLwaKeh2FnoNcF6B-qtFLAfjw
+
+{
+    "app_uuid": "cbd84e62-cb3d-4217-a367-0e343cbb5bc0",
+    "btn_defs": [
+        {
+            "id": 1,
+            "name": "Order Button",
+            "btn_name": "btn_order"
+        }
+    ]
+}
+
+
+### second user
+
+###
+GET http://localhost:8080/api/v1/user/profile HTTP/1.1
+content-type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbXSwiZXhwIjoxNjIxNDY0OTY0LCJpYXQiOiJjb20uZGF0YWxhYi5zZXJ2aWNlLnVzZXItYXV0aGVudGljYXRpb24iLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiJjNzI4ZGVhNy01M2NhLTQ3MGUtODUzZC00YTUxNzE5NzBiMDQifQ.msO58KBfG7oE55C9u9P80u77BIS8HTRXNq2MjIrz5Zc
+
+###
+GET http://localhost:8080/api/v1/user/profile/colleagues HTTP/1.1
+content-type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbXSwiZXhwIjoxNjIxNDY0OTY0LCJpYXQiOiJjb20uZGF0YWxhYi5zZXJ2aWNlLnVzZXItYXV0aGVudGljYXRpb24iLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiJjNzI4ZGVhNy01M2NhLTQ3MGUtODUzZC00YTUxNzE5NzBiMDQifQ.msO58KBfG7oE55C9u9P80u77BIS8HTRXNq2MjIrz5Zc
+
+###
+POST http://localhost:8080/api/v1/user/profile/update HTTP/1.1
+content-type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbXSwiZXhwIjoxNjIxNDY0OTY0LCJpYXQiOiJjb20uZGF0YWxhYi5zZXJ2aWNlLnVzZXItYXV0aGVudGljYXRpb24iLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiJjNzI4ZGVhNy01M2NhLTQ3MGUtODUzZC00YTUxNzE5NzBiMDQifQ.msO58KBfG7oE55C9u9P80u77BIS8HTRXNq2MjIrz5Zc
+
+{
+    "first_name": "Konstantin",
+    "last_name":  "Gasser",
+    "orgn_position": "Software Engineer",
+    "profile_img_url": "some/path/to/image"
+}
+
+###
+POST http://localhost:8080/api/v1/app/create HTTP/1.1
+content-type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbXSwiZXhwIjoxNjIxNDY0OTY0LCJpYXQiOiJjb20uZGF0YWxhYi5zZXJ2aWNlLnVzZXItYXV0aGVudGljYXRpb24iLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiJjNzI4ZGVhNy01M2NhLTQ3MGUtODUzZC00YTUxNzE5NzBiMDQifQ.msO58KBfG7oE55C9u9P80u77BIS8HTRXNq2MjIrz5Zc
+
+{
+    "app_name": "dummy#1",
+    "app_URL":  "http://dummy#1.io",
+    "app_description": "App Test #1"
+}
+
+###
+GET http://localhost:8080/api/v1/app/get?app=d64ffb7e-d384-4128-8b78-ce1d0a96935a HTTP/1.1
+content-type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbXSwiZXhwIjoxNjIxNDY0OTY0LCJpYXQiOiJjb20uZGF0YWxhYi5zZXJ2aWNlLnVzZXItYXV0aGVudGljYXRpb24iLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiJjNzI4ZGVhNy01M2NhLTQ3MGUtODUzZC00YTUxNzE5NzBiMDQifQ.msO58KBfG7oE55C9u9P80u77BIS8HTRXNq2MjIrz5Zc
+
+###
+GET http://localhost:8080/api/v1/app/getall HTTP/1.1
+content-type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbXSwiZXhwIjoxNjIxNDY0OTY0LCJpYXQiOiJjb20uZGF0YWxhYi5zZXJ2aWNlLnVzZXItYXV0aGVudGljYXRpb24iLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiJjNzI4ZGVhNy01M2NhLTQ3MGUtODUzZC00YTUxNzE5NzBiMDQifQ.msO58KBfG7oE55C9u9P80u77BIS8HTRXNq2MjIrz5Zc
+
+###
+POST http://localhost:8080/api/v1/app/token/create HTTP/1.1
+content-type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbXSwiZXhwIjoxNjIxNDY0OTY0LCJpYXQiOiJjb20uZGF0YWxhYi5zZXJ2aWNlLnVzZXItYXV0aGVudGljYXRpb24iLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiJjNzI4ZGVhNy01M2NhLTQ3MGUtODUzZC00YTUxNzE5NzBiMDQifQ.msO58KBfG7oE55C9u9P80u77BIS8HTRXNq2MjIrz5Zc
+
+{
+    "app_name": "dummy#2",
+    "app_uuid": "2692042e-df8f-45a4-a50d-fdc0828782d6",
+    "owner_domain": "datalab.dev",
+    "app_origin": "http://test.io"
+}
+
+###
+POST http://localhost:8080/api/v1/app/config/upsert?flag=funnel HTTP/1.1
+content-type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbXSwiZXhwIjoxNjIxNDY0OTY0LCJpYXQiOiJjb20uZGF0YWxhYi5zZXJ2aWNlLnVzZXItYXV0aGVudGljYXRpb24iLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiJjNzI4ZGVhNy01M2NhLTQ3MGUtODUzZC00YTUxNzE5NzBiMDQifQ.msO58KBfG7oE55C9u9P80u77BIS8HTRXNq2MjIrz5Zc
+
+{
+    "app_uuid": "cbd84e62-cb3d-4217-a367-0e343cbb5bc0",
+    "stages": [
+        {
+            "id": 1,
+            "name": "Stage Zero",
+            "transition": "btn_add_to"
+        },
+        {
+            "id": 2,
+            "name": "Stage One",
+            "transition": "btn_process"
+        },
+        {
+            "id": 3,
+            "name": "Stage Two",
+            "transition": "btn_buy"
+        }
+    ]
+}
+
+###
+POST http://localhost:8080/api/v1/app/config/upsert?flag=campaign HTTP/1.1
+content-type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbXSwiZXhwIjoxNjIxNDY0OTY0LCJpYXQiOiJjb20uZGF0YWxhYi5zZXJ2aWNlLnVzZXItYXV0aGVudGljYXRpb24iLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiJjNzI4ZGVhNy01M2NhLTQ3MGUtODUzZC00YTUxNzE5NzBiMDQifQ.msO58KBfG7oE55C9u9P80u77BIS8HTRXNq2MjIrz5Zc
+
+{
+    "app_uuid": "cbd84e62-cb3d-4217-a367-0e343cbb5bc0",
+    "records": [
+        {
+            "id": 1,
+            "name": "Summer Sales",
+            "prefix": "summer"
+        }
+    ]
+}
+
+###
+POST http://localhost:8080/api/v1/app/config/upsert?flag=btn_time HTTP/1.1
+content-type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbXSwiZXhwIjoxNjIxNDY0OTY0LCJpYXQiOiJjb20uZGF0YWxhYi5zZXJ2aWNlLnVzZXItYXV0aGVudGljYXRpb24iLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiJjNzI4ZGVhNy01M2NhLTQ3MGUtODUzZC00YTUxNzE5NzBiMDQifQ.msO58KBfG7oE55C9u9P80u77BIS8HTRXNq2MjIrz5Zc
 
 {
     "app_uuid": "cbd84e62-cb3d-4217-a367-0e343cbb5bc0",

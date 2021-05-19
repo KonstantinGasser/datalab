@@ -11,7 +11,7 @@ import (
 )
 
 type NotificationLogic interface {
-	IsLoggedIn(ctx context.Context, token string) (*common.TokenClaims, errors.ErrApi)
+	IsLoggedIn(ctx context.Context, token string) (*common.UserTokenClaims, errors.ErrApi)
 	OpenSocket(ctx context.Context, w http.ResponseWriter, r *http.Request) error
 	EventAppInvite(ctx context.Context, msg notifyhub.Message, recUuid, recOrgn string)
 }

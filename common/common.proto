@@ -71,7 +71,7 @@ message AppTokenInfo {
     int64 exp = 2;
 }
 
-message TokenClaims {
+message UserTokenClaims {
     string uuid = 1;
     string organization = 2;
     UserPermissions permissions = 3;

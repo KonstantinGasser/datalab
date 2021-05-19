@@ -15,7 +15,6 @@ func (svc gatewaylogic) HasAppPermissions(ctx context.Context, userUuid, appUuid
 	appHash := hasher.Build(appName, organization)
 	resp, err := svc.appClient.MayAcquireToken(ctx, &appsvc.MayAcquireTokenRequest{
 		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
-		CallerUuid: userUuid,
 		AppUuid:    appUuid,
 		AppHash:    appHash,
 	})

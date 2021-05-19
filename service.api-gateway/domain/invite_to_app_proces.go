@@ -36,8 +36,8 @@ func (svc gatewaylogic) InviteToAppProcess(ctx context.Context, form InviteForm)
 	}
 	inviteResp, err := svc.appClient.Invite(ctx, &appsvc.InviteRequest{
 		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
+		UserClaims: ctx_value.GetAuthedUser(ctx),
 		AppUuid:    form.AppUuid,
-		OwnerUuid:  user.GetUuid(),
 		UserUuid:   form.InvitedUuid,
 	})
 	if err != nil {
@@ -73,7 +73,6 @@ func (svc gatewaylogic) InviteToAppProcess(ctx context.Context, form InviteForm)
 			},
 		},
 	}
-	fmt.Println(notification)
 	notificationErr := svc.IssueNotification(ctx, notification)
 	if err != nil {
 		return notificationErr

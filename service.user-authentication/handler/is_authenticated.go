@@ -15,6 +15,7 @@ func (handler Handler) IsAuthed(ctx context.Context, in *proto.IsAuthedRequest) 
 
 	claims, err := handler.domain.IsAuthenticated(ctx, in)
 	if err != nil {
+		logrus.Errorf("<%v>[service.user-authentication.IsAuthed] %v\n", ctx_value.GetString(ctx, "tracingID"), err.Error())
 		return &proto.IsAuthedResponse{
 			StatusCode: err.Code(),
 			Msg:        err.Info(),

@@ -37,3 +37,26 @@ func ToApp(ctx context.Context, repo repo.Repo, userUuid, ownerUuid, appUuid str
 	}
 	return nil
 }
+
+func Accept(ctx context.Context, repo repo.Repo, appUuid, userUuid string) error {
+	return updateInviteStatus(ctx, repo, appUuid, userUuid, types.InviteAccepted)
+}
+
+func Reject(ctx context.Context, repo repo.Repo, appUuid, userUuid string) error {
+	return updateInviteStatus(ctx, repo, appUuid, userUuid, types.InviteRejected)
+}
+
+func updateInviteStatus(ctx context.Context, repo repo.Repo, appUuid, userUuid string, status types.InviteStatus) error {
+	filter := bson.M{
+		"_id":         appUuid,
+		"member.uuid": userUuid,
+	}
+	query := bson.D{
+		{
+			Key:   "$set",
+			Value: bson.M{"member.$.status": status},
+		},
+	}
+	_, err := repo.UpdateOne(ctx, config.AppDB, config.AppColl, filter, query, false)
+	return err
+}

@@ -28,10 +28,10 @@ func GetString(ctx context.Context, key string) string {
 // coming from the TokenService to the context. Claims of user might be needed afterwards.
 // GetAuthedUser is tide to the grpc_def of TokenService.AuthenticatedUser and if not found
 // will return nil
-func GetAuthedUser(ctx context.Context) *common.TokenClaims {
+func GetAuthedUser(ctx context.Context) *common.UserTokenClaims {
 	value := ctx.Value(ctxKey("user"))
 	if value == nil {
 		return nil
 	}
-	return value.(*common.TokenClaims)
+	return value.(*common.UserTokenClaims)
 }

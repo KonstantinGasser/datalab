@@ -13,7 +13,7 @@ func (handler Handler) AddAppAccess(ctx context.Context, in *proto.AddAppAccessR
 	ctx = ctx_value.AddValue(ctx, "tracingID", in.GetTracing_ID())
 	logrus.Infof("<%v>[service.user-authentication.AddAppAccess] received request\n", ctx_value.GetString(ctx, "tracingID"))
 
-	err := handler.domain.AddAppAccess(ctx, in)
+	newToken, err := handler.domain.AddAppAccess(ctx, in)
 	if err != nil {
 		logrus.Errorf("<%v>[service.user-authentication.AddAppAccess] could not add permission: %v\n",
 			ctx_value.GetString(ctx, "tracingID"),
@@ -24,7 +24,8 @@ func (handler Handler) AddAppAccess(ctx context.Context, in *proto.AddAppAccessR
 		}, nil
 	}
 	return &proto.AddAppAccessResponse{
-		StatusCode: http.StatusOK,
-		Msg:        "App Permissions Updated",
+		StatusCode:   http.StatusOK,
+		Msg:          "App Permissions Updated",
+		UpdatedToken: newToken,
 	}, nil
 }

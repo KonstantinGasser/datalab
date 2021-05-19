@@ -17,7 +17,7 @@ func (handler *Handler) GetAppList(w http.ResponseWriter, r *http.Request) {
 	}
 	apps, err := handler.domain.GetAppList(r.Context(), user.Uuid)
 	if err != nil {
-		logrus.Errorf("<%v>[handler.GetAppList] could not get app list: %v\n", ctx_value.GetString(r.Context(), "tracingID"), err.Error())
+		logrus.Errorf("<%v>[handler.GetAppList] %v\n", ctx_value.GetString(r.Context(), "tracingID"), err.Error())
 		handler.onError(w, err.Info(), int(err.Code()))
 		return
 	}
