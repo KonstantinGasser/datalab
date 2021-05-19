@@ -11,6 +11,7 @@ service AppAdminister {
     rpc Delete(DeleteRequest) returns (DeleteResponse) {}
     rpc Get(GetRequest) returns (GetResponse) {}
     rpc GetList(GetListRequest) returns (GetListResponse) {}
+    rpc Invite(InviteRequest) returns (InviteResponse) {}
     rpc MayAcquireToken(MayAcquireTokenRequest) returns (MayAcquireTokenResponse) {}
 }
 
@@ -85,4 +86,17 @@ message MayAcquireTokenResponse {
     int32 status_code = 1;
     string msg = 2;
     bool is_allowed = 3;
+}
+
+message InviteRequest {
+    string tracing_ID = 1;
+    string app_uuid = 2;
+    string owner_uuid = 3;
+    string user_uuid = 4;
+}
+message InviteResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    string app_name =3;
+    string owner_uuid = 4;
 }

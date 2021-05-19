@@ -9,6 +9,7 @@ import (
 	"github.com/KonstantinGasser/datalab/service.app-administer/domain/create"
 	"github.com/KonstantinGasser/datalab/service.app-administer/domain/delete"
 	"github.com/KonstantinGasser/datalab/service.app-administer/domain/get"
+	"github.com/KonstantinGasser/datalab/service.app-administer/domain/invite"
 	"github.com/KonstantinGasser/datalab/service.app-administer/domain/token"
 	"github.com/KonstantinGasser/datalab/service.app-administer/errors"
 	"github.com/KonstantinGasser/datalab/service.app-administer/proto"
@@ -25,6 +26,7 @@ type AppAdmin interface {
 	GetSingle(ctx context.Context, in *proto.GetRequest) (*common.AppInfo, errors.ErrApi)
 	GetMultiple(ctx context.Context, in *proto.GetListRequest) ([]*common.AppMetaInfo, errors.ErrApi)
 	MayAcquireToken(ctx context.Context, in *proto.MayAcquireTokenRequest) errors.ErrApi
+	InviteToApp(ctx context.Context, in *proto.InviteRequest) (string, string, errors.ErrApi)
 }
 
 type appadmin struct {
@@ -128,7 +130,7 @@ func (svc appadmin) Delete(ctx context.Context, in *proto.DeleteRequest) errors.
 
 // GetSingle fetches all data belonging to the app data
 func (svc appadmin) GetSingle(ctx context.Context, in *proto.GetRequest) (*common.AppInfo, errors.ErrApi) {
-	app, err := get.Single(ctx, svc.repo, in)
+	app, err := get.Single(ctx, svc.repo, in.GetAppUuid())
 	if err != nil {
 		return nil, errors.ErrAPI{
 			Status: http.StatusInternalServerError,
@@ -177,4 +179,31 @@ func (svc appadmin) MayAcquireToken(ctx context.Context, in *proto.MayAcquireTok
 		return errors.ErrAPI{Status: http.StatusUnauthorized, Msg: "Missing permission to acquire token", Err: err}
 	}
 	return nil
+}
+
+func (svc appadmin) InviteToApp(ctx context.Context, in *proto.InviteRequest) (string, string, errors.ErrApi) {
+	err := invite.ToApp(ctx, svc.repo, in.GetUserUuid(), in.GetOwnerUuid(), in.GetAppUuid())
+	if err != nil {
+		if err == invite.ErrNoAppFound {
+			return "", "", errors.ErrAPI{
+				Status: http.StatusBadRequest,
+				Msg:    "Could not find requested app",
+				Err:    err,
+			}
+		}
+		return "", "", errors.ErrAPI{
+			Status: http.StatusInternalServerError,
+			Msg:    "Could not invite user to app",
+			Err:    err,
+		}
+	}
+	app, err := get.Single(ctx, svc.repo, in.GetAppUuid())
+	if err != nil {
+		return "", "", errors.ErrAPI{
+			Status: http.StatusInternalServerError,
+			Msg:    "Could not get App Information",
+			Err:    err,
+		}
+	}
+	return app.Name, app.Owner, nil
 }

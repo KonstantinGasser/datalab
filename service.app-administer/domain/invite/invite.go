@@ -1,0 +1,39 @@
+package invite
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/KonstantinGasser/datalab/service.app-administer/config"
+	"github.com/KonstantinGasser/datalab/service.app-administer/domain/types"
+	"github.com/KonstantinGasser/datalab/service.app-administer/repo"
+	"go.mongodb.org/mongo-driver/bson"
+)
+
+var (
+	ErrNoAppFound = fmt.Errorf("could not find requested app info")
+)
+
+func ToApp(ctx context.Context, repo repo.Repo, userUuid, ownerUuid, appUuid string) error {
+
+	var invite = types.Invite{
+		Uuid:   userUuid,
+		Status: types.InvitePending,
+	}
+	filter := bson.M{"_id": appUuid, "owner_uuid": ownerUuid}
+	updateCount, err := repo.UpdateOne(ctx, config.AppDB, config.AppColl, filter, bson.D{
+		{
+			Key: "$addToSet",
+			Value: bson.M{
+				"member": invite,
+			},
+		},
+	}, false)
+	if err != nil {
+		if updateCount == 0 {
+			return ErrNoAppFound
+		}
+		return err
+	}
+	return nil
+}

@@ -227,7 +227,7 @@ export default {
                 app_uuid: this.$props.app_uuid,
                 stages: this.funnel,
             }
-            axios.post("http://192.168.0.177:8080/api/v1/app/config/upsert?flag=funnel", payload, options).then(res => {
+            axios.post("http://localhost:8080/api/v1/app/config/upsert?flag=funnel", payload, options).then(res => {
                 console.log(res);
                 this.$toast.success("Updated Funnel information");
                 this.$emit("appchange", false);
@@ -282,7 +282,7 @@ export default {
                 app_uuid: this.$props.app_uuid,
                 records: this.campaign,
             }
-            axios.post("http://192.168.0.177:8080/api/v1/app/config/upsert?flag=campaign", payload, options).then(res => {
+            axios.post("http://localhost:8080/api/v1/app/config/upsert?flag=campaign", payload, options).then(res => {
                 console.log(res);
                 this.$toast.success("Updated Campaign information");
                 this.$emit("appchange", false);
@@ -337,7 +337,7 @@ export default {
                 app_uuid: this.$props.app_uuid,
                 btn_defs: this.buttons,
             }
-            axios.post("http://192.168.0.177:8080/api/v1/app/config/upsert?flag=btn_time", payload, options).then(res => {
+            axios.post("http://localhost:8080/api/v1/app/config/upsert?flag=btn_time", payload, options).then(res => {
                 console.log(res);
                 this.$toast.success("Updated Interesting-Buttons information");
                 this.$emit("appchange", false);

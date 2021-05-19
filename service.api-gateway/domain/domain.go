@@ -31,6 +31,8 @@ type GatewayLogic interface {
 
 	UpdateAppConfig(ctx context.Context, form UpdateConfigForm, flag string) errors.ErrApi
 	GetAppConfig(ctx context.Context, uuid string) (*common.AppConfigInfo, errors.ErrApi)
+
+	InviteToAppProcess(ctx context.Context, form InviteForm) errors.ErrApi
 }
 
 type gatewaylogic struct {

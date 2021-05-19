@@ -22,6 +22,7 @@ type AppAdministerClient interface {
 	Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
 	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
 	GetList(ctx context.Context, in *GetListRequest, opts ...grpc.CallOption) (*GetListResponse, error)
+	Invite(ctx context.Context, in *InviteRequest, opts ...grpc.CallOption) (*InviteResponse, error)
 	MayAcquireToken(ctx context.Context, in *MayAcquireTokenRequest, opts ...grpc.CallOption) (*MayAcquireTokenResponse, error)
 }
 
@@ -69,6 +70,15 @@ func (c *appAdministerClient) GetList(ctx context.Context, in *GetListRequest, o
 	return out, nil
 }
 
+func (c *appAdministerClient) Invite(ctx context.Context, in *InviteRequest, opts ...grpc.CallOption) (*InviteResponse, error) {
+	out := new(InviteResponse)
+	err := c.cc.Invoke(ctx, "/app_proto.AppAdminister/Invite", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *appAdministerClient) MayAcquireToken(ctx context.Context, in *MayAcquireTokenRequest, opts ...grpc.CallOption) (*MayAcquireTokenResponse, error) {
 	out := new(MayAcquireTokenResponse)
 	err := c.cc.Invoke(ctx, "/app_proto.AppAdminister/MayAcquireToken", in, out, opts...)
@@ -86,6 +96,7 @@ type AppAdministerServer interface {
 	Delete(context.Context, *DeleteRequest) (*DeleteResponse, error)
 	Get(context.Context, *GetRequest) (*GetResponse, error)
 	GetList(context.Context, *GetListRequest) (*GetListResponse, error)
+	Invite(context.Context, *InviteRequest) (*InviteResponse, error)
 	MayAcquireToken(context.Context, *MayAcquireTokenRequest) (*MayAcquireTokenResponse, error)
 	mustEmbedUnimplementedAppAdministerServer()
 }
@@ -105,6 +116,9 @@ func (UnimplementedAppAdministerServer) Get(context.Context, *GetRequest) (*GetR
 }
 func (UnimplementedAppAdministerServer) GetList(context.Context, *GetListRequest) (*GetListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetList not implemented")
+}
+func (UnimplementedAppAdministerServer) Invite(context.Context, *InviteRequest) (*InviteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Invite not implemented")
 }
 func (UnimplementedAppAdministerServer) MayAcquireToken(context.Context, *MayAcquireTokenRequest) (*MayAcquireTokenResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method MayAcquireToken not implemented")
@@ -194,6 +208,24 @@ func _AppAdminister_GetList_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AppAdminister_Invite_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InviteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppAdministerServer).Invite(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/app_proto.AppAdminister/Invite",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppAdministerServer).Invite(ctx, req.(*InviteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _AppAdminister_MayAcquireToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(MayAcquireTokenRequest)
 	if err := dec(in); err != nil {
@@ -234,6 +266,10 @@ var AppAdminister_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetList",
 			Handler:    _AppAdminister_GetList_Handler,
+		},
+		{
+			MethodName: "Invite",
+			Handler:    _AppAdminister_Invite_Handler,
 		},
 		{
 			MethodName: "MayAcquireToken",

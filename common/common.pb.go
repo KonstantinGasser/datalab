@@ -134,12 +134,12 @@ type AppInfo struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Uuid        string   `protobuf:"bytes,1,opt,name=uuid,proto3" json:"uuid,omitempty"`
-	Name        string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	URL         string   `protobuf:"bytes,3,opt,name=URL,proto3" json:"URL,omitempty"`
-	Description string   `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
-	Owner       string   `protobuf:"bytes,5,opt,name=owner,proto3" json:"owner,omitempty"`
-	Member      []string `protobuf:"bytes,6,rep,name=member,proto3" json:"member,omitempty"`
+	Uuid        string       `protobuf:"bytes,1,opt,name=uuid,proto3" json:"uuid,omitempty"`
+	Name        string       `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	URL         string       `protobuf:"bytes,3,opt,name=URL,proto3" json:"URL,omitempty"`
+	Description string       `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
+	Owner       string       `protobuf:"bytes,5,opt,name=owner,proto3" json:"owner,omitempty"`
+	Member      []*AppMember `protobuf:"bytes,6,rep,name=member,proto3" json:"member,omitempty"`
 }
 
 func (x *AppInfo) Reset() {
@@ -209,11 +209,74 @@ func (x *AppInfo) GetOwner() string {
 	return ""
 }
 
-func (x *AppInfo) GetMember() []string {
+func (x *AppInfo) GetMember() []*AppMember {
 	if x != nil {
 		return x.Member
 	}
 	return nil
+}
+
+type AppMember struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Uuid   string `protobuf:"bytes,1,opt,name=uuid,proto3" json:"uuid,omitempty"`
+	Role   string `protobuf:"bytes,2,opt,name=role,proto3" json:"role,omitempty"`
+	Status int32  `protobuf:"varint,3,opt,name=status,proto3" json:"status,omitempty"`
+}
+
+func (x *AppMember) Reset() {
+	*x = AppMember{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_common_common_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *AppMember) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AppMember) ProtoMessage() {}
+
+func (x *AppMember) ProtoReflect() protoreflect.Message {
+	mi := &file_common_common_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AppMember.ProtoReflect.Descriptor instead.
+func (*AppMember) Descriptor() ([]byte, []int) {
+	return file_common_common_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *AppMember) GetUuid() string {
+	if x != nil {
+		return x.Uuid
+	}
+	return ""
+}
+
+func (x *AppMember) GetRole() string {
+	if x != nil {
+		return x.Role
+	}
+	return ""
+}
+
+func (x *AppMember) GetStatus() int32 {
+	if x != nil {
+		return x.Status
+	}
+	return 0
 }
 
 type AppMetaInfo struct {
@@ -228,7 +291,7 @@ type AppMetaInfo struct {
 func (x *AppMetaInfo) Reset() {
 	*x = AppMetaInfo{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_common_common_proto_msgTypes[2]
+		mi := &file_common_common_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -241,7 +304,7 @@ func (x *AppMetaInfo) String() string {
 func (*AppMetaInfo) ProtoMessage() {}
 
 func (x *AppMetaInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_common_common_proto_msgTypes[2]
+	mi := &file_common_common_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -254,7 +317,7 @@ func (x *AppMetaInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AppMetaInfo.ProtoReflect.Descriptor instead.
 func (*AppMetaInfo) Descriptor() ([]byte, []int) {
-	return file_common_common_proto_rawDescGZIP(), []int{2}
+	return file_common_common_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *AppMetaInfo) GetName() string {
@@ -284,7 +347,7 @@ type AppConfigInfo struct {
 func (x *AppConfigInfo) Reset() {
 	*x = AppConfigInfo{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_common_common_proto_msgTypes[3]
+		mi := &file_common_common_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -297,7 +360,7 @@ func (x *AppConfigInfo) String() string {
 func (*AppConfigInfo) ProtoMessage() {}
 
 func (x *AppConfigInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_common_common_proto_msgTypes[3]
+	mi := &file_common_common_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -310,7 +373,7 @@ func (x *AppConfigInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AppConfigInfo.ProtoReflect.Descriptor instead.
 func (*AppConfigInfo) Descriptor() ([]byte, []int) {
-	return file_common_common_proto_rawDescGZIP(), []int{3}
+	return file_common_common_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *AppConfigInfo) GetFunnel() []*Funnel {
@@ -347,7 +410,7 @@ type Funnel struct {
 func (x *Funnel) Reset() {
 	*x = Funnel{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_common_common_proto_msgTypes[4]
+		mi := &file_common_common_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -360,7 +423,7 @@ func (x *Funnel) String() string {
 func (*Funnel) ProtoMessage() {}
 
 func (x *Funnel) ProtoReflect() protoreflect.Message {
-	mi := &file_common_common_proto_msgTypes[4]
+	mi := &file_common_common_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -373,7 +436,7 @@ func (x *Funnel) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Funnel.ProtoReflect.Descriptor instead.
 func (*Funnel) Descriptor() ([]byte, []int) {
-	return file_common_common_proto_rawDescGZIP(), []int{4}
+	return file_common_common_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *Funnel) GetId() int32 {
@@ -410,7 +473,7 @@ type Campaign struct {
 func (x *Campaign) Reset() {
 	*x = Campaign{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_common_common_proto_msgTypes[5]
+		mi := &file_common_common_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -423,7 +486,7 @@ func (x *Campaign) String() string {
 func (*Campaign) ProtoMessage() {}
 
 func (x *Campaign) ProtoReflect() protoreflect.Message {
-	mi := &file_common_common_proto_msgTypes[5]
+	mi := &file_common_common_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -436,7 +499,7 @@ func (x *Campaign) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Campaign.ProtoReflect.Descriptor instead.
 func (*Campaign) Descriptor() ([]byte, []int) {
-	return file_common_common_proto_rawDescGZIP(), []int{5}
+	return file_common_common_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *Campaign) GetId() int32 {
@@ -473,7 +536,7 @@ type BtnTime struct {
 func (x *BtnTime) Reset() {
 	*x = BtnTime{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_common_common_proto_msgTypes[6]
+		mi := &file_common_common_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -486,7 +549,7 @@ func (x *BtnTime) String() string {
 func (*BtnTime) ProtoMessage() {}
 
 func (x *BtnTime) ProtoReflect() protoreflect.Message {
-	mi := &file_common_common_proto_msgTypes[6]
+	mi := &file_common_common_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -499,7 +562,7 @@ func (x *BtnTime) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BtnTime.ProtoReflect.Descriptor instead.
 func (*BtnTime) Descriptor() ([]byte, []int) {
-	return file_common_common_proto_rawDescGZIP(), []int{6}
+	return file_common_common_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *BtnTime) GetId() int32 {
@@ -540,7 +603,7 @@ type UserInfo struct {
 func (x *UserInfo) Reset() {
 	*x = UserInfo{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_common_common_proto_msgTypes[7]
+		mi := &file_common_common_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -553,7 +616,7 @@ func (x *UserInfo) String() string {
 func (*UserInfo) ProtoMessage() {}
 
 func (x *UserInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_common_common_proto_msgTypes[7]
+	mi := &file_common_common_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -566,7 +629,7 @@ func (x *UserInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserInfo.ProtoReflect.Descriptor instead.
 func (*UserInfo) Descriptor() ([]byte, []int) {
-	return file_common_common_proto_rawDescGZIP(), []int{7}
+	return file_common_common_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *UserInfo) GetUuid() string {
@@ -630,7 +693,7 @@ type UserMetaInfo struct {
 func (x *UserMetaInfo) Reset() {
 	*x = UserMetaInfo{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_common_common_proto_msgTypes[8]
+		mi := &file_common_common_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -643,7 +706,7 @@ func (x *UserMetaInfo) String() string {
 func (*UserMetaInfo) ProtoMessage() {}
 
 func (x *UserMetaInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_common_common_proto_msgTypes[8]
+	mi := &file_common_common_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -656,7 +719,7 @@ func (x *UserMetaInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserMetaInfo.ProtoReflect.Descriptor instead.
 func (*UserMetaInfo) Descriptor() ([]byte, []int) {
-	return file_common_common_proto_rawDescGZIP(), []int{8}
+	return file_common_common_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *UserMetaInfo) GetUuid() string {
@@ -685,7 +748,7 @@ type AppTokenInfo struct {
 func (x *AppTokenInfo) Reset() {
 	*x = AppTokenInfo{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_common_common_proto_msgTypes[9]
+		mi := &file_common_common_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -698,7 +761,7 @@ func (x *AppTokenInfo) String() string {
 func (*AppTokenInfo) ProtoMessage() {}
 
 func (x *AppTokenInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_common_common_proto_msgTypes[9]
+	mi := &file_common_common_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -711,7 +774,7 @@ func (x *AppTokenInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AppTokenInfo.ProtoReflect.Descriptor instead.
 func (*AppTokenInfo) Descriptor() ([]byte, []int) {
-	return file_common_common_proto_rawDescGZIP(), []int{9}
+	return file_common_common_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *AppTokenInfo) GetToken() string {
@@ -741,7 +804,7 @@ type TokenClaims struct {
 func (x *TokenClaims) Reset() {
 	*x = TokenClaims{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_common_common_proto_msgTypes[10]
+		mi := &file_common_common_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -754,7 +817,7 @@ func (x *TokenClaims) String() string {
 func (*TokenClaims) ProtoMessage() {}
 
 func (x *TokenClaims) ProtoReflect() protoreflect.Message {
-	mi := &file_common_common_proto_msgTypes[10]
+	mi := &file_common_common_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -767,7 +830,7 @@ func (x *TokenClaims) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TokenClaims.ProtoReflect.Descriptor instead.
 func (*TokenClaims) Descriptor() ([]byte, []int) {
-	return file_common_common_proto_rawDescGZIP(), []int{10}
+	return file_common_common_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *TokenClaims) GetUuid() string {
@@ -802,7 +865,7 @@ type UserPermissions struct {
 func (x *UserPermissions) Reset() {
 	*x = UserPermissions{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_common_common_proto_msgTypes[11]
+		mi := &file_common_common_proto_msgTypes[12]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -815,7 +878,7 @@ func (x *UserPermissions) String() string {
 func (*UserPermissions) ProtoMessage() {}
 
 func (x *UserPermissions) ProtoReflect() protoreflect.Message {
-	mi := &file_common_common_proto_msgTypes[11]
+	mi := &file_common_common_proto_msgTypes[12]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -828,7 +891,7 @@ func (x *UserPermissions) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserPermissions.ProtoReflect.Descriptor instead.
 func (*UserPermissions) Descriptor() ([]byte, []int) {
-	return file_common_common_proto_rawDescGZIP(), []int{11}
+	return file_common_common_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *UserPermissions) GetApps() []*AppPermission {
@@ -850,7 +913,7 @@ type AppPermission struct {
 func (x *AppPermission) Reset() {
 	*x = AppPermission{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_common_common_proto_msgTypes[12]
+		mi := &file_common_common_proto_msgTypes[13]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -863,7 +926,7 @@ func (x *AppPermission) String() string {
 func (*AppPermission) ProtoMessage() {}
 
 func (x *AppPermission) ProtoReflect() protoreflect.Message {
-	mi := &file_common_common_proto_msgTypes[12]
+	mi := &file_common_common_proto_msgTypes[13]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -876,7 +939,7 @@ func (x *AppPermission) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AppPermission.ProtoReflect.Descriptor instead.
 func (*AppPermission) Descriptor() ([]byte, []int) {
-	return file_common_common_proto_rawDescGZIP(), []int{12}
+	return file_common_common_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *AppPermission) GetAppUuid() string {
@@ -900,7 +963,7 @@ var file_common_common_proto_rawDesc = []byte{
 	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x06, 0x63, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x22, 0x2d, 0x0a,
 	0x05, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x12, 0x10, 0x0a, 0x03, 0x6d, 0x73, 0x67, 0x18, 0x01, 0x20,
 	0x01, 0x28, 0x09, 0x52, 0x03, 0x6d, 0x73, 0x67, 0x12, 0x12, 0x0a, 0x04, 0x63, 0x6f, 0x64, 0x65,
-	0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x22, 0x93, 0x01, 0x0a,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x22, 0xa6, 0x01, 0x0a,
 	0x07, 0x41, 0x70, 0x70, 0x49, 0x6e, 0x66, 0x6f, 0x12, 0x12, 0x0a, 0x04, 0x75, 0x75, 0x69, 0x64,
 	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x75, 0x75, 0x69, 0x64, 0x12, 0x12, 0x0a, 0x04,
 	0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65,
@@ -908,9 +971,15 @@ var file_common_common_proto_rawDesc = []byte{
 	0x52, 0x4c, 0x12, 0x20, 0x0a, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f,
 	0x6e, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70,
 	0x74, 0x69, 0x6f, 0x6e, 0x12, 0x14, 0x0a, 0x05, 0x6f, 0x77, 0x6e, 0x65, 0x72, 0x18, 0x05, 0x20,
-	0x01, 0x28, 0x09, 0x52, 0x05, 0x6f, 0x77, 0x6e, 0x65, 0x72, 0x12, 0x16, 0x0a, 0x06, 0x6d, 0x65,
-	0x6d, 0x62, 0x65, 0x72, 0x18, 0x06, 0x20, 0x03, 0x28, 0x09, 0x52, 0x06, 0x6d, 0x65, 0x6d, 0x62,
-	0x65, 0x72, 0x22, 0x35, 0x0a, 0x0b, 0x41, 0x70, 0x70, 0x4d, 0x65, 0x74, 0x61, 0x49, 0x6e, 0x66,
+	0x01, 0x28, 0x09, 0x52, 0x05, 0x6f, 0x77, 0x6e, 0x65, 0x72, 0x12, 0x29, 0x0a, 0x06, 0x6d, 0x65,
+	0x6d, 0x62, 0x65, 0x72, 0x18, 0x06, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x63, 0x6f, 0x6d,
+	0x6d, 0x6f, 0x6e, 0x2e, 0x41, 0x70, 0x70, 0x4d, 0x65, 0x6d, 0x62, 0x65, 0x72, 0x52, 0x06, 0x6d,
+	0x65, 0x6d, 0x62, 0x65, 0x72, 0x22, 0x4b, 0x0a, 0x09, 0x41, 0x70, 0x70, 0x4d, 0x65, 0x6d, 0x62,
+	0x65, 0x72, 0x12, 0x12, 0x0a, 0x04, 0x75, 0x75, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x04, 0x75, 0x75, 0x69, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x72, 0x6f, 0x6c, 0x65, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x72, 0x6f, 0x6c, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x73, 0x74,
+	0x61, 0x74, 0x75, 0x73, 0x18, 0x03, 0x20, 0x01, 0x28, 0x05, 0x52, 0x06, 0x73, 0x74, 0x61, 0x74,
+	0x75, 0x73, 0x22, 0x35, 0x0a, 0x0b, 0x41, 0x70, 0x70, 0x4d, 0x65, 0x74, 0x61, 0x49, 0x6e, 0x66,
 	0x6f, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
 	0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x75, 0x75, 0x69, 0x64, 0x18, 0x02, 0x20,
 	0x01, 0x28, 0x09, 0x52, 0x04, 0x75, 0x75, 0x69, 0x64, 0x22, 0x91, 0x01, 0x0a, 0x0d, 0x41, 0x70,
@@ -998,35 +1067,37 @@ func file_common_common_proto_rawDescGZIP() []byte {
 }
 
 var file_common_common_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_common_common_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
+var file_common_common_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_common_common_proto_goTypes = []interface{}{
 	(AppRole)(0),            // 0: common.AppRole
 	(*Hello)(nil),           // 1: common.Hello
 	(*AppInfo)(nil),         // 2: common.AppInfo
-	(*AppMetaInfo)(nil),     // 3: common.AppMetaInfo
-	(*AppConfigInfo)(nil),   // 4: common.AppConfigInfo
-	(*Funnel)(nil),          // 5: common.Funnel
-	(*Campaign)(nil),        // 6: common.Campaign
-	(*BtnTime)(nil),         // 7: common.BtnTime
-	(*UserInfo)(nil),        // 8: common.UserInfo
-	(*UserMetaInfo)(nil),    // 9: common.UserMetaInfo
-	(*AppTokenInfo)(nil),    // 10: common.AppTokenInfo
-	(*TokenClaims)(nil),     // 11: common.TokenClaims
-	(*UserPermissions)(nil), // 12: common.UserPermissions
-	(*AppPermission)(nil),   // 13: common.AppPermission
+	(*AppMember)(nil),       // 3: common.AppMember
+	(*AppMetaInfo)(nil),     // 4: common.AppMetaInfo
+	(*AppConfigInfo)(nil),   // 5: common.AppConfigInfo
+	(*Funnel)(nil),          // 6: common.Funnel
+	(*Campaign)(nil),        // 7: common.Campaign
+	(*BtnTime)(nil),         // 8: common.BtnTime
+	(*UserInfo)(nil),        // 9: common.UserInfo
+	(*UserMetaInfo)(nil),    // 10: common.UserMetaInfo
+	(*AppTokenInfo)(nil),    // 11: common.AppTokenInfo
+	(*TokenClaims)(nil),     // 12: common.TokenClaims
+	(*UserPermissions)(nil), // 13: common.UserPermissions
+	(*AppPermission)(nil),   // 14: common.AppPermission
 }
 var file_common_common_proto_depIdxs = []int32{
-	5,  // 0: common.AppConfigInfo.funnel:type_name -> common.Funnel
-	6,  // 1: common.AppConfigInfo.campaign:type_name -> common.Campaign
-	7,  // 2: common.AppConfigInfo.btn_time:type_name -> common.BtnTime
-	12, // 3: common.TokenClaims.permissions:type_name -> common.UserPermissions
-	13, // 4: common.UserPermissions.apps:type_name -> common.AppPermission
-	0,  // 5: common.AppPermission.role:type_name -> common.AppRole
-	6,  // [6:6] is the sub-list for method output_type
-	6,  // [6:6] is the sub-list for method input_type
-	6,  // [6:6] is the sub-list for extension type_name
-	6,  // [6:6] is the sub-list for extension extendee
-	0,  // [0:6] is the sub-list for field type_name
+	3,  // 0: common.AppInfo.member:type_name -> common.AppMember
+	6,  // 1: common.AppConfigInfo.funnel:type_name -> common.Funnel
+	7,  // 2: common.AppConfigInfo.campaign:type_name -> common.Campaign
+	8,  // 3: common.AppConfigInfo.btn_time:type_name -> common.BtnTime
+	13, // 4: common.TokenClaims.permissions:type_name -> common.UserPermissions
+	14, // 5: common.UserPermissions.apps:type_name -> common.AppPermission
+	0,  // 6: common.AppPermission.role:type_name -> common.AppRole
+	7,  // [7:7] is the sub-list for method output_type
+	7,  // [7:7] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_common_common_proto_init() }
@@ -1060,7 +1131,7 @@ func file_common_common_proto_init() {
 			}
 		}
 		file_common_common_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*AppMetaInfo); i {
+			switch v := v.(*AppMember); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1072,7 +1143,7 @@ func file_common_common_proto_init() {
 			}
 		}
 		file_common_common_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*AppConfigInfo); i {
+			switch v := v.(*AppMetaInfo); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1084,7 +1155,7 @@ func file_common_common_proto_init() {
 			}
 		}
 		file_common_common_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Funnel); i {
+			switch v := v.(*AppConfigInfo); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1096,7 +1167,7 @@ func file_common_common_proto_init() {
 			}
 		}
 		file_common_common_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Campaign); i {
+			switch v := v.(*Funnel); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1108,7 +1179,7 @@ func file_common_common_proto_init() {
 			}
 		}
 		file_common_common_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*BtnTime); i {
+			switch v := v.(*Campaign); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1120,7 +1191,7 @@ func file_common_common_proto_init() {
 			}
 		}
 		file_common_common_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UserInfo); i {
+			switch v := v.(*BtnTime); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1132,7 +1203,7 @@ func file_common_common_proto_init() {
 			}
 		}
 		file_common_common_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UserMetaInfo); i {
+			switch v := v.(*UserInfo); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1144,7 +1215,7 @@ func file_common_common_proto_init() {
 			}
 		}
 		file_common_common_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*AppTokenInfo); i {
+			switch v := v.(*UserMetaInfo); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1156,7 +1227,7 @@ func file_common_common_proto_init() {
 			}
 		}
 		file_common_common_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*TokenClaims); i {
+			switch v := v.(*AppTokenInfo); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1168,7 +1239,7 @@ func file_common_common_proto_init() {
 			}
 		}
 		file_common_common_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UserPermissions); i {
+			switch v := v.(*TokenClaims); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1180,6 +1251,18 @@ func file_common_common_proto_init() {
 			}
 		}
 		file_common_common_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UserPermissions); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_common_common_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*AppPermission); i {
 			case 0:
 				return &v.state
@@ -1198,7 +1281,7 @@ func file_common_common_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_common_common_proto_rawDesc,
 			NumEnums:      1,
-			NumMessages:   13,
+			NumMessages:   14,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

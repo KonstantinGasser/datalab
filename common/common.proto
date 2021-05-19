@@ -17,7 +17,12 @@ message AppInfo {
     string URL = 3;
     string description = 4;
     string owner = 5;
-    repeated string member = 6;
+    repeated AppMember member = 6;
+}
+message AppMember {
+    string uuid = 1;
+    string role = 2;
+    int32 status = 3;
 }
 
 message AppMetaInfo {

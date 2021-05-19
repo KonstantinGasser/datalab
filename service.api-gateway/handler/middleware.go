@@ -64,12 +64,7 @@ func (handler *Handler) WithAppPermissions(next http.HandlerFunc) http.HandlerFu
 			Origin: payload.AppOrigin,
 			Hash:   hasher.Build(payload.AppName, payload.Orgn),
 		})
-		// map[string]string{
-		// 	"appOrigin": payload.AppOrigin,
-		// 	"appUuid":   payload.AppUuid,
-		// 	"appHash":   hasher.Build(payload.AppName, payload.Orgn),
-		// }
-		// )
+
 		// serve next request
 		next(w, r.WithContext(ctx))
 	}

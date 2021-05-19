@@ -22,6 +22,8 @@ func Run(ctx context.Context, hostAddr, userauthAddr string) error {
 	}
 
 	notifyHub := notifyhub.New()
+	defer notifyHub.Stop()
+
 	domain := domain.NewNotificationLogic(userauthClient, notifyHub)
 
 	notifySvc := handler.NewHandler(domain)

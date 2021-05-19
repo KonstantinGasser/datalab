@@ -20,7 +20,7 @@ type MessageEvent int
 type VueMutation string
 
 const (
-	healthTimeOut = 10 * time.Second
+	healthTimeOut = 20 * time.Second
 
 	EventAppInvite MessageEvent = iota
 

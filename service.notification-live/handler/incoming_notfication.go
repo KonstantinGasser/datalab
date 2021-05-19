@@ -8,7 +8,7 @@ import (
 )
 
 func (handler *Handler) HandleIncomingNofication(w http.ResponseWriter, r *http.Request) {
-
+	logrus.Infof("[handler.IncomingNofication] received require\n")
 	var notification struct {
 		ReceiverUuid string            `json:"receiver_uuid"`
 		ReceiverOrgn string            `json:"receiver_orgn"`
