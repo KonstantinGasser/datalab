@@ -15,7 +15,7 @@ POST http://localhost:8080/api/v1/user/login HTTP/1.1
 content-type: application/json
 
 {
-    "username": "dummy1",
+    "username": "dummy",
     "password": "hello"
 }
 
@@ -53,14 +53,14 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbeyJhcHBfdXVpZCI6
 }
 
 ###
-GET http://localhost:8080/api/v1/app/get?app=d64ffb7e-d384-4128-8b78-ce1d0a96935a HTTP/1.1
+GET http://localhost:8080/api/v1/app/get?app=923d323d-5f86-402e-921c-9c59a635bb2d HTTP/1.1
 content-type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbeyJhcHBfdXVpZCI6ImQ2NGZmYjdlLWQzODQtNDEyOC04Yjc4LWNlMWQwYTk2OTM1YSIsInJvbGUiOjB9XSwiZXhwIjoxNjIxNDYzNTU1LCJpYXQiOiJjb20uZGF0YWxhYi5zZXJ2aWNlLnVzZXItYXV0aGVudGljYXRpb24iLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiI3MGVkMTZmMi04YmYwLTQ3ZjctYmU0Mi02Y2YwMTIwMjE5MmUifQ.Cia4cN92Eo5iIbOkxjCLwaKeh2FnoNcF6B-qtFLAfjw
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbeyJhcHBfdXVpZCI6ImQ2NGZmYjdlLWQzODQtNDEyOC04Yjc4LWNlMWQwYTk2OTM1YSIsInJvbGUiOjB9LHsiYXBwX3V1aWQiOiJjYTIzYzg0Yy1jOTI4LTQ4ZjMtOTU3NS0wOGY1MzBlNWJiOTEiLCJyb2xlIjowfSx7ImFwcF91dWlkIjoiNTU1MjUyMDItMDBmMS00MGI1LWJhMzQtMDNlMWI5MTI3NWM2Iiwicm9sZSI6MH0seyJhcHBfdXVpZCI6IjkyM2QzMjNkLTVmODYtNDAyZS05MjFjLTljNTlhNjM1YmIyZCIsInJvbGUiOjB9XSwiZXhwIjoxNjIxNTMxMzIzLCJpYXQiOiJjb20uZGF0YWxhYi5zZXJ2aWNlLnVzZXItYXV0aGVudGljYXRpb24iLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiI3MGVkMTZmMi04YmYwLTQ3ZjctYmU0Mi02Y2YwMTIwMjE5MmUifQ.81k5-6Vqhxv5h4fleX9DbEXHlu721a2s4aL96Vz40Cg
 
 ###
 GET http://localhost:8080/api/v1/app/getall HTTP/1.1
 content-type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbeyJhcHBfdXVpZCI6ImQ2NGZmYjdlLWQzODQtNDEyOC04Yjc4LWNlMWQwYTk2OTM1YSIsInJvbGUiOjB9XSwiZXhwIjoxNjIxNDYzNTU1LCJpYXQiOiJjb20uZGF0YWxhYi5zZXJ2aWNlLnVzZXItYXV0aGVudGljYXRpb24iLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiI3MGVkMTZmMi04YmYwLTQ3ZjctYmU0Mi02Y2YwMTIwMjE5MmUifQ.Cia4cN92Eo5iIbOkxjCLwaKeh2FnoNcF6B-qtFLAfjw
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbeyJhcHBfdXVpZCI6ImQ2NGZmYjdlLWQzODQtNDEyOC04Yjc4LWNlMWQwYTk2OTM1YSIsInJvbGUiOjB9LHsiYXBwX3V1aWQiOiJjYTIzYzg0Yy1jOTI4LTQ4ZjMtOTU3NS0wOGY1MzBlNWJiOTEiLCJyb2xlIjowfSx7ImFwcF91dWlkIjoiNTU1MjUyMDItMDBmMS00MGI1LWJhMzQtMDNlMWI5MTI3NWM2Iiwicm9sZSI6MH0seyJhcHBfdXVpZCI6IjkyM2QzMjNkLTVmODYtNDAyZS05MjFjLTljNTlhNjM1YmIyZCIsInJvbGUiOjB9XSwiZXhwIjoxNjIxNTMxMzIzLCJpYXQiOiJjb20uZGF0YWxhYi5zZXJ2aWNlLnVzZXItYXV0aGVudGljYXRpb24iLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiI3MGVkMTZmMi04YmYwLTQ3ZjctYmU0Mi02Y2YwMTIwMjE5MmUifQ.81k5-6Vqhxv5h4fleX9DbEXHlu721a2s4aL96Vz40Cg
 
 ###
 POST http://localhost:8080/api/v1/app/token/create HTTP/1.1
@@ -77,10 +77,10 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbeyJhcHBfdXVpZCI6
 ###
 POST http://localhost:8080/api/v1/app/config/upsert?flag=funnel HTTP/1.1
 content-type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbeyJhcHBfdXVpZCI6ImQ2NGZmYjdlLWQzODQtNDEyOC04Yjc4LWNlMWQwYTk2OTM1YSIsInJvbGUiOjB9XSwiZXhwIjoxNjIxNDYzNTU1LCJpYXQiOiJjb20uZGF0YWxhYi5zZXJ2aWNlLnVzZXItYXV0aGVudGljYXRpb24iLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiI3MGVkMTZmMi04YmYwLTQ3ZjctYmU0Mi02Y2YwMTIwMjE5MmUifQ.Cia4cN92Eo5iIbOkxjCLwaKeh2FnoNcF6B-qtFLAfjw
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbeyJhcHBfdXVpZCI6ImQ2NGZmYjdlLWQzODQtNDEyOC04Yjc4LWNlMWQwYTk2OTM1YSIsInJvbGUiOjB9LHsiYXBwX3V1aWQiOiJjYTIzYzg0Yy1jOTI4LTQ4ZjMtOTU3NS0wOGY1MzBlNWJiOTEiLCJyb2xlIjowfSx7ImFwcF91dWlkIjoiNTU1MjUyMDItMDBmMS00MGI1LWJhMzQtMDNlMWI5MTI3NWM2Iiwicm9sZSI6MH0seyJhcHBfdXVpZCI6IjkyM2QzMjNkLTVmODYtNDAyZS05MjFjLTljNTlhNjM1YmIyZCIsInJvbGUiOjB9XSwiZXhwIjoxNjIxNTMxMzIzLCJpYXQiOiJjb20uZGF0YWxhYi5zZXJ2aWNlLnVzZXItYXV0aGVudGljYXRpb24iLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiI3MGVkMTZmMi04YmYwLTQ3ZjctYmU0Mi02Y2YwMTIwMjE5MmUifQ.81k5-6Vqhxv5h4fleX9DbEXHlu721a2s4aL96Vz40Cg
 
 {
-    "app_uuid": "cbd84e62-cb3d-4217-a367-0e343cbb5bc0",
+    "app_uuid": "923d323d-5f86-402e-921c-9c59a635bb2d",
     "stages": [
         {
             "id": 1,
@@ -246,4 +246,12 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbXSwiZXhwIjoxNjIx
             "btn_name": "btn_order"
         }
     ]
+}
+###
+POST http://localhost:8080/api/v1/app/member/invite/accept HTTP/1.1
+content-type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBzIjpbXSwiZXhwIjoxNjIxNTMwNDQ1LCJpYXQiOiJjb20uZGF0YWxhYi5zZXJ2aWNlLnVzZXItYXV0aGVudGljYXRpb24iLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiJjNzI4ZGVhNy01M2NhLTQ3MGUtODUzZC00YTUxNzE5NzBiMDQifQ.4gJq4u5k9k-hTCRJWLPsI9FMwMBE6WObyNJMQR8e-bE
+
+{
+    "app_uuid": "923d323d-5f86-402e-921c-9c59a635bb2d"
 }

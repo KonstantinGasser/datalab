@@ -87,12 +87,14 @@
         async created() {
             // fetch initial data of app list
             const init_data = await this.getAppList();
-            if (init_data.apps === undefined || init_data.apps === null || init_data.apps.length <= 0) {
+            console.log(init_data)
+            if (init_data.data.apps === undefined || init_data.data.apps === null || init_data.data.apps.length <= 0 || init_data.status != 200) {
+
                 this.apps = [];
                 this.isInCreateMode = true;
             }
             else {
-                this.apps = init_data.apps.reverse();
+                this.apps = init_data.data.apps.reverse();
                 const init_app = await this.getApp(this.apps[0].uuid);
                 this.activeApp = init_app;
                 this.selectedApp = this.activeApp?.app?.uuid;
@@ -103,6 +105,7 @@
         props: ['status'],
         methods: {
             async loadApp(uuid) {
+                this.isInCreateMode = false;
                 const data = await this.getApp(uuid);
                 if (data.app === undefined || data.app == null) {
                     return
@@ -121,7 +124,7 @@
                 if (resp.status != 200) {
                     this.$toast.error(resp.data);
                 }
-                return resp.data
+                return resp
             },
             async getApp(uuid) {
                 let options = {
@@ -129,18 +132,25 @@
                         'Authorization': localStorage.getItem("token"),
                     }
                 };
-                const resp = await axios.get("http://localhost:8080/api/v1/app/get?app="+uuid, options)
-                if (resp.status != 200) {
-                    this.$toast.error(resp.data);
+                let resp = {}
+                try {
+                    resp = await axios.get("http://localhost:8080/api/v1/app/get?app="+uuid, options)
+                    if (resp.status != 200) {
+                        this.$toast.error(resp.data);
+                    }
+                    return resp.data
+                }catch(err) {
+                    this.isInCreateMode = true
+                    return null;
                 }
-                return resp.data
+                
             },
             tabChange(tab) {
                 this.activeTab = tab;
             },
             async updateState(event) {
                 const init_data = await this.getAppList();
-                this.apps = init_data.apps;
+                this.apps = init_data.data.apps;
                 const init_app = await this.getApp(event.app_uuid);
                 this.activeApp = init_app;
                 this.activeTab = "Overview";

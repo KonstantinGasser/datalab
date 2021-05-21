@@ -62,7 +62,7 @@ func (svc userauthlogic) RegisterNewUser(ctx context.Context, in *proto.Register
 
 // LoginUser coordinates the use-case of login in a user
 func (svc userauthlogic) LoginUser(ctx context.Context, in *proto.LoginRequest) (string, errors.ErrApi) {
-	token, err := login.User(ctx, svc.repo, in)
+	accessToken, err := login.User(ctx, svc.repo, in)
 	if err != nil {
 		if err == login.ErrUserNotFound {
 			return "", errors.ErrAPI{
@@ -79,12 +79,12 @@ func (svc userauthlogic) LoginUser(ctx context.Context, in *proto.LoginRequest) 
 			}
 		}
 	}
-	return token, nil
+	return accessToken, nil
 }
 
 // IsAuthenticated handles logic concerning the authentication of a user
 func (svc userauthlogic) IsAuthenticated(ctx context.Context, in *proto.IsAuthedRequest) (*common.UserTokenClaims, errors.ErrApi) {
-	claims, err := login.IsLoggedIn(ctx, in.GetJwt())
+	claims, err := login.IsLoggedIn(ctx, in.GetAccessToken())
 	if err != nil {
 		if err == login.ErrCorruptedToken || err == login.ErrInvalidToken {
 			return nil, errors.ErrAPI{
@@ -99,6 +99,15 @@ func (svc userauthlogic) IsAuthenticated(ctx context.Context, in *proto.IsAuthed
 			Err:    err,
 		}
 	}
+	permissions, err := permissions.GetAppAccess(ctx, svc.repo, claims.Uuid)
+	if err != nil {
+		return nil, errors.ErrAPI{
+			Status: http.StatusInternalServerError,
+			Msg:    "Could not verify if user is authenticated",
+			Err:    err,
+		}
+	}
+	claims.Permissions = &common.UserPermissions{Apps: permissions}
 	return claims, nil
 }
 

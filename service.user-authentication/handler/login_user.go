@@ -14,18 +14,18 @@ func (handler Handler) Login(ctx context.Context, in *proto.LoginRequest) (*prot
 	ctx = ctx_value.AddValue(ctx, "tracingID", in.GetTracing_ID())
 	logrus.Infof("<%v>[service.user-authentication.Login] received request\n", ctx_value.GetString(ctx, "tracingID"))
 
-	token, err := handler.domain.LoginUser(ctx, in)
+	accessToken, err := handler.domain.LoginUser(ctx, in)
 	if err != nil {
 		logrus.Errorf("<%v>[service.user-authentication.Login] could not authenticate user: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
 		return &proto.LoginResponse{
-			StatusCode: err.Code(),
-			Msg:        err.Info(),
-			Jwt:        "",
+			StatusCode:  err.Code(),
+			Msg:         err.Info(),
+			AccessToken: "",
 		}, nil
 	}
 	return &proto.LoginResponse{
-		StatusCode: http.StatusOK,
-		Msg:        "User authenticated",
-		Jwt:        token,
+		StatusCode:  http.StatusOK,
+		Msg:         "User authenticated",
+		AccessToken: accessToken,
 	}, nil
 }

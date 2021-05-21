@@ -18,6 +18,9 @@ export default createStore({
       console.log("State: ", state.notifications);
       state.notifications.push(event);
     },
+    POP_NOTIFICATION(state, event) {
+      state.notifications = state.notifications.filter(item => item === event)
+    },
     // Connection open
     SOCKET_ONOPEN (state, event) {
       Vue.prototype.$socket = event.currentTarget

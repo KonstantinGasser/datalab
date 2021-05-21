@@ -47,7 +47,18 @@ func (svc appconfig) GetConfigs(ctx context.Context, in *proto.GetRequest) (*com
 
 	permissionErr := permissions.CanAccess(ctx, svc.repo, in.GetUserClaims(), in.GetAppUuid())
 	if permissionErr != nil {
-		return nil, permissionErr
+		if permissionErr == permissions.ErrNotAuthorized {
+			return nil, errors.ErrAPI{
+				Status: http.StatusUnauthorized,
+				Msg:    "User is not authorized to access resource",
+				Err:    permissionErr,
+			}
+		}
+		return nil, errors.ErrAPI{
+			Status: http.StatusInternalServerError,
+			Msg:    "Could not get Apps",
+			Err:    permissionErr,
+		}
 	}
 	cfgs, err := get.Configs(ctx, svc.repo, in)
 	if err != nil {
@@ -70,7 +81,18 @@ func (svc appconfig) GetConfigs(ctx context.Context, in *proto.GetRequest) (*com
 func (svc appconfig) UpdateConfig(ctx context.Context, in *proto.UpdateRequest) errors.ErrApi {
 	permissionErr := permissions.CanAccess(ctx, svc.repo, in.GetUserClaims(), in.GetAppUuid())
 	if permissionErr != nil {
-		return permissionErr
+		if permissionErr == permissions.ErrNotAuthorized {
+			return errors.ErrAPI{
+				Status: http.StatusUnauthorized,
+				Msg:    "User is not authorized to access resource",
+				Err:    permissionErr,
+			}
+		}
+		return errors.ErrAPI{
+			Status: http.StatusInternalServerError,
+			Msg:    "Could not get Apps",
+			Err:    permissionErr,
+		}
 	}
 
 	// translate from protobuf to mongo document struct

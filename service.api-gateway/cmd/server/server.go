@@ -107,12 +107,6 @@ func Run(ctx context.Context, hostAddr, userAddr, appAddr, apptokenAddr, tokenAd
 		gatewaysvc.WithAuth,
 	)
 
-	// gatewaysvc.Register("api/v1/app/create", nil)
-	// gatewaysvc.Register("api/v1/app/delete", nil)
-
-	// gatewaysvc.Register("api/v1/app/token/generate", nil)
-	// gatewaysvc.Register("api/v1/app/config/update", nil)
-
 	// waiting for context to be canceled
 	// not implemented: graceful shutdown
 	go func() {

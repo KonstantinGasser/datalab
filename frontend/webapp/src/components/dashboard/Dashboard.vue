@@ -37,6 +37,10 @@ export default {
     DocClient,
     SideMenu,
   },
+  created() {
+    const url = "ws://localhost:8008/api/v1/datalab/live?token="+ localStorage.getItem("token");
+    this.$connect(url);
+  },
   methods: {
     showView(view) {
       // logout user

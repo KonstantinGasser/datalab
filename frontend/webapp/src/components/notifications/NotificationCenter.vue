@@ -6,6 +6,7 @@
             {{notifications}} -->
             <div class="notify-table">
                 <div v-for="item in notifications" :key="item" class="notify-row">
+                    {{item}}
                     <div v-if="item.value?.event === 0">
                         <div class="emoji-line d-flex justify-start"><strong>You got an App Invite</strong>&nbsp;- go check it out 🚀</div>
                         <div  class="notify-title">
@@ -16,11 +17,11 @@
                     </div>
                     <div class="actions">
                         <div class="py-1">
-                            <button class="btn accept" @click="acceptInvite(item.app_uuid)">Accept</button>
+                            <button class="btn accept" @click="acceptInvite(item, item.value?.app_uuid)">Accept</button>
                         </div>
 
                         <div class="py-1">
-                            <button class="btn reject" @click="rejectInvite(item.app_uuid)">Reject</button>
+                            <button class="btn reject" @click="rejectInvite(item, item.value?.app_uuid)">Reject</button>
                         </div>
                     </div>
                 </div>
@@ -30,11 +31,13 @@
 </template>
 
 <script>
+import axios from "axios";
 
 export default {
   name: 'NotificationCenter',
   data() {
     return {
+        notifies: [],
     };
   },
   components: {
@@ -45,11 +48,31 @@ export default {
       },
   },
   methods: {
-      acceptInvite(app_uuid) {
-
+      async acceptInvite(item, app_uuid) {
+          console.log(item)
+          console.log(app_uuid)
+          let options = {
+                headers: {
+                    'Authorization': localStorage.getItem("token"),
+                }
+            };
+            const payload = {
+                app_uuid: app_uuid,
+            }
+            const resp = await axios.post("http://localhost:8080/api/v1/app/member/invite/accept", payload, options);
+            if (resp.status != 200) {
+                this.$toast.error("Could not send invite feedback");
+                return
+            }
+        //     localStorage.setItem("token", resp.data.token)
+            this.$toast.success("Cool! You can now see the App")
+            this.popNotification(item)
       },
       rejectInvite(app_uuid) {
       },
+      popNotification(item) {
+          this.$store.commit("POP_NOTIFICATION", item)
+      }
   },
 };
 </script>
@@ -69,7 +92,7 @@ export default {
 }
 
 .notify-row {
-    width: max-content;
+    width: 100%;
     height: max-content;
     max-width: 100%;
     overflow-wrap: break-word;

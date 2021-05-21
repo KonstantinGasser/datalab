@@ -45,5 +45,5 @@ func (svc gatewaylogic) LoginUser(ctx context.Context, form LoginForm) (string, 
 			Err:    fmt.Errorf("could not login user"),
 		}
 	}
-	return loginResp.GetJwt(), nil
+	return loginResp.GetAccessToken(), nil
 }

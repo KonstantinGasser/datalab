@@ -118,8 +118,20 @@ func (svc appadmin) Create(ctx context.Context, in *proto.CreateRequest) (string
 
 // Delete removes an existing App-Record from the database
 func (svc appadmin) Delete(ctx context.Context, in *proto.DeleteRequest) errors.ErrApi {
-	if err := permissions.IsOwner(ctx, svc.repo, in.GetUserClaims().GetUuid(), in.GetAppUuid()); err != nil {
-		return err
+	permissionErr := permissions.IsOwner(ctx, svc.repo, in.GetUserClaims().GetUuid(), in.GetAppUuid())
+	if permissionErr != nil {
+		if permissionErr == permissions.ErrNotAuthorized {
+			return errors.ErrAPI{
+				Status: http.StatusUnauthorized,
+				Msg:    "User is not authorized to access resource",
+				Err:    permissionErr,
+			}
+		}
+		return errors.ErrAPI{
+			Status: http.StatusInternalServerError,
+			Msg:    "Could not get Apps",
+			Err:    permissionErr,
+		}
 	}
 	_, err := delete.App(ctx, svc.repo, in)
 	if err != nil {
@@ -137,7 +149,18 @@ func (svc appadmin) Delete(ctx context.Context, in *proto.DeleteRequest) errors.
 // GetSingle fetches all data belonging to the app data
 func (svc appadmin) GetSingle(ctx context.Context, in *proto.GetRequest) (*common.AppInfo, errors.ErrApi) {
 	if permissionErr := permissions.IsOwnerOrMember(ctx, svc.repo, in.GetUserClaims(), in.GetAppUuid()); permissionErr != nil {
-		return nil, permissionErr
+		if permissionErr == permissions.ErrNotAuthorized {
+			return nil, errors.ErrAPI{
+				Status: http.StatusUnauthorized,
+				Msg:    "User is not authorized to access resource",
+				Err:    permissionErr,
+			}
+		}
+		return nil, errors.ErrAPI{
+			Status: http.StatusInternalServerError,
+			Msg:    "Could not get Apps",
+			Err:    permissionErr,
+		}
 	}
 	app, err := get.Single(ctx, svc.repo, in.GetAppUuid())
 	if err != nil {
@@ -162,7 +185,18 @@ func (svc appadmin) GetSingle(ctx context.Context, in *proto.GetRequest) (*commo
 func (svc appadmin) GetMultiple(ctx context.Context, in *proto.GetListRequest) ([]*common.AppMetaInfo, errors.ErrApi) {
 	appUuids, permissionErr := permissions.CanAccess(ctx, svc.repo, in.GetUserClaims())
 	if permissionErr != nil {
-		return nil, permissionErr
+		if permissionErr == permissions.ErrNotAuthorized {
+			return nil, errors.ErrAPI{
+				Status: http.StatusUnauthorized,
+				Msg:    "User is not authorized to access resource",
+				Err:    permissionErr,
+			}
+		}
+		return nil, errors.ErrAPI{
+			Status: http.StatusInternalServerError,
+			Msg:    "Could not get Apps",
+			Err:    permissionErr,
+		}
 	}
 
 	apps, err := get.Multiple(ctx, svc.repo, appUuids...)
@@ -204,7 +238,18 @@ func (svc appadmin) MayAcquireToken(ctx context.Context, in *proto.MayAcquireTok
 func (svc appadmin) InviteToApp(ctx context.Context, in *proto.InviteRequest) (string, string, errors.ErrApi) {
 	permissionErr := permissions.IsOwner(ctx, svc.repo, in.GetUserClaims().GetUuid(), in.GetAppUuid())
 	if permissionErr != nil {
-		return "", "", permissionErr
+		if permissionErr == permissions.ErrNotAuthorized {
+			return "", "", errors.ErrAPI{
+				Status: http.StatusUnauthorized,
+				Msg:    "User is not authorized to access resource",
+				Err:    permissionErr,
+			}
+		}
+		return "", "", errors.ErrAPI{
+			Status: http.StatusInternalServerError,
+			Msg:    "Could not get Apps",
+			Err:    permissionErr,
+		}
 	}
 	err := invite.ToApp(ctx, svc.repo, in.GetUserUuid(), in.GetUserClaims().GetUuid(), in.GetAppUuid())
 	if err != nil {
@@ -235,7 +280,18 @@ func (svc appadmin) InviteToApp(ctx context.Context, in *proto.InviteRequest) (s
 func (svc appadmin) AcceptInvite(ctx context.Context, in *proto.AcceptInviteRequest) errors.ErrApi {
 	permissionErr := permissions.HasInvite(ctx, svc.repo, in.GetUserClaims(), in.GetAppUuid())
 	if permissionErr != nil {
-		return permissionErr
+		if permissionErr == permissions.ErrNotAuthorized {
+			return errors.ErrAPI{
+				Status: http.StatusUnauthorized,
+				Msg:    "User is not authorized to access resource",
+				Err:    permissionErr,
+			}
+		}
+		return errors.ErrAPI{
+			Status: http.StatusInternalServerError,
+			Msg:    "Could not get Apps",
+			Err:    permissionErr,
+		}
 	}
 
 	err := invite.Accept(ctx, svc.repo, in.GetAppUuid(), in.GetUserClaims().GetUuid())

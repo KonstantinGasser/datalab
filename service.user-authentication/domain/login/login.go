@@ -44,9 +44,9 @@ func User(ctx context.Context, repo repo.Repo, in *proto.LoginRequest) (string, 
 		return "", err
 	}
 
-	token, err := jwts.Issue(foundUser.Uuid, foundUser.Organization, foundPermissions.Apps)
+	accessToken, err := jwts.Issue(foundUser.Uuid, foundUser.Organization, foundPermissions.Apps)
 	if err != nil {
 		return "", err
 	}
-	return token, nil
+	return accessToken, nil
 }

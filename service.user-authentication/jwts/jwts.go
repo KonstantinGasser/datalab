@@ -32,12 +32,13 @@ func Issue(uuid, organization string, permissions []types.AppPermission) (string
 		"apps": permissions,
 	}
 
-	_token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	token, err := _token.SignedString([]byte(secretUser))
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	accessToken, err := token.SignedString([]byte(secretUser))
 	if err != nil {
 		return "", fmt.Errorf("[jwts.IssueUser] could not sign token: %v", err)
 	}
-	return token, nil
+
+	return accessToken, nil
 }
 
 func GetJWTClaims(tokenString string) (map[string]interface{}, error) {

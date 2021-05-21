@@ -32,23 +32,10 @@ func IsLoggedIn(ctx context.Context, token string) (*common.UserTokenClaims, err
 	if !ok {
 		return nil, ErrCorruptedToken
 	}
-	permissions := rawClaims["apps"].([]interface{})
-	if !ok {
-		return nil, ErrCorruptedToken
-	}
-	var appPermissions = make([]*common.AppPermission, len(permissions))
-	if len(permissions) != 0 {
-		for i, item := range permissions {
-			tmp := item.(map[string]interface{})
-			appPermissions[i] = &common.AppPermission{
-				AppUuid: tmp["app_uuid"].(string),
-				Role:    common.AppRole(tmp["role"].(float64)),
-			}
-		}
-	}
+
 	return &common.UserTokenClaims{
 		Uuid:         uuid,
 		Organization: organization,
-		Permissions:  &common.UserPermissions{Apps: appPermissions},
+		Permissions:  nil,
 	}, nil
 }

@@ -32,12 +32,12 @@ message LoginRequest {
 message LoginResponse {
     int32 status_code = 1;
     string msg = 2;
-    string jwt = 3;
+    string access_token = 3;
 }
 
 message IsAuthedRequest {
     string tracing_ID = 1;
-    string jwt = 2;
+    string access_token = 2;
 }
 message IsAuthedResponse {
     int32 status_code = 1;

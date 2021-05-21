@@ -29,9 +29,14 @@ createApp(App)
     .use(router)
     .use(Toaster)
     .use(VueMarkdownIt)
-    .use(VueNativeSock, "ws://localhost:8008/api/v1/datalab/live?token="+ localStorage.getItem("token"), {
+    .use(VueNativeSock, "ws://localhost:8008/api/v1/datalab/live?token=", {
         store: store,
         format: "json",
-        mutations: mutations
+        mutations: mutations,
+        // reconnection: true,
+        // reconnectionAttempts: 5,
+        // reconnectionDelay: 3000,
+        connectManually: true,
+
     })
     .mount('#app');

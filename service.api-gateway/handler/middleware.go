@@ -21,7 +21,6 @@ func (handler *Handler) WithAuth(next http.HandlerFunc) http.HandlerFunc {
 		}
 		// invoke grpc call to token-service to validate a JWT
 		claims, err := handler.domain.IsLoggedIn(r.Context(), token)
-		fmt.Printf("caims: %v\n", claims)
 		if err != nil {
 			logrus.Errorf("<%v>[handler.WithAuth] could not authenticate user: %v", ctx_value.GetString(r.Context(), "tracingID"), err)
 			handler.onError(w, err.Info(), int(err.Code()))
