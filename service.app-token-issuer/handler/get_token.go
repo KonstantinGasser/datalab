@@ -15,6 +15,7 @@ func (handler Handler) Get(ctx context.Context, in *proto.GetRequest) (*proto.Ge
 
 	token, err := handler.domain.GetToken(ctx, in)
 	if err != nil {
+		logrus.Errorf("<%v>[service.app-token-issuer.Get] could not get app token: %v\n", ctx_value.GetString(ctx, "tracingID"), err.Error())
 		return &proto.GetResponse{
 			StatusCode: err.Code(),
 			Msg:        err.Info(),

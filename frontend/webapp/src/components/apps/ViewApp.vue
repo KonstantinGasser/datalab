@@ -25,7 +25,7 @@
                         <div>Unsaved Changes</div>
                     </div>
                 </h1>
-                <div class="desc_test">{{activeApp.description}}</div>
+                <div class="desc_test">{{activeApp.app?.description}}</div>
                 <hr>
                 <Tabs class="my-2" ref="Tabs" :update="activeTab" :initTab="activeTab" :tabs="tabs" @tabChange="tabChange"/>
                 <General v-if="activeTab === 'Overview'" :app="activeApp" @drop_app="drop_app" :token_placeholder="token_placeholder"/>
@@ -120,7 +120,7 @@
                         'Authorization': localStorage.getItem("token"),
                     }
                 };
-                const resp = await axios.get("http://localhost:8080/api/v1/app/getall", options)
+                const resp = await axios.get("http://192.168.0.177:8080/api/v1/app/getall", options)
                 if (resp.status != 200) {
                     this.$toast.error(resp.data);
                 }
@@ -134,7 +134,7 @@
                 };
                 let resp = {}
                 try {
-                    resp = await axios.get("http://localhost:8080/api/v1/app/get?app="+uuid, options)
+                    resp = await axios.get("http://192.168.0.177:8080/api/v1/app/get?app="+uuid, options)
                     if (resp.status != 200) {
                         this.$toast.error(resp.data);
                     }
@@ -172,7 +172,7 @@
                     }
                 };
 
-                const res = await axios.get("http://localhost:8080/api/v2/view/app/details", options)
+                const res = await axios.get("http://192.168.0.177:8080/api/v2/view/app/details", options)
                 if (res.data == null || res.status >= 400) {
                     this.isInCreateMode = true;
                     console.log(this.isInCreateMode);
@@ -188,7 +188,7 @@
                         'Authorization': localStorage.getItem("token"),
                     }
                 };
-                axios.get("http://localhost:8080/api/v2/view/app/get?uuid="+uuid, options).then(resp => {
+                axios.get("http://192.168.0.177:8080/api/v2/view/app/get?uuid="+uuid, options).then(resp => {
                     if (this.isInCreateMode)
                         this.isInCreateMode = !this.isInCreateMode;
                     this.activeApp = resp.data.app;

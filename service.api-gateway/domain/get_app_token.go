@@ -15,6 +15,7 @@ func (svc gatewaylogic) GetAppToken(ctx context.Context, uuid string) (*common.A
 
 	resp, err := svc.apptokenClient.Get(ctx, &apptokissuer.GetRequest{
 		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
+		UserClaims: ctx_value.GetAuthedUser(ctx),
 		AppUuid:    uuid,
 	})
 	if err != nil {

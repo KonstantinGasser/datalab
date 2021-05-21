@@ -9,6 +9,7 @@ import (
 	"github.com/KonstantinGasser/datalab/service.app-administer/domain/create"
 	"github.com/KonstantinGasser/datalab/service.app-administer/domain/delete"
 	"github.com/KonstantinGasser/datalab/service.app-administer/domain/get"
+	"github.com/KonstantinGasser/datalab/service.app-administer/domain/hasher"
 	"github.com/KonstantinGasser/datalab/service.app-administer/domain/invite"
 	"github.com/KonstantinGasser/datalab/service.app-administer/domain/permissions"
 	"github.com/KonstantinGasser/datalab/service.app-administer/domain/token"
@@ -16,6 +17,7 @@ import (
 	"github.com/KonstantinGasser/datalab/service.app-administer/proto"
 	"github.com/KonstantinGasser/datalab/service.app-administer/repo"
 	cfgsvc "github.com/KonstantinGasser/datalab/service.app-configuration/proto"
+	aptissuer "github.com/KonstantinGasser/datalab/service.app-token-issuer/proto"
 	usersvc "github.com/KonstantinGasser/datalab/service.user-administer/proto"
 	userauthsvc "github.com/KonstantinGasser/datalab/service.user-authentication/proto"
 )
@@ -35,17 +37,19 @@ type appadmin struct {
 	userSvc     usersvc.UserAdministerClient
 	configSvc   cfgsvc.AppConfigurationClient
 	userauthSvc userauthsvc.UserAuthenticationClient
+	apptokenSvc aptissuer.AppTokenIssuerClient
 	repo        repo.Repo
 }
 
 func NewAppLogic(repo repo.Repo,
 	user usersvc.UserAdministerClient, config cfgsvc.AppConfigurationClient,
-	userauth userauthsvc.UserAuthenticationClient) AppAdmin {
+	userauth userauthsvc.UserAuthenticationClient, apptokenSvc aptissuer.AppTokenIssuerClient) AppAdmin {
 	return &appadmin{
 		repo:        repo,
 		userSvc:     user,
 		configSvc:   config,
 		userauthSvc: userauth,
+		apptokenSvc: apptokenSvc,
 	}
 }
 
@@ -98,6 +102,29 @@ func (svc appadmin) Create(ctx context.Context, in *proto.CreateRequest) (string
 		AppRole:    common.AppRole_OWNER,
 	})
 	if err != nil || respPermissions.GetStatusCode() != http.StatusOK {
+		// if the init of the app-config service fails the created app must be deleted
+		// to avoid an inconsistent state of the system
+		if err := create.CompensateApp(ctx, svc.repo, appUuid); err != nil {
+			return "", errors.ErrAPI{
+				Status: http.StatusInternalServerError,
+				Msg:    "Could not rollback creation of App",
+				Err:    err,
+			}
+		}
+		return "", errors.ErrAPI{
+			Status: http.StatusInternalServerError,
+			Msg:    "Could not create new App",
+			Err:    fmt.Errorf("could not compensate created app and role back: %v", err),
+		}
+	}
+	// this will go to kafka at some point in time
+	respApptoken, err := svc.apptokenSvc.Init(ctx, &aptissuer.InitRequest{
+		Tracing_ID: in.GetTracing_ID(),
+		AppUuid:    appUuid,
+		AppOwner:   in.GetOwnerUuid(),
+		AppHash:    hasher.Build(in.GetName(), in.GetOrganization()),
+	})
+	if err != nil || respApptoken.GetStatusCode() != http.StatusOK {
 		// if the init of the app-config service fails the created app must be deleted
 		// to avoid an inconsistent state of the system
 		if err := create.CompensateApp(ctx, svc.repo, appUuid); err != nil {

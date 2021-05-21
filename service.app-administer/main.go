@@ -17,6 +17,7 @@ func main() {
 	userAddr := flag.String("user-srv", "localhost:8001", "address to connect to user-service")
 	configAddr := flag.String("config-srv", "localhost:8005", "address to connect to app-config-service")
 	userauthAddr := flag.String("permissions-srv", "localhost:8002", "address to connect to user-authentication-service")
+	apptokenAddr := flag.String("apptoken-srv", "localhost:8006", "address to connect to user-authentication-service")
 	dbAddr := flag.String("db-srv", "mongodb://appadminstorage:secure@192.168.0.177:27018", "address to connect to app-database")
 
 	flag.Parse()
@@ -32,5 +33,5 @@ func main() {
 		time.Sleep(time.Second * 1)
 		os.Exit(0)
 	}()
-	logrus.Fatal(server.Run(ctx, *host, *userAddr, *configAddr, *userauthAddr, *dbAddr))
+	logrus.Fatal(server.Run(ctx, *host, *userAddr, *configAddr, *userauthAddr, *apptokenAddr, *dbAddr))
 }

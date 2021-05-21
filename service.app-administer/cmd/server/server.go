@@ -16,27 +16,20 @@ import (
 
 // Run is a run abstraction for the main function allowing
 // to return an error
-func Run(ctx context.Context, host, userAddr, configAddr, authAddr, dbAddr string) error {
+func Run(ctx context.Context, host, userAddr, configAddr, authAddr, apptokenAddr, dbAddr string) error {
 	srv := grpc.NewServer()
 	// create app-service
 	// create app dependencies
+	var err error
 	repo, err := repo.NewMongoDB(dbAddr)
-	if err != nil {
-		return err
-	}
 	userClient, err := grpc_adapter.NewUserAdministerClient(userAddr)
-	if err != nil {
-		return err
-	}
 	configClient, err := grpc_adapter.NewAppConfigClient(configAddr)
-	if err != nil {
-		return err
-	}
 	userauthClient, err := grpc_adapter.NewUserAuthClient(authAddr)
+	apptokenClient, err := grpc_adapter.NewAppTokenIssuerClient(apptokenAddr)
 	if err != nil {
 		return err
 	}
-	appLogic := domain.NewAppLogic(repo, userClient, configClient, userauthClient)
+	appLogic := domain.NewAppLogic(repo, userClient, configClient, userauthClient, apptokenClient)
 	appadminSvc := handler.NewHandler(appLogic)
 	proto.RegisterAppAdministerServer(srv, appadminSvc)
 

@@ -18,6 +18,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AppTokenIssuerClient interface {
+	Init(ctx context.Context, in *InitRequest, opts ...grpc.CallOption) (*InitResponse, error)
 	Issue(ctx context.Context, in *IssueRequest, opts ...grpc.CallOption) (*IssueResponse, error)
 	Validate(ctx context.Context, in *ValidateRequest, opts ...grpc.CallOption) (*ValidateResponse, error)
 	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
@@ -30,6 +31,15 @@ type appTokenIssuerClient struct {
 
 func NewAppTokenIssuerClient(cc grpc.ClientConnInterface) AppTokenIssuerClient {
 	return &appTokenIssuerClient{cc}
+}
+
+func (c *appTokenIssuerClient) Init(ctx context.Context, in *InitRequest, opts ...grpc.CallOption) (*InitResponse, error) {
+	out := new(InitResponse)
+	err := c.cc.Invoke(ctx, "/issuer_proto.AppTokenIssuer/Init", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *appTokenIssuerClient) Issue(ctx context.Context, in *IssueRequest, opts ...grpc.CallOption) (*IssueResponse, error) {
@@ -72,6 +82,7 @@ func (c *appTokenIssuerClient) MarkDirty(ctx context.Context, in *MarkDirtyReque
 // All implementations must embed UnimplementedAppTokenIssuerServer
 // for forward compatibility
 type AppTokenIssuerServer interface {
+	Init(context.Context, *InitRequest) (*InitResponse, error)
 	Issue(context.Context, *IssueRequest) (*IssueResponse, error)
 	Validate(context.Context, *ValidateRequest) (*ValidateResponse, error)
 	Get(context.Context, *GetRequest) (*GetResponse, error)
@@ -83,6 +94,9 @@ type AppTokenIssuerServer interface {
 type UnimplementedAppTokenIssuerServer struct {
 }
 
+func (UnimplementedAppTokenIssuerServer) Init(context.Context, *InitRequest) (*InitResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Init not implemented")
+}
 func (UnimplementedAppTokenIssuerServer) Issue(context.Context, *IssueRequest) (*IssueResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Issue not implemented")
 }
@@ -106,6 +120,24 @@ type UnsafeAppTokenIssuerServer interface {
 
 func RegisterAppTokenIssuerServer(s grpc.ServiceRegistrar, srv AppTokenIssuerServer) {
 	s.RegisterService(&AppTokenIssuer_ServiceDesc, srv)
+}
+
+func _AppTokenIssuer_Init_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InitRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppTokenIssuerServer).Init(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/issuer_proto.AppTokenIssuer/Init",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppTokenIssuerServer).Init(ctx, req.(*InitRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _AppTokenIssuer_Issue_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -187,6 +219,10 @@ var AppTokenIssuer_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "issuer_proto.AppTokenIssuer",
 	HandlerType: (*AppTokenIssuerServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Init",
+			Handler:    _AppTokenIssuer_Init_Handler,
+		},
 		{
 			MethodName: "Issue",
 			Handler:    _AppTokenIssuer_Issue_Handler,
