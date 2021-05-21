@@ -8,5 +8,5 @@ deploy:
 	
 	# ============ Push To Registry ============
 	sudo docker push datalab-registry.dev:5000/service.notification.live:$(VERSION)_$(tag)
-
+	echo '* BUILD DONE FOR\n\tcreated on: $(shell date)\n\tversion:    $(VERSION)_$(tag)\n' >> version
 	# ============ Deployment <$(VERSION)_$(tag)> DONE ============

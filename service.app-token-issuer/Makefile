@@ -8,10 +8,6 @@ deploy:
 
 	# ============ Push To Registry ============
 	sudo docker push datalab-registry.dev:5000/service.app.tokenissuer:$(VERSION)_$(tag)
-	
+	echo '* BUILD DONE FOR\n\tcreated on: $(shell date)\n\tversion:    $(VERSION)_$(tag)\n' >> version	
 	# ============ Deployment <$(VERSION)_$(tag)> DONE ============
 
-
-protobuf:
-	protoc -I. --go_out=$(GOPATH)/src service.app-token-issuer/proto/app-token-issuer.proto
-	protoc -I. --go-grpc_out=$(GOPATH)/src service.app-token-issuer/proto/app-token-issuer.proto

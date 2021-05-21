@@ -15,6 +15,7 @@ x-datalab-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOiIyMDIxLTA1LTI0VD
     "referrer": "http://google.com"
 }
 
+###
 POST http://localhost:8008/api/v1/datalab/publish/event HTTP/1.1
 content-type: application/json
 
@@ -22,10 +23,12 @@ content-type: application/json
     "receiver_uuid":"5bc54a86-7d9e-409e-b877-7c17ef484414",
     "receiver_orgn": "datalab.dev",
     "msg": {
-        "mutation": "TEST",
+        "mutation": "APP_INVITE",
         "event": 0,
         "value": {
-            "hello": "world"
+            "app": "Coole App",
+            "uuid": ""
+            "owner": "Konstantin Gasser"
         }
     }
 }

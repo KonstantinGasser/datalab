@@ -11,4 +11,5 @@ ENTRYPOINT ["/usr/bin/service", \
                 "-user-srv=service-user-administer:8001", \
                 "-permissions-srv=service-user-authentication:8002", \
                 "-config-srv=service-app-configuration:8005", \
+                "-apptoken-srv=service-app-tokenissuer:8006", \
                 "-db-srv=mongodb://appadminstorage:secure@192.168.0.179:27018"]
