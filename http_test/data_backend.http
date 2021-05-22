@@ -20,15 +20,12 @@ POST http://localhost:8008/api/v1/datalab/publish/event HTTP/1.1
 content-type: application/json
 
 {
-    "receiver_uuid":"5bc54a86-7d9e-409e-b877-7c17ef484414",
+    "receiver_uuid":"75598d0f-3e4c-40d8-964c-bc306805c2a2",
     "receiver_orgn": "datalab.dev",
-    "msg": {
-        "mutation": "APP_INVITE",
-        "event": 0,
-        "value": {
-            "app": "Coole App",
-            "uuid": ""
-            "owner": "Konstantin Gasser"
-        }
+    "event": 0,
+    "value": {
+        "app_name": "Coole App",
+        "app_uuid": "",
+        "app_owner": "Konstantin Gasser"
     }
 }

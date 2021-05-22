@@ -13,10 +13,12 @@ export default createStore({
     notifications: [],
   },
   mutations: {
+    INIT_LOAD(state, event) {
+      event.notifications?.forEach(item => {
+        state.notifications.push(item);
+      })
+    },
     APP_INVITE(state, event) {
-      console.log("This is a test: ", event);
-      console.log("State: ", state.notifications);
-      event["timestamp"] = new Date().getTime();
       state.notifications.push(event);
     },
     POP_NOTIFICATION(state, event) {

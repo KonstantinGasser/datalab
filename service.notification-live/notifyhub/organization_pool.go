@@ -16,20 +16,23 @@ var (
 	ErrWriteToConn     = fmt.Errorf("could not write to connection")
 )
 
-// func (pool *OrganizationPool) Broadcast(hub *NotifyHub) {
-// 	for {
-// 		select {
-// 		case msg := <-hub.Notify:
-// 			fmt.Println(msg)
-// 		case
-// 		}
-// 	}
-// }
+func (pool *OrganizationPool) SendBatch(receiver string, msgs BatchNotification) error {
+	for _, conn := range *pool {
+		if conn.Uuid == receiver {
+			err := conn.Conn.WriteJSON(msgs)
+			if err != nil {
+				return ErrWriteToConn
+			}
+			return nil
+		}
+	}
+	return ErrNoRecevierFound
+}
 
 // Send iterate over the pool and sends the message to the connection
 // which uuid matches with the receiver ones. If not receiver is found
 // Send returns an ErrNoRecevierFound
-func (pool *OrganizationPool) Send(receiver string, msg Message) error {
+func (pool *OrganizationPool) Send(receiver string, msg *IncomingEvent) error {
 	for _, conn := range *pool {
 		if conn.Uuid == receiver {
 			err := conn.Conn.WriteJSON(msg)

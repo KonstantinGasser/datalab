@@ -1,50 +1,59 @@
 <template>
-  <div class="main-container">
-    <div>
-      <h1 v-if="!hasRegistered">Datalab - Mine Your Business</h1>
-      <h1 v-if="hasRegistered">Welcome to Datalab</h1>
+  <div class="login-page">
+    <div class="info-box">
+      
     </div>
-    <!-- <h1>datalab Mine Your business </h1> -->
-    <div class="login-grid">
-    <div class="context">
-      <div class="login-form">
+    <div class="signinup">
+      <div class="d-flex justify-end">
+        <div class="prime-text" @click="switchMode">Sing In</div>
+      </div>
+      <div class="d-flex justify-center">
+        <div class="login">
           <div class="creds">
-              <div class="inputs">
-                <div class="text-capture big">About You</div>
-                <div class="field-set">
-                  <input type="text" name="first_name" for="first_name" id="first_name" placeholder="First Name" v-model="input.first_name"/>
-                  <input type="text" name="last_name" for="last_name" id="last_name" placeholder="Last Name" v-model="input.last_name"/>
+            <!-- <div class="inputs"> -->
+              <div class="text-capture big">About You</div>
+              <div class="form-row">
+                <div class="form-group col">
+                  <input type="text" class="form-control" name="first_name" for="first_name" id="first_name" placeholder="First Name" v-model="input.first_name"/>
                 </div>
-                <div class="field-set">
-                  <input type="text" name="username" for="username" id="username" placeholder="@username" v-model="input.username"/>
-                </div>
-                <hr>
-                <div class="text-capture big mt-2">Your Company</div>
-                <div class="field-set">
-                  <input type="text" name="orgn_domain" for="orgn_domain" id="orgn_domain" placeholder="Organization domain" v-model="input.orgn_domain"/>
-                  <input type="text" name="orgn_position" for="orgn_position" id="orgn_position" placeholder="Your Position" v-model="input.orgn_position"/>
-                  <!-- <span class="tooltiptext">this is used to map colleagues to your project<br>(example com.datalab)</span> -->
-                </div>
-                <hr>
-                <div class="text-capture big mt-2">Add Protection</div>
-                <div class="field-set">
-                  <input type="password" name="password" for="password" id="password" placeholder="Password" v-model="input.password"/>
-                  <input type="password" name="passwordConfirm" for="passwordConfirm" id="passwordConfirm" placeholder="Confirm Password" v-model="input.passwordConfirm"/>
+                <div class="form-group col">
+                  <input type="text" class="form-control" name="last_name" for="last_name" id="last_name" placeholder="Last Name" v-model="input.last_name"/>
                 </div>
               </div>
-              <div class="submit-btn">
-                <button @click="register"><span>Register for free</span></button>
+              <div class="form-row">
+                <div class="form-group col">
+                  <input type="text" class="form-control" name="username" for="username" id="username" placeholder="@username" v-model="input.username"/>
+                </div>
               </div>
-          </div>
+              <hr>
+              <div class="text-capture big mt-2">Your Company</div>
+              <div class="form-row">
+                <div class="form-group col">
+                  <input type="text" class="form-control" name="orgn_domain" for="orgn_domain" id="orgn_domain" placeholder="Organization domain" v-model="input.orgn_domain"/>
+                </div>
+                <div class="form-group col">
+                  <input type="text" class="form-control" name="orgn_position" for="orgn_position" id="orgn_position" placeholder="Your Position" v-model="input.orgn_position"/>
+                </div>
+              
+              </div>
+              <hr>
+              <div class="text-capture big mt-2">Security</div>
+              <div class="form-row">
+                <div class="form-group col">
+                  <input type="password" class="form-control" name="password" for="password" id="password" placeholder="Password" v-model="input.password"/>
+                </div>
+                <div class="form-group col">
+                  <input type="password" class="form-control" name="passwordConfirm" for="passwordConfirm" id="passwordConfirm" placeholder="Confirm Password" v-model="input.passwordConfirm"/>
+                </div>
+              </div>
+            <!-- </div> -->
+            <div class="submit-btn">
+              <button @click="register"><span>Sign Up</span></button>
+            </div>
+        </div>
       </div>
-      <div class="wave">
-        <img src="../../assets/wave.svg" alt="" />
       </div>
     </div>
-    <div class="footer">
-      <div class="ankor-text" @click="switchMode">Sign In</div>
-    </div>
-  </div>
   </div>
 </template>
 
@@ -109,71 +118,48 @@ h1, h2{
   font-size: 45px;
   text-align: center;
   font-weight: 100;
-  background: linear-gradient(135deg, #50e3c2 0%,#10d574 100%);
+  background: var(--gradient-green);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-hr {
-  margin: 3px 0;
-}
-.main-container {
+
+.login-page {
   height: 100%;
-  min-height: 100vh;
-  width: 100vw;
+  width: 100%;
   display: grid;
-  justify-content: center;
+  grid-template-columns: 65% auto;
+}
+
+.info-box {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(310deg, #50e3c2 0%,#10d574 100%);
+}
+
+.signinup {
+  display: grid;
+  padding: 15px 25px;
+}
+.prime-text {
+  font-size: 1rem;
+  font-weight: bold;
+  color: var(--h-color);
+  cursor: pointer;
+}
+.login {
+  padding: 25px 25px 0px 25px;
+  border-radius: 8px;
+  box-shadow: 0 0 11px 0px rgb(0 0 0 / 10%);
+  height: max-content;
+  display: grid;
+  row-gap: 25px;
   align-content: center;
-  grid-template-rows: min-content min-content;
-  grid-row-gap: 25px;
-  /* background: #0D1116; */
-}
-.component-fade-enter-active, .component-fade-leave-active {
-  transition: opacity .3s ease;
-}
-.component-fade-enter, .component-fade-leave-to
-/* .component-fade-leave-active for <2.1.8 */ {
-  opacity: 0;
-}
-.login-grid {
-  /* display: grid;
-  grid-template-rows: 100px max-content; */
-}
-.context {
-  display: flex;
-  height: 471px;
-  background: var(--sub-bg);
-  border-radius: 20px;
-  box-shadow: 0 0 16px 10px rgb(0 0 0 / 10%);
-}
-
-.login-form {
-  display: grid;
-  justify-self: baseline;
-  grid-template-columns: 500px;
-  align-self: center;
-  padding-left: 50px;
-}
-
-.inputs .field, .field-set {
-  margin: 10px 0;
+  justify-content: center;   
 }
 
 .creds {
   display: grid;
   justify-content: center;
-}
-
-.inputs .field, .field-set input {
-  height: 35px;
-  font-size: 18px;
-  border-radius: 5px;
-  padding: 5px 15px;
-  border: 1px solid var(--sub-border);
-  width: 200px;
-}
-
-.inputs .field-set input {
-  margin: 0 3px;
 }
 
 .submit-btn {
@@ -206,13 +192,12 @@ hr {
 
 }
 
-.footer {
-  margin: 15px 0px;
+.login-footer {
   display: flex;
   justify-content: flex-start;
 }
 
-.footer .ankor-text {
+.login-footer .ankor-text {
   font-size: 14px;
   opacity: 0.6;
   color: var(--txt-small);
@@ -221,110 +206,6 @@ hr {
 
 .ankor-text:hover {
   cursor: pointer;
-  color:var(--txt-small);
-}
-
-button {
-  outline: none;
-}
-
-.wave {
-  width: 449px;
-}
-
-.wave img {
-  object-fit: contain;
-  height: 472px;
-  border-radius: 20px;
-}
-
-.fade-enter-active, .fade-leave-active {
-  transition: opacity .5s;
-}
-.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-  opacity: 0;
-}
-
-.tooltip {
-  position: relative;
-}
-
-.tooltip .tooltiptext {
-  visibility: hidden;
-  width: 200px;
-  bottom: -35%;
-  left: 101%;
-  margin-left: 0px; 
-  background-color: black;
-  opacity: 0.5;
-  color: #fff;
-  text-align: center;
-  border-radius: 6px;
-  padding: 5px 0;
-
-  /* Position the tooltip */
-  position: absolute;
-  z-index: 1;
-}
-
-.tooltip:hover .tooltiptext {
-  visibility: visible;
-}
-
-input {
-  outline: none;
-  border: none;
-}
-
-input:focus::-webkit-input-placeholder {
-  color: transparent;
-}
-input:focus:-moz-placeholder {
-  color: transparent;
-}
-input:focus::-moz-placeholder {
-  color: transparent;
-}
-input:focus:-ms-input-placeholder {
-  color: transparent;
-}
-
-textarea:focus::-webkit-input-placeholder {
-  color: transparent;
-}
-textarea:focus:-moz-placeholder {
-  color: transparent;
-}
-textarea:focus::-moz-placeholder {
-  color: transparent;
-}
-textarea:focus:-ms-input-placeholder {
-  color: transparent;
-}
-
-input::-webkit-input-placeholder {
-  color: #999999;
-}
-input:-moz-placeholder {
-  color: #999999;
-}
-input::-moz-placeholder {
-  color: #999999;
-}
-input:-ms-input-placeholder {
-  color: #999999;
-}
-
-textarea::-webkit-input-placeholder {
-  color: #999999;
-}
-textarea:-moz-placeholder {
-  color: #999999;
-}
-textarea::-moz-placeholder {
-  color: #999999;
-}
-textarea:-ms-input-placeholder {
-  color: #999999;
+  color: var(--txt-small);
 }
 </style>

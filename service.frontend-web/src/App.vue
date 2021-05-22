@@ -58,10 +58,9 @@ a {
 }
 
 #app {
-  /* height: 100%; */
-  min-height: 100vh;
-  padding-bottom: 25px;
-  padding-top: 100px;
+  height: 100%;
+  /* min-height: 100vh; */
+  /* padding-bottom: 25px; */
   display: flex;
   align-items: flex-start;
   justify-content: center;

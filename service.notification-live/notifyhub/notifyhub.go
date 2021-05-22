@@ -8,51 +8,20 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gorilla/websocket"
+	"github.com/KonstantinGasser/datalab/service.notification-live/repo"
 	"github.com/sirupsen/logrus"
 )
 
-type MessageEvent int
-
-// VueMutation represents the actual function names
-// on the vuejs client side. The "mutation" in a message will
-// trigger the function on the client side
-type VueMutation string
-
 const (
-	healthTimeOut = 20 * time.Second
-
-	EventAppInvite MessageEvent = iota
-
-	// MutationAppInvite maps to the corresponding Vue function
-	// when the client socket receives a new message
-	MutationAppInvite VueMutation = "APP_INVITE"
+	healthTimeOut = 10 * time.Second
 )
 
-type Notification struct {
-	Organization string
-	Uuid         string
-	Msg          Message
-}
-
-type Message struct {
-	Mutation string                 `json:"mutation"`
-	Event    MessageEvent           `json:"event"`
-	Value    map[string]interface{} `json:"value"`
-}
-
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-	CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
-}
-
 type NotifyHub struct {
+	repo        repo.Repo
 	subscribe   chan *Connection
 	unsubscribe chan *Connection
-	Notify      chan *Notification
+	Notify      chan *IncomingEvent
+	batchNotify chan *UserNotifications
 
 	// guards the Organizations map
 	mu sync.RWMutex
@@ -61,11 +30,13 @@ type NotifyHub struct {
 }
 
 // New creates a new NotifyHub and starts its run function in a goroutine
-func New() *NotifyHub {
+func New(repo repo.Repo) *NotifyHub {
 	hub := &NotifyHub{
+		repo:          repo,
 		subscribe:     make(chan *Connection),
 		unsubscribe:   make(chan *Connection),
-		Notify:        make(chan *Notification),
+		Notify:        make(chan *IncomingEvent),
+		batchNotify:   make(chan *UserNotifications),
 		mu:            sync.RWMutex{},
 		Organizations: make(map[string]*OrganizationPool),
 	}
@@ -84,7 +55,10 @@ func (hub *NotifyHub) run() {
 		// if no pool present it creates a new one and adds the new
 		// connection to the pool
 		case conn := <-hub.subscribe:
-			hub.subscribeConn(conn)
+			err := hub.subscribeConn(conn)
+			if err != nil {
+				logrus.Errorf("[notifyHub.chan.subscribe] could not subscribe connection: %v\n", err)
+			}
 			// check health of connection
 			// if unhealthy kill connection
 			go conn.Health(hub)
@@ -104,7 +78,20 @@ func (hub *NotifyHub) run() {
 					if pool == nil {
 						continue
 					}
-					hub.unsubscribe <- pool.Find(notification.Uuid)
+					hub.unsubscribe <- pool.Find(notification.UserUuid)
+				}
+				logrus.Errorf("[notifyHub.chan.Notify] could not send message: %v\n", err)
+			}
+		case userNotifies := <-hub.batchNotify:
+			err := hub.sendBatch(userNotifies.Organization, userNotifies.UserUuid, userNotifies.Notifications)
+			if err != nil {
+				// receiver not available: kill connection
+				if err == ErrWriteToConn {
+					pool := hub.find(userNotifies.Organization)
+					if pool == nil {
+						continue
+					}
+					hub.unsubscribe <- pool.Find(userNotifies.UserUuid)
 				}
 				logrus.Errorf("[notifyHub.chan.Notify] could not send message: %v\n", err)
 			}
@@ -116,15 +103,40 @@ func (hub *NotifyHub) run() {
 }
 
 // sendMessage handles the sending of a message routing it to the correct pool
-func (hub *NotifyHub) sendMessage(notification *Notification) error {
-	hub.mu.RLock()
-	defer hub.mu.RUnlock()
+func (hub *NotifyHub) sendMessage(notify *IncomingEvent) error {
+	hub.mu.Lock()
+	defer hub.mu.Unlock()
 
-	pool, ok := hub.Organizations[notification.Organization]
+	pool, ok := hub.Organizations[notify.Organization]
 	if !ok {
-		return fmt.Errorf("could not find pool: %v", notification.Organization)
+		return fmt.Errorf("could not find pool: %v", notify.Organization)
 	}
-	err := pool.Send(notification.Uuid, notification.Msg)
+	err := pool.Send(notify.UserUuid, notify)
+	if err != nil {
+		return err
+	}
+	// save message in database
+	go hub.SaveEvent(notify.UserUuid, notify)
+	return nil
+}
+
+// sendMessage handles the sending of a message routing it to the correct pool
+func (hub *NotifyHub) sendBatch(organization, userUuid string, messages []Notification) error {
+	defer func() {
+		// after delivery to client
+		// save notification in storage
+	}()
+	hub.mu.Lock()
+	defer hub.mu.Unlock()
+
+	pool, ok := hub.Organizations[organization]
+	if !ok {
+		return fmt.Errorf("could not find pool: %v", organization)
+	}
+	err := pool.SendBatch(userUuid, BatchNotification{
+		Mutation: MutationLoadFromDB,
+		Messages: messages,
+	})
 	if err != nil {
 		return err
 	}
@@ -134,17 +146,32 @@ func (hub *NotifyHub) sendMessage(notification *Notification) error {
 // subscribeConn adds a user the its correct pool
 // if no pool present it creates a new one and adds the new
 // connection to the pool
-func (hub *NotifyHub) subscribeConn(conn *Connection) {
+func (hub *NotifyHub) subscribeConn(conn *Connection) error {
 	hub.mu.Lock()
 	defer hub.mu.Unlock()
+	ok, err := hub.HasRecord(conn.Uuid)
+	if err != nil { // db error will lead to no socket connection
+		return err
+	}
+	if !ok { // create default record for new client if non present
+		err := hub.PersistInitRecord(conn)
+		if err != nil {
+			return err
+		}
+	}
+	// add connection to correct pool
 	orgnPool, ok := hub.Organizations[conn.Organization]
 	if !ok {
 		hub.Organizations[conn.Organization] = &OrganizationPool{conn}
-		return
+	} else {
+		if err := orgnPool.Add(conn); err != nil {
+			return err
+		}
 	}
-	if err := orgnPool.Add(conn); err != nil {
-		logrus.Errorf("[notifyHub.subscribeConn] could not add connection: %v\n", err)
-	}
+
+	// send persisted notification in background
+	go hub.LookUpAndSend(conn.Uuid)
+	return nil
 }
 
 func (hub *NotifyHub) unsubscribeConn(conn *Connection) {
@@ -185,6 +212,7 @@ func (hub *NotifyHub) OpenSocket(ctx context.Context, w http.ResponseWriter, r *
 
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
+		logrus.Errorf("[hub.OpenSocket] could not open socket: %v\n", err)
 		return err
 	}
 	connection := &Connection{

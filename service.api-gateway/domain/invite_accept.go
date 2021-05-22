@@ -12,7 +12,8 @@ import (
 )
 
 type AcceptInviteForm struct {
-	AppUuid string `json:"app_uuid"`
+	AppUuid        string `json:"app_uuid"`
+	EventTimestamp int64  `json:"event_timestamp"`
 }
 
 func (svc gatewaylogic) AcceptInvite(ctx context.Context, form AcceptInviteForm) (string, errors.ErrApi) {

@@ -8,20 +8,25 @@ import (
 	"github.com/KonstantinGasser/datalab/service.notification-live/domain"
 	"github.com/KonstantinGasser/datalab/service.notification-live/handler"
 	"github.com/KonstantinGasser/datalab/service.notification-live/notifyhub"
+	"github.com/KonstantinGasser/datalab/service.notification-live/repo"
 	"github.com/sirupsen/logrus"
 )
 
 // Run acts as a run abstraction to start the HTTP-Server
 // and can return an error - which is nice when called
 // from main
-func Run(ctx context.Context, hostAddr, userauthAddr string) error {
+func Run(ctx context.Context, hostAddr, userauthAddr, dbAddr string) error {
 	// create api dependencies
 	userauthClient, err := adapter.CreateUserAuthClient(userauthAddr)
 	if err != nil {
 		return err
 	}
 
-	notifyHub := notifyhub.New()
+	storage, err := repo.NewMongoDB(dbAddr)
+	if err != nil {
+		return err
+	}
+	notifyHub := notifyhub.New(storage)
 	defer notifyHub.Stop()
 
 	domain := domain.NewNotificationLogic(userauthClient, notifyHub)
@@ -36,7 +41,7 @@ func Run(ctx context.Context, hostAddr, userauthAddr string) error {
 		notifySvc.WithCors,
 	)
 
-	notifySvc.Register("/api/v1/datalab/publish/event", notifySvc.HandleIncomingNofication,
+	notifySvc.Register("/api/v1/datalab/publish/event", notifySvc.HandleIncomingNotification,
 		notifySvc.WithTracing,
 		notifySvc.WithCors,
 	)

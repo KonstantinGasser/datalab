@@ -6,11 +6,6 @@ import (
 	"github.com/KonstantinGasser/datalab/service.notification-live/notifyhub"
 )
 
-func (svc notificationlogic) EventAppInvite(ctx context.Context, msg notifyhub.Message, recUuid, recOrgn string) {
-
-	svc.notifyHub.Notify <- &notifyhub.Notification{
-		Uuid:         recUuid,
-		Organization: recOrgn,
-		Msg:          msg,
-	}
+func (svc notificationlogic) EventAppInvite(ctx context.Context, notification notifyhub.IncomingEvent) {
+	svc.notifyHub.Notify <- &notification
 }

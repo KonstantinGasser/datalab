@@ -125,6 +125,7 @@ Each service (api,app,user,token,frontend) have their own `Makefile` with the `d
 | mongo-app             | appstorage           | 27018:27017 | appstorage:secure          |
 | monog-user            | userstorage          | 27017:27017 | userstorage:secure         |
 | monog-config          | configstorage        | 27019:27017 | configstorage:secure       |
+| monog-apptoken        | apptokenstorage      | 27020:27017 | apptokenstorage:secure     |
 | monog-userauth        | userauthstorage      | 27021:27017 | userauthstorage:secure     |
 
 

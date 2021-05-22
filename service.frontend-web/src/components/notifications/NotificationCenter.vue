@@ -6,7 +6,7 @@
             {{notifications}} -->
             <div class="notify-table">
                 <div v-for="item in notifications" :key="item" class="notify-row">
-                    <div v-if="item.value?.event === 0">
+                    <div v-if="item.event === 0">
                         <div class="emoji-line d-flex justify-start"><strong>You got an App Invite</strong>&nbsp;- go check it out 🚀</div>
                         <div  class="notify-title">
                             👉 &nbsp;

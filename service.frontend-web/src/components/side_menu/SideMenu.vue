@@ -28,11 +28,20 @@ export default {
   name: 'SideMenu',
   data() {
     return {
-      mode: false,
+      mode: "light",
     };
   },
   components: {
       MenuItem,
+  },
+  created() {
+    this.mode = localStorage.getItem("theme");
+    console.log("Theme: ", localStorage.getItem("theme"));
+    if (this.mode === undefined || this.mode === null) {
+      localStorage.setItem("theme", "light");
+      this.mode = "light";
+    }
+    this.setMode();
   },
   methods: {
       setActive(value) {
@@ -41,7 +50,10 @@ export default {
       },
       setMode() {
         var root = document.documentElement
-        if (this.mode) {
+        
+        if (this.mode === "light") {
+          localStorage.setItem("theme", this.mode)
+          this.mode = "dark"
           root.style.setProperty("--main-bg", "#cccccc1B");
           root.style.setProperty("--sub-bg", "#fff");
           root.style.setProperty("--tab-bg", "#fff");
@@ -51,6 +63,8 @@ export default {
           root.style.setProperty("--txt-small", "#666666AA");
           root.style.setProperty("--main-color", "#666666AA");
         } else {
+          localStorage.setItem("theme", this.mode)
+          this.mode = "light"
           root.style.setProperty("--main-bg", "#1E1E1E");
           root.style.setProperty("--sub-bg", "#2F2F2F");
           root.style.setProperty("--btn-font-hover", "#121212");
@@ -60,7 +74,6 @@ export default {
           root.style.setProperty("--txt-small", "#FFFFFFAA");
           root.style.setProperty("--main-color", "#FFFFFFAA");
         }
-        this.mode = !this.mode;
       },
   },
   computed: {
