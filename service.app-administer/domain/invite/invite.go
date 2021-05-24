@@ -47,9 +47,29 @@ func Reject(ctx context.Context, repo repo.Repo, appUuid, userUuid string) error
 }
 
 func updateInviteStatus(ctx context.Context, repo repo.Repo, appUuid, userUuid string, status types.InviteStatus) error {
-	filter := bson.M{
-		"_id":         appUuid,
-		"member.uuid": userUuid,
+
+	// loop up app where user is listed as member in pending state
+	filter := bson.D{
+		{
+			Key: "$and",
+			Value: bson.A{
+				bson.D{
+					{
+						Key:   "_id",
+						Value: appUuid,
+					},
+				},
+				bson.D{
+					{
+						Key: "$and",
+						Value: bson.A{
+							bson.D{{Key: "member.uuid", Value: userUuid}},
+							bson.D{{Key: "member.status", Value: types.InvitePending}},
+						},
+					},
+				},
+			},
+		},
 	}
 	query := bson.D{
 		{

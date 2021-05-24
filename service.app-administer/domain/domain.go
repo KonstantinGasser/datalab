@@ -94,7 +94,7 @@ func (svc appadmin) Create(ctx context.Context, in *proto.CreateRequest) (string
 			Err:    err,
 		}
 	}
-	// this will go to kafka at some point in time
+	// this will go to Kafka at some point in time
 	respPermissions, err := svc.userauthSvc.AddAppAccess(ctx, &userauthsvc.AddAppAccessRequest{
 		Tracing_ID: in.GetTracing_ID(),
 		UserUuid:   in.GetOwnerUuid(),
@@ -117,7 +117,7 @@ func (svc appadmin) Create(ctx context.Context, in *proto.CreateRequest) (string
 			Err:    fmt.Errorf("could not compensate created app and role back: %v", err),
 		}
 	}
-	// this will go to kafka at some point in time
+	// this will go to Kafka at some point in time
 	respApptoken, err := svc.apptokenSvc.Init(ctx, &aptissuer.InitRequest{
 		Tracing_ID: in.GetTracing_ID(),
 		AppUuid:    appUuid,
@@ -140,6 +140,7 @@ func (svc appadmin) Create(ctx context.Context, in *proto.CreateRequest) (string
 			Err:    fmt.Errorf("could not compensate created app and role back: %v", err),
 		}
 	}
+
 	return appUuid, nil
 }
 

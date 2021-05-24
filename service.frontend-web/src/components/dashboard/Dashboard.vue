@@ -67,7 +67,9 @@ export default {
 
   width: 90%;
   min-width: 750px;
-  height: 90%;
+  height: 100%;
+  padding-bottom: 25px;
+  padding-top: 75px;
 }
 
 .app-menu {

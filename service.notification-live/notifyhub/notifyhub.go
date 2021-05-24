@@ -107,6 +107,9 @@ func (hub *NotifyHub) sendMessage(notify *IncomingEvent) error {
 	hub.mu.Lock()
 	defer hub.mu.Unlock()
 
+	// save message in database
+	go hub.SaveEvent(notify.UserUuid, notify)
+
 	pool, ok := hub.Organizations[notify.Organization]
 	if !ok {
 		return fmt.Errorf("could not find pool: %v", notify.Organization)
@@ -115,8 +118,6 @@ func (hub *NotifyHub) sendMessage(notify *IncomingEvent) error {
 	if err != nil {
 		return err
 	}
-	// save message in database
-	go hub.SaveEvent(notify.UserUuid, notify)
 	return nil
 }
 

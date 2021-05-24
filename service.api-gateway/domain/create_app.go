@@ -12,10 +12,9 @@ import (
 )
 
 type CreateAppForm struct {
-	Name        string   `json:"app_name" required:"yes"`
-	URL         string   `json:"app_URL" required:"yes"`
-	Description string   `json:"app_description" required:"yes"`
-	Member      []string `json:"app_member"`
+	Name        string `json:"app_name" required:"yes"`
+	URL         string `json:"app_URL" required:"yes"`
+	Description string `json:"app_description" required:"yes"`
 }
 
 func (svc gatewaylogic) CreateApp(ctx context.Context, uuid, organization string, form CreateAppForm) (string, errors.ErrApi) {

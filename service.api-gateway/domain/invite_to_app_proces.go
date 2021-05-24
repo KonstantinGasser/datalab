@@ -63,14 +63,12 @@ func (svc gatewaylogic) InviteToAppProcess(ctx context.Context, form InviteForm)
 	notification := Notification{
 		ReceiverUuid: form.InvitedUuid,
 		ReceiverOrgn: user.GetOrganization(),
-		Msg: NotfyMsg{
-			Mutation: "APP_INVITE",
-			Value: map[string]interface{}{
-				"event":     0,
-				"app_name":  inviteResp.GetAppName(),
-				"app_uuid":  form.AppUuid,
-				"app_owner": strings.Join([]string{owner.GetFirstName(), owner.GetLastName()}, " "),
-			},
+		Mutation:     "APP_INVITE",
+		Value: map[string]interface{}{
+			"event":     0,
+			"app_name":  inviteResp.GetAppName(),
+			"app_uuid":  form.AppUuid,
+			"app_owner": strings.Join([]string{owner.GetFirstName(), owner.GetLastName()}, " "),
 		},
 	}
 	notificationErr := svc.IssueNotification(ctx, notification)

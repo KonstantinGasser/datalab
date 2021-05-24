@@ -18,13 +18,11 @@ func (handler *Handler) AcceptInvite(w http.ResponseWriter, r *http.Request) {
 		handler.onError(w, "could not decode r.Body", http.StatusBadRequest)
 		return
 	}
-	updatedToken, acceptErr := handler.domain.AcceptInvite(r.Context(), inviteForm)
+	_, acceptErr := handler.domain.AcceptInvite(r.Context(), inviteForm)
 	if err != nil {
 		logrus.Errorf("<%v>[handler.AcceptInvite] could not accept user invite: %v\n", ctx_value.GetString(r.Context(), "tracingID"), acceptErr.Error())
 		handler.onError(w, acceptErr.Info(), int(acceptErr.Code()))
 		return
 	}
-	handler.onSuccessJSON(w, map[string]interface{}{
-		"token": updatedToken,
-	}, http.StatusOK)
+	handler.onSuccessJSON(w, nil, http.StatusOK)
 }

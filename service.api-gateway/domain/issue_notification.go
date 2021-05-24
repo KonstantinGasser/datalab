@@ -10,9 +10,11 @@ import (
 )
 
 type Notification struct {
-	ReceiverUuid string   `json:"receiver_uuid"`
-	ReceiverOrgn string   `json:"receiver_orgn"`
-	Msg          NotfyMsg `json:"msg"`
+	ReceiverUuid string                 `json:"receiver_uuid"`
+	ReceiverOrgn string                 `json:"receiver_orgn"`
+	Mutation     string                 `json:"mutation"`
+	Event        int                    `json:"event"`
+	Value        map[string]interface{} `json:"value"`
 }
 
 type NotfyMsg struct {
@@ -31,7 +33,7 @@ func (svc gatewaylogic) IssueNotification(ctx context.Context, notification Noti
 			Err:    err,
 		}
 	}
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "http://192.168.0.179:8008/api/v1/datalab/publish/event", bytes.NewBuffer(b))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "http://localhost:8008/api/v1/datalab/publish/event", bytes.NewBuffer(b))
 	req.Header.Set("Content-Type", "application/json")
 
 	client := http.DefaultClient

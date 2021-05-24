@@ -58,21 +58,11 @@ a {
 }
 
 #app {
-  height: 100%;
-  /* min-height: 100vh; */
-  /* padding-bottom: 25px; */
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-
+  min-height: 100vh;
+  background: var(--main-bg);
   font-family: 'Signika', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: var(--main-bg);
-  background-image: url("assets/dash_bottom_green.svg"), url("assets/dash_top_green.svg");
-  background-repeat: no-repeat, no-repeat;
-  background-position: left bottom, right top;
-  background-size: contain, contain;
 }
 
 .view_component {
