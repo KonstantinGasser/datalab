@@ -2,8 +2,9 @@
    <div>
         <h1>Any News? 🧐</h1>
         <div class="">
-            <!-- Hello NotificationCenter
-            {{notifications}} -->
+            <div class="no-notifications" v-if="notifications === null || notifications.length === 0">
+                Looks like you are up-to date. We let you know when you have any news 😄🙌
+            </div>
             <div class="notify-table">
                 <div v-for="item in notifications" :key="item" class="notify-row">
                     <div v-if="item.event === 0">
@@ -58,7 +59,7 @@ export default {
             const payload = {
                 app_uuid: app_uuid,
             }
-            const resp = await axios.post("http://localhost:8080/api/v1/app/member/invite/accept", payload, options);
+            const resp = await axios.post("http://192.168.0.177:8080/api/v1/app/member/invite/accept", payload, options);
             if (resp.status != 200) {
                 this.$toast.error("Could not send invite feedback");
                 return
@@ -80,6 +81,17 @@ export default {
 <style scoped>
 .app-view {
     height: 100%;
+}
+
+.no-notifications {
+    margin-top: 75px;
+    background: #5465ff54;
+    border: 1px solid #5465ff;
+    color: #fff;
+    padding: 25px;
+    text-align: center;
+    /* width: max-content; */
+    border-radius: 8px;
 }
 
 .notify-table {

@@ -17,11 +17,12 @@ const (
 )
 
 type NotifyHub struct {
-	repo        repo.Repo
-	subscribe   chan *Connection
-	unsubscribe chan *Connection
-	Notify      chan *IncomingEvent
-	batchNotify chan *UserNotifications
+	repo         repo.Repo
+	subscribe    chan *Connection
+	unsubscribe  chan *Connection
+	Notify       chan *IncomingEvent
+	RemoveNotify chan *RemoveEvent
+	batchNotify  chan *UserNotifications
 
 	// guards the Organizations map
 	mu sync.RWMutex
@@ -36,6 +37,7 @@ func New(repo repo.Repo) *NotifyHub {
 		subscribe:     make(chan *Connection),
 		unsubscribe:   make(chan *Connection),
 		Notify:        make(chan *IncomingEvent),
+		RemoveNotify:  make(chan *RemoveEvent),
 		batchNotify:   make(chan *UserNotifications),
 		mu:            sync.RWMutex{},
 		Organizations: make(map[string]*OrganizationPool),
@@ -94,6 +96,13 @@ func (hub *NotifyHub) run() {
 					hub.unsubscribe <- pool.Find(userNotifies.UserUuid)
 				}
 				logrus.Errorf("[notifyHub.chan.Notify] could not send message: %v\n", err)
+			}
+		// removes notifications with are no longer important
+		// and can be delete from the database
+		case notification := <-hub.RemoveNotify:
+			err := hub.removeNotification(notification)
+			if err != nil {
+				logrus.Errorf("[notifyHub.chan.RemoveNotify] could not remove message: %v\n", err)
 			}
 		// is this just for health checks
 		case <-ticker.C:
@@ -195,6 +204,10 @@ func (hub *NotifyHub) unsubscribeConn(conn *Connection) {
 	if orgnPool.Length() == 0 {
 		delete(hub.Organizations, conn.Organization)
 	}
+}
+
+func (hub *NotifyHub) removeNotification(notification *RemoveEvent) error {
+	return hub.Remove(notification)
 }
 
 func (hub *NotifyHub) find(orgn string) *OrganizationPool {

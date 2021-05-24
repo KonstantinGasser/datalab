@@ -38,7 +38,7 @@ export default {
     SideMenu,
   },
   created() {
-    const url = "ws://localhost:8008/api/v1/datalab/live?token="+ localStorage.getItem("token");
+    const url = "ws://192.168.0.177:8008/api/v1/datalab/live?token="+ localStorage.getItem("token");
     this.$connect(url);
   },
   methods: {

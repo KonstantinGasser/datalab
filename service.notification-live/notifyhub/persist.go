@@ -70,3 +70,24 @@ func (hub *NotifyHub) LookUpAndSend(userUuid string) {
 	// send all messages to client
 	hub.batchNotify <- &stored
 }
+
+// Remove removes one notification form a user notification array
+func (hub *NotifyHub) Remove(removeEvent *RemoveEvent) error {
+	filter := bson.M{"_id": removeEvent.UserUuid}
+	query := bson.D{
+		{
+			Key: "$pull",
+			Value: bson.D{
+				{
+					Key:   "notification",
+					Value: bson.M{"timestamp": removeEvent.Timestamp},
+				},
+			},
+		},
+	}
+	_, err := hub.repo.UpdateOne(context.Background(), config.NofifyDB, config.NotifyCol, filter, query, false)
+	if err != nil {
+		return err
+	}
+	return nil
+}

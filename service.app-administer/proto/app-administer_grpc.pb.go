@@ -25,7 +25,6 @@ type AppAdministerClient interface {
 	Invite(ctx context.Context, in *InviteRequest, opts ...grpc.CallOption) (*InviteResponse, error)
 	AcceptInvite(ctx context.Context, in *AcceptInviteRequest, opts ...grpc.CallOption) (*AcceptInviteResponse, error)
 	RejectInvite(ctx context.Context, in *RejectInviteRequest, opts ...grpc.CallOption) (*RejectInviteResponse, error)
-	MayAcquireToken(ctx context.Context, in *MayAcquireTokenRequest, opts ...grpc.CallOption) (*MayAcquireTokenResponse, error)
 }
 
 type appAdministerClient struct {
@@ -99,15 +98,6 @@ func (c *appAdministerClient) RejectInvite(ctx context.Context, in *RejectInvite
 	return out, nil
 }
 
-func (c *appAdministerClient) MayAcquireToken(ctx context.Context, in *MayAcquireTokenRequest, opts ...grpc.CallOption) (*MayAcquireTokenResponse, error) {
-	out := new(MayAcquireTokenResponse)
-	err := c.cc.Invoke(ctx, "/app_proto.AppAdminister/MayAcquireToken", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // AppAdministerServer is the server API for AppAdminister service.
 // All implementations must embed UnimplementedAppAdministerServer
 // for forward compatibility
@@ -119,7 +109,6 @@ type AppAdministerServer interface {
 	Invite(context.Context, *InviteRequest) (*InviteResponse, error)
 	AcceptInvite(context.Context, *AcceptInviteRequest) (*AcceptInviteResponse, error)
 	RejectInvite(context.Context, *RejectInviteRequest) (*RejectInviteResponse, error)
-	MayAcquireToken(context.Context, *MayAcquireTokenRequest) (*MayAcquireTokenResponse, error)
 	mustEmbedUnimplementedAppAdministerServer()
 }
 
@@ -147,9 +136,6 @@ func (UnimplementedAppAdministerServer) AcceptInvite(context.Context, *AcceptInv
 }
 func (UnimplementedAppAdministerServer) RejectInvite(context.Context, *RejectInviteRequest) (*RejectInviteResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RejectInvite not implemented")
-}
-func (UnimplementedAppAdministerServer) MayAcquireToken(context.Context, *MayAcquireTokenRequest) (*MayAcquireTokenResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method MayAcquireToken not implemented")
 }
 func (UnimplementedAppAdministerServer) mustEmbedUnimplementedAppAdministerServer() {}
 
@@ -290,24 +276,6 @@ func _AppAdminister_RejectInvite_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AppAdminister_MayAcquireToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MayAcquireTokenRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AppAdministerServer).MayAcquireToken(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/app_proto.AppAdminister/MayAcquireToken",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AppAdministerServer).MayAcquireToken(ctx, req.(*MayAcquireTokenRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // AppAdminister_ServiceDesc is the grpc.ServiceDesc for AppAdminister service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -342,10 +310,6 @@ var AppAdminister_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RejectInvite",
 			Handler:    _AppAdminister_RejectInvite_Handler,
-		},
-		{
-			MethodName: "MayAcquireToken",
-			Handler:    _AppAdminister_MayAcquireToken_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

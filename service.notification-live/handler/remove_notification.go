@@ -15,4 +15,5 @@ func (handler *Handler) HandleRemoveNotification(w http.ResponseWriter, r *http.
 		handler.onError(w, "could not decode r.Body", http.StatusBadGateway)
 		return
 	}
+	handler.domain.RemoveNotifcation(r.Context(), notification)
 }

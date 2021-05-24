@@ -60,5 +60,11 @@ func (svc gatewaylogic) AcceptInvite(ctx context.Context, form AcceptInviteForm)
 			Err:    fmt.Errorf("%s", permissionResp.GetMsg()),
 		}
 	}
+
+	svc.RemoveNotification(ctx, RemoveEvent{
+		UserUuid: ctx_value.GetAuthedUser(ctx).GetUuid(),
+		Timesamp: form.EventTimestamp,
+	})
+
 	return permissionResp.GetUpdatedToken(), nil
 }

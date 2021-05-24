@@ -62,7 +62,6 @@ type IncomingEvent struct {
 }
 
 type RemoveEvent struct {
-	UserUuid     string `json:"receiver_uuid"`
-	Organization string `json:"receiver_orgn"`
-	Timestamp    int64  `json:"timestamp"`
+	UserUuid  string `json:"user_uuid"`
+	Timestamp int64  `json:"timestamp"`
 }

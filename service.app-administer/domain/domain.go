@@ -12,7 +12,6 @@ import (
 	"github.com/KonstantinGasser/datalab/service.app-administer/domain/hasher"
 	"github.com/KonstantinGasser/datalab/service.app-administer/domain/invite"
 	"github.com/KonstantinGasser/datalab/service.app-administer/domain/permissions"
-	"github.com/KonstantinGasser/datalab/service.app-administer/domain/token"
 	"github.com/KonstantinGasser/datalab/service.app-administer/errors"
 	"github.com/KonstantinGasser/datalab/service.app-administer/proto"
 	"github.com/KonstantinGasser/datalab/service.app-administer/repo"
@@ -28,7 +27,7 @@ type AppAdmin interface {
 	Delete(ctx context.Context, in *proto.DeleteRequest) errors.ErrApi
 	GetSingle(ctx context.Context, in *proto.GetRequest) (*common.AppInfo, errors.ErrApi)
 	GetMultiple(ctx context.Context, in *proto.GetListRequest) ([]*common.AppMetaInfo, errors.ErrApi)
-	MayAcquireToken(ctx context.Context, in *proto.MayAcquireTokenRequest) errors.ErrApi
+
 	InviteToApp(ctx context.Context, in *proto.InviteRequest) (string, string, errors.ErrApi)
 	AcceptInvite(ctx context.Context, in *proto.AcceptInviteRequest) errors.ErrApi
 }
@@ -243,24 +242,6 @@ func (svc appadmin) GetMultiple(ctx context.Context, in *proto.GetListRequest) (
 		}
 	}
 	return apps, nil
-}
-
-// MayAcquireToken verifies that the user trying to create an app token is allowed to do so
-func (svc appadmin) MayAcquireToken(ctx context.Context, in *proto.MayAcquireTokenRequest) errors.ErrApi {
-	ok, err := token.MayAcquire(ctx, svc.repo, in)
-	if err != nil {
-		if err == token.ErrNotFound {
-			return errors.ErrAPI{Status: http.StatusBadRequest, Msg: "Could not find request App information", Err: err}
-		}
-		if err == token.ErrNotAuthorized {
-			return errors.ErrAPI{Status: http.StatusUnauthorized, Msg: "Missing permission to acquire token", Err: err}
-		}
-		return errors.ErrAPI{Status: http.StatusInternalServerError, Msg: "Could not check for authorization", Err: err}
-	}
-	if !ok {
-		return errors.ErrAPI{Status: http.StatusUnauthorized, Msg: "Missing permission to acquire token", Err: err}
-	}
-	return nil
 }
 
 func (svc appadmin) InviteToApp(ctx context.Context, in *proto.InviteRequest) (string, string, errors.ErrApi) {
