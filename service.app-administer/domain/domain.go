@@ -6,10 +6,10 @@ import (
 	"net/http"
 
 	"github.com/KonstantinGasser/datalab/common"
+	"github.com/KonstantinGasser/datalab/hasher"
 	"github.com/KonstantinGasser/datalab/service.app-administer/domain/create"
 	"github.com/KonstantinGasser/datalab/service.app-administer/domain/delete"
 	"github.com/KonstantinGasser/datalab/service.app-administer/domain/get"
-	"github.com/KonstantinGasser/datalab/service.app-administer/domain/hasher"
 	"github.com/KonstantinGasser/datalab/service.app-administer/domain/invite"
 	"github.com/KonstantinGasser/datalab/service.app-administer/domain/permissions"
 	"github.com/KonstantinGasser/datalab/service.app-administer/errors"
@@ -244,6 +244,8 @@ func (svc appadmin) GetMultiple(ctx context.Context, in *proto.GetListRequest) (
 	return apps, nil
 }
 
+// InviteToApp handles the invite process to an app. The requester must have the correct permissions
+// (must be owner of the app) in order to create a new invite
 func (svc appadmin) InviteToApp(ctx context.Context, in *proto.InviteRequest) (string, string, errors.ErrApi) {
 	permissionErr := permissions.IsOwner(ctx, svc.repo, in.GetUserClaims().GetUuid(), in.GetAppUuid())
 	if permissionErr != nil {
@@ -286,6 +288,8 @@ func (svc appadmin) InviteToApp(ctx context.Context, in *proto.InviteRequest) (s
 	return app.Name, app.Owner, nil
 }
 
+// AcceptInvite handles the accept of an invite where the requester must be listed in the app's
+// member array with status InvitePending in order to have the correct permissions
 func (svc appadmin) AcceptInvite(ctx context.Context, in *proto.AcceptInviteRequest) errors.ErrApi {
 	permissionErr := permissions.HasInvite(ctx, svc.repo, in.GetUserClaims(), in.GetAppUuid())
 	if permissionErr != nil {

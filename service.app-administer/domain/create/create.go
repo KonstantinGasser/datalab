@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/KonstantinGasser/datalab/hasher"
 	"github.com/KonstantinGasser/datalab/service.app-administer/config"
-	"github.com/KonstantinGasser/datalab/service.app-administer/domain/hasher"
 	"github.com/KonstantinGasser/datalab/service.app-administer/domain/types"
 	"github.com/KonstantinGasser/datalab/service.app-administer/proto"
 	"github.com/KonstantinGasser/datalab/service.app-administer/repo"

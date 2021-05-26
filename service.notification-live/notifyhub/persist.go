@@ -79,7 +79,7 @@ func (hub *NotifyHub) Remove(removeEvent *RemoveEvent) error {
 			Key: "$pull",
 			Value: bson.D{
 				{
-					Key:   "notification",
+					Key:   "notifications",
 					Value: bson.M{"timestamp": removeEvent.Timestamp},
 				},
 			},

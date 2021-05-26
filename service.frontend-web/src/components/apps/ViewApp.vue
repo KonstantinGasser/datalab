@@ -24,6 +24,9 @@
                     <div  v-if="app_unsaved" class="unsaved d-flex align-center justify-center">
                         <div>Unsaved Changes</div>
                     </div>
+                    <div class="sync d-flex align-center justify-center" @click="syncAppChanges(activeApp?.app?.uuid)">
+                        <div>sync <span class="icon icon-rotate-cw"></span></div>
+                    </div>
                 </h1>
                 <div class="desc_test">{{activeApp.app?.description}}</div>
                 <hr>
@@ -104,6 +107,13 @@
         },
         props: ['status'],
         methods: {
+            async syncAppChanges(uuid){
+                const data = await this.getApp(uuid);
+                if (data.app === undefined || data.app == null) {
+                    return
+                }
+                this.activeApp = data; 
+            },
             async loadApp(uuid) {
                 this.isInCreateMode = false;
                 const data = await this.getApp(uuid);
@@ -120,7 +130,7 @@
                         'Authorization': localStorage.getItem("token"),
                     }
                 };
-                const resp = await axios.get("http://192.168.0.177:8080/api/v1/app/getall", options)
+                const resp = await axios.get("http://localhost:8080/api/v1/app/getall", options)
                 if (resp.status != 200) {
                     this.$toast.error(resp.data);
                 }
@@ -134,7 +144,7 @@
                 };
                 let resp = {}
                 try {
-                    resp = await axios.get("http://192.168.0.177:8080/api/v1/app/get?app="+uuid, options)
+                    resp = await axios.get("http://localhost:8080/api/v1/app/get?app="+uuid, options)
                     if (resp.status != 200) {
                         this.$toast.error(resp.data);
                     }
@@ -172,7 +182,7 @@
                     }
                 };
 
-                const res = await axios.get("http://192.168.0.177:8080/api/v2/view/app/details", options)
+                const res = await axios.get("http://localhost:8080/api/v2/view/app/details", options)
                 if (res.data == null || res.status >= 400) {
                     this.isInCreateMode = true;
                     console.log(this.isInCreateMode);
@@ -188,7 +198,7 @@
                         'Authorization': localStorage.getItem("token"),
                     }
                 };
-                axios.get("http://192.168.0.177:8080/api/v2/view/app/get?uuid="+uuid, options).then(resp => {
+                axios.get("http://localhost:8080/api/v2/view/app/get?uuid="+uuid, options).then(resp => {
                     if (this.isInCreateMode)
                         this.isInCreateMode = !this.isInCreateMode;
                     this.activeApp = resp.data.app;
@@ -297,5 +307,25 @@ h2 {
     color: var(--sub-bg);
     font-size: 16px;
     font-weight: bold;
+}
+
+.sync {
+    cursor: pointer;
+    margin-left: 15px;
+    width: auto;
+    height: 25px;
+    border-radius: 8px;
+    background: #ffa50050;
+    border: 1px solid #ffa500;
+    padding: 5px 15px;
+}
+.sync div {
+    color: var(--sub-bg);
+    font-size: 16px;
+    font-weight: bold;
+}
+.sync span {
+    font-size: 16px;
+    font-weight: bolder;
 }
 </style>

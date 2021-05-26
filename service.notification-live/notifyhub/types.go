@@ -53,9 +53,9 @@ type BatchNotification struct {
 }
 
 type IncomingEvent struct {
-	UserUuid     string `json:"receiver_uuid"`
-	Organization string `json:"receiver_orgn"`
-	Timestamp    int64
+	UserUuid     string                 `json:"receiver_uuid"`
+	Organization string                 `json:"receiver_orgn"`
+	Timestamp    int64                  `json:"timestamp"`
 	Mutation     VueMutation            `json:"mutation"`
 	Event        MessageEvent           `json:"event"`
 	Value        map[string]interface{} `json:"value"`

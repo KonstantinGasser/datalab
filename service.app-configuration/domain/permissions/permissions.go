@@ -3,12 +3,10 @@ package permissions
 import (
 	"context"
 	"fmt"
+	"net/http"
 
 	"github.com/KonstantinGasser/datalab/common"
-	"github.com/KonstantinGasser/datalab/service.app-configuration/config"
-	"github.com/KonstantinGasser/datalab/service.app-configuration/repo"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
+	"github.com/KonstantinGasser/datalab/service.app-token-issuer/errors"
 )
 
 var (
@@ -18,32 +16,21 @@ var (
 	ErrNoAppsFound    = fmt.Errorf("could not find any apps the user is allowed to have access to")
 )
 
-func CanAccess(ctx context.Context, repo repo.Repo, permissions *common.UserTokenClaims, appUuid string) error {
+type Permission struct {
+	permissionRepo PermissionDao
+}
 
-	var allowedApps []string
-	for _, item := range permissions.GetPermissions().GetApps() {
-		allowedApps = append(allowedApps, item.GetAppUuid())
+func New(repo PermissionDao) Permission {
+	return Permission{
+		permissionRepo: repo,
 	}
-	filter := bson.D{
-		{
-			Key: "_id",
-			Value: bson.D{
-				{
-					Key:   "$in",
-					Value: allowedApps,
-				},
-			},
-		},
-	}
-	ok, err := repo.Exists(ctx, config.CfgDB, config.CfgColl, filter)
-	if err != nil {
-		if err == mongo.ErrNoDocuments {
-			return ErrNotAuthorized
+}
+
+func (p Permission) HasRead(ctx context.Context, appUuid string, allowedReads []*common.AppPermission) errors.ErrApi {
+	for _, item := range allowedReads {
+		if item.AppUuid == appUuid {
+			return nil
 		}
-		return err
 	}
-	if !ok {
-		return ErrNotAuthorized
-	}
-	return nil
+	return errors.New(http.StatusUnauthorized, ErrNotAuthorized, "User is not allowed to see App Config")
 }

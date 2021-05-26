@@ -7,6 +7,7 @@ import (
 
 	"github.com/KonstantinGasser/datalab/service.user-administer/repo"
 	"github.com/KonstantinGasser/datalab/service.user-authentication/config"
+	"github.com/KonstantinGasser/datalab/service.user-authentication/domain/permissions"
 	"github.com/KonstantinGasser/datalab/service.user-authentication/domain/types"
 	"github.com/KonstantinGasser/datalab/service.user-authentication/proto"
 	"github.com/KonstantinGasser/datalab/utils/hash"
@@ -21,10 +22,11 @@ var (
 
 // NewUser registers a new user in the database
 func NewUser(ctx context.Context, repo repo.Repo, in *proto.RegisterRequest) (string, error) {
+	// must not contain "/"
 	if !orgnNameAllowed(in.GetOrganisation()) {
 		return "", ErrInvalidOrgnName
 	}
-
+	// username must be unique
 	exists, err := repo.Exists(ctx, config.UserAuthDB, config.UserAuthColl, bson.M{"username": in.GetUsername()})
 	if err != nil {
 		return "", err
@@ -41,22 +43,22 @@ func NewUser(ctx context.Context, repo repo.Repo, in *proto.RegisterRequest) (st
 	if err != nil {
 		return "", err
 	}
-	var newUser = types.UserAuthInfo{
+
+	err = repo.InsertOne(ctx, config.UserAuthDB, config.UserAuthColl, types.UserAuthInfo{
 		Uuid:         uuid,
 		Username:     strings.TrimSpace(in.GetUsername()),
 		Organization: strings.TrimSpace(in.GetOrganisation()),
 		Password:     hashedPassword,
-	}
-	err = repo.InsertOne(ctx, config.UserAuthDB, config.UserAuthColl, newUser)
+	})
 	if err != nil {
 		return "", fmt.Errorf("insert-user: %w", err)
 	}
-	var newPermissions = types.Permissions{
+
+	err = repo.InsertOne(ctx, config.UserAuthDB, config.UserPermissionColl, permissions.Permissions{
 		UserUuid: uuid,
 		UserOrgn: in.GetOrganisation(),
-		Apps:     []types.AppPermission{},
-	}
-	err = repo.InsertOne(ctx, config.UserAuthDB, config.UserPermissionColl, newPermissions)
+		Apps:     []permissions.AppPermission{},
+	})
 	if err != nil {
 		return "", fmt.Errorf("insert-permissions: %w", err)
 	}

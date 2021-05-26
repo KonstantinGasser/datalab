@@ -16,6 +16,7 @@ var (
 	ErrNotFound = fmt.Errorf("could not find any related app")
 )
 
+// Single looks up the app data for one given app uuid
 func Single(ctx context.Context, repo repo.Repo, appUuid string) (*common.AppInfo, error) {
 
 	var app types.AppInfo

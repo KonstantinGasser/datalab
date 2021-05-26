@@ -10,6 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
+// Multiple looks up all apps a user can access given its permissions
 func Multiple(ctx context.Context, repo repo.Repo, appUuids ...string) ([]*common.AppMetaInfo, error) {
 
 	filter := bson.D{

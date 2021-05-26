@@ -9,6 +9,7 @@ import (
 	"github.com/KonstantinGasser/datalab/service.app-token-issuer/errors"
 	userauthsvc "github.com/KonstantinGasser/datalab/service.user-authentication/proto"
 	"github.com/KonstantinGasser/datalab/utils/ctx_value"
+	"github.com/sirupsen/logrus"
 )
 
 type AcceptInviteForm struct {
@@ -23,6 +24,7 @@ func (svc gatewaylogic) AcceptInvite(ctx context.Context, form AcceptInviteForm)
 		UserClaims: ctx_value.GetAuthedUser(ctx),
 		AppUuid:    form.AppUuid,
 	})
+	fmt.Printf("Resp: %+v\n", resp)
 	if err != nil {
 		return "", errors.ErrAPI{
 			Status: http.StatusInternalServerError,
@@ -37,7 +39,8 @@ func (svc gatewaylogic) AcceptInvite(ctx context.Context, form AcceptInviteForm)
 			Err:    fmt.Errorf("%s", resp.GetMsg()),
 		}
 	}
-
+	fmt.Println("before add access")
+	// needs to move to Kafka ASAP
 	// once the invite status is changed to accept the users permissions
 	// need to be appended accordingly
 	permissionResp, err := svc.userauthClient.AddAppAccess(ctx, &userauthsvc.AddAppAccessRequest{
@@ -60,11 +63,14 @@ func (svc gatewaylogic) AcceptInvite(ctx context.Context, form AcceptInviteForm)
 			Err:    fmt.Errorf("%s", permissionResp.GetMsg()),
 		}
 	}
-
-	svc.RemoveNotification(ctx, RemoveEvent{
+	fmt.Println("after add access")
+	// needs to move to Kafka ASAP
+	err = svc.RemoveNotification(ctx, RemoveEvent{
 		UserUuid: ctx_value.GetAuthedUser(ctx).GetUuid(),
 		Timesamp: form.EventTimestamp,
 	})
-
+	if err != nil {
+		logrus.Errorf("remove notification: %v\n", err)
+	}
 	return permissionResp.GetUpdatedToken(), nil
 }

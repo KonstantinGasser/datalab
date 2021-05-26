@@ -4,10 +4,10 @@ import (
 	"context"
 	"net"
 
+	"github.com/KonstantinGasser/datalab/service.app-configuration/dao"
 	"github.com/KonstantinGasser/datalab/service.app-configuration/domain"
 	"github.com/KonstantinGasser/datalab/service.app-configuration/handler"
 	"github.com/KonstantinGasser/datalab/service.app-configuration/proto"
-	"github.com/KonstantinGasser/datalab/service.app-configuration/repo"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )
@@ -17,11 +17,11 @@ import (
 func Run(ctx context.Context, host, dbAddr string) error {
 	srv := grpc.NewServer()
 	// create storage dependency
-	repo, err := repo.NewMongoDB(dbAddr)
+	dao, err := dao.NewMongoDB(dbAddr)
 	if err != nil {
 		return err
 	}
-	domain := domain.NewAppConfigLogic(repo)
+	domain := domain.NewDomainLogic(dao)
 	configService := handler.NewHandler(domain)
 	proto.RegisterAppConfigurationServer(srv, configService)
 

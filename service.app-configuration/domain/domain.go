@@ -6,14 +6,10 @@ import (
 	"net/http"
 
 	"github.com/KonstantinGasser/datalab/common"
-	"github.com/KonstantinGasser/datalab/service.app-configuration/domain/get"
-	"github.com/KonstantinGasser/datalab/service.app-configuration/domain/initialize"
 	"github.com/KonstantinGasser/datalab/service.app-configuration/domain/permissions"
-	"github.com/KonstantinGasser/datalab/service.app-configuration/domain/types"
-	"github.com/KonstantinGasser/datalab/service.app-configuration/domain/update"
 	"github.com/KonstantinGasser/datalab/service.app-configuration/errors"
 	"github.com/KonstantinGasser/datalab/service.app-configuration/proto"
-	"github.com/KonstantinGasser/datalab/service.app-configuration/repo"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type AppConfig interface {
@@ -23,118 +19,89 @@ type AppConfig interface {
 }
 
 type appconfig struct {
-	repo repo.Repo
+	dao         Dao
+	permissions permissions.Permission
 }
 
-func NewAppConfigLogic(repo repo.Repo) AppConfig {
+func NewDomainLogic(dao Dao) AppConfig {
 	return &appconfig{
-		repo: repo,
+		dao:         dao,
+		permissions: permissions.New(dao),
 	}
 }
 
+// initConfigs creates an initialized config struct which will be stored in the database
 func (svc appconfig) InitConfigs(ctx context.Context, in *proto.InitRequest) errors.ErrApi {
-	if err := initialize.Configs(ctx, svc.repo, in); err != nil {
-		return errors.ErrAPI{
-			Status: http.StatusInternalServerError,
-			Msg:    "Could not initialize configurations",
-			Err:    err,
-		}
+	initConifg := ConfigInfo{
+		AppUuid:  in.GetForApp(),
+		Funnel:   make([]Stage, 0),
+		Campaign: make([]Record, 0),
+		BtnTime:  make([]BtnDef, 0),
 	}
-	return nil
+	return svc.initAppConfig(ctx, initConifg)
 }
 
+// GetConfigs looks up all configs maped to a given AppUuid if the caller has read access to the resource
 func (svc appconfig) GetConfigs(ctx context.Context, in *proto.GetRequest) (*common.AppConfigInfo, errors.ErrApi) {
-
-	permissionErr := permissions.CanAccess(ctx, svc.repo, in.GetUserClaims(), in.GetAppUuid())
+	permissionErr := svc.permissions.HasRead(ctx, in.GetAppUuid(), in.GetUserClaims().Permissions.GetApps())
 	if permissionErr != nil {
-		if permissionErr == permissions.ErrNotAuthorized {
-			return nil, errors.ErrAPI{
-				Status: http.StatusUnauthorized,
-				Msg:    "User is not authorized to access resource",
-				Err:    permissionErr,
-			}
-		}
-		return nil, errors.ErrAPI{
-			Status: http.StatusInternalServerError,
-			Msg:    "Could not get Apps",
-			Err:    permissionErr,
-		}
+		return nil, permissionErr
 	}
-	cfgs, err := get.Configs(ctx, svc.repo, in)
+	appConfig, err := svc.dao.GetById(ctx, in.GetAppUuid())
 	if err != nil {
-		if err == get.ErrNotFound {
-			return nil, errors.ErrAPI{
-				Status: http.StatusNotFound,
-				Msg:    "Could not find any related App-Configs",
-				Err:    err,
-			}
+		if err == mongo.ErrNoDocuments {
+			return nil, errors.New(http.StatusNotFound, err, "Could not find App Config")
 		}
-		return nil, errors.ErrAPI{
-			Status: http.StatusInternalServerError,
-			Msg:    "Could not find any related App-Configs",
-			Err:    err,
-		}
+		return nil, errors.New(http.StatusInternalServerError, err, "Could not get App Config")
 	}
-	return cfgs, nil
+	// convert dao struct to API struct
+	var funnel = make([]*common.Funnel, len(appConfig.Funnel))
+	for i, item := range appConfig.Funnel {
+		funnel[i] = &common.Funnel{Id: item.ID, Name: item.Name, Transition: item.Transition}
+	}
+	var campaign = make([]*common.Campaign, len(appConfig.Campaign))
+	for i, item := range appConfig.Campaign {
+		campaign[i] = &common.Campaign{Id: item.ID, Name: item.Name, Prefix: item.Suffix}
+	}
+	var btnTime = make([]*common.BtnTime, len(appConfig.BtnTime))
+	for i, item := range appConfig.BtnTime {
+		btnTime[i] = &common.BtnTime{Id: item.ID, Name: item.Name, BtnName: item.BtnName}
+	}
+
+	return &common.AppConfigInfo{
+		Funnel:   funnel,
+		Campaign: campaign,
+		BtnTime:  btnTime,
+	}, nil
 }
 
 func (svc appconfig) UpdateConfig(ctx context.Context, in *proto.UpdateRequest) errors.ErrApi {
-	permissionErr := permissions.CanAccess(ctx, svc.repo, in.GetUserClaims(), in.GetAppUuid())
+	permissionErr := svc.permissions.HasRead(ctx, in.GetAppUuid(), in.GetUserClaims().Permissions.GetApps())
 	if permissionErr != nil {
-		if permissionErr == permissions.ErrNotAuthorized {
-			return errors.ErrAPI{
-				Status: http.StatusUnauthorized,
-				Msg:    "User is not authorized to access resource",
-				Err:    permissionErr,
-			}
-		}
-		return errors.ErrAPI{
-			Status: http.StatusInternalServerError,
-			Msg:    "Could not get Apps",
-			Err:    permissionErr,
-		}
+		return permissionErr
 	}
 
-	// translate from protobuf to mongo document struct
-	var cfg []types.Config
+	// translate from protobuf to dao struct
+	var config []interface{}
 	switch in.GetUpdateFlag() {
 	case "funnel":
-		cfg = make([]types.Config, len(in.GetStages()))
+		config = make([]interface{}, len(in.GetStages()))
 		for i, item := range in.GetStages() {
-			cfg[i] = types.Stage{ID: item.Id, Name: item.Name, Transition: item.Transition}
+			config[i] = Stage{ID: item.Id, Name: item.Name, Transition: item.Transition}
 		}
 	case "campaign":
-		cfg = make([]types.Config, len(in.GetRecords()))
+		config = make([]interface{}, len(in.GetRecords()))
 		for i, item := range in.GetRecords() {
-			cfg[i] = types.Record{ID: item.Id, Name: item.Name, Prefix: item.Prefix}
+			config[i] = Record{ID: item.Id, Name: item.Name, Suffix: item.Prefix}
 		}
 	case "btn_time":
-		cfg = make([]types.Config, len(in.GetBtnDefs()))
+		config = make([]interface{}, len(in.GetBtnDefs()))
 		for i, item := range in.GetBtnDefs() {
-			cfg[i] = types.BtnDef{ID: item.Id, Name: item.Name, BtnName: item.BtnName}
+			config[i] = BtnDef{ID: item.Id, Name: item.Name, BtnName: item.BtnName}
 		}
 	default:
-		return errors.ErrAPI{
-			Status: http.StatusBadRequest,
-			Msg:    "Provided update-flag not found",
-			Err:    fmt.Errorf("could not match '%s' as update-flag", in.GetUpdateFlag()),
-		}
+		return errors.New(http.StatusBadRequest, fmt.Errorf("could not match '%s' as update-flag", in.GetUpdateFlag()), "Provided update-flag not found")
 	}
 
-	err := update.ByFlag(ctx, svc.repo, in.GetUpdateFlag(), in.GetAppUuid(), cfg)
-	if err != nil {
-		if err == update.ErrInvalidFlag {
-			return errors.ErrAPI{
-				Status: http.StatusBadRequest,
-				Msg:    "Provided update flag is invalid",
-				Err:    err,
-			}
-		}
-		return errors.ErrAPI{
-			Status: http.StatusInternalServerError,
-			Msg:    "Could not update config",
-			Err:    err,
-		}
-	}
-	return nil
+	return svc.updateConfigByFlag(ctx, in.GetUpdateFlag(), in.GetAppUuid(), config)
 }

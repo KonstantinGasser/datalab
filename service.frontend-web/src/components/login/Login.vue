@@ -36,7 +36,7 @@
               <i class="fas fa-lock"></i>
               <input type="password" v-model="signup.passwordConfirm" placeholder="Confirm Password" />
             </div>
-            <button type="submit" class="btn" value="Sign up" @click="register">Sign Up</button>
+            <button type="button" class="btn" value="Sign up" @click="register">Sign Up</button>
           </form>
         </div>
       </div>
@@ -93,7 +93,7 @@ export default {
   },
   methods: {
     login() {
-      axios.post('http://192.168.0.177:8080/api/v1/user/login', {
+      axios.post('http://localhost:8080/api/v1/user/login', {
         username: this.input.username,
         password: this.input.password,
       }).then(resp => {
@@ -122,7 +122,7 @@ export default {
         last_name: this.signup.last_name,
         orgn_position: this.signup.orgn_position,
       };
-      axios.post('http://192.168.0.177:8080/api/v1/user/register', payload).then((resp) => {
+      axios.post('http://localhost:8080/api/v1/user/register', payload).then((resp) => {
         if (resp.status === 200) {
           this.hasRegistered = !this.hasRegistered;
           this.$toast.success("Your account has been created");

@@ -19,7 +19,6 @@ func (handler *Handler) WithAuth(next http.HandlerFunc) http.HandlerFunc {
 			handler.onError(w, "no Authentication-Header found", http.StatusForbidden)
 			return
 		}
-		// invoke grpc call to token-service to validate a JWT
 		claims, err := handler.domain.IsLoggedIn(r.Context(), token)
 		if err != nil {
 			logrus.Errorf("<%v>[handler.WithAuth] could not authenticate user: %v", ctx_value.GetString(r.Context(), "tracingID"), err)

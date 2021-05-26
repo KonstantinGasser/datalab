@@ -11,13 +11,15 @@ import (
 	"github.com/KonstantinGasser/required"
 )
 
+// LoginForm represents the JSON send for login
 type LoginForm struct {
 	Username string `json:"username" required:"yes"`
 	Password string `json:"password" required:"yes"`
 }
 
+// LoginUser authenticated the username and password by requesting the user-auth service to check
+// its database
 func (svc gatewaylogic) LoginUser(ctx context.Context, form LoginForm) (string, errors.ErrApi) {
-
 	if err := required.Atomic(&form); err != nil {
 		return "", errors.ErrAPI{
 			Status: http.StatusBadRequest,

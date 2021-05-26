@@ -15,7 +15,6 @@ type RemoveEvent struct {
 }
 
 func (svc gatewaylogic) RemoveNotification(ctx context.Context, event RemoveEvent) error {
-
 	b, err := json.Marshal(&event)
 	if err != nil {
 		return errors.ErrAPI{
@@ -24,11 +23,12 @@ func (svc gatewaylogic) RemoveNotification(ctx context.Context, event RemoveEven
 			Err:    err,
 		}
 	}
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "http://192.168.0.177:8008/api/v1/datalab/remove/event", bytes.NewBuffer(b))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "http://localhost:8008/api/v1/datalab/remove/event", bytes.NewBuffer(b))
 	req.Header.Set("Content-Type", "application/json")
 
 	client := http.DefaultClient
 	_, err = client.Do(req)
+
 	if err != nil {
 		return errors.ErrAPI{
 			Status: http.StatusInternalServerError,

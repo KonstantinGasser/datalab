@@ -241,5 +241,5 @@ var AppTokenIssuer_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "service.app-token-issuer/proto/app-token-issuer.proto",
+	Metadata: "service.app.token-issuer/ports/proto/app-token-issuer.proto",
 }

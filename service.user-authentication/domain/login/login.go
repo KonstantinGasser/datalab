@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/KonstantinGasser/datalab/service.user-authentication/config"
+	"github.com/KonstantinGasser/datalab/service.user-authentication/domain/permissions"
 	"github.com/KonstantinGasser/datalab/service.user-authentication/domain/types"
 	"github.com/KonstantinGasser/datalab/service.user-authentication/jwts"
 	"github.com/KonstantinGasser/datalab/service.user-authentication/proto"
@@ -35,7 +36,7 @@ func User(ctx context.Context, repo repo.Repo, in *proto.LoginRequest) (string, 
 		return "", ErrWrongPassword
 	}
 
-	var foundPermissions types.Permissions
+	var foundPermissions permissions.Permissions
 	err = repo.FindOne(ctx, config.UserAuthDB, config.UserPermissionColl, bson.M{"_id": foundUser.Uuid}, &foundPermissions)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {

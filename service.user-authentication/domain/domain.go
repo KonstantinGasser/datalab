@@ -9,7 +9,6 @@ import (
 	"github.com/KonstantinGasser/datalab/service.user-authentication/domain/login"
 	"github.com/KonstantinGasser/datalab/service.user-authentication/domain/permissions"
 	"github.com/KonstantinGasser/datalab/service.user-authentication/domain/register"
-	"github.com/KonstantinGasser/datalab/service.user-authentication/domain/types"
 	"github.com/KonstantinGasser/datalab/service.user-authentication/jwts"
 	"github.com/KonstantinGasser/datalab/service.user-authentication/proto"
 	"github.com/KonstantinGasser/datalab/service.user-authentication/repo"
@@ -23,10 +22,12 @@ type UserAuthLogic interface {
 	AddAppAccess(ctx context.Context, in *proto.AddAppAccessRequest) (string, errors.ErrApi)
 }
 
+// userauthlogic implements the UserAuthLogic interface
 type userauthlogic struct {
 	repo repo.Repo
 }
 
+// NewUserAuthLogic returns a new UserAuthLogic
 func NewUserAuthLogic(repo repo.Repo) UserAuthLogic {
 	return &userauthlogic{
 		repo: repo,
@@ -112,9 +113,9 @@ func (svc userauthlogic) IsAuthenticated(ctx context.Context, in *proto.IsAuthed
 }
 
 func (svc userauthlogic) AddAppAccess(ctx context.Context, in *proto.AddAppAccessRequest) (string, errors.ErrApi) {
-	permission := types.AppPermission{
+	permission := permissions.AppPermission{
 		AppUuid: in.GetAppUuid(),
-		Role:    types.AppRole(in.GetAppRole()),
+		Role:    permissions.AppRole(in.GetAppRole()),
 	}
 	newPermission, err := permissions.UpdateAppAccess(ctx, svc.repo, in.GetUserUuid(), permission)
 	if err != nil {

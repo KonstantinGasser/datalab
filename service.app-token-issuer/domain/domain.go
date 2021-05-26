@@ -3,17 +3,17 @@ package domain
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"github.com/KonstantinGasser/datalab/common"
-	"github.com/KonstantinGasser/datalab/service.app-administer/errors"
-	appsvc "github.com/KonstantinGasser/datalab/service.app-administer/proto"
-	"github.com/KonstantinGasser/datalab/service.app-token-issuer/domain/get"
-	"github.com/KonstantinGasser/datalab/service.app-token-issuer/domain/initialize"
-	"github.com/KonstantinGasser/datalab/service.app-token-issuer/domain/issue"
 	"github.com/KonstantinGasser/datalab/service.app-token-issuer/domain/permissions"
-	"github.com/KonstantinGasser/datalab/service.app-token-issuer/domain/validate"
+	"github.com/KonstantinGasser/datalab/service.app-token-issuer/errors"
 	"github.com/KonstantinGasser/datalab/service.app-token-issuer/proto"
-	"github.com/KonstantinGasser/datalab/service.app-token-issuer/repo"
+	"github.com/KonstantinGasser/required"
+)
+
+const (
+	tokenExp = time.Hour * 24 * 7
 )
 
 type AppTokenIssuer interface {
@@ -24,106 +24,59 @@ type AppTokenIssuer interface {
 }
 
 type apptokenissuer struct {
-	repo     repo.Repo
-	appadmin appsvc.AppAdministerClient
+	dao        Dao
+	permission permissions.Permission
 }
 
-func NewAppTokenLogic(repo repo.Repo, appadmin appsvc.AppAdministerClient) AppTokenIssuer {
+func NewDomainLogic(dao Dao) AppTokenIssuer {
 	return &apptokenissuer{
-		repo:     repo,
-		appadmin: appadmin,
+		dao:        dao,
+		permission: permissions.New(dao),
 	}
 }
 
+// InitToken initializes the doucment with the required meta data for an App Token
 func (svc apptokenissuer) InitToken(ctx context.Context, in *proto.InitRequest) errors.ErrApi {
-	err := initialize.AppToken(ctx, svc.repo, in.GetAppUuid(), in.GetAppHash(), in.GetAppOwner())
-	if err != nil {
-		return errors.ErrAPI{
-			Status: http.StatusInternalServerError,
-			Msg:    "Could not initialize App Token",
-			Err:    err,
-		}
+	var appToken = AppToken{
+		AppUuid:  in.GetAppUuid(),
+		AppHash:  in.GetAppHash(),
+		AppOwner: in.GetAppOwner(),
 	}
-	return nil
+	if err := required.Atomic(&appToken); err != nil {
+		return errors.New(http.StatusBadRequest, err, "Missing fields")
+	}
+	return svc.initAppToken(ctx, appToken)
 }
 
+// IssueToken creates a new app token and updates the token in the database if the token is not set yet
+// or has expired else will return an error
 func (svc apptokenissuer) IssueToken(ctx context.Context, in *proto.IssueRequest) (*common.AppTokenInfo, errors.ErrApi) {
-	permissionErr := permissions.IsOwner(ctx, svc.repo, in.GetCallerUuid(), in.GetAppUuid())
+	permissionErr := svc.permission.IsOwner(ctx, svc.dao, in.GetCallerUuid(), in.GetAppUuid())
 	if permissionErr != nil {
-		if permissionErr == permissions.ErrNotAuthorized {
-			return nil, errors.ErrAPI{
-				Status: http.StatusUnauthorized,
-				Msg:    "User must be App Owner to generate App Token",
-				Err:    permissionErr,
-			}
-		}
-		return nil, errors.ErrAPI{
-			Status: http.StatusInternalServerError,
-			Msg:    "Could not verify permissions",
-			Err:    permissionErr,
-		}
+		return nil, permissionErr
 	}
 
-	token, err := issue.Token(ctx, svc.repo, in)
+	jwt, err := svc.issueAppToken(ctx, in.GetAppUuid(), in.GetAppOrigin(), in.GetAppHash())
 	if err != nil {
-		if err == issue.ErrTokenStillValid {
-			return nil, errors.ErrAPI{
-				Status: http.StatusBadRequest,
-				Msg:    "Current App-Token has not expired yet",
-				Err:    err,
-			}
-		}
-		return nil, errors.ErrAPI{
-			Status: http.StatusInternalServerError,
-			Msg:    "Could not issue App-Token",
-			Err:    err,
-		}
+		return nil, err
 	}
-	return token, nil
+	return jwt, nil
 }
 
+// ValidateToken checks if the token is a valid JWT and returns a subset of the data if valid
 func (svc apptokenissuer) ValidateToken(ctx context.Context, in *proto.ValidateRequest) (string, string, errors.ErrApi) {
-	appUuid, appOrigin, err := validate.Token(ctx, in.GetAppToken())
+	appUuid, appOrigin, err := svc.validateAppToken(ctx, in.GetAppToken())
 	if err != nil {
-		return "", "", errors.ErrAPI{
-			Status: http.StatusUnauthorized,
-			Msg:    "App Token invalid",
-			Err:    err,
-		}
+		return "", "", err
 	}
 	return appUuid, appOrigin, nil
 }
 
+// GetToken looks up the stored App Token data
 func (svc apptokenissuer) GetToken(ctx context.Context, in *proto.GetRequest) (*common.AppTokenInfo, errors.ErrApi) {
-	permissionErr := permissions.CanAccess(ctx, svc.repo, in.GetUserClaims(), in.GetAppUuid())
-	if permissionErr != nil {
-		if permissionErr == permissions.ErrNotAuthorized {
-			return nil, errors.ErrAPI{
-				Status: http.StatusUnauthorized,
-				Msg:    "User must be App Owner to generate App Token",
-				Err:    permissionErr,
-			}
-		}
-		return nil, errors.ErrAPI{
-			Status: http.StatusInternalServerError,
-			Msg:    "Could not verify permissions",
-			Err:    permissionErr,
-		}
-	}
-	token, err := get.Token(ctx, svc.repo, in.GetAppUuid())
+	token, err := svc.getAppToken(ctx, in.GetAppUuid())
 	if err != nil {
-		if err == get.ErrNotFound {
-			return nil, errors.ErrAPI{
-				Status: http.StatusNotFound,
-				Msg:    "Could not find App-Token",
-				Err:    err,
-			}
-		}
-		return nil, errors.ErrAPI{
-			Status: http.StatusInternalServerError,
-			Msg:    "Could not find App-Token",
-			Err:    err,
-		}
+		return nil, err
 	}
 	return token, nil
 }

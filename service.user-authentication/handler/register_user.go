@@ -16,7 +16,7 @@ func (handler Handler) Register(ctx context.Context, in *proto.RegisterRequest) 
 
 	uuid, err := handler.domain.RegisterNewUser(ctx, in)
 	if err != nil {
-		logrus.Infof("<%v>[service.user-authentication.Register] could not register user account: %v\n", ctx_value.GetString(ctx, "tracingID"), err.Error())
+		logrus.Errorf("<%v>[service.user-authentication.Register] could not register user account: %v\n", ctx_value.GetString(ctx, "tracingID"), err.Error())
 		return &proto.RegisterResponse{
 			StatusCode: err.Code(),
 			Msg:        err.Info(),

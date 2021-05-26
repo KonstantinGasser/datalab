@@ -11,7 +11,7 @@ func (handler *Handler) HandleRemoveNotification(w http.ResponseWriter, r *http.
 	logrus.Infof("[handler.RemoveNotification] received require\n")
 	var notification notifyhub.RemoveEvent
 	if err := handler.decode(r.Body, &notification); err != nil {
-		logrus.Errorf("[handler.IncomingNotification] could not decode r.Body: %v\n", err)
+		logrus.Errorf("[handler.RemoveNotification] could not decode r.Body: %v\n", err)
 		handler.onError(w, "could not decode r.Body", http.StatusBadGateway)
 		return
 	}

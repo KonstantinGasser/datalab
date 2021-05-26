@@ -100,6 +100,7 @@ func (hub *NotifyHub) run() {
 		// removes notifications with are no longer important
 		// and can be delete from the database
 		case notification := <-hub.RemoveNotify:
+			fmt.Printf("remove: %+v\n", notification)
 			err := hub.removeNotification(notification)
 			if err != nil {
 				logrus.Errorf("[notifyHub.chan.RemoveNotify] could not remove message: %v\n", err)
