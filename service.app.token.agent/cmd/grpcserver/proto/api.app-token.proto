@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package issuer_proto;
+
+option go_package = "github.com/KonstantinGasser/datalab/service.app.token.agent/cmd/grpcserver/proto";
+import "common/common.proto";
+
+service AppToken {
+    rpc Initialize(InitializeRequest) returns (InitializeResponse) {}
+    rpc Issue(IssueRequest) returns (IssueResponse) {}
+    rpc Validate(ValidateRequest) returns (ValidateResponse) {}
+    rpc Get(GetRequest) returns (GetResponse) {}
+}
+
+message InitializeRequest {
+    string tracing_ID = 1;
+    string app_uuid = 2;
+    string app_owner = 3;
+    string app_hash = 4;
+    string app_origin = 5;
+}
+
+message InitializeResponse {
+    int32 status_code = 1;
+    string msg = 2;
+}
+
+message IssueRequest {
+    string tracing_ID = 1;
+    string caller_uuid = 2; 
+    string app_uuid = 3;
+}
+
+message IssueResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    common.AppAccessToken token = 3;
+}
+
+message GetRequest {
+    string tracing_ID = 1;
+    common.AuthedUser authed_user = 2;
+    string app_uuid = 3;
+}
+
+message GetResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    common.AppAccessToken token = 3;
+}
+
+message ValidateRequest {
+    string tracing_ID = 1;
+    common.AuthedUser authed_user = 2;
+    string app_token = 3;
+}
+
+message ValidateResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    string app_uuid = 3;
+    string app_origin = 4;
+}

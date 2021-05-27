@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package config_proto;
+
+option go_package = "github.com/KonstantinGasser/datalab/service.app.config.agent/cmd/grpcserver/proto";
+
+import "common/common.proto";
+
+service AppConfiguration {
+    rpc Initialize(InitRequest) returns (InitResponse) {}
+    rpc Get(GetRequest) returns (GetResponse) {}
+    rpc Update(UpdateRequest) returns (UpdateResponse) {}
+}
+
+
+message InitRequest {
+    string tracing_ID = 1;
+    string app_ref_uuid = 2;
+    string app_owner = 3;
+}
+message InitResponse {
+    int32 status_code = 1;
+    string msg = 2;
+}
+
+message GetRequest {
+    string tracing_ID = 1;
+    common.AuthedUser authed_user = 2;
+    string app_uuid = 3;
+
+}
+message GetResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    common.AppConfigurations configs = 3;
+}
+
+message UpdateRequest {
+    string tracing_ID = 1;
+    common.AuthedUser authed_user = 2;
+    string app_ref_uuid =  3;
+    string update_flag = 4;
+    repeated common.Stage stages = 5;
+    repeated common.Record records = 6;
+    repeated common.BtnDef btn_defs = 7;
+}
+message UpdateResponse {
+    int32 status_code = 1;
+    string msg = 2;
+}

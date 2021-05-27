@@ -5,10 +5,7 @@ package common;
 option go_package = "github.com/KonstantinGasser/datalab/common";
 
 
-message Hello {
-    string msg = 1;
-    int32 code = 2;
-}
+
 
 
 message AppInfo {
@@ -91,4 +88,42 @@ enum AppRole {
 message AppPermission {
     string app_uuid = 1;
     AppRole role = 2;
+}
+
+
+message AuthedUser {
+    string uuid = 1;
+    string organization = 2;
+    repeated string read_write_apps = 3;
+}
+
+message ReadWriteApps {
+    string uuid = 1;
+}
+
+message AppAccessToken {
+    string jwt = 1;
+    int64 expiration = 2;
+}
+
+message AppConfigurations {
+    repeated Stage funnel = 1;
+    repeated Record campaign = 2;
+    repeated BtnDef btn_time = 3;
+}
+
+message Stage {
+    int32 id = 1;
+    string name = 2;
+    string transition = 3;
+}
+message Record {
+    int32 id = 1;
+    string name = 2;
+    string suffix = 3;
+}
+message BtnDef {
+    int32 id = 1;
+    string name = 2;
+    string btn_name = 3;
 }

@@ -1,0 +1,100 @@
+syntax = "proto3";
+
+
+package app_proto;
+option go_package = "github.com/KonstantinGasser/datalab/service.app.meta.agent/proto";
+
+import "common/common.proto";
+
+service AppAdminister {
+    rpc Create(CreateRequest) returns (CreateResponse) {}
+    rpc Delete(DeleteRequest) returns (DeleteResponse) {}
+    rpc Get(GetRequest) returns (GetResponse) {}
+    rpc GetList(GetListRequest) returns (GetListResponse) {}
+
+    rpc Invite(InviteRequest) returns (InviteResponse) {}
+    rpc AcceptInvite(AcceptInviteRequest) returns (AcceptInviteResponse) {}
+}
+
+
+// RPC CREATE APP
+message CreateRequest {
+    string tracing_ID = 1;
+    string user_uuid = 2;
+    string owner_uuid = 3;
+    string name = 4;
+    string organization = 5;
+    string description = 6;
+    string app_url = 7;
+}
+message CreateResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    string app_uuid = 3;
+}
+// ***************************
+
+// RPC DELETE APP
+message DeleteRequest {
+    string tracing_ID = 1;
+    common.AuthedUser authed_user = 2;
+    string app_uuid = 3;
+    string app_name = 4;
+    string orgn_name = 5;
+}
+
+message DeleteResponse {
+    int32 status_code = 1;
+    string msg = 2;
+}
+// ***************************
+
+// RPC GET APP LIST
+message GetListRequest {
+    string tracing_ID = 1;
+    common.AuthedUser authed_user = 2;
+}
+message GetListResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    repeated common.AppMetaInfo app_list = 3;
+}
+// ***************************
+
+// RPC GET APP
+message GetRequest {
+    string tracing_ID = 1;
+    common.AuthedUser authed_user = 2;
+    string app_uuid = 3;
+    
+}
+
+message GetResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    common.AppInfo app = 3;
+}
+
+message InviteRequest {
+    string tracing_ID = 1;
+    common.AuthedUser authed_user = 2;
+    string app_uuid = 3;
+    string user_uuid = 4;
+}
+message InviteResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    string app_name =3;
+    string owner_uuid = 4;
+}
+
+message AcceptInviteRequest {
+    string tracing_ID = 1;
+    common.AuthedUser authed_user = 2;
+    string app_uuid = 3;
+}
+
+message AcceptInviteResponse {
+    int32 status_code = 1;
+    string msg = 2;
+}

@@ -6,15 +6,12 @@ app-admin:
 	protoc -I. --go-grpc_out=$(GOPATH)/src service.app-administer/proto/app-administer.proto common/common.proto
 
 app-token-issuer:
-	protoc -I. --go_out=$(GOPATH)/src service.app.token-issuer/ports/proto/app-token-issuer.proto common/common.proto
-	protoc -I. --go-grpc_out=$(GOPATH)/src service.app.token-issuer/ports/proto/app-token-issuer.proto common/common.proto
-
-	# protoc -I. --go_out=$(GOPATH)/src service.app-token-issuer/proto/app-token-issuer.proto common/common.proto
-	# protoc -I. --go-grpc_out=$(GOPATH)/src service.app-token-issuer/proto/app-token-issuer.proto common/common.proto
+	protoc -I. --go_out=$(GOPATH)/src service.app.token.agent/cmd/grpcserver/proto/api.app-token.proto common/common.proto
+	protoc -I. --go-grpc_out=$(GOPATH)/src service.app.token.agent/cmd/grpcserver/proto/api.app-token.proto common/common.proto
 
 app-configuration:
-	protoc -I. --go_out=$(GOPATH)/src service.app-configuration/proto/app-configuration.proto common/common.proto
-	protoc -I. --go-grpc_out=$(GOPATH)/src service.app-configuration/proto/app-configuration.proto common/common.proto
+	protoc -I. --go_out=$(GOPATH)/src service.app.config.agent/cmd/grpcserver/proto/api.app-config.proto common/common.proto
+	protoc -I. --go-grpc_out=$(GOPATH)/src service.app.config.agent/cmd/grpcserver/proto/api.app-config.proto common/common.proto
 
 user-admin:
 	protoc -I. --go_out=$(GOPATH)/src service.user-administer/proto/user-administer.proto common/common.proto
