@@ -1,5 +1,7 @@
 package users
 
+import "github.com/KonstantinGasser/datalab/common"
+
 type RegisterRequest struct {
 	UserUuid     string `json:",omitempty"`
 	Username     string `json:"username" required:"yes"`
@@ -36,4 +38,24 @@ type UpdateProfileResponse struct {
 	Stauts int32  `json:"status"`
 	Msg    string `json:"msg"`
 	Err    string `json:"error,omitempty"`
+}
+
+type GetProfileRequest struct {
+	UserUuid string
+}
+type GetProfileResponse struct {
+	Stauts int32            `json:"status"`
+	Msg    string           `json:"msg"`
+	Err    string           `json:"error,omitempty"`
+	User   *common.UserInfo `json:"user"`
+}
+
+type GetColleagueRequest struct {
+	UserUuid string
+}
+type GetColleagueResponse struct {
+	Stauts     int32              `json:"status"`
+	Msg        string             `json:"msg"`
+	Err        string             `json:"error,omitempty"`
+	Colleagues []*common.UserInfo `json:"user"`
 }

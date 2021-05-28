@@ -20,12 +20,11 @@ service AppMeta {
 // RPC CREATE APP
 message CreateRequest {
     string tracing_ID = 1;
-    string user_uuid = 2;
-    string owner_uuid = 3;
-    string name = 4;
-    string organization = 5;
-    string description = 6;
-    string app_url = 7;
+    string owner_uuid = 2;
+    string name = 3;
+    string organization = 4;
+    string description = 5;
+    string app_url = 6;
 }
 message CreateResponse {
     int32 status_code = 1;

@@ -42,44 +42,44 @@ func Run(ctx context.Context, hostAddr, userAddr, appAddr, apptokenAddr, tokenAd
 	logrus.Info("[api.Dependency] established connection to all services\n")
 	gatewaysvc.Apply(handler.WithAllowedOrigins("*"))
 
-	gatewaysvc.Register("/api/v1/user/register", gatewaysvc.RegisterUser,
+	gatewaysvc.Register("/api/v1/user/register", gatewaysvc.RegisterUser, /// Done
 		gatewaysvc.WithTracing,
 		gatewaysvc.WithCors,
 	)
-	gatewaysvc.Register("/api/v1/user/login", gatewaysvc.LoginUser,
+	gatewaysvc.Register("/api/v1/user/login", gatewaysvc.LoginUser, /// Done
 		gatewaysvc.WithTracing,
 		gatewaysvc.WithCors,
 	)
 
-	gatewaysvc.Register("/api/v1/user/profile", gatewaysvc.GetUserProfile,
-		gatewaysvc.WithTracing,
-		gatewaysvc.WithCors,
-		gatewaysvc.WithAuth,
-	)
-
-	gatewaysvc.Register("/api/v1/user/profile/colleagues", gatewaysvc.GetUserColleagues,
+	gatewaysvc.Register("/api/v1/user/profile", gatewaysvc.GetUserProfile, /// Done
 		gatewaysvc.WithTracing,
 		gatewaysvc.WithCors,
 		gatewaysvc.WithAuth,
 	)
 
-	gatewaysvc.Register("/api/v1/user/profile/update", gatewaysvc.UpdateUserProfile,
+	gatewaysvc.Register("/api/v1/user/profile/colleagues", gatewaysvc.GetUserColleagues, /// Done
 		gatewaysvc.WithTracing,
 		gatewaysvc.WithCors,
 		gatewaysvc.WithAuth,
 	)
 
-	gatewaysvc.Register("/api/v1/app/create", gatewaysvc.CreateApp,
+	gatewaysvc.Register("/api/v1/user/profile/update", gatewaysvc.UpdateUserProfile, /// Done
 		gatewaysvc.WithTracing,
 		gatewaysvc.WithCors,
 		gatewaysvc.WithAuth,
 	)
-	gatewaysvc.Register("/api/v1/app/get", gatewaysvc.GetAppDetails,
+
+	gatewaysvc.Register("/api/v1/app/create", gatewaysvc.CreateApp, /// Done
 		gatewaysvc.WithTracing,
 		gatewaysvc.WithCors,
 		gatewaysvc.WithAuth,
 	)
-	gatewaysvc.Register("/api/v1/app/getall", gatewaysvc.GetAppList,
+	gatewaysvc.Register("/api/v1/app/get", gatewaysvc.GetAppDetails, /// Done
+		gatewaysvc.WithTracing,
+		gatewaysvc.WithCors,
+		gatewaysvc.WithAuth,
+	)
+	gatewaysvc.Register("/api/v1/app/getall", gatewaysvc.GetAppList, ///
 		gatewaysvc.WithTracing,
 		gatewaysvc.WithCors,
 		gatewaysvc.WithAuth,

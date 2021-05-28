@@ -7,7 +7,10 @@ import (
 	"net"
 	"net/http"
 
+	"github.com/KonstantinGasser/datalab/service.api.bff/internal/apps/collecting"
+	"github.com/KonstantinGasser/datalab/service.api.bff/internal/apps/creating"
 	"github.com/KonstantinGasser/datalab/service.api.bff/internal/users/authenticating"
+	"github.com/KonstantinGasser/datalab/service.api.bff/internal/users/fetching"
 	"github.com/KonstantinGasser/datalab/service.api.bff/internal/users/updating"
 	"github.com/sirupsen/logrus"
 )
@@ -57,11 +60,17 @@ type Server struct {
 	// *** Server dependiencies ***
 	userauthService   authenticating.Service
 	userupdateService updating.Service
+	userfetchService  fetching.Service
+	appcreateService  creating.Service
+	appCollectService collecting.Service
 }
 
 func NewDefault(
 	authService authenticating.Service,
 	userupdateService updating.Service,
+	userfetchService fetching.Service,
+	appcreateService creating.Service,
+	appCollectService collecting.Service,
 ) *Server {
 	return &Server{
 		// *** CORS-Configurations ***
@@ -72,6 +81,9 @@ func NewDefault(
 		onSuccess:         onSuccess,
 		userauthService:   authService,
 		userupdateService: userupdateService,
+		userfetchService:  userfetchService,
+		appcreateService:  appcreateService,
+		appCollectService: appCollectService,
 	}
 }
 

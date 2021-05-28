@@ -18,7 +18,7 @@ func (s Server) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	}
 	resp := s.userauthService.Register(r.Context(), &request)
 	if resp.Stauts != http.StatusOK {
-		logrus.Errorf("<%v>[Server.LoginUser] could not login user: %v\n", tracingID, resp.Err)
+		logrus.Errorf("<%v>[Server.RegisterUser] could not register user: %v\n", tracingID, resp.Err)
 	}
 	s.onSuccess(w, resp.Stauts, resp)
 }

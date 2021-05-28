@@ -5,7 +5,10 @@ import (
 	"log"
 
 	"github.com/KonstantinGasser/datalab/service.api.bff/cmd/httpserver"
+	"github.com/KonstantinGasser/datalab/service.api.bff/internal/apps/collecting"
+	"github.com/KonstantinGasser/datalab/service.api.bff/internal/apps/creating"
 	"github.com/KonstantinGasser/datalab/service.api.bff/internal/users/authenticating"
+	"github.com/KonstantinGasser/datalab/service.api.bff/internal/users/fetching"
 	"github.com/KonstantinGasser/datalab/service.api.bff/internal/users/updating"
 	"github.com/KonstantinGasser/datalab/service.api.bff/ports/client"
 	"github.com/sirupsen/logrus"
@@ -29,12 +32,34 @@ func main() {
 	if err != nil {
 		logrus.Fatal(err)
 	}
+	grpcAppMeta, err := client.NewClientAppMeta(*appMetaAddr)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+	grpcAppToken, err := client.NewClientAppToken(*apptokenAddr)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+	grpcAppConfig, err := client.NewClientAppConfig(*appconfigAddr)
+	if err != nil {
+		logrus.Fatal(err)
+	}
 
 	// create server dependencies
 	userauthSerivce := authenticating.NewService(*grpcUserAuth, *grpcUserMeta)
 	userupdateService := updating.NewService(*grpcUserMeta)
+	userfetchService := fetching.NewService(*grpcUserMeta)
 
-	server := httpserver.NewDefault(userauthSerivce, userupdateService)
+	appcreateService := creating.NewService(*grpcAppMeta)
+	appcollectService := collecting.NewService(*grpcAppMeta, *grpcUserMeta, *grpcAppToken, *grpcAppConfig)
+
+	server := httpserver.NewDefault(
+		userauthSerivce,
+		userupdateService,
+		userfetchService,
+		appcreateService,
+		appcollectService,
+	)
 
 	server.Apply(httpserver.WithAllowedOrigins("*"))
 
@@ -48,6 +73,27 @@ func main() {
 		server.WithCors,
 	)
 	server.Register("/api/v1/user/profile/update", server.UpdateUserProfile,
+		server.WithTracing,
+		server.WithCors,
+		server.WithAuth,
+	)
+	server.Register("/api/v1/user/profile", server.GetUserProfile,
+		server.WithTracing,
+		server.WithCors,
+		server.WithAuth,
+	)
+	server.Register("/api/v1/user/colleagues", server.GetColleagues,
+		server.WithTracing,
+		server.WithCors,
+		server.WithAuth,
+	)
+
+	server.Register("/api/v1/app/create", server.CreateApp,
+		server.WithTracing,
+		server.WithCors,
+		server.WithAuth,
+	)
+	server.Register("/api/v1/app", server.GetApp,
 		server.WithTracing,
 		server.WithCors,
 		server.WithAuth,
