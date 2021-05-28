@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/KonstantinGasser/datalab/common"
 	grpcAppConfig "github.com/KonstantinGasser/datalab/service.app.config.agent/cmd/grpcserver/proto"
 	"github.com/KonstantinGasser/datalab/service.app.meta.agent/ports"
 	grpcAppToken "github.com/KonstantinGasser/datalab/service.app.token.agent/cmd/grpcserver/proto"
+	grpcUserPermissions "github.com/KonstantinGasser/datalab/service.user.auth.agent/cmd/grpcserver/proto"
 	"google.golang.org/grpc"
 )
 
@@ -78,6 +80,41 @@ func (client ClientAppConfig) Emit(ctx context.Context, event *ports.Event, errC
 	}
 	if resp.GetStatusCode() != http.StatusOK {
 		errC <- fmt.Errorf("appconf.init err: %s", resp.GetMsg())
+		return
+	}
+	errC <- nil
+}
+
+type ClientUserPermissions struct {
+	conn grpcUserPermissions.UserAuthenticationClient
+}
+
+func NewClientUserPermissions(clientAddr string) (*ClientUserPermissions, error) {
+	conn, err := grpc.Dial(clientAddr, grpc.WithInsecure())
+	if err != nil {
+		return nil, err
+	}
+	client := grpcUserPermissions.NewUserAuthenticationClient(conn)
+	return &ClientUserPermissions{
+		conn: client,
+	}, nil
+}
+
+// Emit tirggers the initialize endpoint for the AppConfigSerivce asking it to
+// initialize and acknowlege that the owners app permissions must be append by the created app
+func (client ClientUserPermissions) Emit(ctx context.Context, event *ports.Event, errC chan error) {
+	resp, err := client.conn.AddAppAccess(ctx, &grpcUserPermissions.AddAppAccessRequest{
+		Tracing_ID: ctx.Value("tracingID").(string),
+		UserUuid:   event.App.OwnerUuid,
+		AppUuid:    event.App.Uuid,
+		AppRole:    *common.AppRole_OWNER.Enum(),
+	})
+	if err != nil {
+		errC <- err
+		return
+	}
+	if resp.GetStatusCode() != http.StatusOK {
+		errC <- fmt.Errorf("userpermission.addAppAccess err: %s", resp.GetMsg())
 		return
 	}
 	errC <- nil

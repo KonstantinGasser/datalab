@@ -15,16 +15,19 @@ type Service interface {
 }
 
 type service struct {
-	repo            apps.AppsRepository
-	emitterAppToken ports.EventEmitter
-	emitterAppConf  ports.EventEmitter
+	repo                   apps.AppsRepository
+	emitterAppToken        ports.EventEmitter
+	emitterAppConf         ports.EventEmitter
+	emitterUserPermissions ports.EventEmitter
 }
 
-func NewService(repo apps.AppsRepository, emitterAppToken ports.EventEmitter, emitterAppConf ports.EventEmitter) Service {
+func NewService(repo apps.AppsRepository, emitterAppToken ports.EventEmitter,
+	emitterAppConf ports.EventEmitter, emitterUserPermissions ports.EventEmitter) Service {
 	return &service{
-		repo:            repo,
-		emitterAppToken: emitterAppToken,
-		emitterAppConf:  emitterAppConf,
+		repo:                   repo,
+		emitterAppToken:        emitterAppToken,
+		emitterAppConf:         emitterAppConf,
+		emitterUserPermissions: emitterUserPermissions,
 	}
 }
 
@@ -55,8 +58,9 @@ func (s service) emitInitEvent(ctx context.Context, app *apps.App) error {
 
 	go s.emitterAppToken.Emit(withCancel, emitterEvent, errC)
 	go s.emitterAppConf.Emit(withCancel, emitterEvent, errC)
+	go s.emitterUserPermissions.Emit(withCancel, emitterEvent, errC)
 
-	for i := 0; i < 2; i++ {
+	for i := 0; i < 3; i++ {
 		err := <-errC
 		if err != nil {
 			logrus.Errorf("[%s][creating.EmitInit] emit cause error: %v\n", ctx.Value("tracingID"), err)
