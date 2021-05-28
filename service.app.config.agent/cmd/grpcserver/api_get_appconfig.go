@@ -10,7 +10,7 @@ import (
 )
 
 func (server AppConfigServer) Get(ctx context.Context, in *proto.GetRequest) (*proto.GetResponse, error) {
-	tracingId := ctx.Value("tracingID")
+	tracingId := in.GetTracing_ID()
 	logrus.Infof("[%v][server.Get] received request\n", tracingId)
 
 	appConfig, err := server.fetchService.GetById(ctx, in.GetAppUuid(), in.GetAuthedUser())

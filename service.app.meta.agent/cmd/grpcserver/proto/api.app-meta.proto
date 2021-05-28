@@ -2,11 +2,11 @@ syntax = "proto3";
 
 
 package app_proto;
-option go_package = "github.com/KonstantinGasser/datalab/service.app.meta.agent/proto";
+option go_package = "github.com/KonstantinGasser/datalab/service.app.meta.agent/cmd/grpcserver/proto";
 
 import "common/common.proto";
 
-service AppAdminister {
+service AppMeta {
     rpc Create(CreateRequest) returns (CreateResponse) {}
     rpc Delete(DeleteRequest) returns (DeleteResponse) {}
     rpc Get(GetRequest) returns (GetResponse) {}
@@ -57,7 +57,7 @@ message GetListRequest {
 message GetListResponse {
     int32 status_code = 1;
     string msg = 2;
-    repeated common.AppMetaInfo app_list = 3;
+    repeated common.AppSubset app_list = 3;
 }
 // ***************************
 

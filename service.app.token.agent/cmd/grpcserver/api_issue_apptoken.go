@@ -10,11 +10,12 @@ import (
 )
 
 func (server AppTokenServer) Issue(ctx context.Context, in *proto.IssueRequest) (*proto.IssueResponse, error) {
-	tracingId := ctx.Value("tracingID")
+	tracingId := in.GetTracing_ID()
 	logrus.Infof("[%v][server.Issue] received request\n", tracingId)
 
 	jwt, exp, err := server.modifySevice.IssueAppToken(ctx, in.GetAppUuid(), in.GetCallerUuid())
 	if err != nil {
+		logrus.Errorf("[%v][server.Issue] could not issue App Token: %v\n", tracingId, err.Error())
 		return &proto.IssueResponse{
 			StatusCode: err.Code(),
 			Msg:        err.Info(),

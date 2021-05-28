@@ -11,7 +11,7 @@ import (
 )
 
 func (server AppConfigServer) Update(ctx context.Context, in *proto.UpdateRequest) (*proto.UpdateResponse, error) {
-	tracingId := ctx.Value("tracingID")
+	tracingId := in.GetTracing_ID()
 	logrus.Infof("[%v][server.Update] received request\n", tracingId)
 
 	var err errors.Api

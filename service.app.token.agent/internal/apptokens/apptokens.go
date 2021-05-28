@@ -17,7 +17,7 @@ const (
 )
 
 var (
-	ErrMissingFields      = fmt.Errorf("AppToken must have appuuid/hash/owner")
+	ErrMissingFields      = fmt.Errorf("AppToken must have appRefUuid/hash/owner")
 	ErrAppTokenStillValid = fmt.Errorf("current AppToken is still valid")
 	ErrNoReadWriteAccess  = fmt.Errorf("user read/write access for AppToken")
 	ErrNoReadAccess       = fmt.Errorf("user has no read access for AppToken")
@@ -31,21 +31,21 @@ type ApptokenRepo interface {
 
 // AppToken represents the token data as it will be stored in the datbase
 type AppToken struct {
-	AppUuid   string    `bson:"_id" required:"yes"`
-	AppHash   string    `bson:"app_hash" required:"yes"`
-	AppOwner  string    `bson:"app_owner" required:"yes"`
-	AppOrigin string    `bson:"app_origin"`
-	Jwt       string    `bson:"app_jwt"`
-	Exp       time.Time `bson:"app_jwt_exp"`
+	AppRefUuid string    `bson:"_id" required:"yes"`
+	AppHash    string    `bson:"app_hash" required:"yes"`
+	AppOwner   string    `bson:"app_owner" required:"yes"`
+	AppOrigin  string    `bson:"app_origin"`
+	Jwt        string    `bson:"app_jwt"`
+	Exp        time.Time `bson:"app_jwt_exp"`
 }
 
 // NewDefault creates a new default AppToken with only the meta data but no valid
 // Jwt nor Expiration time
-func NewDefault(appUuid, appHash, appOwner string) (*AppToken, error) {
+func NewDefault(AppRefUuid, appHash, appOwner string) (*AppToken, error) {
 	appToken := AppToken{
-		AppUuid:  appUuid,
-		AppHash:  appHash,
-		AppOwner: appOwner,
+		AppRefUuid: AppRefUuid,
+		AppHash:    appHash,
+		AppOwner:   appOwner,
 	}
 	if err := required.Atomic(&appToken); err != nil {
 		return nil, ErrMissingFields
@@ -66,12 +66,12 @@ func (appToken *AppToken) Issue() (*AppToken, error) {
 		return nil, err
 	}
 	return &AppToken{
-		AppUuid:   appToken.AppUuid,
-		AppHash:   appToken.AppHash,
-		AppOwner:  appToken.AppOwner,
-		AppOrigin: appToken.AppOrigin,
-		Jwt:       jwt,
-		Exp:       exp,
+		AppRefUuid: appToken.AppRefUuid,
+		AppHash:    appToken.AppHash,
+		AppOwner:   appToken.AppOwner,
+		AppOrigin:  appToken.AppOrigin,
+		Jwt:        jwt,
+		Exp:        exp,
 	}, nil
 }
 
@@ -80,7 +80,7 @@ func (appToken AppToken) JWT() (string, time.Time, error) {
 
 	exp := time.Now().Add(appTokenExpTime)
 	claims := jwt.MapClaims{
-		"sub":    appToken.AppUuid,
+		"sub":    appToken.AppRefUuid,
 		"origin": appToken.AppOrigin,
 		"hash":   appToken.AppHash,
 		"iss":    issuerService,
@@ -108,7 +108,7 @@ func (appToken AppToken) HasReadWrite(userUuid string) error {
 // HasRead checks if the user has read access on the AppToken
 func (appToken AppToken) HasRead(readWriteUuids ...string) error {
 	for _, uuid := range readWriteUuids {
-		if uuid == appToken.AppUuid {
+		if uuid == appToken.AppRefUuid {
 			return nil
 		}
 	}

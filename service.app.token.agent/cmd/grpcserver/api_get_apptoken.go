@@ -10,7 +10,7 @@ import (
 )
 
 func (server AppTokenServer) Get(ctx context.Context, in *proto.GetRequest) (*proto.GetResponse, error) {
-	tracingId := ctx.Value("tracingID")
+	tracingId := in.GetTracing_ID()
 	logrus.Infof("[%v][server.Get] received request\n", tracingId)
 
 	authedUser := in.GetAuthedUser()
@@ -27,6 +27,7 @@ func (server AppTokenServer) Get(ctx context.Context, in *proto.GetRequest) (*pr
 		authedUser.GetReadWriteApps()...,
 	)
 	if err != nil {
+		logrus.Errorf("[%v][server.Get] could not get app token: %v\n", tracingId, err.Error())
 		return &proto.GetResponse{
 			StatusCode: err.Code(),
 			Msg:        err.Info(),

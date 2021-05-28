@@ -14,7 +14,7 @@ service AppToken {
 
 message InitializeRequest {
     string tracing_ID = 1;
-    string app_uuid = 2;
+    string app_ref_uuid = 2;
     string app_owner = 3;
     string app_hash = 4;
     string app_origin = 5;

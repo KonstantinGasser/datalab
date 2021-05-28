@@ -22,8 +22,8 @@ func NewService(repo apptokens.ApptokenRepo) Service {
 
 // InitializeAppToken creates the core data object to represent an AppToken and stores it in the
 // database
-func (s *service) InitializeAppToken(ctx context.Context, appUuid, appHash, appOwner string) errors.Api {
-	appToken, err := apptokens.NewDefault(appUuid, appHash, appOwner)
+func (s *service) InitializeAppToken(ctx context.Context, appRefUuid, appHash, appOwner string) errors.Api {
+	appToken, err := apptokens.NewDefault(appRefUuid, appHash, appOwner)
 	if err != nil {
 		return errors.New(http.StatusBadRequest, err, "Could not create App Token")
 	}

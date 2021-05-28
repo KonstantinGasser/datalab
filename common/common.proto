@@ -91,6 +91,12 @@ message AppPermission {
 }
 
 
+
+message AppSubset {
+    string uuid = 1;
+    string name = 2;
+}
+
 message AuthedUser {
     string uuid = 1;
     string organization = 2;

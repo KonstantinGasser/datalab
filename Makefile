@@ -2,8 +2,8 @@ proto-common:
 	protoc -I. --go_out=$(GOPATH)/src common/common.proto
 
 app-admin:
-	protoc -I. --go_out=$(GOPATH)/src service.app-administer/proto/app-administer.proto common/common.proto
-	protoc -I. --go-grpc_out=$(GOPATH)/src service.app-administer/proto/app-administer.proto common/common.proto
+	protoc -I. --go_out=$(GOPATH)/src service.app.meta.agent/cmd/grpcserver/proto/api.app-meta.proto common/common.proto
+	protoc -I. --go-grpc_out=$(GOPATH)/src service.app.meta.agent/cmd/grpcserver/proto/api.app-meta.proto common/common.proto
 
 app-token-issuer:
 	protoc -I. --go_out=$(GOPATH)/src service.app.token.agent/cmd/grpcserver/proto/api.app-token.proto common/common.proto
