@@ -3,7 +3,7 @@ package hasher
 import (
 	"strings"
 
-	"github.com/KonstantinGasser/datalab/utils/hash"
+	"github.com/KonstantinGasser/datalab/library/utils/hash"
 )
 
 // Build generates the app hash

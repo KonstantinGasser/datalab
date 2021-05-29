@@ -30,7 +30,7 @@ func NewService(repo users.UserRepo, permissionInit initializing.Service) Servic
 }
 
 func (s service) Register(ctx context.Context, username, organization, password string) (string, errors.Api) {
-	if ok, err := s.repo.UsernameTaken(ctx, username); err != nil || !ok {
+	if ok, err := s.repo.UsernameTaken(ctx, username); err != nil || ok {
 		if err != nil {
 			return "", errors.New(http.StatusInternalServerError,
 				err,
@@ -67,7 +67,7 @@ func (s service) Register(ctx context.Context, username, organization, password 
 	}
 
 	// create init permissions for user
-	if err := s.permissionInit.InitPermissions(ctx, username, organization); err != nil {
+	if err := s.permissionInit.InitPermissions(ctx, newUser.Uuid, newUser.Organization); err != nil {
 		return "", err
 	}
 

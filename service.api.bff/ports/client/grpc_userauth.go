@@ -6,6 +6,7 @@ import (
 
 	"github.com/KonstantinGasser/datalab/common"
 	"github.com/KonstantinGasser/datalab/library/errors"
+	"github.com/KonstantinGasser/datalab/library/utils/ctx_value"
 	"github.com/KonstantinGasser/datalab/service.api.bff/internal/users"
 	grpcUserAuth "github.com/KonstantinGasser/datalab/service.user.auth.agent/cmd/grpcserver/proto"
 	"google.golang.org/grpc"
@@ -28,7 +29,7 @@ func NewClientUserAuth(clientAddr string) (*ClientUserAuth, error) {
 
 func (client ClientUserAuth) Register(ctx context.Context, r *users.RegisterRequest) (string, errors.Api) {
 	resp, err := client.Conn.Register(ctx, &grpcUserAuth.RegisterRequest{
-		Tracing_ID:   ctx.Value("tracingID").(string),
+		Tracing_ID:   ctx_value.GetString(ctx, "tracingID"),
 		Username:     r.Username,
 		Organisation: r.Organization,
 		Password:     r.Password,
@@ -48,7 +49,7 @@ func (client ClientUserAuth) Register(ctx context.Context, r *users.RegisterRequ
 
 func (client ClientUserAuth) Login(ctx context.Context, r *users.LoginRequest) (string, errors.Api) {
 	resp, err := client.Conn.Login(ctx, &grpcUserAuth.LoginRequest{
-		Tracing_ID: ctx.Value("tracingID").(string),
+		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
 		Username:   r.Username,
 		Password:   r.Password,
 	})
@@ -67,7 +68,7 @@ func (client ClientUserAuth) Login(ctx context.Context, r *users.LoginRequest) (
 
 func (client ClientUserAuth) Authenticate(ctx context.Context, accessToken string) (*common.AuthedUser, errors.Api) {
 	resp, err := client.Conn.IsAuthed(ctx, &grpcUserAuth.IsAuthedRequest{
-		Tracing_ID:  ctx.Value("tracingID").(string),
+		Tracing_ID:  ctx_value.GetString(ctx, "tracingID"),
 		AccessToken: accessToken,
 	})
 	if err != nil {

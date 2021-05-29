@@ -3,12 +3,13 @@ package httpserver
 import (
 	"net/http"
 
+	"github.com/KonstantinGasser/datalab/library/utils/ctx_value"
 	"github.com/KonstantinGasser/datalab/service.api.bff/internal/users"
 	"github.com/sirupsen/logrus"
 )
 
 func (s Server) RegisterUser(w http.ResponseWriter, r *http.Request) {
-	tracingID := r.Context().Value("tracingID").(string)
+	tracingID := ctx_value.GetString(r.Context(), "tracingID")
 	logrus.Infof("<%v>[Server.RegisterUser] received request: %v\n", tracingID, r.Host)
 
 	var request users.RegisterRequest
@@ -17,8 +18,8 @@ func (s Server) RegisterUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	resp := s.userauthService.Register(r.Context(), &request)
-	if resp.Stauts != http.StatusOK {
+	if resp.Status != http.StatusOK {
 		logrus.Errorf("<%v>[Server.RegisterUser] could not register user: %v\n", tracingID, resp.Err)
 	}
-	s.onSuccess(w, resp.Stauts, resp)
+	s.onSuccess(w, resp.Status, resp)
 }

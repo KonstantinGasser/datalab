@@ -69,7 +69,7 @@ func (client MongoClient) GetById(ctx context.Context, uuid string, result inter
 func (client MongoClient) UpdateByFlag(ctx context.Context, uuid, flag string, data interface{}) error {
 	query := bson.D{
 		{
-			Key: "$addToSet",
+			Key: "$set",
 			Value: bson.M{
 				flag: data,
 			},

@@ -6,6 +6,9 @@ import (
 	"net/http"
 
 	"github.com/KonstantinGasser/datalab/common"
+	"github.com/KonstantinGasser/datalab/library/errors"
+	"github.com/KonstantinGasser/datalab/library/utils/ctx_value"
+	"github.com/KonstantinGasser/datalab/service.api.bff/internal/apps"
 	grpcAppConfig "github.com/KonstantinGasser/datalab/service.app.config.agent/cmd/grpcserver/proto"
 	"google.golang.org/grpc"
 )
@@ -30,7 +33,7 @@ func (client ClientAppConfig) CollectAppConfig(ctx context.Context, appUuid stri
 	Value interface{}
 }, errC chan error) {
 	resp, err := client.Conn.Get(ctx, &grpcAppConfig.GetRequest{
-		Tracing_ID: ctx.Value("tracingID").(string),
+		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
 		AuthedUser: authedUser,
 		AppUuid:    appUuid,
 	})
@@ -49,4 +52,28 @@ func (client ClientAppConfig) CollectAppConfig(ctx context.Context, appUuid stri
 		Field: "appconfig",
 		Value: resp.GetConfigs(),
 	}
+}
+
+func (client ClientAppConfig) UpdateConfig(ctx context.Context, r *apps.UpdateConfigRequest) errors.Api {
+
+	resp, err := client.Conn.Update(ctx, &grpcAppConfig.UpdateRequest{
+		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
+		AuthedUser: r.AuthedUser,
+		AppRefUuid: r.AppRefUuid,
+		UpdateFlag: r.UpdateFlag,
+		Stages:     r.Stages,
+		Records:    r.Records,
+		BtnDefs:    r.BtnDefs,
+	})
+	if err != nil {
+		return errors.New(http.StatusInternalServerError,
+			err,
+			"Could not update App Config")
+	}
+	if resp.GetStatusCode() != http.StatusOK {
+		return errors.New(resp.GetStatusCode(),
+			err,
+			resp.GetMsg())
+	}
+	return nil
 }

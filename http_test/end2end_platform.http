@@ -1,0 +1,132 @@
+POST http://localhost:8080/api/v1/user/register HTTP/1.1
+content-type: application/json
+
+{
+    "username": "yolo4",
+    "firstname": "yolo",
+    "lastname":  "Gasser",
+    "password": "hello",
+    "organization": "datalab.dev",
+    "position": "Software Engineer"
+}
+
+###
+POST http://localhost:8080/api/v1/user/login HTTP/1.1
+content-type: application/json
+
+{
+    "username": "yolo4",
+    "password": "hello"
+}
+
+###
+GET http://localhost:8080/api/v1/user/profile HTTP/1.1
+content-type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjIyOTM0MDQsImlhdCI6ImRhdGFsYWIuc2VydmljZS51c2VyLmF1dGguYWdlbnQiLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiJhMjliNThmMS0yNjU1LTQ4ZGEtOWVmMS05YzY4YmFhNTYyMTQifQ._YrHx6Q-5EwVpekJ1P_AhQRuj8sZOJYQwL7qFd5-yMo
+
+###
+GET http://localhost:8080/api/v1/user/colleagues HTTP/1.1
+content-type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjIyOTM0MDQsImlhdCI6ImRhdGFsYWIuc2VydmljZS51c2VyLmF1dGguYWdlbnQiLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiJhMjliNThmMS0yNjU1LTQ4ZGEtOWVmMS05YzY4YmFhNTYyMTQifQ._YrHx6Q-5EwVpekJ1P_AhQRuj8sZOJYQwL7qFd5-yMo
+
+###
+POST http://localhost:8080/api/v1/user/profile/update HTTP/1.1
+content-type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjIyOTM0MDQsImlhdCI6ImRhdGFsYWIuc2VydmljZS51c2VyLmF1dGguYWdlbnQiLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiJhMjliNThmMS0yNjU1LTQ4ZGEtOWVmMS05YzY4YmFhNTYyMTQifQ._YrHx6Q-5EwVpekJ1P_AhQRuj8sZOJYQwL7qFd5-yMo
+
+{
+    "firstname": "Konstantin",
+    "lastname":  "Gasser",
+    "position": "Software Engineer",
+    "profile_img_url": "some/path/to/image"
+}
+
+###
+POST http://localhost:8080/api/v1/app/create HTTP/1.1
+content-type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjIyOTM0MDQsImlhdCI6ImRhdGFsYWIuc2VydmljZS51c2VyLmF1dGguYWdlbnQiLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiJhMjliNThmMS0yNjU1LTQ4ZGEtOWVmMS05YzY4YmFhNTYyMTQifQ._YrHx6Q-5EwVpekJ1P_AhQRuj8sZOJYQwL7qFd5-yMo
+
+{
+    "app_name": "dummy#3",
+    "app_url":  "http://dummy#1.io",
+    "app_desc": "App Test #1"
+}
+
+###
+GET http://localhost:8080/api/v1/app?app=d76c9ead-fcd6-4355-8343-fc80f876587c HTTP/1.1
+content-type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjIyOTM0MDQsImlhdCI6ImRhdGFsYWIuc2VydmljZS51c2VyLmF1dGguYWdlbnQiLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiJhMjliNThmMS0yNjU1LTQ4ZGEtOWVmMS05YzY4YmFhNTYyMTQifQ._YrHx6Q-5EwVpekJ1P_AhQRuj8sZOJYQwL7qFd5-yMo
+
+###
+GET http://localhost:8080/api/v1/app/all HTTP/1.1
+content-type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjIyOTM0MDQsImlhdCI6ImRhdGFsYWIuc2VydmljZS51c2VyLmF1dGguYWdlbnQiLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiJhMjliNThmMS0yNjU1LTQ4ZGEtOWVmMS05YzY4YmFhNTYyMTQifQ._YrHx6Q-5EwVpekJ1P_AhQRuj8sZOJYQwL7qFd5-yMo
+
+###
+POST http://localhost:8080/api/v1/app/token/issue HTTP/1.1
+content-type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjIyOTM0MDQsImlhdCI6ImRhdGFsYWIuc2VydmljZS51c2VyLmF1dGguYWdlbnQiLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiJhMjliNThmMS0yNjU1LTQ4ZGEtOWVmMS05YzY4YmFhNTYyMTQifQ._YrHx6Q-5EwVpekJ1P_AhQRuj8sZOJYQwL7qFd5-yMo
+
+{
+    "app_name": "dummy#2",
+    "app_uuid": "8c705d2b-cee1-4844-aa75-386bb4f4157d",
+    "owner_domain": "datalab.dev",
+    "app_origin": "http://test.io"
+}
+
+###
+POST http://localhost:8080/api/v1/app/config/update HTTP/1.1
+content-type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjIyOTM0MDQsImlhdCI6ImRhdGFsYWIuc2VydmljZS51c2VyLmF1dGguYWdlbnQiLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiJhMjliNThmMS0yNjU1LTQ4ZGEtOWVmMS05YzY4YmFhNTYyMTQifQ._YrHx6Q-5EwVpekJ1P_AhQRuj8sZOJYQwL7qFd5-yMo
+
+{   
+    "flag": "funnel",
+    "app_uuid": "d76c9ead-fcd6-4355-8343-fc80f876587c",
+    "stages": [
+        {
+            "id": 1,
+            "name": "Stage Zero",
+            "transition": "btn_add_to"
+        },
+        {
+            "id": 2,
+            "name": "Stage One",
+            "transition": "btn_process"
+        },
+        {
+            "id": 3,
+            "name": "Stage Two",
+            "transition": "btn_buy"
+        }
+    ]
+}
+
+###
+POST http://localhost:8080/api/v1/app/invite HTTP/1.1
+content-type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjIyOTM0MDQsImlhdCI6ImRhdGFsYWIuc2VydmljZS51c2VyLmF1dGguYWdlbnQiLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiJhMjliNThmMS0yNjU1LTQ4ZGEtOWVmMS05YzY4YmFhNTYyMTQifQ._YrHx6Q-5EwVpekJ1P_AhQRuj8sZOJYQwL7qFd5-yMo
+
+{
+    "invited_uuid": "03f6d06c-73aa-4ae1-8531-cdee0b71b47e",
+    "app_uuid": "d76c9ead-fcd6-4355-8343-fc80f876587c"
+}
+
+
+###
+POST http://localhost:8080/api/v1/app/invite/accept HTTP/1.1
+content-type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjIyOTkwNDcsImlhdCI6ImRhdGFsYWIuc2VydmljZS51c2VyLmF1dGguYWdlbnQiLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiIwM2Y2ZDA2Yy03M2FhLTRhZTEtODUzMS1jZGVlMGI3MWI0N2UifQ.gnQOiVXAF4SJU7IqEuhOT-nCC2BFu3l6QcBF7TJNJ_Q
+
+{
+    "app_uuid": "d76c9ead-fcd6-4355-8343-fc80f876587c"
+}
+
+###
+GET http://localhost:8080/api/v1/app?app=d76c9ead-fcd6-4355-8343-fc80f876587c HTTP/1.1
+content-type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjIyOTkwNDcsImlhdCI6ImRhdGFsYWIuc2VydmljZS51c2VyLmF1dGguYWdlbnQiLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiIwM2Y2ZDA2Yy03M2FhLTRhZTEtODUzMS1jZGVlMGI3MWI0N2UifQ.gnQOiVXAF4SJU7IqEuhOT-nCC2BFu3l6QcBF7TJNJ_Q
+
+###
+GET http://localhost:8080/api/v1/app/all HTTP/1.1
+content-type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjIyOTkwNDcsImlhdCI6ImRhdGFsYWIuc2VydmljZS51c2VyLmF1dGguYWdlbnQiLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiIwM2Y2ZDA2Yy03M2FhLTRhZTEtODUzMS1jZGVlMGI3MWI0N2UifQ.gnQOiVXAF4SJU7IqEuhOT-nCC2BFu3l6QcBF7TJNJ_Q

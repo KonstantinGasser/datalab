@@ -32,7 +32,7 @@ func NewService(userAuthClient client.ClientUserAuth, userMetaClient client.Clie
 func (s service) Register(ctx context.Context, r *users.RegisterRequest) *users.RegisterResponse {
 	if err := required.Atomic(r); err != nil {
 		return &users.RegisterResponse{
-			Stauts: http.StatusBadRequest,
+			Status: http.StatusBadRequest,
 			Msg:    "Missing mandatory fields",
 			Err:    err.Error(),
 		}
@@ -41,7 +41,7 @@ func (s service) Register(ctx context.Context, r *users.RegisterRequest) *users.
 	userUuid, err := s.userAuthClient.Register(ctx, r)
 	if err != nil {
 		return &users.RegisterResponse{
-			Stauts: err.Code(),
+			Status: err.Code(),
 			Msg:    err.Info(),
 			Err:    err.Error(),
 		}
@@ -50,13 +50,13 @@ func (s service) Register(ctx context.Context, r *users.RegisterRequest) *users.
 	err = s.userMetaClient.CreateUserProfile(ctx, r)
 	if err != nil {
 		return &users.RegisterResponse{
-			Stauts: err.Code(),
+			Status: err.Code(),
 			Msg:    err.Info(),
 			Err:    err.Error(),
 		}
 	}
 	return &users.RegisterResponse{
-		Stauts: http.StatusOK,
+		Status: http.StatusOK,
 		Msg:    "User Account created",
 	}
 }
@@ -64,7 +64,7 @@ func (s service) Register(ctx context.Context, r *users.RegisterRequest) *users.
 func (s service) Login(ctx context.Context, r *users.LoginRequest) *users.LoginResponse {
 	if err := required.Atomic(r); err != nil {
 		return &users.LoginResponse{
-			Stauts: http.StatusBadRequest,
+			Status: http.StatusBadRequest,
 			Msg:    "Username and Password required",
 			Err:    err.Error(),
 		}
@@ -73,13 +73,13 @@ func (s service) Login(ctx context.Context, r *users.LoginRequest) *users.LoginR
 	accessToken, err := s.userAuthClient.Login(ctx, r)
 	if err != nil {
 		return &users.LoginResponse{
-			Stauts: err.Code(),
+			Status: err.Code(),
 			Msg:    err.Info(),
 			Err:    err.Error(),
 		}
 	}
 	return &users.LoginResponse{
-		Stauts:      http.StatusOK,
+		Status:      http.StatusOK,
 		Msg:         "User logged in",
 		AccessToken: accessToken,
 	}

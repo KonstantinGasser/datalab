@@ -23,7 +23,7 @@ type Permission struct {
 	Apps     []string `bson:"apps"`
 }
 
-func NewDefaultPermission(userUuid, userOrgn string) (*Permission, error) {
+func NewDefault(userUuid, userOrgn string) (*Permission, error) {
 	permission := Permission{
 		UserUuid: userUuid,
 		UserOrgn: userOrgn,

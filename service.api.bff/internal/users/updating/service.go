@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/KonstantinGasser/datalab/common"
+	"github.com/KonstantinGasser/datalab/library/utils/ctx_value"
 	"github.com/KonstantinGasser/datalab/service.api.bff/internal/users"
 	"github.com/KonstantinGasser/datalab/service.api.bff/ports/client"
 	"github.com/KonstantinGasser/required"
@@ -28,31 +28,31 @@ func NewService(userMetaClient client.ClientUserMeta) Service {
 func (s service) UpdateProfile(ctx context.Context, r *users.UpdateProfileRequest) *users.UpdateProfileResponse {
 	if err := required.Atomic(r); err != nil {
 		return &users.UpdateProfileResponse{
-			Stauts: http.StatusBadRequest,
+			Status: http.StatusBadRequest,
 			Msg:    "Mandatory fields missing",
 			Err:    err.Error(),
 		}
 	}
-	authedUser, ok := ctx.Value("user").(*common.AuthedUser)
-	if !ok {
+	authedUser := ctx_value.GetAuthedUser(ctx)
+	if authedUser == nil {
 		return &users.UpdateProfileResponse{
-			Stauts: http.StatusUnauthorized,
+			Status: http.StatusUnauthorized,
 			Msg:    "User must be logged in",
 			Err:    fmt.Errorf("user not logged in").Error(),
 		}
 	}
-	r.UserUuuid = authedUser.Uuid
+	r.UserUuid = authedUser.Uuid
 
 	err := s.userMetaClient.UpdateUserProfile(ctx, r)
 	if err != nil {
 		return &users.UpdateProfileResponse{
-			Stauts: err.Code(),
+			Status: err.Code(),
 			Msg:    err.Info(),
 			Err:    err.Error(),
 		}
 	}
 	return &users.UpdateProfileResponse{
-		Stauts: http.StatusOK,
+		Status: http.StatusOK,
 		Msg:    "User Profile updated",
 	}
 }

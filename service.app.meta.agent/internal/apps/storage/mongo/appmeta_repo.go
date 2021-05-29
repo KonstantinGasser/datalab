@@ -91,7 +91,7 @@ func (client MongoClient) GetAll(ctx context.Context, userUuid string, stored in
 	if err != nil {
 		return err
 	}
-	if err := cur.Decode(stored); err != nil {
+	if err := cur.All(ctx, stored); err != nil {
 		return err
 	}
 	return nil

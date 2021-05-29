@@ -1,12 +1,11 @@
 package httpserver
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"strings"
 
-	"github.com/KonstantinGasser/datalab/utils/ctx_value"
+	"github.com/KonstantinGasser/datalab/library/utils/ctx_value"
 	"github.com/gofrs/uuid"
 	"github.com/sirupsen/logrus"
 )
@@ -75,7 +74,7 @@ func (s Server) WithTracing(next http.HandlerFunc) http.HandlerFunc {
 		}
 		// add tracing ID to request context for other function involved in the request
 		// to have access to it
-		ctx := context.WithValue(r.Context(), "tracingID", fmt.Sprintf("%x", tracingID.Bytes()[:4]))
+		ctx := ctx_value.AddValue(r.Context(), "tracingID", fmt.Sprintf("%x", tracingID.Bytes()[:4]))
 		next(w, r.WithContext(ctx))
 	}
 }

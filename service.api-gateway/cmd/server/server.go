@@ -79,19 +79,19 @@ func Run(ctx context.Context, hostAddr, userAddr, appAddr, apptokenAddr, tokenAd
 		gatewaysvc.WithCors,
 		gatewaysvc.WithAuth,
 	)
-	gatewaysvc.Register("/api/v1/app/getall", gatewaysvc.GetAppList, ///
+	gatewaysvc.Register("/api/v1/app/getall", gatewaysvc.GetAppList, /// Done
 		gatewaysvc.WithTracing,
 		gatewaysvc.WithCors,
 		gatewaysvc.WithAuth,
 	)
 
-	gatewaysvc.Register("/api/v1/app/token/create", gatewaysvc.CreateAppToken,
+	gatewaysvc.Register("/api/v1/app/token/create", gatewaysvc.CreateAppToken, /// Done
 		gatewaysvc.WithTracing,
 		gatewaysvc.WithCors,
 		gatewaysvc.WithAuth,
 	)
 
-	gatewaysvc.Register("/api/v1/app/config/upsert", gatewaysvc.UpdateAppConfig,
+	gatewaysvc.Register("/api/v1/app/config/upsert", gatewaysvc.UpdateAppConfig, /// Done
 		gatewaysvc.WithTracing,
 		gatewaysvc.WithCors,
 		gatewaysvc.WithAuth,

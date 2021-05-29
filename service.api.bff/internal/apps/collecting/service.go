@@ -7,12 +7,14 @@ import (
 	"github.com/KonstantinGasser/datalab/common"
 	"github.com/KonstantinGasser/datalab/service.api.bff/internal/apps"
 	"github.com/KonstantinGasser/datalab/service.api.bff/ports/client"
+	"github.com/KonstantinGasser/datalab/utils_old/ctx_value"
 	"github.com/KonstantinGasser/required"
 	"github.com/sirupsen/logrus"
 )
 
 type Service interface {
 	GetApp(ctx context.Context, r *apps.GetAppRequest) *apps.GetAppResponse
+	GetAppList(ctx context.Context, r *apps.GetAppListRequest) *apps.GetAppListResponse
 }
 
 type service struct {
@@ -39,7 +41,7 @@ func NewService(
 func (s service) GetApp(ctx context.Context, r *apps.GetAppRequest) *apps.GetAppResponse {
 	if err := required.Atomic(r); err != nil {
 		return &apps.GetAppResponse{
-			Stauts: http.StatusOK,
+			Status: http.StatusOK,
 			Msg:    "Mandatory fields missing",
 			Err:    err.Error(),
 		}
@@ -48,7 +50,7 @@ func (s service) GetApp(ctx context.Context, r *apps.GetAppRequest) *apps.GetApp
 	app, err := s.appMetaClient.GetApp(ctx, r)
 	if err != nil {
 		return &apps.GetAppResponse{
-			Stauts: err.Code(),
+			Status: err.Code(),
 			Msg:    err.Info(),
 			Err:    err.Error(),
 		}
@@ -58,7 +60,7 @@ func (s service) GetApp(ctx context.Context, r *apps.GetAppRequest) *apps.GetApp
 		logrus.Errorf("[app.collection.Get] could not get all data: %v\n", collectErr)
 	}
 	return &apps.GetAppResponse{
-		Stauts: http.StatusOK,
+		Status: http.StatusOK,
 		Msg:    "App Data",
 		App:    app,
 		Config: conf,
@@ -68,7 +70,23 @@ func (s service) GetApp(ctx context.Context, r *apps.GetAppRequest) *apps.GetApp
 
 }
 
-func (s service) collectAttachedAppData(ctx context.Context, appUuid string, authedUser *common.AuthedUser) (*common.AppAccessToken, *common.AppConfigInfo, *common.UserInfo, error) {
+func (s service) GetAppList(ctx context.Context, r *apps.GetAppListRequest) *apps.GetAppListResponse {
+	applist, err := s.appMetaClient.GetAppList(ctx, r)
+	if err != nil {
+		return &apps.GetAppListResponse{
+			Status: err.Code(),
+			Msg:    err.Info(),
+			Err:    err.Error(),
+		}
+	}
+	return &apps.GetAppListResponse{
+		Status: http.StatusOK,
+		Msg:    "User's Apps",
+		Apps:   applist,
+	}
+}
+
+func (s service) collectAttachedAppData(ctx context.Context, appUuid string, authedUser *common.AuthedUser) (*common.AppAccessToken, *common.AppConfigurations, *common.UserInfo, error) {
 	withCancel, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -82,22 +100,24 @@ func (s service) collectAttachedAppData(ctx context.Context, appUuid string, aut
 	go s.userMetaClient.CollectOwnerInfo(withCancel, authedUser, resC, errC)
 
 	var apptoken *common.AppAccessToken
-	var appconfig *common.AppConfigInfo
+	var appconfig *common.AppConfigurations
 	var appowner *common.UserInfo
 	for i := 0; i < 3; i++ {
 		select {
 		case err := <-errC:
 			if err != nil {
-				logrus.Errorf("[%s][creating.EmitInit] emit cause error: %v\n", ctx.Value("tracingID"), err)
+				logrus.Errorf("[%s][creating.EmitInit] emit cause error: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
 				// if there is an error while emitting events
 				// here the emiited events must succed in order for the
 				// transaction to succeed - hence if err cancel context and
 				// role back (if that would have been implmeneted)
-				return nil, nil, nil, err
+				// return nil, nil, nil, err
+				continue
 			}
 		case result := <-resC:
 			switch result.Field {
 			case "apptoken":
+				// fmt.Println("token: ", result)
 				var ok bool
 				apptoken, ok = result.Value.(*common.AppAccessToken)
 				if !ok { // if assertion fails value will be nil which is not nice but sometimes will happen thou
@@ -105,11 +125,12 @@ func (s service) collectAttachedAppData(ctx context.Context, appUuid string, aut
 				}
 			case "appconfig":
 				var ok bool
-				appconfig, ok = result.Value.(*common.AppConfigInfo)
+				appconfig, ok = result.Value.(*common.AppConfigurations)
 				if !ok { // if assertion fails value will be nil which is not nice but sometimes will happen thou
 					continue
 				}
 			case "appowner":
+				// fmt.Println("owner: ", result)
 				var ok bool
 				appowner, ok = result.Value.(*common.UserInfo)
 				if !ok { // if assertion fails value will be nil which is not nice but sometimes will happen thou

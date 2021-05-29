@@ -8,46 +8,50 @@ import (
 	"github.com/KonstantinGasser/datalab/common"
 	"github.com/KonstantinGasser/datalab/library/errors"
 	"github.com/KonstantinGasser/datalab/service.app.meta.agent/internal/apps"
-	"github.com/KonstatinGasser/datalab/service.app.meta.agent/internal/apps"
+	"github.com/KonstantinGasser/datalab/service.app.meta.agent/ports/client"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type Service interface {
-	SendInvite(ctx context.Context, appUuid, invitedUuid string, authedUser *common.AuthedUser) errors.Api
+	SendInvite(ctx context.Context, appUuid, invitedUuid string, authedUser *common.AuthedUser) (string, errors.Api)
 	AcceptInvite(ctx context.Context, appUuid, userUuid string) errors.Api
 }
 
 type service struct {
-	repo apps.AppsRepository
+	repo           apps.AppsRepository
+	userAuthClient *client.ClientUserAuth
 }
 
-func NewService(repo apps.AppsRepository) Service {
-	return &service{repo: repo}
+func NewService(repo apps.AppsRepository, userAuthClient *client.ClientUserAuth) Service {
+	return &service{
+		repo:           repo,
+		userAuthClient: userAuthClient,
+	}
 }
 
 // SendInvite adds the given user to the App.Member in state InvitePending
-func (s service) SendInvite(ctx context.Context, appUuid, invitedUuid string, authedUser *common.AuthedUser) errors.Api {
+func (s service) SendInvite(ctx context.Context, appUuid, invitedUuid string, authedUser *common.AuthedUser) (string, errors.Api) {
 	var storedApp apps.App
 	if err := s.repo.GetById(ctx, appUuid, &storedApp); err != nil {
 		if err == mongo.ErrNoDocuments {
-			return errors.New(http.StatusNotFound, err, "Could not find App data")
+			return "", errors.New(http.StatusNotFound, err, "Could not find App data")
 		}
-		return errors.New(http.StatusInternalServerError, err, "Could not get App data")
+		return "", errors.New(http.StatusInternalServerError, err, "Could not get App data")
 	}
 	// only onwer may invite member to app
 	if err := storedApp.IsOwner(authedUser.Uuid); err != nil {
-		return errors.New(http.StatusUnauthorized, err, "Only Owner can invite members")
+		return "", errors.New(http.StatusUnauthorized, err, "Only Owner can invite members")
 	}
 
 	member, inviteErr := storedApp.AddInvite(invitedUuid)
 	if inviteErr != nil {
-		return errors.New(http.StatusBadRequest, inviteErr, "User is already member of App")
+		return "", errors.New(http.StatusBadRequest, inviteErr, "User is already member of App")
 	}
 	err := s.repo.AddMember(ctx, appUuid, *member)
 	if err != nil {
-		return errors.New(http.StatusInternalServerError, err, "Could not add Invite to App")
+		return "", errors.New(http.StatusInternalServerError, err, "Could not add Invite to App")
 	}
-	return nil
+	return storedApp.Name, nil
 }
 
 // AcceptInvite updates the App.Member for the given user to state InviteAccepted
@@ -68,6 +72,10 @@ func (s service) AcceptInvite(ctx context.Context, appUuid, userUuid string) err
 	err := s.repo.MemberStatus(ctx, appUuid, *openInvite)
 	if err != nil {
 		return errors.New(http.StatusInternalServerError, err, "Could not update invite status")
+	}
+	// append users permission with new app
+	if err := s.userAuthClient.AddAppAccess(ctx, openInvite.Uuid, storedApp.Uuid); err != nil {
+		return err
 	}
 	return nil
 }

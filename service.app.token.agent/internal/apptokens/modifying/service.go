@@ -44,7 +44,7 @@ func (s *service) IssueAppToken(ctx context.Context, appUuid, callerUuid string)
 		}
 		return "", time.Time{}, errors.New(http.StatusInternalServerError, err, "Could not issue new App Token")
 	}
-	repoErr := s.repo.Update(ctx, modifiedAppToken.AppUuid, modifiedAppToken.Jwt, modifiedAppToken.Exp)
+	repoErr := s.repo.Update(ctx, modifiedAppToken.AppRefUuid, modifiedAppToken.Jwt, modifiedAppToken.Exp)
 	if repoErr != nil {
 		return "", time.Time{}, errors.New(http.StatusInternalServerError, repoErr, "Could not update App Token")
 	}

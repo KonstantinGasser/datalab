@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/KonstantinGasser/datalab/library/utils/hash"
 	"github.com/KonstantinGasser/datalab/library/utils/unique"
-	"github.com/KonstantinGasser/datalab/utils/hash"
 	"github.com/KonstantinGasser/required"
 	"github.com/dgrijalva/jwt-go"
 )

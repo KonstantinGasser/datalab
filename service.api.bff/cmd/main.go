@@ -7,6 +7,8 @@ import (
 	"github.com/KonstantinGasser/datalab/service.api.bff/cmd/httpserver"
 	"github.com/KonstantinGasser/datalab/service.api.bff/internal/apps/collecting"
 	"github.com/KonstantinGasser/datalab/service.api.bff/internal/apps/creating"
+	"github.com/KonstantinGasser/datalab/service.api.bff/internal/apps/inviting"
+	"github.com/KonstantinGasser/datalab/service.api.bff/internal/apps/modifying"
 	"github.com/KonstantinGasser/datalab/service.api.bff/internal/users/authenticating"
 	"github.com/KonstantinGasser/datalab/service.api.bff/internal/users/fetching"
 	"github.com/KonstantinGasser/datalab/service.api.bff/internal/users/updating"
@@ -50,8 +52,10 @@ func main() {
 	userupdateService := updating.NewService(*grpcUserMeta)
 	userfetchService := fetching.NewService(*grpcUserMeta)
 
-	appcreateService := creating.NewService(*grpcAppMeta)
+	appcreateService := creating.NewService(*grpcAppMeta, *grpcAppToken)
 	appcollectService := collecting.NewService(*grpcAppMeta, *grpcUserMeta, *grpcAppToken, *grpcAppConfig)
+	appmodifyService := modifying.NewService(*grpcAppConfig)
+	appinviteService := inviting.NewService(*grpcAppMeta)
 
 	server := httpserver.NewDefault(
 		userauthSerivce,
@@ -59,6 +63,8 @@ func main() {
 		userfetchService,
 		appcreateService,
 		appcollectService,
+		appmodifyService,
+		appinviteService,
 	)
 
 	server.Apply(httpserver.WithAllowedOrigins("*"))
@@ -98,7 +104,32 @@ func main() {
 		server.WithCors,
 		server.WithAuth,
 	)
+	server.Register("/api/v1/app/all", server.GetAppList,
+		server.WithTracing,
+		server.WithCors,
+		server.WithAuth,
+	)
+	server.Register("/api/v1/app/token/issue", server.IssueAppToken,
+		server.WithTracing,
+		server.WithCors,
+		server.WithAuth,
+	)
 
+	server.Register("/api/v1/app/config/update", server.UpdateAppConfig,
+		server.WithTracing,
+		server.WithCors,
+		server.WithAuth,
+	)
+	server.Register("/api/v1/app/invite", server.SendAppInvite,
+		server.WithTracing,
+		server.WithCors,
+		server.WithAuth,
+	)
+	server.Register("/api/v1/app/invite/accept", server.AcceptInvite,
+		server.WithTracing,
+		server.WithCors,
+		server.WithAuth,
+	)
 	// run server
 	log.Fatal(server.Start(*host))
 }

@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	nameDB   = "datalab_userpermission"
+	nameDB   = "datalab_userauth"
 	nameColl = "userpermission"
 )
 

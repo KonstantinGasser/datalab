@@ -20,6 +20,11 @@ func New(code int32, err error, msg string) API {
 	}
 }
 
-func (err API) Error() string { return err.Err.Error() }
-func (err API) Info() string  { return err.Msg }
-func (err API) Code() int32   { return err.Status }
+func (err API) Error() string {
+	if err.Err == nil {
+		return "nil error!"
+	}
+	return err.Err.Error()
+}
+func (err API) Info() string { return err.Msg }
+func (err API) Code() int32  { return err.Status }

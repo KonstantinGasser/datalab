@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/KonstantinGasser/datalab/library/utils/ctx_value"
 	"github.com/KonstantinGasser/datalab/service.user-administer/proto"
-	"github.com/KonstantinGasser/datalab/utils/ctx_value"
 	"github.com/sirupsen/logrus"
 )
 

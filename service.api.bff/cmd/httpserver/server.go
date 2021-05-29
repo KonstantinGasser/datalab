@@ -9,6 +9,8 @@ import (
 
 	"github.com/KonstantinGasser/datalab/service.api.bff/internal/apps/collecting"
 	"github.com/KonstantinGasser/datalab/service.api.bff/internal/apps/creating"
+	"github.com/KonstantinGasser/datalab/service.api.bff/internal/apps/inviting"
+	"github.com/KonstantinGasser/datalab/service.api.bff/internal/apps/modifying"
 	"github.com/KonstantinGasser/datalab/service.api.bff/internal/users/authenticating"
 	"github.com/KonstantinGasser/datalab/service.api.bff/internal/users/fetching"
 	"github.com/KonstantinGasser/datalab/service.api.bff/internal/users/updating"
@@ -63,6 +65,8 @@ type Server struct {
 	userfetchService  fetching.Service
 	appcreateService  creating.Service
 	appCollectService collecting.Service
+	appModifyService  modifying.Service
+	appInviteService  inviting.Service
 }
 
 func NewDefault(
@@ -71,19 +75,24 @@ func NewDefault(
 	userfetchService fetching.Service,
 	appcreateService creating.Service,
 	appCollectService collecting.Service,
+	appModifyService modifying.Service,
+	appInviteService inviting.Service,
 ) *Server {
 	return &Server{
 		// *** CORS-Configurations ***
-		allowedOrigins:    []string{"*"},
-		allowedMethods:    []string{"GET", "POST", "OPTIONS"},
-		allowedHeaders:    []string{"*"},
-		onErr:             onErr,
-		onSuccess:         onSuccess,
+		allowedOrigins: []string{"*"},
+		allowedMethods: []string{"GET", "POST", "OPTIONS"},
+		allowedHeaders: []string{"*"},
+		onErr:          onErr,
+		onSuccess:      onSuccess,
+		// *** service dependencies ***
 		userauthService:   authService,
 		userupdateService: userupdateService,
 		userfetchService:  userfetchService,
 		appcreateService:  appcreateService,
 		appCollectService: appCollectService,
+		appModifyService:  appModifyService,
+		appInviteService:  appInviteService,
 	}
 }
 

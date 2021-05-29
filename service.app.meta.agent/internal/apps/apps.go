@@ -121,7 +121,7 @@ func (app *App) AddInvite(userUuid string) (*Member, error) {
 func (app App) HasReadAccess(userUuid string) error {
 	errO := app.IsOwner(userUuid)
 	errM := app.IsMember(userUuid, InviteAccepted)
-	if errM != nil || errO != nil {
+	if errM != nil && errO != nil {
 		return ErrReadAccess
 	}
 	return nil
