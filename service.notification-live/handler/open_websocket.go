@@ -3,7 +3,7 @@ package handler
 import (
 	"net/http"
 
-	"github.com/KonstantinGasser/datalab/utils/ctx_value"
+	"github.com/KonstantinGasser/datalab/library/utils/ctx_value"
 	"github.com/sirupsen/logrus"
 )
 

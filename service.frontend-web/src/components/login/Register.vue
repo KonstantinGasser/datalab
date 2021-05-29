@@ -86,12 +86,12 @@ export default {
       let payload = {
         username: this.input.username,
         password: this.input.password,
-        orgn_domain: this.input.orgn_domain,
-        first_name: this.input.first_name,
-        last_name: this.input.last_name,
-        orgn_position: this.input.orgn_position,
+        organization: this.input.orgn_domain,
+        firstname: this.input.first_name,
+        lastname: this.input.last_name,
+        position: this.input.orgn_position,
       };
-      axios.post('http://localhost:8080/api/v1/user/register', payload).then((resp) => {
+      axios.post('http://192.168.0.177:8080/api/v1/user/register', payload).then((resp) => {
         if (resp.status === 200) {
           this.hasRegistered = !this.hasRegistered;
           this.$toast.success("Your account has been created");

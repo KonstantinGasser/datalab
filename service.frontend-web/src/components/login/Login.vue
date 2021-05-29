@@ -93,12 +93,12 @@ export default {
   },
   methods: {
     login() {
-      axios.post('http://localhost:8080/api/v1/user/login', {
+      axios.post('http://192.168.0.177:8080/api/v1/user/login', {
         username: this.input.username,
         password: this.input.password,
       }).then(resp => {
           if (resp.status === 200) {
-            localStorage.setItem('token', resp.data.token);
+            localStorage.setItem('token', resp.data.access_token);
             this.$router.replace({ name: 'dashboard' });
           }
         }).catch((err) => {
@@ -117,12 +117,12 @@ export default {
       let payload = {
         username: this.signup.username,
         password: this.signup.password,
-        orgn_domain: this.signup.orgn_domain,
-        first_name: this.signup.first_name,
-        last_name: this.signup.last_name,
-        orgn_position: this.signup.orgn_position,
+        organization: this.signup.orgn_domain,
+        firstname: this.signup.first_name,
+        lastname: this.signup.last_name,
+        position: this.signup.orgn_position,
       };
-      axios.post('http://localhost:8080/api/v1/user/register', payload).then((resp) => {
+      axios.post('http://192.168.0.177:8080/api/v1/user/register', payload).then((resp) => {
         if (resp.status === 200) {
           this.hasRegistered = !this.hasRegistered;
           this.$toast.success("Your account has been created");

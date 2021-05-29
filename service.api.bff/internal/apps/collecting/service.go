@@ -5,9 +5,9 @@ import (
 	"net/http"
 
 	"github.com/KonstantinGasser/datalab/common"
+	"github.com/KonstantinGasser/datalab/library/utils/ctx_value"
 	"github.com/KonstantinGasser/datalab/service.api.bff/internal/apps"
 	"github.com/KonstantinGasser/datalab/service.api.bff/ports/client"
-	"github.com/KonstantinGasser/datalab/utils_old/ctx_value"
 	"github.com/KonstantinGasser/required"
 	"github.com/sirupsen/logrus"
 )

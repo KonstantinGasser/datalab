@@ -23,6 +23,7 @@ func main() {
 	apptokenAddr := flag.String("apptoken-srv", "localhost:8006", "address to connect to app-service")
 	appconfigAddr := flag.String("config-srv", "localhost:8005", "address to connect to app-service")
 	userauthAddr := flag.String("token-srv", "localhost:8002", "address to connect to token-service")
+	notifyliveAddr := flag.String("notify-srv", "localhost:8008", "address to connect to notification-service")
 	flag.Parse()
 
 	// create grpc service dependencies
@@ -46,6 +47,7 @@ func main() {
 	if err != nil {
 		logrus.Fatal(err)
 	}
+	httpNotifyClient := client.NewClientNotifyLive(*notifyliveAddr)
 
 	// create server dependencies
 	userauthSerivce := authenticating.NewService(*grpcUserAuth, *grpcUserMeta)
@@ -55,7 +57,7 @@ func main() {
 	appcreateService := creating.NewService(*grpcAppMeta, *grpcAppToken)
 	appcollectService := collecting.NewService(*grpcAppMeta, *grpcUserMeta, *grpcAppToken, *grpcAppConfig)
 	appmodifyService := modifying.NewService(*grpcAppConfig)
-	appinviteService := inviting.NewService(*grpcAppMeta)
+	appinviteService := inviting.NewService(*grpcAppMeta, *httpNotifyClient)
 
 	server := httpserver.NewDefault(
 		userauthSerivce,

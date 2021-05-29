@@ -90,7 +90,7 @@ func (client ClientAppMeta) GetAppList(ctx context.Context, r *apps.GetAppListRe
 	return resp.GetAppList(), nil
 }
 
-func (client ClientAppMeta) SendInvite(ctx context.Context, r *apps.SendInviteRequest) errors.Api {
+func (client ClientAppMeta) SendInvite(ctx context.Context, r *apps.SendInviteRequest) (string, errors.Api) {
 
 	resp, err := client.Conn.Invite(ctx, &grpcAppMeta.InviteRequest{
 		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
@@ -99,16 +99,16 @@ func (client ClientAppMeta) SendInvite(ctx context.Context, r *apps.SendInviteRe
 		UserUuid:   r.InvitedUuid,
 	})
 	if err != nil {
-		return errors.New(http.StatusInternalServerError,
+		return "", errors.New(http.StatusInternalServerError,
 			err,
 			"Could not send App Invite")
 	}
 	if resp.GetStatusCode() != http.StatusOK {
-		return errors.New(resp.GetStatusCode(),
+		return "", errors.New(resp.GetStatusCode(),
 			err,
 			resp.GetMsg())
 	}
-	return nil
+	return resp.GetAppName(), nil
 }
 
 func (client ClientAppMeta) AcceptInvite(ctx context.Context, r *apps.AcceptInviteRequest) errors.Api {

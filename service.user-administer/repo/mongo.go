@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/KonstantinGasser/datalab/service.user-administer/errors"
+	"github.com/KonstantinGasser/datalab/library/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -73,7 +73,7 @@ func (client mongoClient) InsertOne(ctx context.Context, db, collection string, 
 	if reflect.ValueOf(query).Kind() == reflect.Struct {
 		data, err = bson.Marshal(query)
 		if err != nil {
-			return errors.ErrAPI{
+			return errors.API{
 				Status: http.StatusInternalServerError,
 				Err:    err,
 			}
@@ -83,7 +83,7 @@ func (client mongoClient) InsertOne(ctx context.Context, db, collection string, 
 	coll := client.conn.Database(db).Collection(collection)
 	_, err = coll.InsertOne(ctx, data)
 	if err != nil {
-		return errors.ErrAPI{
+		return errors.API{
 			Status: http.StatusInternalServerError,
 			Err:    err,
 		}
@@ -97,7 +97,7 @@ func (client mongoClient) DeleteOne(ctx context.Context, db, collection string, 
 	coll := client.conn.Database(db).Collection(collection)
 
 	if _, err := coll.DeleteOne(ctx, filter); err != nil {
-		return errors.ErrAPI{
+		return errors.API{
 			Status: http.StatusInternalServerError,
 			Err:    err,
 		}

@@ -73,7 +73,7 @@ export default {
                 'Authorization': localStorage.getItem("token"),
             }
         };
-        const resp = await axios.get("http://localhost:8080/api/v1/user/profile/colleagues", options);
+        const resp = await axios.get("http://192.168.0.177:8080/api/v1/user/colleagues", options);
         if (resp.status != 200) {
             this.$toast.error("Could not fetch Your Colleagues");
             return;
@@ -93,9 +93,8 @@ export default {
             const payload = {
                 app_uuid: this.$props.app_uuid,
                 invited_uuid: user.uuid,
-                app_role: 0,
             }
-            const resp = await axios.post("http://localhost:8080/api/v1/app/member/invite", payload, options);
+            const resp = await axios.post("http://192.168.0.177:8080/api/v1/app/invite", payload, options);
             if (resp.status === 200) {
                 this.inTeam.push(user.uuid)
                 user["status"] = 1

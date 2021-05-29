@@ -39,6 +39,7 @@ func (server UserAuthServer) IsAuthed(ctx context.Context, in *proto.IsAuthedReq
 		IsAuthed:   true,
 		AuthedUser: &common.AuthedUser{
 			Uuid:          authedUser.Uuid,
+			Username:      authedUser.Username,
 			Organization:  authedUser.Organization,
 			ReadWriteApps: permisions.AllowedApps(),
 		},

@@ -100,7 +100,8 @@ message AppSubset {
 message AuthedUser {
     string uuid = 1;
     string organization = 2;
-    repeated string read_write_apps = 3;
+    string username = 3;
+    repeated string read_write_apps = 4;
 }
 
 message ReadWriteApps {

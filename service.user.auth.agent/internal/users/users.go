@@ -46,6 +46,7 @@ type User struct {
 type AuthedUser struct {
 	Uuid         string
 	Organization string
+	Username     string
 }
 
 func NewDefaultUser(username, organization string) (*User, error) {
@@ -96,10 +97,11 @@ func (u User) Credentials(password string) error {
 // AccessToken generates a JWT based on the User information
 func (u User) AccessToken() (string, error) {
 	claims := jwt.MapClaims{
-		"sub":  u.Uuid,
-		"orgn": u.Organization,
-		"iat":  issuerUser,
-		"exp":  time.Now().Add(expTimeUser).Unix(),
+		"sub":   u.Uuid,
+		"uname": u.Username,
+		"orgn":  u.Organization,
+		"iat":   issuerUser,
+		"exp":   time.Now().Add(expTimeUser).Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -127,6 +129,7 @@ func LoggedIn(accessToken string) (*AuthedUser, error) {
 	return &AuthedUser{
 		Uuid:         claims["sub"].(string),
 		Organization: claims["orgn"].(string),
+		Username:     claims["uname"].(string),
 	}, nil
 }
 

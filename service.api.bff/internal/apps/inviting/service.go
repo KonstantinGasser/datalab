@@ -7,6 +7,7 @@ import (
 	"github.com/KonstantinGasser/datalab/service.api.bff/internal/apps"
 	"github.com/KonstantinGasser/datalab/service.api.bff/ports/client"
 	"github.com/KonstantinGasser/required"
+	"github.com/sirupsen/logrus"
 )
 
 type Service interface {
@@ -15,12 +16,14 @@ type Service interface {
 }
 
 type service struct {
-	appMetaClient client.ClientAppMeta
+	appMetaClient    client.ClientAppMeta
+	notifyLiveClient client.ClientNotifiyLive
 }
 
-func NewService(appMetaClient client.ClientAppMeta) Service {
+func NewService(appMetaClient client.ClientAppMeta, notifyLiveClient client.ClientNotifiyLive) Service {
 	return &service{
-		appMetaClient: appMetaClient,
+		appMetaClient:    appMetaClient,
+		notifyLiveClient: notifyLiveClient,
 	}
 }
 
@@ -33,13 +36,22 @@ func (s service) SendInvite(ctx context.Context, r *apps.SendInviteRequest) *app
 		}
 	}
 
-	err := s.appMetaClient.SendInvite(ctx, r)
+	appName, err := s.appMetaClient.SendInvite(ctx, r)
 	if err != nil {
 		return &apps.SendInviteResponse{
 			Status: err.Code(),
 			Msg:    err.Info(),
 			Err:    err.Error(),
 		}
+	}
+	notifyErr := s.notifyLiveClient.EmitSendInvite(ctx, r.InvitedUuid, r.AuthedUser.Organization, map[string]interface{}{
+		"app_uuid":  r.AppUuid,
+		"app_name":  appName,
+		"app_owner": r.AuthedUser.Username,
+	})
+	// if message not send for now I dont care...will change in future
+	if notifyErr != nil {
+		logrus.Errorf("[service.inviting.SendInvite] could not send invite to notification service: %v\n", notifyErr)
 	}
 	return &apps.SendInviteResponse{
 		Status: http.StatusOK,

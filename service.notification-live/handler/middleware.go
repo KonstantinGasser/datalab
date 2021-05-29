@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/KonstantinGasser/datalab/utils/ctx_value"
+	"github.com/KonstantinGasser/datalab/library/utils/ctx_value"
 	"github.com/gofrs/uuid"
 	"github.com/sirupsen/logrus"
 )
@@ -23,14 +23,14 @@ func (handler *Handler) WithAuth(next http.HandlerFunc) http.HandlerFunc {
 		// invoke grpc call to token-service to validate a JWT
 		// ctx := context.WithTimeout(r.Context(), authTimeout)
 		// defer cancel()
-		claims, err := handler.domain.IsLoggedIn(r.Context(), token)
+		authedUser, err := handler.domain.IsLoggedIn(r.Context(), token)
 		if err != nil {
 			logrus.Errorf("<%v>[handler.WithAuth] could not authenticate user: %v", ctx_value.GetString(r.Context(), "tracingID"), err)
 			handler.onError(w, err.Info(), int(err.Code()))
 			return
 		}
 		// add JWT claims of user in r.Context()
-		ctxWithVal := ctx_value.AddValue(r.Context(), "user", claims)
+		ctxWithVal := ctx_value.AddValue(r.Context(), "user", authedUser)
 		// serve request with user claims in context
 		next(w, r.WithContext(ctxWithVal))
 	}

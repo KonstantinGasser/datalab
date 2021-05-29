@@ -79,16 +79,6 @@
             this.user = this.fetchUpdate();
         },
         methods: {
-            getToken() {
-                const parseJwt = (token) => {
-                    try {
-                      return JSON.parse(atob(token.split('.')[1]));
-                    } catch (e) {
-                      return null;
-                    }
-                };
-                return parseJwt(localStorage.getItem("token"));
-            },
             async updateAccount() {
                 let options = {
                     headers: {
@@ -97,10 +87,10 @@
                     }
                 };
                 
-                const resp = await axios.post("http://localhost:8080/api/v1/user/profile/update", {
-                    first_name: this.user.first_name,
-                    last_name: this.user.last_name,
-                    orgn_position: this.user.orgn_position,
+                const resp = await axios.post("http://192.168.0.177:8080/api/v1/user/profile/update", {
+                    firstname: this.user.first_name,
+                    lastname: this.user.last_name,
+                    position: this.user.orgn_position,
                 }, options)
                 if (resp.status !== 200) {
                     this.$toast.error("Mhm sorry we could not update your account");
@@ -117,8 +107,7 @@
                     }
                 };
 
-                let uuid = this.getToken().uuid;
-                axios.get("http://localhost:8080/api/v1/user/profile", options).then(resp => {
+                axios.get("http://192.168.0.177:8080/api/v1/user/profile", options).then(resp => {
                     console.log(resp);
                     this.user = resp.data.user;
                     console.log(this.user);

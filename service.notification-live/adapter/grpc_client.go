@@ -1,20 +1,20 @@
 package adapter
 
 import (
-	appsvc "github.com/KonstantinGasser/datalab/service.app-administer/proto"
-	cfgsvc "github.com/KonstantinGasser/datalab/service.app-configuration/proto"
-	apptokensvc "github.com/KonstantinGasser/datalab/service.app-token-issuer/proto"
+	cfgsvc "github.com/KonstantinGasser/datalab/service.app.config.agent/cmd/grpcserver/proto"
+	appsvc "github.com/KonstantinGasser/datalab/service.app.meta.agent/cmd/grpcserver/proto"
+	apptokensvc "github.com/KonstantinGasser/datalab/service.app.token.agent/cmd/grpcserver/proto"
 	usersvc "github.com/KonstantinGasser/datalab/service.user-administer/proto"
-	userauthsvc "github.com/KonstantinGasser/datalab/service.user-authentication/proto"
+	userauthsvc "github.com/KonstantinGasser/datalab/service.user.auth.agent/cmd/grpcserver/proto"
 	"google.golang.org/grpc"
 )
 
-func CreateAppAdminClient(listenon string) (appsvc.AppAdministerClient, error) {
+func CreateAppAdminClient(listenon string) (appsvc.AppMetaClient, error) {
 	conn, err := grpc.Dial(listenon, grpc.WithInsecure())
 	if err != nil {
 		return nil, err
 	}
-	client := appsvc.NewAppAdministerClient(conn)
+	client := appsvc.NewAppMetaClient(conn)
 	return client, nil
 }
 func CreateAppConfigClient(listenon string) (cfgsvc.AppConfigurationClient, error) {
@@ -26,12 +26,12 @@ func CreateAppConfigClient(listenon string) (cfgsvc.AppConfigurationClient, erro
 	return client, nil
 }
 
-func CreateAppTokenIssuerClient(listenon string) (apptokensvc.AppTokenIssuerClient, error) {
+func CreateAppTokenIssuerClient(listenon string) (apptokensvc.AppTokenClient, error) {
 	conn, err := grpc.Dial(listenon, grpc.WithInsecure())
 	if err != nil {
 		return nil, err
 	}
-	client := apptokensvc.NewAppTokenIssuerClient(conn)
+	client := apptokensvc.NewAppTokenClient(conn)
 	return client, nil
 }
 

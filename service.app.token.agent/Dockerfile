@@ -2,7 +2,7 @@ FROM scratch
 
 WORKDIR /usr/bin
 
-COPY ./build/service .
+COPY build/service .
 
 EXPOSE 8006
 

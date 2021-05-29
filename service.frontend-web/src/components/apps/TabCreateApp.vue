@@ -31,54 +31,7 @@
                 </div>
             </div>
         </div>
-        <!-- <div class="p-2">
-            <label for="">What do you want to monitor?</label>
-            <ul class="checkboxes">
-                <li>
-                    <div class="custom-control custom-switch">
-                        <input v-model="appCfgs" :value="'mouse-move-map'" @change="setConfig($event)" type="checkbox" class="custom-control-input" id="mouse-move-map">
-                        <label class="custom-control-label" for="mouse-move-map">Mouse Movements</label>
-                    </div>
-                </li>
-                <li>
-                    <div class="custom-control custom-switch">
-                        <input v-model="appCfgs" :value="'mouse-move-map'" @change="setConfig($event)" type="checkbox" class="custom-control-input" id="mouse-move-map">
-                        <label class="custom-control-label" for="mouse-move-map">Customer Journey</label>
-                    </div>
-                </li>
-                <li>
-                    <div class="custom-control custom-switch">
-                        <input v-model="appCfgs" :value="'mouse-move-map'" @change="setConfig($event)" type="checkbox" class="custom-control-input" id="mouse-move-map">
-                        <label class="custom-control-label" for="mouse-move-map">User Fun-Facts</label>
-                    </div>
-                </li>
-            </ul>
-        </div> -->
     </div>
-    <!-- <div class="view_component">
-        <div class="form-row">
-            <div class="from-group col-6">
-                <label for="">Add Colleagues to the App</label>
-                <input type="text" name="" id="search_member_field" class="form-control" placeholder="Search">
-            </div>
-            <div class="from-group col d-flex flex-wrap justify-center align-center">
-                <div class="user_card">
-                    <div class="d-flex align-center justify-end">
-                        <div @click="addMemberToApp(dummy)">
-                            <span class="icon icon-user-plus hover big"></span>
-                        </div>
-                    </div>
-                    <div class="d-flex align-center justify-center">
-                        <img class="circle-img medium" src="http://www.expertyou.de:8080/member/expert/266/profile/photo_266_1604926599.jpeg" alt="">
-                    </div>
-                    <div class="member_info">
-                        <span class="member_name dots">Konstantin Gasser</span>
-                        <span class="member_pos dots">Software Engineer</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> -->
 </template>
 
 <script>
@@ -143,10 +96,10 @@
                             'Authorization': localStorage.getItem("token"),
                         }
                     };
-                    await axios.post("http://localhost:8080/api/v1/app/create", {
+                    await axios.post("http://192.168.0.177:8080/api/v1/app/create", {
                             app_name: this.appName,
-                            app_description: this.appDesc,
-                            app_URL: this.appURL,
+                            app_desc: this.appDesc,
+                            app_url: this.appURL,
                         }, options
                     ).then((resp) => {
                         console.log("Resp ",resp);

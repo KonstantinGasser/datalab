@@ -130,7 +130,7 @@
                         'Authorization': localStorage.getItem("token"),
                     }
                 };
-                const resp = await axios.get("http://localhost:8080/api/v1/app/getall", options)
+                const resp = await axios.get("http://192.168.0.177:8080/api/v1/app/all", options)
                 if (resp.status != 200) {
                     this.$toast.error(resp.data);
                 }
@@ -144,7 +144,7 @@
                 };
                 let resp = {}
                 try {
-                    resp = await axios.get("http://localhost:8080/api/v1/app/get?app="+uuid, options)
+                    resp = await axios.get("http://192.168.0.177:8080/api/v1/app?app="+uuid, options)
                     if (resp.status != 200) {
                         this.$toast.error(resp.data);
                     }
@@ -174,44 +174,6 @@
             },
             modeCreateApp() {
                 this.isInCreateMode = true;
-            },
-            async getViewApp() {
-                let options = {
-                    headers: {
-                        'Authorization': localStorage.getItem("token"),
-                    }
-                };
-
-                const res = await axios.get("http://localhost:8080/api/v2/view/app/details", options)
-                if (res.data == null || res.status >= 400) {
-                    this.isInCreateMode = true;
-                    console.log(this.isInCreateMode);
-                    return null;
-                }
-                this.activeTab = "Overview";
-                return res.data;
-                
-            },
-            async getAppDetails(uuid) {
-                let options = {
-                    headers: {
-                        'Authorization': localStorage.getItem("token"),
-                    }
-                };
-                axios.get("http://localhost:8080/api/v2/view/app/get?uuid="+uuid, options).then(resp => {
-                    if (this.isInCreateMode)
-                        this.isInCreateMode = !this.isInCreateMode;
-                    this.activeApp = resp.data.app;
-                    this.activeApp["app_token"] = resp.data.app_token;
-                    this.activeApp["app_config"] = {
-                        "funnel": resp.data.config_funnel,
-                        "campaign": resp.data.config_campaign,
-                        "btn_time": resp.data.config_btn_time,
-                    }
-                    this.activeTab = "Overview";
-                }).catch(error => {
-                    console.log(error);
-                });
             },
             setdoc(event) {
                 this.activeTab = "Documentation";
