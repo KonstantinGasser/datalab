@@ -14,7 +14,10 @@ type MessageEvent int
 type VueMutation string
 
 const (
+	// indicates that a user has been invited to join an App
 	EventAppInvite MessageEvent = iota
+	// indicates that the App has changed and can be synced
+	EventSyncApp
 
 	// MutationAppInvite maps to the corresponding Vue function
 	// when the client socket receives a new message

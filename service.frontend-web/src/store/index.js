@@ -11,6 +11,10 @@ export default createStore({
       message: "",
     },
     notifications: [],
+    sync_app: {
+      uuid: null,
+      sync: false,
+    },
   },
   mutations: {
     INIT_LOAD(state, event) {
@@ -24,6 +28,15 @@ export default createStore({
     POP_NOTIFICATION(state, event) {
       state.notifications = state.notifications.filter(item => !(item.timestamp === event.timestamp))
     },
+    SYNC_APP(state, event) {
+      state.sync_app.uuid = event?.value?.app_uuid
+      state.sync_app.sync = event?.value?.sync
+    },
+    UNSYNC_APP(state) {
+      state.sync_app.uuid = null
+      state.sync_app.sync = false
+    },
+    
     // Connection open
     SOCKET_ONOPEN (state, event) {
       Vue.prototype.$socket = event.currentTarget

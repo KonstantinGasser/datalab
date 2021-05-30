@@ -72,18 +72,27 @@ func (hub *NotifyHub) run() {
 		// finds the correct pool to send the message
 		// if send fails looks up connection and kills it
 		case notification := <-hub.Notify:
-			err := hub.sendMessage(notification)
-			if err != nil {
-				// receiver not available: kill connection
-				if err == ErrWriteToConn {
-					pool := hub.find(notification.Organization)
-					if pool == nil {
-						continue
+			switch notification.Event {
+			case EventAppInvite:
+				err := hub.sendMessage(notification)
+				if err != nil {
+					// receiver not available: kill connection
+					if err == ErrWriteToConn {
+						pool := hub.find(notification.Organization)
+						if pool == nil {
+							continue
+						}
+						hub.unsubscribe <- pool.Find(notification.UserUuid)
 					}
-					hub.unsubscribe <- pool.Find(notification.UserUuid)
+					logrus.Errorf("[notifyHub.chan.Notify] could not send message: %v\n", err)
 				}
-				logrus.Errorf("[notifyHub.chan.Notify] could not send message: %v\n", err)
+			case EventSyncApp:
+				err := hub.sendBroadcast(notification)
+				if err != nil {
+					logrus.Errorf("[notifyHub.chan.Notify] could not broadcast message: %v\n", err)
+				}
 			}
+
 		case userNotifies := <-hub.batchNotify:
 			err := hub.sendBatch(userNotifies.Organization, userNotifies.UserUuid, userNotifies.Notifications)
 			if err != nil {
@@ -100,7 +109,6 @@ func (hub *NotifyHub) run() {
 		// removes notifications with are no longer important
 		// and can be delete from the database
 		case notification := <-hub.RemoveNotify:
-			fmt.Printf("remove: %+v\n", notification)
 			err := hub.removeNotification(notification)
 			if err != nil {
 				logrus.Errorf("[notifyHub.chan.RemoveNotify] could not remove message: %v\n", err)
@@ -125,6 +133,19 @@ func (hub *NotifyHub) sendMessage(notify *IncomingEvent) error {
 		return fmt.Errorf("could not find pool: %v", notify.Organization)
 	}
 	err := pool.Send(notify.UserUuid, notify)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// sendBroadcast broadcasts a message to all connection in a given pool
+func (hub *NotifyHub) sendBroadcast(notify *IncomingEvent) error {
+	pool, ok := hub.Organizations[notify.Organization]
+	if !ok {
+		return fmt.Errorf("could not find pool: %v", notify.Organization)
+	}
+	err := pool.Broadcast(notify)
 	if err != nil {
 		return err
 	}

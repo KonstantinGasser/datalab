@@ -15,14 +15,20 @@ type Service interface {
 }
 
 type service struct {
-	appMetaService  client.ClientAppMeta
-	appTokenService client.ClientAppToken
+	appMetaService   client.ClientAppMeta
+	appTokenService  client.ClientAppToken
+	notifyLiveClient client.ClientNotifiyLive
 }
 
-func NewService(appMetaService client.ClientAppMeta, appTokenService client.ClientAppToken) Service {
+func NewService(
+	appMetaService client.ClientAppMeta,
+	appTokenService client.ClientAppToken,
+	notifyLiveClient client.ClientNotifiyLive,
+) Service {
 	return &service{
-		appMetaService:  appMetaService,
-		appTokenService: appTokenService,
+		appMetaService:   appMetaService,
+		appTokenService:  appTokenService,
+		notifyLiveClient: notifyLiveClient,
 	}
 }
 
@@ -61,6 +67,10 @@ func (s service) CreateAppToken(ctx context.Context, r *apps.CreateAppTokenReque
 			AppToken: nil,
 		}
 	}
+	s.notifyLiveClient.EmitSendInvite(ctx, 1, client.MutationSyncApp, "", r.AuthedUser.Organization, map[string]interface{}{
+		"app_uuid": r.AppUuid,
+		"sync":     true,
+	})
 	return &apps.CreateAppTokenResponse{
 		Status:   http.StatusOK,
 		Msg:      "App Token created",

@@ -4,10 +4,18 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/sirupsen/logrus"
+)
+
+type VueMutation string
+
+const (
+	MutationAppInvite VueMutation = "APP_INVITE"
+	MutationSyncApp   VueMutation = "SYNC_APP"
 )
 
 type ClientNotifiyLive struct {
@@ -22,14 +30,14 @@ func NewClientNotifyLive(addr string) *ClientNotifiyLive {
 	}
 }
 
-func (client ClientNotifiyLive) EmitSendInvite(ctx context.Context, receiverUuid, receiverOrgn string, value map[string]interface{}) error {
+func (client ClientNotifiyLive) EmitSendInvite(ctx context.Context, event int, mutation VueMutation, receiverUuid, receiverOrgn string, value map[string]interface{}) error {
 
 	var payload = map[string]interface{}{
 		"receiver_uuid": receiverUuid,
 		"receiver_orgn": receiverOrgn,
 		"timestamp":     time.Now().Unix(),
-		"mutation":      "APP_INVITE",
-		"event":         0,
+		"mutation":      mutation,
+		"event":         event,
 		"value":         value,
 	}
 	buf := new(bytes.Buffer)
@@ -50,6 +58,6 @@ func (client ClientNotifiyLive) EmitSendInvite(ctx context.Context, receiverUuid
 }
 
 func (client ClientNotifiyLive) Addr() string {
-	return "http://192.168.0.232:8008/api/v1/datalab/publish/event"
-	// return fmt.Sprintf("http://%s%s", client.addr, client.apiPublish)
+	// return "http://192.168.0.232:8008/api/v1/datalab/publish/event"
+	return fmt.Sprintf("http://%s%s", client.addr, client.apiPublish)
 }

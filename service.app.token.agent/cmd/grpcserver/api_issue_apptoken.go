@@ -27,7 +27,7 @@ func (server AppTokenServer) Issue(ctx context.Context, in *proto.IssueRequest) 
 		Msg:        "App Token updated",
 		Token: &common.AppAccessToken{
 			Jwt:        jwt,
-			Expiration: exp.Unix(),
+			Expiration: exp,
 		},
 	}, nil
 }

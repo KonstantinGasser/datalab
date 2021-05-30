@@ -66,13 +66,13 @@ func (client MongoClient) GetById(ctx context.Context, uuid string, result inter
 }
 
 // Update updates the Jwt and Exp of the stored AppToken document
-func (client MongoClient) Update(ctx context.Context, uuid, jwt string, exp time.Time) error {
+func (client MongoClient) Update(ctx context.Context, uuid, jwt string, exp int64) error {
 	query := bson.D{
 		{
 			Key: "$set",
 			Value: bson.M{
 				"app_jwt":     jwt,
-				"app_jwt_exp": exp.Unix(),
+				"app_jwt_exp": exp,
 			},
 		},
 	}

@@ -2,7 +2,6 @@ package fetching
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"github.com/KonstantinGasser/datalab/library/errors"
@@ -26,7 +25,6 @@ func NewService(repo users.UserRepository) Service {
 }
 
 func (s service) FetchById(ctx context.Context, uuid string) (*users.User, errors.Api) {
-	fmt.Println("uuid: ", uuid)
 	var user users.User
 	if err := s.repo.GetById(ctx, uuid, &user); err != nil {
 		if err == mongo.ErrNoDocuments {

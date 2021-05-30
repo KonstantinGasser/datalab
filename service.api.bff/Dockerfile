@@ -13,4 +13,4 @@ ENTRYPOINT ["/usr/bin/service", \
                 "-apptoken-srv=service-app-tokenissuer:8006", \
                 "-config-srv=service-app-configuration:8005", \
                 "-token-srv=service-user-authentication:8002", \
-                "-notify-srv=localhost:8008"]
+                "-notify-srv=service-notification-live:8008"]

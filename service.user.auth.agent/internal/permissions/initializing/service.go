@@ -2,7 +2,6 @@ package initializing
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"github.com/KonstantinGasser/datalab/library/errors"
@@ -30,7 +29,6 @@ func (s service) InitPermissions(ctx context.Context, userUuid, userOrgn string)
 			err,
 			"Missing fields")
 	}
-	fmt.Println("p: ", permission)
 	err = s.repo.Store(ctx, *permission)
 	if err != nil {
 		return errors.New(http.StatusInternalServerError,

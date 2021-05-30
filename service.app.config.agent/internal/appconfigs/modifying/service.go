@@ -31,18 +31,26 @@ func (s *service) UpdateFunnel(ctx context.Context, appRefUuid string, authedUse
 	err := s.repo.GetById(ctx, appRefUuid, &storedAppConfig)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return errors.New(http.StatusNotFound, err, "Could not find any App Config")
+			return errors.New(http.StatusNotFound,
+				err,
+				"Could not find any App Config")
 		}
-		return errors.New(http.StatusInternalServerError, err, "Could not get App Config")
+		return errors.New(http.StatusInternalServerError,
+			err,
+			"Could not get App Config")
 	}
 	// check user permissions
 	if err := storedAppConfig.HasReadOrWrite(authedUser.Uuid, authedUser.ReadWriteApps...); err != nil {
-		return errors.New(http.StatusUnauthorized, err, "User has no rights to change App Config")
+		return errors.New(http.StatusUnauthorized,
+			err,
+			"User has no rights to change App Config")
 	}
 	// update config
 	storedAppConfig.ApplyFunnel(stages...)
 	if err := s.repo.UpdateByFlag(ctx, appRefUuid, appconfigs.FlagFunnel, stages); err != nil {
-		return errors.New(http.StatusInternalServerError, err, "Could not update Funnel Config")
+		return errors.New(http.StatusInternalServerError,
+			err,
+			"Could not update Funnel Config")
 	}
 	return nil
 }

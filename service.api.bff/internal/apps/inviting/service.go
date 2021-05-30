@@ -44,7 +44,7 @@ func (s service) SendInvite(ctx context.Context, r *apps.SendInviteRequest) *app
 			Err:    err.Error(),
 		}
 	}
-	notifyErr := s.notifyLiveClient.EmitSendInvite(ctx, r.InvitedUuid, r.AuthedUser.Organization, map[string]interface{}{
+	notifyErr := s.notifyLiveClient.EmitSendInvite(ctx, 0, client.MutationAppInvite, r.InvitedUuid, r.AuthedUser.Organization, map[string]interface{}{
 		"app_uuid":  r.AppUuid,
 		"app_name":  appName,
 		"app_owner": r.AuthedUser.Username,

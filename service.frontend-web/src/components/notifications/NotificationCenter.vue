@@ -49,8 +49,6 @@ export default {
   },
   methods: {
       async acceptInvite(item, app_uuid) {
-          console.log(item)
-          console.log(app_uuid)
           let options = {
                 headers: {
                     'Authorization': localStorage.getItem("token"),
@@ -60,8 +58,7 @@ export default {
                 app_uuid: app_uuid,
                 event_timestamp: item.timestamp,
             }
-            console.log(payload)
-            const resp = await axios.post("http://localhost:8080/api/v1/app/invite/accept", payload, options);
+            const resp = await axios.post("http://192.168.0.177:8080/api/v1/app/invite/accept", payload, options);
             if (resp.status != 200) {
                 this.$toast.error("Could not send invite feedback");
                 return

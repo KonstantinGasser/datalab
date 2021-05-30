@@ -17,7 +17,6 @@ func (handler *Handler) HandleIncomingNotification(w http.ResponseWriter, r *htt
 		return
 	}
 	notification.Timestamp = time.Now().Unix()
-	notification.Mutation = notifyhub.MutationAppInvite
 
 	handler.domain.EventAppInvite(r.Context(), notification)
 }

@@ -39,7 +39,7 @@ func (server AppTokenServer) Get(ctx context.Context, in *proto.GetRequest) (*pr
 		Msg:        "Fetched App Token",
 		Token: &common.AppAccessToken{
 			Jwt:        appToken.Jwt,
-			Expiration: appToken.Exp.Unix(),
+			Expiration: appToken.Exp,
 		},
 	}, nil
 }

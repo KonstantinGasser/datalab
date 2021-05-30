@@ -13,12 +13,14 @@ type Service interface {
 }
 
 type service struct {
-	appConfigClient client.ClientAppConfig
+	appConfigClient  client.ClientAppConfig
+	notifyLiveClient client.ClientNotifiyLive
 }
 
-func NewService(appConfigClient client.ClientAppConfig) Service {
+func NewService(appConfigClient client.ClientAppConfig, notifyLiveClient client.ClientNotifiyLive) Service {
 	return &service{
-		appConfigClient: appConfigClient,
+		appConfigClient:  appConfigClient,
+		notifyLiveClient: notifyLiveClient,
 	}
 }
 
@@ -32,6 +34,10 @@ func (s service) UpdateConfig(ctx context.Context, r *apps.UpdateConfigRequest) 
 			Err:    err.Error(),
 		}
 	}
+	s.notifyLiveClient.EmitSendInvite(ctx, 1, client.MutationSyncApp, "", r.AuthedUser.Organization, map[string]interface{}{
+		"app_uuid": r.AppRefUuid,
+		"sync":     true,
+	})
 	return &apps.UpdateConfigResponse{
 		Status: http.StatusOK,
 		Msg:    "Updated App Config",

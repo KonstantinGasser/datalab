@@ -13,7 +13,6 @@ func (s Server) UpdateAppConfig(w http.ResponseWriter, r *http.Request) {
 	logrus.Infof("<%v>[Server.UpdateAppConfig] received request: %v\n", tracingID, r.Host)
 
 	authedUser := ctx_value.GetAuthedUser(r.Context())
-
 	var request apps.UpdateConfigRequest
 	if err := s.decode(r.Body, &request); err != nil {
 		s.onErr(w, http.StatusBadRequest, "Could not decode r.Body")

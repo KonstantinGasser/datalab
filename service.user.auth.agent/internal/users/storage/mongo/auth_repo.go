@@ -2,7 +2,6 @@ package mongo
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/KonstantinGasser/datalab/service.user.auth.agent/internal/users"
@@ -88,7 +87,6 @@ func (client MongoClient) UsernameTaken(ctx context.Context, username string) (b
 	if err != nil {
 		return false, err
 	}
-	fmt.Printf("Count: %v\n", count)
 	if count != 0 {
 		return true, nil
 	}

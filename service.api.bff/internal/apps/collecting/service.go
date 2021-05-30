@@ -117,7 +117,6 @@ func (s service) collectAttachedAppData(ctx context.Context, appUuid string, app
 		case result := <-resC:
 			switch result.Field {
 			case "apptoken":
-				// fmt.Println("token: ", result)
 				var ok bool
 				apptoken, ok = result.Value.(*common.AppAccessToken)
 				if !ok { // if assertion fails value will be nil which is not nice but sometimes will happen thou
@@ -130,7 +129,6 @@ func (s service) collectAttachedAppData(ctx context.Context, appUuid string, app
 					continue
 				}
 			case "appowner":
-				// fmt.Println("owner: ", result)
 				var ok bool
 				appowner, ok = result.Value.(*common.UserInfo)
 				if !ok { // if assertion fails value will be nil which is not nice but sometimes will happen thou

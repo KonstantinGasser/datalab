@@ -9,10 +9,10 @@
                 </div>
             <div class="">
                 <div class="form-col col d-flex flex-wrap">
-                    <div v-for="f in funnel" :key="f.id" class="d-flex align-center m-1">
+                    <div v-for="f in app_config?.funnel" :key="f.id" class="d-flex align-center m-1">
                         <div class="funnel">
                             <div class="d-flex justify-end trash-span">
-                                <span v-if="f.id >= funnel.length" class="icon icon-trash-2 hover" @click="removeStage(f.id)"></span>
+                                <span v-if="f.id >= app_config?.funnel?.length" class="icon icon-trash-2 hover" @click="removeStage(f.id)"></span>
                             </div>
                             <div class="d-flex justify-center align-center flex-col">
                                 <div class="stage-name">{{f.name}}</div>
@@ -20,7 +20,7 @@
                             </div>
                         </div>
                         <div>
-                             <span v-if="f.id < funnel.length" class="icon icon-chevron-right super"></span>
+                             <span v-if="f.id < app_config?.funnel?.length" class="icon icon-chevron-right super"></span>
                          </div>
                     </div>
                      <div class="funnel add-box d-flex align-center justify-even">
@@ -58,21 +58,21 @@
                 <tr>
                     <th>#</th>
                     <th>Campaign Name</th>
-                    <th>URL Prefix</th>
+                    <th>URL Suffix</th>
                     <th>Action</th>
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="item in campaign" :key="item.id">
+                <tr v-for="item in app_config?.campaign" :key="item.id">
                     <th>{{item.id}}</th>
                     <th>{{item.name}}</th>
-                    <th>{{item.prefix}}</th>
+                    <th>{{item.suffix}}</th>
                     <th><span class="icon icon-trash-2 hover" @click="removeCampaign(item.id)"></span></th>
                 </tr>
                 <tr>
-                    <th class="v-center">{{campaign_count}}</th>
+                    <th class="v-center"></th>
                     <td><input v-model="campaign_name" type="text" placeholder="Name (E-Mail Campaign)" class="form-control border" :class="{'border-danger': campaign_invalid}" ></td>
-                    <td><input v-model="campaign_prefix" type="text" placeholder="Prefix (ex. summer-sales)" class="form-control border" :class="{'border-danger': campaign_invalid}" ></td>
+                    <td><input v-model="campaign_suffix" type="text" placeholder="Suffix (ex. summer-sales)" class="form-control border" :class="{'border-danger': campaign_invalid}" ></td>
                     <td class="v-center"><span class="icon icon-plus hover" @click="addCampaign"></span></td>
                 </tr> 
             </tbody>
@@ -95,14 +95,14 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="item in buttons" :key="item.id">
+                <tr v-for="item in app_config?.btn_time" :key="item.id">
                     <th>{{item.id}}</th>
                     <th>{{item.name}}</th>
                     <th>{{item.btn_name}}</th>
                     <th><span class="icon icon-trash-2 hover" @click="removeBtnTime(item.id)"></span></th>
                 </tr>
                 <tr>
-                    <th class="v-center">{{button_count}}</th>
+                    <th class="v-center"></th>
                     <td><input v-model="button_name" type="text" placeholder="Name (ex. Btn-Order)" class="form-control border" :class="{'border-danger': button_invalid}" ></td>
                     <td><input v-model="button_btn" type="text" placeholder="Btn (ex. btn_order)" class="form-control border" :class="{'border-danger': button_invalid}" ></td>
                     <td class="v-center"><span class="icon icon-plus hover" @click="addBtnTime"></span></td>
@@ -120,26 +120,17 @@ export default {
     name: "Configuration",
     data() {
         return {
-            funnel: [],
+            stage_invalid: false,
             stage_name: null,
             stage_transition: null,
-            funnel_count: 0,
-            stage_invalid: false,
 
-            campaign: [],
-            campaign_name: null,
-            campaign_prefix: null,
-            campaign_count: 0,
             campaign_invalid: false,
+            campaign_name: null,
+            campaign_suffix: null,
 
-            buttons: [],
+            button_invalid: false,
             button_name: null,
             button_btn: null,
-            buttons_count: 0,
-            button_invalid: false,
-            unsaved_funnel: [],
-            unsaved_campaign: [],
-            unsaved_btn: [],
         };
     },
     props: {
@@ -155,67 +146,33 @@ export default {
 
     },
     mounted() {
-        if (this.$props.app_config === null || Object.keys(this.$props.app_config).length === 0){
-            this.funnel = [];
-            this.funnel_count = 1;
-            this.campaign = [];
-            this.campaign_count = 1;
-            this.buttons = [];
-            this.buttons_count = 1;
-            return
-        }
-        this.funnel = this.$props.app_config.funnel ? this.$props.app_config?.funnel: [];
-        this.funnel_count = this.funnel.length + 1;
 
-        this.campaign = this.$props.app_config.campaign ? this.$props.app_config?.campaign: [];
-        this.campaign_count = this.campaign.length + 1;
-
-        this.buttons = this.$props.app_config.btn_time ? this.$props.app_config?.btn_time: [];
-        this.buttons_count = this.buttons.length + 1;
     },
     computed: {
+
     },
     methods: {
         addStage() {
             if (this.stage_invalid) this.stage_invalid = false;
-            const tmp = this.funnel.filter(item => item.name === this.stage_name || item.transition === this.stage_transition)
-            if (tmp.length > 0) {
+            const tmp = this.$props.app_config?.funnel?.filter(item => item.name === this.stage_name || item.transition === this.stage_transition)
+            if (tmp?.length > 0) {
                 this.$toast.warning("Funnel Name and Transition must be unique");
                 this.stage_invalid = true;
                 return
             }
-
-            // mark unsaved changes of this element
-            this.unsaved_funnel.push(this.funnel_count)
-            console.log("added unsave: ", this.unsaved_funnel)
-            this.funnel.push({
-                id: this.funnel_count,
-                name: this.stage_name,
-                transition: this.stage_transition,
-            });
-            this.stage_name = null;
-            this.stage_transition = null;
-            this.funnel_count++;
-
-            this.$emit("appchange", true);
+            let count = this.$props.app_config?.funnel?.length + 1
+            if (Number.isNaN(count)) {
+                count = 1
+            }
+            this.$emit("appchange", {unsaved: true, type: "funnel-add", item: {
+                    id: count,
+                    name: this.stage_name,
+                    transition: this.stage_transition,
+                }
+            })
         },
         removeStage(id) {
-            if (this.unsaved_funnel.length === 0) {
-                this.$emit("appchange", true);
-            } else {
-                this.unsaved_funnel = this.unsaved_funnel.filter(item => item !== this.funnel_count-1)
-                if (this.unsaved_funnel.length > 0) {
-                    this.$emit("appchange", true);
-                } else {
-                    this.$emit("appchange", false);
-                }
-            }
-            
-            this.funnel = this.funnel.filter(item => item.id != id);
-            this.funnel.forEach((item,i) => {
-                item.id = i+1;
-            });
-            this.funnel_count--;  
+            this.$emit("appchange", {unsaved: true, type: "funnel-remove", item: id}) 
         },
         updateStages() {
             let options = {
@@ -226,52 +183,35 @@ export default {
             const payload = {
                 flag: "funnel",
                 app_uuid: this.$props.app_uuid,
-                stages: this.funnel,
+                stages: this.$props.app_config?.funnel,
             }
-            axios.post("http://localhost:8080/api/v1/app/config/update", payload, options).then(res => {
-                console.log(res);
+            axios.post("http://192.168.0.177:8080/api/v1/app/config/update", payload, options).then(res => {
                 this.$toast.success("Updated Funnel information");
-                this.$emit("appchange", false);
+                this.$emit("appchange", {unsaved: false, type: "funnel-saved"});
+
             }).catch(err => this.$toast.error(err.response.data));
         },
         addCampaign() {
             if (this.campaign_invalid) this.campaign_invalid = false;
-            const tmp = this.campaign.filter(item => item.name === this.campaign_name || item.prefix === this.campaign_prefix)
-            if (tmp.length > 0) {
+            const tmp = this.$props.app_config?.campaign?.filter(item => item.name === this.campaign_name || item.suffix === this.campaign_suffix)
+            if (tmp?.length > 0) {
                 this.$toast.warning("Campaign Name and Prefix must be unique");
                 this.campaign_invalid = true;
                 return
             }
-            // mark unsaved changes of this element
-            this.unsaved_campaign.push(this.campaign_count)
-            this.campaign.push(
-                {
-                    id: this.campaign_count,
+            let count = this.$props.app_config?.campaign?.length + 1
+            if (Number.isNaN(count)) {
+                count = 1
+            }
+            this.$emit("appchange", {unsaved: true, type: "campaign-add", item: {
+                    id: count,
                     name: this.campaign_name,
-                    prefix: this.campaign_prefix,
+                    suffix: this.campaign_suffix,
                 }
-            );
-            this.campaign_name = null;
-            this.campaign_prefix = null;
-            this.campaign_count++;
-            this.$emit("appchange", true);
+            }) 
         },
         removeCampaign(id) {
-            if (this.unsaved_campaign.length === 0) {
-                this.$emit("appchange", true);
-            } else {
-                this.unsaved_campaign = this.unsaved_campaign.filter(item => item !== this.campaign_count-1)
-                if (this.unsaved_campaign.length > 0) {
-                    this.$emit("appchange", true);
-                } else {
-                    this.$emit("appchange", false);
-                }
-            }
-            this.campaign = this.campaign.filter(item => item.id != id);
-            this.campaign.forEach((item,i) => {
-                item.id = i+1;
-            });
-            this.campaign_count--;
+            this.$emit("appchange", {unsaved: true, type: "campaign-remove", item: id})
         },
         updateCampaigns() {
             let options = {
@@ -279,55 +219,41 @@ export default {
                     'Authorization': localStorage.getItem("token"),
                 }
             }; 
+
             const payload = {
                 flag:"campaign",
                 app_uuid: this.$props.app_uuid,
-                records: this.campaign,
+                records: this.$props.app_config?.campaign,
             }
-            axios.post("http://localhost:8080/api/v1/app/config/update", payload, options).then(res => {
-                console.log(res);
+            axios.post("http://192.168.0.177:8080/api/v1/app/config/update", payload, options).then(res => {
                 this.$toast.success("Updated Campaign information");
-                this.$emit("appchange", false);
+                this.$emit("appchange", {unsaved: false, type: "campaign-saved"});
+
             }).catch(err => this.$toast.error(err.response.data));
         },
 
         addBtnTime() {
             if (this.button_invalid) this.button_invalid = false;
-            const tmp = this.buttons.filter(item => item.name === this.button_name || item.btn_name === this.button_name);
-            if (tmp.length > 0) {
+            const tmp = this.$props.app_config?.btn_time?.filter(item => item.name === this.button_name || item.btn_name === this.button_btn);
+            if (tmp?.length > 0) {
                 this.$toast.warning("Button Name and Identifier must be unique");
                 this.button_invalid = true;
                 return
             }
-            // mark unsaved changes of this element
-            this.unsaved_btn.push(this.buttons_count)
-            this.buttons.push({
-                id: this.buttons_count,
-                name: this.button_name,
-                btn_name: this.button_btn,
-            })
 
-            this.button_name = null;
-            this.button_btn = null;
-            this.buttons_count++;
-            this.$emit("appchange", true);
+            let count = this.$props.app_config?.btn_time?.length + 1
+            if (Number.isNaN(count)) {
+                count = 1
+            }
+            this.$emit("appchange", {unsaved: true, type: "btn-add", item: {
+                    id: count,
+                    name: this.button_name,
+                    btn_name: this.button_btn,
+                }
+            }) 
         },
         removeBtnTime(id) {
-            if (this.unsaved_btn.length === 0) {
-                this.$emit("appchange", true);
-            } else {
-                this.unsaved_btn = this.unsaved_btn.filter(item => item !== this.buttons_count-1)
-                if (this.unsaved_btn.length > 0) {
-                    this.$emit("appchange", true);
-                } else {
-                    this.$emit("appchange", false);
-                }
-            }
-            this.buttons = this.buttons.filter(item => item.id != id);
-            this.buttons.forEach((item,i) => {
-                item.id = i+1;
-            });
-            this.buttons_count--;
+            this.$emit("appchange", {unsaved: true, type: "btn-remove", item: id})
         },
         updateBtnTime() {
             let options = {
@@ -335,19 +261,18 @@ export default {
                     'Authorization': localStorage.getItem("token"),
                 }
             }; 
+            console.log("DATA: ",this.$props.app_config?.btn_time)
             const payload = {
                 flag:"btntime",
                 app_uuid: this.$props.app_uuid,
-                btn_defs: this.buttons,
+                btn_defs: this.$props.app_config?.btn_time,
             }
-            axios.post("http://localhost:8080/api/v1/app/config/update", payload, options).then(res => {
-                console.log(res);
+            axios.post("http://192.168.0.177:8080/api/v1/app/config/update", payload, options).then(res => {
                 this.$toast.success("Updated Interesting-Buttons information");
-                this.$emit("appchange", false);
+                this.$emit("appchange", {unsaved: false, type: "btn-saved"})
             }).catch(err => this.$toast.error(err.response.data));
         },
         showCfg(type) {
-            console.log(type);
             this.$emit("setdoc", type);
         },
     },

@@ -55,7 +55,6 @@ func (client ClientAppConfig) CollectAppConfig(ctx context.Context, appUuid stri
 }
 
 func (client ClientAppConfig) UpdateConfig(ctx context.Context, r *apps.UpdateConfigRequest) errors.Api {
-
 	resp, err := client.Conn.Update(ctx, &grpcAppConfig.UpdateRequest{
 		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
 		AuthedUser: r.AuthedUser,
@@ -72,7 +71,7 @@ func (client ClientAppConfig) UpdateConfig(ctx context.Context, r *apps.UpdateCo
 	}
 	if resp.GetStatusCode() != http.StatusOK {
 		return errors.New(resp.GetStatusCode(),
-			err,
+			fmt.Errorf(resp.GetMsg()),
 			resp.GetMsg())
 	}
 	return nil

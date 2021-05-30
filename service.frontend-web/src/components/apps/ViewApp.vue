@@ -5,34 +5,33 @@
                 <button @click="modeCreateApp()" class="btn btn-standard">Create App <span class="">🙌</span></button>
             </div>
             <div class="app_name_list">
-                <p class="info-text" v-if="app_list == null || app_list.length === 0">
+                <p class="info-text" v-if="apps == null || apps.length === 0">
                     Mhm looks like you do not have any apps yet - <a @click="modeCreateApp()">go create one!</a>
                 </p>
-                <div :class="{selected: selectedApp===app.uuid}" class="app-name d-flex justify-start align-center" v-for="app in app_list" :key="app.uuid" @click="loadApp(app.uuid)">
+                <div :class="{selected: selectedApp===app.uuid}" class="app-name d-flex justify-start align-center" v-for="app in apps" :key="app.uuid" @click="loadApp(app.uuid)">
                     <span class="dots medium-font" >{{ app.name }}</span>
-                    <!-- <span class="icon icon-delete hover big" @click="removeApp(app.uuid)"></span> -->
                 </div>
             </div>
         </div>
         <div>
             <TabCreateApp v-if="isInCreateMode" @createdApp="updateState" :orgn_domain="activeApp.owner?.orgn_domain" />
             <div v-if="!isInCreateMode">
-                <h1 class="super-lg d-flex align-center">{{activeApp.owner?.orgn_domain}}/{{activeApp.app?.name}} 
+                <h1 class="super-lg d-flex align-center">{{activeApp.owner?.orgn_domain}}/{{activeApp.app?.name}}
                     <div  v-if="!app_unsaved" class="saved d-flex align-center justify-center">
                         <div>Saved</div>
                     </div>
                     <div  v-if="app_unsaved" class="unsaved d-flex align-center justify-center">
                         <div>Unsaved Changes</div>
                     </div>
-                    <div class="sync d-flex align-center justify-center" @click="syncAppChanges(activeApp?.app?.uuid)">
-                        <div>sync <span class="icon icon-rotate-cw"></span></div>
+                    <div v-if="activeApp?.app?.uuid == sync_app?.uuid && sync_app?.sync === true" class="sync d-flex align-center justify-center" @click="syncAppChanges(activeApp?.app?.uuid)">
+                        <div>sync data</div>
                     </div>
                 </h1>
                 <div class="desc_test">{{activeApp.app?.description}}</div>
                 <hr>
                 <Tabs class="my-2" ref="Tabs" :update="activeTab" :initTab="activeTab" :tabs="tabs" @tabChange="tabChange"/>
-                <General v-if="activeTab === 'Overview'" :app="activeApp" @drop_app="drop_app" :token_placeholder="token_placeholder"/>
-                <Config v-if="activeTab == 'Configuration'" @appchange="markUnsaved" :app_config="activeApp.config" :app_uuid="activeApp?.app?.uuid" @setdoc="setdoc"/>
+                <General v-if="activeTab === 'Overview'" :app_token="activeApp?.token" :app_uuid="activeApp?.app?.uuid" @drop_app="drop_app" />
+                <Config v-if="activeTab == 'Configuration'" @appchange="markUnsaved" :app_config="activeApp?.config" :app_uuid="activeApp?.app?.uuid" @setdoc="setdoc"/>
                 <InviteMember v-if="activeTab == 'Invite'" :app_uuid="activeApp?.app?.uuid" :member="activeApp?.app?.member" :app_owner="activeApp?.owner"/>
             </div>
         </div>
@@ -58,15 +57,15 @@
             InviteMember,
         },
         computed: {
+            sync_app() {
+                return this.$store.state.sync_app
+            },
             blockTabs() {
                 return this.tabsBlocked;
             },
             showCreateApp() {
                 return this.isInCreateMode;
             },
-            app_list() {
-                return this.apps;
-            }
         },
         data() {
             return {
@@ -90,9 +89,7 @@
         async created() {
             // fetch initial data of app list
             const init_data = await this.getAppList();
-            console.log(init_data)
             if (init_data.data.apps === undefined || init_data.data.apps === null || init_data.data.apps.length <= 0 || init_data.status != 200) {
-
                 this.apps = [];
                 this.isInCreateMode = true;
             }
@@ -101,7 +98,6 @@
                 const init_app = await this.getApp(this.apps[0].uuid);
                 this.activeApp = init_app;
                 this.selectedApp = this.activeApp?.app?.uuid;
-                console.log(this.activeApp);
                 this.isInCreateMode = false;
             }    
         },
@@ -123,6 +119,7 @@
                 this.activeApp = data;
                 this.selectedApp = data.app?.uuid;
                 this.activeTab = "Overview";
+                this.app_unsaved = false;
             },
             async getAppList() {
                 let options = {
@@ -130,7 +127,7 @@
                         'Authorization': localStorage.getItem("token"),
                     }
                 };
-                const resp = await axios.get("http://localhost:8080/api/v1/app/all", options)
+                const resp = await axios.get("http://192.168.0.177:8080/api/v1/app/all", options)
                 if (resp.status != 200) {
                     this.$toast.error(resp.data);
                 }
@@ -144,7 +141,7 @@
                 };
                 let resp = {}
                 try {
-                    resp = await axios.get("http://localhost:8080/api/v1/app?app="+uuid, options)
+                    resp = await axios.get("http://192.168.0.177:8080/api/v1/app?app="+uuid, options)
                     if (resp.status != 200) {
                         this.$toast.error(resp.data);
                     }
@@ -168,7 +165,51 @@
                 this.isInCreateMode = false; 
             },
             markUnsaved(value) {
-                this.app_unsaved = value;
+                this.$store.commit("UNSYNC_APP")
+                switch (value.type) {
+                    case "funnel-add":
+                        if (this.activeApp?.config?.funnel === undefined) {
+                            this.activeApp.config.funnel = []
+                        }
+                        this.activeApp?.config?.funnel?.push(value.item)
+                        this.app_unsaved = value.unsaved
+                        break;
+                    case "funnel-remove":
+                        this.activeApp.config.funnel = this.activeApp?.config?.funnel?.filter(item => item.id !== value.item)
+                        this.app_unsaved = value.unsaved
+                        break;
+                    case "funnel-saved":
+                        this.app_unsaved = false;
+                        break;
+                    case "campaign-add":
+                        if (this.activeApp?.config?.campaign === undefined) {
+                            this.activeApp.config.campaign = []
+                        }
+                        this.activeApp?.config?.campaign?.push(value.item)
+                        this.app_unsaved = value.unsaved
+                        break;
+                    case "campaign-remove":
+                        this.activeApp.config.campaign = this.activeApp?.config?.campaign?.filter(item => item.id !== value.item)
+                        this.app_unsaved = value.unsaved
+                        break;
+                    case "campaign-saved":
+                        this.app_unsaved = false;
+                        break;
+                    case "btn-add":
+                        if (this.activeApp?.config?.btn_time === undefined) {
+                            this.activeApp.config.btn_time = []
+                        }
+                        this.activeApp?.config?.btn_time?.push(value.item)
+                        this.app_unsaved = value.unsaved
+                        break;
+                    case "btn-remove":
+                        this.activeApp.config.btn_time = this.activeApp?.config?.btn_time?.filter(item => item.id !== value.item)
+                        this.app_unsaved = value.unsaved
+                        break;
+                    case "btn-saved":
+                        this.app_unsaved = false;
+                        break;
+                }
             },
             drop_app() {
             },

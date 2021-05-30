@@ -29,6 +29,16 @@ func (pool *OrganizationPool) SendBatch(receiver string, msgs BatchNotification)
 	return ErrNoRecevierFound
 }
 
+func (pool *OrganizationPool) Broadcast(msg *IncomingEvent) error {
+	for _, conn := range *pool {
+		err := conn.Conn.WriteJSON(msg)
+		if err != nil {
+			return ErrWriteToConn
+		}
+	}
+	return nil
+}
+
 // Send iterate over the pool and sends the message to the connection
 // which uuid matches with the receiver ones. If not receiver is found
 // Send returns an ErrNoRecevierFound

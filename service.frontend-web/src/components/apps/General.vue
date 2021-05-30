@@ -12,7 +12,7 @@
                         </small>
                     </label>
                     <div class="input-group">
-                        <input v-model="token_placeholder" type="text" class="form-control" placeholder="Organisation-Domain/App-Name" aria-label="" aria-describedby="basic-addon1">
+                        <input v-model="verification_step" type="text" class="form-control" placeholder="Organisation-Domain/App-Name" aria-label="" aria-describedby="basic-addon1">
                         <div class="input-group-append">
                             <button class="btn btn-standard" @click="generateToken()" type="button">Authorize and Generate</button>
                         </div>
@@ -25,14 +25,14 @@
                 <div class="form-group col">
                     <label for="">Your App Token</label>
                     <div class="input-group">
-                        <textarea type="text" class="form-control" rows="2" readonly id="app_token_value" :value="token" aria-label="" aria-describedby="basic-addon1"></textarea>
+                        <textarea type="text" class="form-control" rows="2" readonly id="app_token_value" :value="jwt" aria-label="" aria-describedby="basic-addon1"></textarea>
                         <div class="input-group-append">
                             <button class="btn btn-standard" @click="copyTokenToClipboard()" type="button">Copy</button>
                         </div>
                     </div>
-                    <div v-if="app_token || app?.token?.token" class=""><small>Token expires in {{get_valid_till.days}} days {{get_valid_till.hours}} hours</small></div>
+                    <div class=""><small>Token expires in {{expTimeSet.days}} days {{expTimeSet.hours}} hours</small></div>
                     <div class="mt-3">
-                        Checkout the <a href="http://localhost:3000/docs/lib" target="_blank">documentation</a> 
+                        Checkout the <a href="http://192.168.0.177:3000/docs/lib" target="_blank">documentation</a> 
                         on how to implement the client side
                     </div>
                 </div>
@@ -70,44 +70,47 @@
         },
         data() {
             return {
-                isEdit: false,
-                token_placeholder: null,
-                delete_app_verify: null,
-                verified: false,
-                app_token: null,
+                verification_step: null,
+                token_string: null,
                 token_exp: null,
-                new_img_url: null,
-                header_name: "",
-                valid_till: null,
-                valid_days: null,
-                valid_hours: null,
             };
         },
-        props: ['app', 'token_placeholder'],
+        props: {
+            app_token:{
+                type: Object,
+                default: null,
+            },
+            app_uuid: {
+                type: String,
+                default: "",
+            },
+        },
+        created(){
+            if (this.$props.app_token !== undefined || this.$props.app_token !== null) {
+                this.token_string = this.$props.app_token?.jwt
+                this.token_exp = this.$props.app_token?.expiration
+            }
+            console.log(this.token_string)
+            console.log(this.token_exp)
+        },
         computed: {
-            token() {
-                const props_token = this.$props.app?.token?.jwt;
-                if (props_token === undefined || props_token === null || props_token === "") {
-                    if (this.app_token !== null) {
-                        return this.app_token
-                    }
-                    return ""
+            jwt(){
+                if (this.$props.app_token?.jwt === undefined || this.$props.app_token?.jwt === null) {
+                    return this.token_string
                 }
-                return props_token
-                },
-            get_valid_till() {
-                const exp = this.$props.app?.token?.exp;
-                if (exp === undefined || exp === null || exp < 0){
-                    if (this.token_exp !== null) {
-                        const total = Math.abs(this.token_exp*1000 - new Date().getTime());
-                        const hours = Math.floor( (total/(1000*60*60)) % 24 );
-                        const days = Math.floor( total/(1000*60*60*24) );
-                        return {days: days, hours: hours};
-                    } else {
-                        return
-                    }
+                return this.$props.app_token?.jwt
+            },
+            exp(){
+                if (this.$props.app_token?.expiration === undefined || this.$props.app_token?.expiration === null) {
+                    return this.token_exp
                 }
-                const total = Math.abs(exp*1000 - new Date().getTime());
+                return this.$props.app_token?.expiration
+            },
+            expTimeSet() {
+                // if (this.token_exp === undefined || this.token_exp == null || this.token_exp < 0){
+                //     return {}
+                // }
+                const total = Math.abs(this.exp*1000 - new Date().getTime());
                 const hours = Math.floor( (total/(1000*60*60)) % 24 );
                 const days = Math.floor( total/(1000*60*60*24) );
                 return {days: days, hours: hours};
@@ -115,11 +118,11 @@
         },
         methods: {
             generateToken() {
-                if (this.$props.token_placeholder === null) {
+                if (this.verification_step === null) {
                     this.$toast.warning("Please provide the correct Organization/AppName");
                     return
                 }
-                const appOrgn = this.$props.token_placeholder.split("/");
+                const appOrgn = this.verification_step.split("/");
                 if (appOrgn.length < 2) {
                     this.$toast.warning("Please provide the correct Organization/AppName");
                     return
@@ -130,19 +133,19 @@
                     }
                 };
 
-                axios.post("http://localhost:8080/api/v1/app/token/issue", {
-                    app_uuid: this.$props.app?.app?.uuid,
+                axios.post("http://192.168.0.177:8080/api/v1/app/token/issue", {
+                    app_uuid: this.$props.app_uuid,
                     // app_name: appOrgn[1],
                     // owner_domain: appOrgn[0],
                     // app_origin: this.$props.app?.app?.URL,
                 }, options).then(res => {
-                    console.log(res);
-                    this.app_token = res.data.app_token?.jwt;
-                    this.token_exp = res.data.app_token?.exp;
+                    this.token_string = res.data.app_token?.jwt;
+                    this.token_exp = res.data.app_token?.expiration;
                     this.$toast.success("App Token generated");
                 }).catch(err => {
                     this.$toast.warning(err.response.data);
                 });
+                
             },
             deleteApp(id) {
                 if (this.delete_app_verify == null) {
@@ -150,7 +153,6 @@
                     return
                 }
                 const appOrgn = this.delete_app_verify.split("/");
-                console.log("I: ", appOrgn);
                 if (appOrgn.length < 2) {
                     this.$toast.warning("Please provide the correct Organization/AppName");
                     return
@@ -161,7 +163,7 @@
                         'Authorization': localStorage.getItem("token"),
                     }
                 };
-                axios.post("http://localhost:8080/api/v2/view/app/delete", {
+                axios.post("http://192.168.0.177:8080/api/v2/view/app/delete", {
                         app_uuid: id,
                         orgn_name: appOrgn[0],
                         app_name: appOrgn[1],
@@ -172,7 +174,6 @@
                         this.$emit("drop_app", {"type": "drop_app", "app_uuid": id});
                     }
                 }).catch(err => {
-                    console.log(err);
                     this.$toast.warning("Sorry app could not be removed");
                     return;
                 });

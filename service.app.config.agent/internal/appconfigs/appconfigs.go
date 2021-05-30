@@ -28,7 +28,7 @@ type AppConfig struct {
 	ConfigOwner string   `bson:"config_owner"`
 	Funnel      []Stage  `bson:"funnel"`
 	Campaign    []Record `bson:"campaign"`
-	BtnTime     []BtnDef `bson:"btn_time"`
+	BtnTime     []BtnDef `bson:"btntime"`
 }
 
 type Stage struct {
@@ -93,13 +93,10 @@ func (appConfig AppConfig) HasRead(readWriteUuids ...string) error {
 
 // HasReadOrWrite checks if the user has either read or write acces on the AppToken
 func (appConfig AppConfig) HasReadOrWrite(userUuid string, readWriteUuids ...string) error {
-	var err error
-	if err = appConfig.HasRead(readWriteUuids...); err != nil {
-		return err
-	}
-
-	if err = appConfig.HasReadWrite(userUuid); err != nil {
-		return err
+	readErr := appConfig.HasRead(readWriteUuids...)
+	rwErr := appConfig.HasReadWrite(userUuid)
+	if readErr != nil && rwErr != nil {
+		return ErrNoReadAccess
 	}
 	return nil
 }

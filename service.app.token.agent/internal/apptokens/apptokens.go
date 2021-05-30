@@ -26,17 +26,17 @@ var (
 type ApptokenRepo interface {
 	Initialize(ctx context.Context, appToken AppToken) error
 	GetById(ctx context.Context, uuid string, result interface{}) error
-	Update(ctx context.Context, uuid, jwt string, exp time.Time) error
+	Update(ctx context.Context, uuid, jwt string, exp int64) error
 }
 
 // AppToken represents the token data as it will be stored in the datbase
 type AppToken struct {
-	AppRefUuid string    `bson:"_id" required:"yes"`
-	AppHash    string    `bson:"app_hash" required:"yes"`
-	AppOwner   string    `bson:"app_owner" required:"yes"`
-	AppOrigin  string    `bson:"app_origin"`
-	Jwt        string    `bson:"app_jwt"`
-	Exp        time.Time `bson:"app_jwt_exp"`
+	AppRefUuid string `bson:"_id" required:"yes"`
+	AppHash    string `bson:"app_hash" required:"yes"`
+	AppOwner   string `bson:"app_owner" required:"yes"`
+	AppOrigin  string `bson:"app_origin"`
+	Jwt        string `bson:"app_jwt"`
+	Exp        int64  `bson:"app_jwt_exp"`
 }
 
 // NewDefault creates a new default AppToken with only the meta data but no valid
@@ -76,7 +76,7 @@ func (appToken *AppToken) Issue() (*AppToken, error) {
 }
 
 // JWT creates a new JSON-Web-Token based on the current AppToken information
-func (appToken AppToken) JWT() (string, time.Time, error) {
+func (appToken AppToken) JWT() (string, int64, error) {
 
 	exp := time.Now().Add(appTokenExpTime)
 	claims := jwt.MapClaims{
@@ -91,9 +91,9 @@ func (appToken AppToken) JWT() (string, time.Time, error) {
 	_token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	token, err := _token.SignedString([]byte(secretAppToken))
 	if err != nil {
-		return "", time.Time{}, fmt.Errorf("[jwts.IssueApp] could not sign token: %v", err)
+		return "", 0, fmt.Errorf("[jwts.IssueApp] could not sign token: %v", err)
 	}
-	return token, exp, nil
+	return token, exp.Unix(), nil
 }
 
 // HasReadWrite checks if the provided user uuid is listed as owner of
@@ -117,18 +117,16 @@ func (appToken AppToken) HasRead(readWriteUuids ...string) error {
 
 // HasReadOrWrite checks if the user has either read or write acces on the AppToken
 func (appToken AppToken) HasReadOrWrite(userUuid string, readWriteUuids ...string) error {
-	var err error
-	if err = appToken.HasRead(readWriteUuids...); err != nil {
-		return err
-	}
+	rErr := appToken.HasRead(readWriteUuids...)
 
-	if err = appToken.HasReadWrite(userUuid); err != nil {
-		return err
+	rwErr := appToken.HasReadWrite(userUuid)
+	if rErr != nil && rwErr != nil {
+		return ErrNoReadAccess
 	}
 	return nil
 }
 
 // expired checks if the current jwt is already expired or not
 func (appToken *AppToken) expired() bool {
-	return appToken.Exp.Unix() < time.Now().Unix()
+	return appToken.Exp < time.Now().Unix()
 }
