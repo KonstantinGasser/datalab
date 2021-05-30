@@ -9,12 +9,12 @@ import (
 	"github.com/KonstantinGasser/datalab/library/errors"
 	"github.com/KonstantinGasser/datalab/library/utils/ctx_value"
 	"github.com/KonstantinGasser/datalab/service.api.bff/internal/users"
-	grpcUserMeta "github.com/KonstantinGasser/datalab/service.user-administer/proto"
+	grpcUserMeta "github.com/KonstantinGasser/datalab/service.user.meta.agent/cmd/grpcserver/proto"
 	"google.golang.org/grpc"
 )
 
 type ClientUserMeta struct {
-	Conn grpcUserMeta.UserAdministerClient
+	Conn grpcUserMeta.UserMetaClient
 }
 
 func NewClientUserMeta(clientAddr string) (*ClientUserMeta, error) {
@@ -22,7 +22,7 @@ func NewClientUserMeta(clientAddr string) (*ClientUserMeta, error) {
 	if err != nil {
 		return nil, err
 	}
-	client := grpcUserMeta.NewUserAdministerClient(conn)
+	client := grpcUserMeta.NewUserMetaClient(conn)
 	return &ClientUserMeta{
 		Conn: client,
 	}, nil
@@ -74,7 +74,7 @@ func (client ClientUserMeta) UpdateUserProfile(ctx context.Context, r *users.Upd
 	}
 	if resp.GetStatusCode() != http.StatusOK {
 		return errors.New(resp.GetStatusCode(),
-			err,
+			fmt.Errorf(resp.GetMsg()),
 			resp.GetMsg())
 	}
 	return nil
@@ -94,7 +94,7 @@ func (client ClientUserMeta) GetProfile(ctx context.Context, r *users.GetProfile
 	}
 	if resp.GetStatusCode() != http.StatusOK {
 		return nil, errors.New(resp.GetStatusCode(),
-			err,
+			fmt.Errorf(resp.GetMsg()),
 			resp.GetMsg())
 	}
 	return resp.GetUser(), nil
@@ -103,8 +103,8 @@ func (client ClientUserMeta) GetProfile(ctx context.Context, r *users.GetProfile
 func (client ClientUserMeta) GetColleagues(ctx context.Context, r *users.GetColleagueRequest) ([]*common.UserInfo, errors.Api) {
 
 	resp, err := client.Conn.GetColleagues(ctx, &grpcUserMeta.GetColleaguesRequest{
-		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
-		UserUuid:   r.UserUuid,
+		Tracing_ID:   ctx_value.GetString(ctx, "tracingID"),
+		Organization: r.Organization,
 	})
 	if err != nil {
 		return nil, errors.New(http.StatusInternalServerError,
@@ -113,20 +113,20 @@ func (client ClientUserMeta) GetColleagues(ctx context.Context, r *users.GetColl
 	}
 	if resp.GetStatusCode() != http.StatusOK {
 		return nil, errors.New(resp.GetStatusCode(),
-			err,
+			fmt.Errorf(resp.GetMsg()),
 			resp.GetMsg())
 	}
 	return resp.GetColleagues(), nil
 }
 
-func (client ClientUserMeta) CollectOwnerInfo(ctx context.Context, authedUser *common.AuthedUser, resC chan struct {
+func (client ClientUserMeta) CollectOwnerInfo(ctx context.Context, appOwner string, resC chan struct {
 	Field string
 	Value interface{}
 }, errC chan error) {
 	resp, err := client.Conn.Get(ctx, &grpcUserMeta.GetRequest{
 		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
-		CallerUuid: authedUser.Uuid,
-		ForUuid:    authedUser.Uuid,
+		CallerUuid: appOwner,
+		ForUuid:    appOwner,
 	})
 	if err != nil {
 		errC <- err

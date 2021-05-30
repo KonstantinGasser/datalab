@@ -61,7 +61,7 @@ export default {
                 event_timestamp: item.timestamp,
             }
             console.log(payload)
-            const resp = await axios.post("http://192.168.0.177:8080/api/v1/app/member/invite/accept", payload, options);
+            const resp = await axios.post("http://localhost:8080/api/v1/app/invite/accept", payload, options);
             if (resp.status != 200) {
                 this.$toast.error("Could not send invite feedback");
                 return

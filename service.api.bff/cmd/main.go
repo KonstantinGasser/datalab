@@ -90,11 +90,6 @@ func main() {
 		server.WithCors,
 		server.WithAuth,
 	)
-	server.Register("/api/v1/user/colleagues", server.GetColleagues,
-		server.WithTracing,
-		server.WithCors,
-		server.WithAuth,
-	)
 
 	server.Register("/api/v1/app/create", server.CreateApp,
 		server.WithTracing,
@@ -116,6 +111,11 @@ func main() {
 		server.WithCors,
 		server.WithAuth,
 	)
+	server.Register("/api/v1/app/member", server.GetInvitableUsers,
+		server.WithTracing,
+		server.WithCors,
+		server.WithAuth,
+	)
 
 	server.Register("/api/v1/app/config/update", server.UpdateAppConfig,
 		server.WithTracing,
@@ -128,6 +128,11 @@ func main() {
 		server.WithAuth,
 	)
 	server.Register("/api/v1/app/invite/accept", server.AcceptInvite,
+		server.WithTracing,
+		server.WithCors,
+		server.WithAuth,
+	)
+	server.Register("/api/v1/app/member/invitable", server.GetInvitableUsers,
 		server.WithTracing,
 		server.WithCors,
 		server.WithAuth,

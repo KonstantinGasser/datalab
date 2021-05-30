@@ -21,6 +21,14 @@
               <input type="text" v-model="signup.username" placeholder="Username" />
             </div>
             <div class="input-field">
+              <i class="fas fa-user"></i>
+              <input type="text" v-model="signup.first_name" placeholder="Firstname" />
+            </div>
+            <div class="input-field">
+              <i class="fas fa-user"></i>
+              <input type="text" v-model="signup.last_name" placeholder="Lastname" />
+            </div>
+            <div class="input-field">
               <i class="fas fa-envelope"></i>
               <input type="text" v-model="signup.orgn_domain" placeholder="Organization" />
             </div>
@@ -82,8 +90,8 @@ export default {
       hasRegistered: false, 
       signup: { 
         username: null,
-        first_name: "null",
-        last_name: "null",
+        first_name: null,
+        last_name: null,
         password: null, 
         passwordConfirm: null, 
         orgn_domain: null,
@@ -93,7 +101,7 @@ export default {
   },
   methods: {
     login() {
-      axios.post('http://192.168.0.177:8080/api/v1/user/login', {
+      axios.post('http://localhost:8080/api/v1/user/login', {
         username: this.input.username,
         password: this.input.password,
       }).then(resp => {
@@ -122,7 +130,7 @@ export default {
         lastname: this.signup.last_name,
         position: this.signup.orgn_position,
       };
-      axios.post('http://192.168.0.177:8080/api/v1/user/register', payload).then((resp) => {
+      axios.post('http://localhost:8080/api/v1/user/register', payload).then((resp) => {
         if (resp.status === 200) {
           this.hasRegistered = !this.hasRegistered;
           this.$toast.success("Your account has been created");

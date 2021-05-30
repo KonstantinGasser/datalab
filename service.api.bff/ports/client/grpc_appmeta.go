@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/KonstantinGasser/datalab/common"
@@ -44,7 +45,7 @@ func (client ClientAppMeta) CreateApp(ctx context.Context, r *apps.CreateAppRequ
 	}
 	if resp.GetStatusCode() != http.StatusOK {
 		return "", errors.New(resp.GetStatusCode(),
-			err,
+			fmt.Errorf(resp.GetMsg()),
 			resp.GetMsg())
 	}
 
@@ -65,7 +66,7 @@ func (client ClientAppMeta) GetApp(ctx context.Context, r *apps.GetAppRequest) (
 	}
 	if resp.GetStatusCode() != http.StatusOK {
 		return nil, errors.New(resp.GetStatusCode(),
-			err,
+			fmt.Errorf(resp.GetMsg()),
 			resp.GetMsg())
 	}
 	return resp.GetApp(), nil
@@ -84,7 +85,7 @@ func (client ClientAppMeta) GetAppList(ctx context.Context, r *apps.GetAppListRe
 	}
 	if resp.GetStatusCode() != http.StatusOK {
 		return nil, errors.New(resp.GetStatusCode(),
-			err,
+			fmt.Errorf(resp.GetMsg()),
 			resp.GetMsg())
 	}
 	return resp.GetAppList(), nil
@@ -105,7 +106,7 @@ func (client ClientAppMeta) SendInvite(ctx context.Context, r *apps.SendInviteRe
 	}
 	if resp.GetStatusCode() != http.StatusOK {
 		return "", errors.New(resp.GetStatusCode(),
-			err,
+			fmt.Errorf(resp.GetMsg()),
 			resp.GetMsg())
 	}
 	return resp.GetAppName(), nil
@@ -125,7 +126,7 @@ func (client ClientAppMeta) AcceptInvite(ctx context.Context, r *apps.AcceptInvi
 	}
 	if resp.GetStatusCode() != http.StatusOK {
 		return errors.New(resp.GetStatusCode(),
-			err,
+			fmt.Errorf(resp.GetMsg()),
 			resp.GetMsg())
 	}
 	return nil

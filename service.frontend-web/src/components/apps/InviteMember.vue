@@ -7,19 +7,20 @@
             <h2>Invite Colleagues</h2>
             <br>
             <div class="notify-table">
-                <div v-for="item in canInvite" :key="item.uuid" class="notify-row">
+                <div v-for="item in colleagues" :key="item.uuid" class="notify-row">
                     <div>
                         <div class="emoji-line d-flex justify-start">👉<strong>&nbsp;{{item.first_name}} {{item.last_name}} (@{{item.username}})</strong></div>
                         <div  class="notify-title">
-                            Position <strong>{{item.orgn_position}}</strong>
+                            Position <strong>{{item.position}}</strong>
                         </div>
                     </div>
                     <div class="actions">            
-                        <div class="px-1">
-                            <button v-if="item.status === undefined" class="btn accept" @click="invite(item)">invite</button>
+                        <div class="px-1">    
+                            <button v-if="item.status === 0 && item.uuid !== app_owner?.uuid" class="btn accept" @click="invite(item)">invite</button>
                             <div  v-if="item.status === 1" class="invited pending">Pending</div>
-                            <div  v-if="item.status === 2" class="invited accepted">Accepted</div>
+                            <div  v-if="item.status === 2 && item.uuid !== app_owner?.uuid" class="invited accepted">Accepted</div>
                             <div  v-if="item.status === 3" class="invited rejected">Rejected</div>
+                            <div  v-if="item.uuid === app_owner?.uuid" class="invited owner">App Owner</div>
                         </div>
                     </div>
                 </div>
@@ -42,6 +43,10 @@ export default {
         }
     },
     props: {
+        app_owner: {
+            type: Object,
+            default: "",
+        },
         app_uuid: {
             type: String,
             default: null,
@@ -52,20 +57,7 @@ export default {
         }
     },
     computed: {
-        canInvite(){
-           if (this.colleagues !== null && this.$props.member !== null) {
-                this.colleagues.forEach(col => {
-                    for (let i = 0; i < this.$props.member.length; i++) {                       
-                        if (col.uuid == this.$props.member[i].uuid) {
-                            col["status"] = this.$props.member[i].status
-                            console.log("Found: ", col)
-                        }
-                    }
-                })
-                console.log(this.colleagues)
-            }
-            return this.colleagues
-        },
+
     },
     async created() {
         let options = {
@@ -73,12 +65,16 @@ export default {
                 'Authorization': localStorage.getItem("token"),
             }
         };
-        const resp = await axios.get("http://192.168.0.177:8080/api/v1/user/colleagues", options);
+        const payload = {
+            app_uuid: this.$props.app_uuid
+        }
+        const resp = await axios.post("http://localhost:8080/api/v1/app/member/invitable", payload, options);
         if (resp.status != 200) {
             this.$toast.error("Could not fetch Your Colleagues");
             return;
         }
-        this.colleagues = resp.data.colleagues;
+        this.colleagues = resp.data.user;
+        console.log(resp.data)
     },
     methods: {
         updateRole(item, role) {
@@ -94,7 +90,7 @@ export default {
                 app_uuid: this.$props.app_uuid,
                 invited_uuid: user.uuid,
             }
-            const resp = await axios.post("http://192.168.0.177:8080/api/v1/app/invite", payload, options);
+            const resp = await axios.post("http://localhost:8080/api/v1/app/invite", payload, options);
             if (resp.status === 200) {
                 this.inTeam.push(user.uuid)
                 user["status"] = 1
@@ -184,5 +180,9 @@ export default {
     border: 1px solid #d90429;
 }
 
+.owner {
+    background: #5465ff54;
+    border: 1px solid #5465ff; 
+}
 
 </style>

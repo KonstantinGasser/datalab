@@ -51,11 +51,34 @@ type GetProfileResponse struct {
 }
 
 type GetColleagueRequest struct {
-	UserUuid string
+	Organization string
 }
 type GetColleagueResponse struct {
 	Status     int32              `json:"status"`
 	Msg        string             `json:"msg"`
 	Err        string             `json:"error,omitempty"`
 	Colleagues []*common.UserInfo `json:"user"`
+}
+
+type GetInvitableUsersRequest struct {
+	AppUuid      string `json:"app_uuid"`
+	Organization string
+	UserUuids    []string
+	AppMember    []*common.AppMember
+}
+type GetInvitableUsersResponse struct {
+	Status    int32           `json:"status"`
+	Msg       string          `json:"msg"`
+	Err       string          `json:"error,omitempty"`
+	Invitable []InvitableUser `json:"user"`
+}
+
+type InvitableUser struct {
+	Uuid         string `json:"uuid"`
+	Username     string `json:"username"`
+	FirstName    string `json:"first_name"`
+	LastName     string `json:"last_name"`
+	Organization string `json:"orgn"`
+	Position     string `json:"position"`
+	Status       int32  `json:"status"`
 }

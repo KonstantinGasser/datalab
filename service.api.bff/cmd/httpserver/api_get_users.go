@@ -23,17 +23,17 @@ func (s Server) GetUserProfile(w http.ResponseWriter, r *http.Request) {
 	s.onSuccess(w, resp.Status, resp)
 }
 
-func (s Server) GetColleagues(w http.ResponseWriter, r *http.Request) {
-	tracingID := ctx_value.GetString(r.Context(), "tracingID")
-	logrus.Infof("<%v>[Server.GetColleagues] received request: %v\n", tracingID, r.Host)
+// func (s Server) GetColleagues(w http.ResponseWriter, r *http.Request) {
+// 	tracingID := ctx_value.GetString(r.Context(), "tracingID")
+// 	logrus.Infof("<%v>[Server.GetColleagues] received request: %v\n", tracingID, r.Host)
 
-	authedUser := ctx_value.GetAuthedUser(r.Context())
-	var request = &users.GetColleagueRequest{
-		UserUuid: authedUser.Uuid,
-	}
-	resp := s.userfetchService.FetchColleagues(r.Context(), request)
-	if resp.Status != http.StatusOK {
-		logrus.Errorf("<%v>[Server.GetColleagues] could not get colleague profiles: %v\n", tracingID, resp.Err)
-	}
-	s.onSuccess(w, resp.Status, resp)
-}
+// 	authedUser := ctx_value.GetAuthedUser(r.Context())
+// 	var request = &users.GetColleagueRequest{
+// 		UserUuid: authedUser.Uuid,
+// 	}
+// 	resp := s.userfetchService.FetchColleagues(r.Context(), request)
+// 	if resp.Status != http.StatusOK {
+// 		logrus.Errorf("<%v>[Server.GetColleagues] could not get colleague profiles: %v\n", tracingID, resp.Err)
+// 	}
+// 	s.onSuccess(w, resp.Status, resp)
+// }

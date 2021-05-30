@@ -55,7 +55,7 @@ func (s service) GetApp(ctx context.Context, r *apps.GetAppRequest) *apps.GetApp
 			Err:    err.Error(),
 		}
 	}
-	token, conf, owner, collectErr := s.collectAttachedAppData(ctx, app.Uuid, r.AuthedUser)
+	token, conf, owner, collectErr := s.collectAttachedAppData(ctx, app.Uuid, app.Owner, r.AuthedUser)
 	if collectErr != nil {
 		logrus.Errorf("[app.collection.Get] could not get all data: %v\n", collectErr)
 	}
@@ -86,7 +86,7 @@ func (s service) GetAppList(ctx context.Context, r *apps.GetAppListRequest) *app
 	}
 }
 
-func (s service) collectAttachedAppData(ctx context.Context, appUuid string, authedUser *common.AuthedUser) (*common.AppAccessToken, *common.AppConfigurations, *common.UserInfo, error) {
+func (s service) collectAttachedAppData(ctx context.Context, appUuid string, appOwner string, authedUser *common.AuthedUser) (*common.AppAccessToken, *common.AppConfigurations, *common.UserInfo, error) {
 	withCancel, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -97,7 +97,7 @@ func (s service) collectAttachedAppData(ctx context.Context, appUuid string, aut
 	})
 	go s.appTokenClient.CollectAppToken(withCancel, appUuid, authedUser, resC, errC)
 	go s.appConfigClient.CollectAppConfig(withCancel, appUuid, authedUser, resC, errC)
-	go s.userMetaClient.CollectOwnerInfo(withCancel, authedUser, resC, errC)
+	go s.userMetaClient.CollectOwnerInfo(withCancel, appOwner, resC, errC)
 
 	var apptoken *common.AppAccessToken
 	var appconfig *common.AppConfigurations

@@ -28,6 +28,7 @@ func main() {
 	if err != nil {
 		logrus.Fatal(err)
 	}
+	defer listener.Close()
 	logrus.Infof("[grpcserver.Listen] listening on: %s\n", *host)
 
 	// create client dependecies

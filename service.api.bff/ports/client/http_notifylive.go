@@ -6,6 +6,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 type ClientNotifiyLive struct {
@@ -30,21 +32,24 @@ func (client ClientNotifiyLive) EmitSendInvite(ctx context.Context, receiverUuid
 		"event":         0,
 		"value":         value,
 	}
-	b, err := json.Marshal(payload)
+	buf := new(bytes.Buffer)
+	_ = json.NewEncoder(buf).Encode(payload)
+
+	req, _ := http.NewRequest("POST", client.Addr(), buf)
+	c := &http.Client{}
+	res, err := c.Do(req)
 	if err != nil {
-		return err
+		logrus.Warnf("[client.Notify.EmitSendInvite] could not send invite: %v\n", err)
 	}
-	_, err = http.NewRequest(http.MethodPost, client.Addr(), bytes.NewBuffer(b))
-	if err != nil {
-		return err
-	}
-	// if resp.Response.StatusCode != http.StatusOK {
-	// 	logrus.Errorf("[notifyService.EmitSendInvite]: %v\n", resp)
-	// }
+	defer func() {
+		if res != nil {
+			res.Body.Close()
+		}
+	}()
 	return nil
 }
 
 func (client ClientNotifiyLive) Addr() string {
-	return "http://localhost:8008/api/v1/datalab/publish/event"
+	return "http://192.168.0.232:8008/api/v1/datalab/publish/event"
 	// return fmt.Sprintf("http://%s%s", client.addr, client.apiPublish)
 }

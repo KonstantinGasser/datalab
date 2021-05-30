@@ -20,13 +20,21 @@ var (
 func Users(ctx context.Context, repo repo.Repo, in *proto.GetListRequest) ([]*common.UserInfo, error) {
 
 	var foundUsers []types.UserInfo
-	err := repo.FindMany(ctx, config.UserDB, config.UserDB, bson.M{"_id": bson.M{"$in": in.GetUuidList()}}, &foundUsers)
+	err := repo.FindMany(ctx, config.UserDB, config.UserColl, bson.D{
+		{
+			Key: "_id",
+			Value: bson.M{
+				"$in": in.GetUuidList(),
+			},
+		},
+	}, &foundUsers)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, ErrNoUsersFound
 		}
 		return nil, err
 	}
+	fmt.Println("uuids: ", foundUsers)
 
 	var users = make([]*common.UserInfo, len(foundUsers))
 	for i, item := range foundUsers {
