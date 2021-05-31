@@ -9,9 +9,13 @@
         <MenuItem @click="setActive('view_docs')" :tabName="'view_docs'" :item="'Docs'" />
         <MenuItem @click="setActive('view_account')" :tabName="'view_account'" :item="'Account'" />
         <MenuItem @click="setActive('view_notify')" :tabName="'view_notify'" :item="'Notification'" :bubble="true"/>
+        <!-- <MenuItem :tabName="'this_is_me'" :thisIsMe="true"/> -->
+
         <!-- <MenuItem @click="setActive('view_settings')" :tabName="'view_settings'" :item="'Settings'" /> -->
       </div>
-      <div class="divider"></div>
+      <div class="divider github-mark d-flex justify-end">
+        
+      </div>
       <div class="menu">
           <MenuItem @click="setActive('view_logout')" :item="'Logout 👋'" />
           <div class="d-flex justify-center">
@@ -134,19 +138,7 @@ h4 {
 .toggle:checked ~ .background {
   --bg: white;
 }
-/* .toggle:checked ~ .title {
-  --color: hsl(40, 100%, 50%);
-}
 
-.title {
-  --color: hsl(240, 100%, 95%);
-  color: var(--color);
-  z-index: 1;
-  cursor: pointer;
-  display: block;
-  padding: 0.5rem 0 0;
-  transition: color 500ms;
-} */
 
 
 </style>

@@ -109,6 +109,7 @@
                     return
                 }
                 this.activeApp = data; 
+                this.$store.commit("UNSYNC_APP")
             },
             async loadApp(uuid) {
                 this.isInCreateMode = false;
@@ -157,12 +158,17 @@
             },
             async updateState(event) {
                 const init_data = await this.getAppList();
-                this.apps = init_data.data.apps;
-                const init_app = await this.getApp(event.app_uuid);
+                this.apps = init_data.data.apps.reverse();
+                const init_app = await this.getApp(this.apps[0].uuid);
                 this.activeApp = init_app;
-                this.activeTab = "Overview";
-                this.selectedApp = event.app_uuid;
-                this.isInCreateMode = false; 
+                this.selectedApp = this.activeApp?.app?.uuid;
+                this.isInCreateMode = false;
+                // this.apps = init_data.data.apps;
+                // const init_app = await this.getApp(event.app_uuid);
+                // this.activeApp = init_app;
+                // this.activeTab = "Overview";
+                // this.selectedApp = event.app_uuid;
+                // this.isInCreateMode = false; 
             },
             markUnsaved(value) {
                 this.$store.commit("UNSYNC_APP")

@@ -1,5 +1,5 @@
 <template>
-      <div class="menu_item" :class="{'active': isActive}">
+    <div v-if="!thisIsMe" class="menu_item" :class="{'active': isActive}">
         <div class="menu_text">
             {{ item }}
         </div>
@@ -24,10 +24,10 @@ export default {
   },
   computed: {
       isActive() {
-          return this.$props.tabName === this.$store.state.activeTab;
+        return this.$props.tabName === this.$store.state.activeTab;
       },
       notifications() {
-          return this.$store.state.notifications.length;
+        return this.$store.state.notifications.length;
       },
   },
 };
@@ -35,7 +35,10 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
+.github-mark img {
+  width: 20px;
+  height: 20px;
+}
 .menu_item {
     padding: 5px;
     margin: 15px 5px;
@@ -84,7 +87,7 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: red;
+    background: #5465ff;
     border-radius: 50%;
     color: white
 }

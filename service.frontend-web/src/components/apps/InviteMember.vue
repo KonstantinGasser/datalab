@@ -4,7 +4,7 @@
             already invited {{colleagues}}
         </div> -->
         <div class="">
-            <h2>Invite Colleagues</h2>
+            <h2>Invite Colleagues</h2> {{loggedInUser}} <br> {{app_owner?.uuid}}
             <br>
             <div class="notify-table">
                 <div v-for="item in colleagues" :key="item.uuid" class="notify-row">
@@ -15,12 +15,15 @@
                         </div>
                     </div>
                     <div class="actions">            
-                        <div class="px-1">    
-                            <button v-if="item.status === 0 && item.uuid !== app_owner?.uuid" class="btn accept" @click="invite(item)">invite</button>
-                            <div  v-if="item.status === 1" class="invited pending">Pending</div>
+                        <div class="px-1"> 
+                            <button v-if="item.status === 0 && loggedInUser.sub === app_owner?.uuid" class="btn accept" @click="invite(item)">invite</button>
+                            <button v-if="item.status === 0 && loggedInUser.sub !== app_owner?.uuid" class="btn accept" disabled>invite</button>
+                            <div  v-if="item.status === 1" class="invited pending">Pending 
+                                <span v-if="loggedInUser.sub === app_owner?.uuid" class="ml-1 icon icon-external-link hover"></span>
+                            </div>
                             <div  v-if="item.status === 2 && item.uuid !== app_owner?.uuid" class="invited accepted">Accepted</div>
+                            <div  v-if="item.uuid === app_owner?.uuid" class="invited owner">Owner</div>
                             <div  v-if="item.status === 3" class="invited rejected">Rejected</div>
-                            <div  v-if="item.uuid === app_owner?.uuid" class="invited owner">App Owner</div>
                         </div>
                     </div>
                 </div>
@@ -33,11 +36,13 @@
 
 
 import axios from "axios";
+import jwt_decode from "jwt-decode";
 
 export default {
     name: "InviteMember",
     data() {
         return {
+            loggedInUser: null,
             colleagues: [],
             inTeam: [],
         }
@@ -57,9 +62,9 @@ export default {
         }
     },
     computed: {
-
     },
     async created() {
+        this.loggedInUser = jwt_decode(localStorage.getItem("token"))
         let options = {
             headers: {
                 'Authorization': localStorage.getItem("token"),
@@ -155,6 +160,10 @@ export default {
     background: #10d57475;
     border: 1px solid #10d574;
 }
+.btn.accept:disabled:hover {
+    background: #10d57425;
+    border: 1px solid #10d574;
+}
 
 .invited {
     display: flex;
@@ -163,6 +172,7 @@ export default {
     width: 100px;
     height: 35px;
     border-radius: 50px;
+    color: #00000075;
 }
 .pending {
     background: #f7fd0450;

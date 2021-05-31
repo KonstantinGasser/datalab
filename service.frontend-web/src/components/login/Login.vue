@@ -79,6 +79,7 @@
 <script>
 
 import axios from 'axios';
+// import jwt_decode from "jwt-decode";
 
 export default {
   name: 'Login',
@@ -87,7 +88,7 @@ export default {
       mode: "signin",
       input: { username: '', password: '' },
       errors: [], 
-      hasRegistered: false, 
+      hasRegistered: false,
       signup: { 
         username: null,
         first_name: null,
@@ -98,6 +99,10 @@ export default {
         orgn_position: null,
       },
     };
+  },
+  created() {
+    this.$disconnect();
+    this.$store.commit("PURGE_CONN");
   },
   methods: {
     login() {

@@ -77,8 +77,9 @@ type SendInviteResponse struct {
 }
 
 type AcceptInviteRequest struct {
-	AuthedUser *common.AuthedUser
-	AppUuid    string `json:"app_uuid"`
+	AuthedUser            *common.AuthedUser
+	AppUuid               string `json:"app_uuid"`
+	NotificationTimestamp int64  `json:"event_timestamp"`
 }
 type AcceptInviteResponse struct {
 	Status int32  `json:"status"`

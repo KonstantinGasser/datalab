@@ -5,6 +5,7 @@ import store from './store';
 import Toaster from "@meforma/vue-toaster";
 import VueMarkdownIt from 'vue3-markdown-it';
 import VueNativeSock from "vue-native-websocket-vue3";
+
 import {
     SOCKET_ONOPEN,
     SOCKET_ONCLOSE,
@@ -29,7 +30,7 @@ createApp(App)
     .use(router)
     .use(Toaster)
     .use(VueMarkdownIt)
-    .use(VueNativeSock, "ws://192.168.0.232:8008/api/v1/datalab/live?token=", {
+    .use(VueNativeSock, "ws://192.168.0.177:8008/api/v1/datalab/live?token=", {
         store: store,
         format: "json",
         mutations: mutations,

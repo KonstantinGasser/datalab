@@ -27,7 +27,7 @@
                     <div class="input-group">
                         <textarea type="text" class="form-control" rows="2" readonly id="app_token_value" :value="jwt" aria-label="" aria-describedby="basic-addon1"></textarea>
                         <div class="input-group-append">
-                            <button class="btn btn-standard" @click="copyTokenToClipboard()" type="button">Copy</button>
+                            <button class="btn btn-standard" style="width:65px;" @click="copyTokenToClipboard()" type="button"><span class="icon icon-clipboard"></span></button>
                         </div>
                     </div>
                     <div class=""><small>Token expires in {{expTimeSet.days}} days {{expTimeSet.hours}} hours</small></div>

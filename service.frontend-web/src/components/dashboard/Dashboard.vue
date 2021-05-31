@@ -1,5 +1,6 @@
 <template>
   <div class="app-layout">
+    
     <SideMenu class="app-menu" @setActive="showView"/>
     <div class="app-header">
     </div>
@@ -38,7 +39,7 @@ export default {
     SideMenu,
   },
   created() {
-    const url = "ws://192.168.0.232:8008/api/v1/datalab/live?token="+ localStorage.getItem("token");
+    const url = "ws://192.168.0.177:8008/api/v1/datalab/live?token="+ localStorage.getItem("token");
     this.$connect(url);
   },
   methods: {
@@ -69,7 +70,7 @@ export default {
   min-width: 750px;
   height: 100%;
   padding-bottom: 25px;
-  padding-top: 75px;
+  padding-top: 45px;
 }
 
 .app-menu {
@@ -93,4 +94,5 @@ export default {
  
   border-radius: 8px;
 }
+
 </style>

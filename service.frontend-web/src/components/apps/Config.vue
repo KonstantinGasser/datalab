@@ -72,7 +72,16 @@
                 <tr>
                     <th class="v-center"></th>
                     <td><input v-model="campaign_name" type="text" placeholder="Name (E-Mail Campaign)" class="form-control border" :class="{'border-danger': campaign_invalid}" ></td>
-                    <td><input v-model="campaign_suffix" type="text" placeholder="Suffix (ex. summer-sales)" class="form-control border" :class="{'border-danger': campaign_invalid}" ></td>
+                    <td>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <button class="btn  btn-standard btn-disabled" disabled type="button">https://awesome.io/promp#</button>
+                            </div>
+                            <input v-model="campaign_suffix" type="text" placeholder="Suffix (ex. summer-sales)" class="form-control border" :class="{'border-danger': campaign_invalid}" >
+                            <!-- <input type="text" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon1"> -->
+                        </div>
+                        
+                    </td>
                     <td class="v-center"><span class="icon icon-plus hover" @click="addCampaign"></span></td>
                 </tr> 
             </tbody>
@@ -279,7 +288,7 @@ export default {
 }
 </script>
 
-<style sceped>
+<style scoped>
 .main-cfg {
     height: 70vh;
     overflow-y: auto;
@@ -300,7 +309,11 @@ export default {
     max-height: 300px;
     overflow-y: auto;
 }
-
+.btn-disabled {
+    border-radius: 4px;
+    background: var(--btn-bg-hover);
+    color: var(--btn-font-hover);
+}
 .v-center {
     vertical-align: middle !important;
 }

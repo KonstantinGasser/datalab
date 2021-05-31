@@ -76,6 +76,11 @@ func (s service) AcceptInvite(ctx context.Context, r *apps.AcceptInviteRequest) 
 			Err:    err.Error(),
 		}
 	}
+	notifyErr := s.notifyLiveClient.EmitSendRemove(ctx, r.AuthedUser.Uuid, r.NotificationTimestamp)
+	// if message not send for now I dont care...will change in future
+	if notifyErr != nil {
+		logrus.Errorf("[service.inviting.SendInvite] could not send invite to notification service: %v\n", notifyErr)
+	}
 	return &apps.AcceptInviteResponse{
 		Status: http.StatusOK,
 		Msg:    "Accepted App Invite",

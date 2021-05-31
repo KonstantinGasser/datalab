@@ -21,12 +21,14 @@ const (
 type ClientNotifiyLive struct {
 	addr       string
 	apiPublish string
+	apiRemove  string
 }
 
 func NewClientNotifyLive(addr string) *ClientNotifiyLive {
 	return &ClientNotifiyLive{
 		addr:       addr,
 		apiPublish: "/api/v1/datalab/publish/event",
+		apiRemove:  "/api/v1/datalab/remove/event",
 	}
 }
 
@@ -43,7 +45,7 @@ func (client ClientNotifiyLive) EmitSendInvite(ctx context.Context, event int, m
 	buf := new(bytes.Buffer)
 	_ = json.NewEncoder(buf).Encode(payload)
 
-	req, _ := http.NewRequest("POST", client.Addr(), buf)
+	req, _ := http.NewRequest("POST", client.AddrPublish(), buf)
 	c := &http.Client{}
 	res, err := c.Do(req)
 	if err != nil {
@@ -57,7 +59,32 @@ func (client ClientNotifiyLive) EmitSendInvite(ctx context.Context, event int, m
 	return nil
 }
 
-func (client ClientNotifiyLive) Addr() string {
-	// return "http://192.168.0.232:8008/api/v1/datalab/publish/event"
+func (client ClientNotifiyLive) EmitSendRemove(ctx context.Context, userUuid string, timestamp int64) error {
+
+	var payload = map[string]interface{}{
+		"user_uuid": "",
+		"timestamp": 0,
+	}
+	buf := new(bytes.Buffer)
+	_ = json.NewEncoder(buf).Encode(payload)
+
+	req, _ := http.NewRequest("POST", client.AddrRemove(), buf)
+	c := &http.Client{}
+	res, err := c.Do(req)
+	if err != nil {
+		logrus.Warnf("[client.Notify.EmitSendInvite] could not send invite: %v\n", err)
+	}
+	defer func() {
+		if res != nil {
+			res.Body.Close()
+		}
+	}()
+	return nil
+}
+func (client ClientNotifiyLive) AddrPublish() string {
 	return fmt.Sprintf("http://%s%s", client.addr, client.apiPublish)
+}
+
+func (client ClientNotifiyLive) AddrRemove() string {
+	return fmt.Sprintf("http://%s%s", client.addr, client.apiRemove)
 }

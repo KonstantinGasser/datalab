@@ -36,6 +36,9 @@ export default createStore({
       state.sync_app.uuid = null
       state.sync_app.sync = false
     },
+    PURGE_CONN(state) {
+      state.notifications = []
+    },
     
     // Connection open
     SOCKET_ONOPEN (state, event) {
