@@ -25,7 +25,7 @@ func onErr(w http.ResponseWriter, status int32, message string) {
 
 func onSuccess(w http.ResponseWriter, status int32, data interface{}) {
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(int(status))
 
 	if err := json.NewEncoder(w).Encode(data); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

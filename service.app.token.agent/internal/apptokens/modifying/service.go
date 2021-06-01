@@ -2,6 +2,7 @@ package modifying
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/KonstantinGasser/datalab/library/errors"
@@ -10,7 +11,7 @@ import (
 )
 
 type Service interface {
-	IssueAppToken(ctx context.Context, appUuid, callerUuid string) (string, int64, errors.Api)
+	IssueAppToken(ctx context.Context, orgn, appName, appUuid, callerUuid string) (string, int64, errors.Api)
 }
 
 type service struct {
@@ -23,7 +24,7 @@ func NewService(repo apptokens.ApptokenRepo) Service {
 
 // IssueAppToken issues an new Jwt based on the stored App Token information and updates its
 // expiration time. Returns the new Jwt and Exp
-func (s *service) IssueAppToken(ctx context.Context, appUuid, callerUuid string) (string, int64, errors.Api) {
+func (s *service) IssueAppToken(ctx context.Context, orgn, appName, appUuid, callerUuid string) (string, int64, errors.Api) {
 	var storedAppToken apptokens.AppToken
 	if err := s.repo.GetById(ctx, appUuid, &storedAppToken); err != nil {
 		if err == mongo.ErrNoDocuments {
@@ -40,6 +41,14 @@ func (s *service) IssueAppToken(ctx context.Context, appUuid, callerUuid string)
 		return "", 0, errors.New(http.StatusUnauthorized,
 			err,
 			"User must be owner to generate AppToken")
+	}
+
+	// verifiy that the user has provided the correct organization-name/app-name
+	// which is part of the verification process
+	if ok := storedAppToken.CompareHash(orgn, appName); !ok {
+		return "", 0, errors.New(http.StatusUnauthorized,
+			fmt.Errorf("app hash do not match"),
+			"Organization-Name/App-Name are incorrect")
 	}
 
 	modifiedAppToken, err := storedAppToken.Issue()

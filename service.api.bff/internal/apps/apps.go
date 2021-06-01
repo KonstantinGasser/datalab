@@ -43,6 +43,10 @@ type GetAppListResponse struct {
 type CreateAppTokenRequest struct {
 	AuthedUser *common.AuthedUser
 	AppUuid    string `json:"app_uuid"`
+	// these are inputs from the user which the user must provid
+	// in order to verify the issuing of an app token
+	AppName      string `json:"app_name"`
+	Organization string `json:"orgn_domain"`
 }
 type CreateAppTokenResponse struct {
 	Status   int32                  `json:"status"`

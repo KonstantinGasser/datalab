@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/KonstantinGasser/datalab/library/hasher"
 	"github.com/KonstantinGasser/required"
 	"github.com/dgrijalva/jwt-go"
 )
@@ -41,11 +42,12 @@ type AppToken struct {
 
 // NewDefault creates a new default AppToken with only the meta data but no valid
 // Jwt nor Expiration time
-func NewDefault(AppRefUuid, appHash, appOwner string) (*AppToken, error) {
+func NewDefault(AppRefUuid, appHash, appOwner, appOrigin string) (*AppToken, error) {
 	appToken := AppToken{
 		AppRefUuid: AppRefUuid,
 		AppHash:    appHash,
 		AppOwner:   appOwner,
+		AppOrigin:  appOrigin,
 	}
 	if err := required.Atomic(&appToken); err != nil {
 		return nil, ErrMissingFields
@@ -94,6 +96,13 @@ func (appToken AppToken) JWT() (string, int64, error) {
 		return "", 0, fmt.Errorf("[jwts.IssueApp] could not sign token: %v", err)
 	}
 	return token, exp.Unix(), nil
+}
+
+// CompareHash compares if the provided meta data (orgnanization name and app name)
+// match with the apptoken.Hash.
+func (appToken AppToken) CompareHash(orgn, appName string) bool {
+	hash := hasher.Build(appName, orgn)
+	return hash == appToken.AppHash
 }
 
 // HasReadWrite checks if the provided user uuid is listed as owner of

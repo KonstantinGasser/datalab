@@ -29,6 +29,8 @@ message IssueRequest {
     string tracing_ID = 1;
     string caller_uuid = 2; 
     string app_uuid = 3;
+    string app_name = 4;
+    string organization = 5;
 }
 
 message IssueResponse {

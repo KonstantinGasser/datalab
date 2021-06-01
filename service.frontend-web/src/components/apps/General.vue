@@ -141,7 +141,11 @@
                 }, options).then(res => {
                     this.token_string = res.data.app_token?.jwt;
                     this.token_exp = res.data.app_token?.expiration;
-                    this.$moshaToast(res.data.msg, {type: 'success',position: 'top-center', timeout: 3000})
+                    if (res.data.status == 200) {
+                        this.$moshaToast(res.data.msg, {type: 'success',position: 'top-center', timeout: 3000})
+                        return
+                    }
+                    this.$moshaToast(res.data.msg, {type: 'warning',position: 'top-center', timeout: 3000})
                 }).catch(err => {
                     this.$moshaToast(err.data.msg, {type: 'danger',position: 'top-center', timeout: 3000})
                 });

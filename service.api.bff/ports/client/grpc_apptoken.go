@@ -57,9 +57,11 @@ func (client ClientAppToken) CollectAppToken(ctx context.Context, appUuid string
 func (client ClientAppToken) IssueAppToken(ctx context.Context, r *apps.CreateAppTokenRequest) (*common.AppAccessToken, errors.Api) {
 
 	resp, err := client.Conn.Issue(ctx, &grpcAppToken.IssueRequest{
-		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
-		CallerUuid: r.AuthedUser.Uuid,
-		AppUuid:    r.AppUuid,
+		Tracing_ID:   ctx_value.GetString(ctx, "tracingID"),
+		CallerUuid:   r.AuthedUser.Uuid,
+		AppUuid:      r.AppUuid,
+		AppName:      r.AppName,
+		Organization: r.Organization,
 	})
 	if err != nil {
 		return nil, errors.New(http.StatusInternalServerError,
