@@ -12,6 +12,10 @@
 
   --main-color: #666666AA;
 
+  --font-blue: #00000075;
+  --font-green: #00000075;
+  --font-yellow: #00000075;
+
   --btn-bg: #cccccc1B; 
   --btn-bg-hover: #10d574;
   --btn-font: #fff;

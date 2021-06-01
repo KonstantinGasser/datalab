@@ -3,7 +3,7 @@
         <br>
         <h1 class="d-flex justify-between">Funnel Configuration</h1>
         <small><span class="link" @click="showCfg('funnel')">how does it work?</span></small>
-        <div class="view_component funnel_view mt-0 pl-0">
+        <div class="view_component funnel_view mt-0 pl-0 dash">
             <div class="d-flex align-center justify-end">
                     <button class="btn btn-standard" @click="updateStages">Save</button>
                 </div>
@@ -75,7 +75,7 @@
                     <td>
                         <div class="input-group">
                             <div class="input-group-prepend">
-                                <button class="btn  btn-standard btn-disabled" disabled type="button">https://awesome.io/promp#</button>
+                                <button class="btn  btn-standard btn-disabled" disabled type="button"><span class="icon icon-hash"></span></button>
                             </div>
                             <input v-model="campaign_suffix" type="text" placeholder="Suffix (ex. summer-sales)" class="form-control border" :class="{'border-danger': campaign_invalid}" >
                             <!-- <input type="text" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon1"> -->
@@ -179,6 +179,8 @@ export default {
                     transition: this.stage_transition,
                 }
             })
+            this.stage_transition = null;
+            this.stage_name = null;
         },
         removeStage(id) {
             this.$emit("appchange", {unsaved: true, type: "funnel-remove", item: id}) 
@@ -195,10 +197,11 @@ export default {
                 stages: this.$props.app_config?.funnel,
             }
             axios.post("http://192.168.0.177:8080/api/v1/app/config/update", payload, options).then(res => {
-                this.$toast.success("Updated Funnel information");
+                // this.$toast.success("Updated Funnel information");
+                this.$moshaToast(res.data.msg, {type: 'success',position: 'top-center', timeout: 3000})
                 this.$emit("appchange", {unsaved: false, type: "funnel-saved"});
 
-            }).catch(err => this.$toast.error(err.response.data));
+            }).catch(err => this.$moshaToast(err.response.data, {type: 'danger',position: 'top-center', timeout: 3000}));
         },
         addCampaign() {
             if (this.campaign_invalid) this.campaign_invalid = false;
@@ -235,10 +238,10 @@ export default {
                 records: this.$props.app_config?.campaign,
             }
             axios.post("http://192.168.0.177:8080/api/v1/app/config/update", payload, options).then(res => {
-                this.$toast.success("Updated Campaign information");
+                this.$moshaToast(res.data.msg, {type: 'success',position: 'top-center', timeout: 3000})
                 this.$emit("appchange", {unsaved: false, type: "campaign-saved"});
 
-            }).catch(err => this.$toast.error(err.response.data));
+            }).catch(err => this.$moshaToast(err.response.data, {type: 'danger',position: 'top-center', timeout: 3000}));
         },
 
         addBtnTime() {
@@ -277,9 +280,9 @@ export default {
                 btn_defs: this.$props.app_config?.btn_time,
             }
             axios.post("http://192.168.0.177:8080/api/v1/app/config/update", payload, options).then(res => {
-                this.$toast.success("Updated Interesting-Buttons information");
+                this.$moshaToast(res.data.msg, {type: 'success',position: 'top-center', timeout: 3000})
                 this.$emit("appchange", {unsaved: false, type: "btn-saved"})
-            }).catch(err => this.$toast.error(err.response.data));
+            }).catch(err => this.$moshaToast(err.response.data, {type: 'danger',position: 'top-center', timeout: 3000}));
         },
         showCfg(type) {
             this.$emit("setdoc", type);
@@ -300,6 +303,10 @@ export default {
     height: max-width;
 }
 
+.dash {
+    border: 1px solid #ccc !important;
+    border-style: dashed !important;
+}
 .funnel_view {
     background: transparent;
     border: none;
@@ -311,8 +318,9 @@ export default {
 }
 .btn-disabled {
     border-radius: 4px;
-    background: var(--btn-bg-hover);
+    background: var(--menu-bg);
     color: var(--btn-font-hover);
+    opacity: 1;
 }
 .v-center {
     vertical-align: middle !important;

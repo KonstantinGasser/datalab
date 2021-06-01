@@ -5,6 +5,8 @@ import store from './store';
 import Toaster from "@meforma/vue-toaster";
 import VueMarkdownIt from 'vue3-markdown-it';
 import VueNativeSock from "vue-native-websocket-vue3";
+import moshaToast from 'mosha-vue-toastify'
+import 'mosha-vue-toastify/dist/style.css'
 
 import {
     SOCKET_ONOPEN,
@@ -29,6 +31,7 @@ createApp(App)
     .use(store)
     .use(router)
     .use(Toaster)
+    .use(moshaToast)
     .use(VueMarkdownIt)
     .use(VueNativeSock, "ws://192.168.0.177:8008/api/v1/datalab/live?token=", {
         store: store,

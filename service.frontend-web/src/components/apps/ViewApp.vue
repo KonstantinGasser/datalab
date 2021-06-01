@@ -46,6 +46,7 @@
     import Config from '@/components/apps/Config';
     import InviteMember from '@/components/apps/InviteMember';
     import axios from 'axios';
+    import jwt_decode from "jwt-decode";
 
     export default {
         name: 'ViewApp',
@@ -69,6 +70,7 @@
         },
         data() {
             return {
+                loggedInUser: null,
                 selectedApp: null,
                 isInCreateMode: false,
                 activeTab: 'App Details',
@@ -80,13 +82,14 @@
                 token_placeholder: "Organization-Domain/App-Name",
                 activeTab: "Overview",
                 tabs: [
-                        {name:'Overview', emoji: "🎛"},
-                        {name:'Configuration', emoji: "⚙️"},
-                        {name:'Invite', emoji: "✉️"},
+                        {name:'Overview', emoji: "icon-package"},
+                        {name:'Configuration', emoji: "icon-sliders"},
+                        {name:'Invite', emoji: "icon-users"},
                     ]
             };
         },
         async created() {
+            this.loggedInUser = jwt_decode(localStorage.getItem("token"));
             // fetch initial data of app list
             const init_data = await this.getAppList();
             if (init_data.data.apps === undefined || init_data.data.apps === null || init_data.data.apps.length <= 0 || init_data.status != 200) {

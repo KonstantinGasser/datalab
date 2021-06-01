@@ -58,7 +58,7 @@ func NewDefault(AppRefUuid, appHash, appOwner string) (*AppToken, error) {
 func (appToken *AppToken) Issue() (*AppToken, error) {
 	// current AppToken must be expired in order to issue a new one
 	// if non set (first time issuing) case will be ignored
-	if ok := appToken.expired(); !ok && appToken.Jwt == "" {
+	if ok := appToken.expired(); !ok && appToken.Jwt != "" {
 		return nil, ErrAppTokenStillValid
 	}
 	jwt, exp, err := appToken.JWT()
@@ -128,5 +128,5 @@ func (appToken AppToken) HasReadOrWrite(userUuid string, readWriteUuids ...strin
 
 // expired checks if the current jwt is already expired or not
 func (appToken *AppToken) expired() bool {
-	return appToken.Exp < time.Now().Unix()
+	return time.Now().Unix() >= appToken.Exp
 }

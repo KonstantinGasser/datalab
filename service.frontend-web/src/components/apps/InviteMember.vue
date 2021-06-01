@@ -4,7 +4,7 @@
             already invited {{colleagues}}
         </div> -->
         <div class="">
-            <h2>Invite Colleagues</h2> {{loggedInUser}} <br> {{app_owner?.uuid}}
+            <h2>Invite Colleagues</h2>
             <br>
             <div class="notify-table">
                 <div v-for="item in colleagues" :key="item.uuid" class="notify-row">
@@ -75,7 +75,7 @@ export default {
         }
         const resp = await axios.post("http://192.168.0.177:8080/api/v1/app/member/invitable", payload, options);
         if (resp.status != 200) {
-            this.$toast.error("Could not fetch Your Colleagues");
+            this.$moshaToast(resp.data, {type: 'danger',position: 'top-center', timeout: 3000})
             return;
         }
         this.colleagues = resp.data.user;
@@ -96,9 +96,12 @@ export default {
             }
             const resp = await axios.post("http://192.168.0.177:8080/api/v1/app/invite", payload, options);
             if (resp.status === 200) {
+                this.$moshaToast(resp.data.msg, {type: 'success',position: 'top-center', timeout: 3000})
                 this.inTeam.push(user.uuid)
                 user["status"] = 1
+                return
             }
+            this.$moshaToast(resp.response.data.msg, {type: 'error',position: 'top-center', timeout: 3000})
             
         }
     },
@@ -172,15 +175,17 @@ export default {
     width: 100px;
     height: 35px;
     border-radius: 50px;
-    color: #00000075;
+    /* color: #00000075; */
 }
 .pending {
     background: #f7fd0450;
     border: 1px solid #f7fd04;
+    color: var(--font-yellow);
 }
 .accepted {
     background: #10d57450;
     border: 1px solid #10d574;
+    color: var(--font-green);
 }
 
 .rejected {
@@ -191,6 +196,7 @@ export default {
 .owner {
     background: #5465ff54;
     border: 1px solid #5465ff; 
+    color: var(--font-blue);
 }
 
 </style>

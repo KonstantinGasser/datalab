@@ -65,6 +65,9 @@ export default {
           root.style.setProperty("--h-color", "#666666");
           root.style.setProperty("--txt-small", "#666666AA");
           root.style.setProperty("--main-color", "#666666AA");
+          root.style.setProperty("--font-blue", "#00000075");
+          root.style.setProperty("--font-green", "#00000075");
+          root.style.setProperty("--font-yellow", "#00000075");
         } else {
           localStorage.setItem("theme", this.mode)
           this.mode = "light"
@@ -76,6 +79,9 @@ export default {
           root.style.setProperty("--h-color", "#ccc");
           root.style.setProperty("--txt-small", "#FFFFFFAA");
           root.style.setProperty("--main-color", "#FFFFFFAA");
+          root.style.setProperty("--font-blue", "#58A6FF");
+          root.style.setProperty("--font-green", "#10d574");
+          root.style.setProperty("--font-yellow", "#f7fd04");
         }
       },
   },

@@ -14,7 +14,7 @@
                     <div class="input-group">
                         <input v-model="verification_step" type="text" class="form-control" placeholder="Organisation-Domain/App-Name" aria-label="" aria-describedby="basic-addon1">
                         <div class="input-group-append">
-                            <button class="btn btn-standard" @click="generateToken()" type="button">Authorize and Generate</button>
+                            <button class="btn btn-standard" style="width:65px;" @click="generateToken()" type="button"><span class="icon icon-tag"></span></button>
                         </div>
                     </div>
                 </div>
@@ -30,7 +30,7 @@
                             <button class="btn btn-standard" style="width:65px;" @click="copyTokenToClipboard()" type="button"><span class="icon icon-clipboard"></span></button>
                         </div>
                     </div>
-                    <div class=""><small>Token expires in {{expTimeSet.days}} days {{expTimeSet.hours}} hours</small></div>
+                    <div class=""><small v-if="expTimeSet">Token expires in {{expTimeSet?.days}} days {{expTimeSet?.hours}} hours</small></div>
                     <div class="mt-3">
                         Checkout the <a href="http://192.168.0.177:3000/docs/lib" target="_blank">documentation</a> 
                         on how to implement the client side
@@ -52,7 +52,7 @@
                     <div class="input-group">
                         <input v-model="delete_app_verify" type="text" class="form-control" placeholder="Domain/AppName" aria-label="" aria-describedby="basic-addon1">
                         <div class="input-group-append">
-                            <button class="btn btn-standard" @click="deleteApp(app.uuid)" type="button">delete 😮</button>
+                            <button class="btn btn-standard" style="width:65px;" @click="deleteApp(app.uuid)" type="button">😮</button>
                         </div>
                     </div>
                 </div>
@@ -107,24 +107,24 @@
                 return this.$props.app_token?.expiration
             },
             expTimeSet() {
-                // if (this.token_exp === undefined || this.token_exp == null || this.token_exp < 0){
-                //     return {}
-                // }
                 const total = Math.abs(this.exp*1000 - new Date().getTime());
                 const hours = Math.floor( (total/(1000*60*60)) % 24 );
                 const days = Math.floor( total/(1000*60*60*24) );
+                if (Number.isNaN(days)) {
+                    return null
+                }
                 return {days: days, hours: hours};
             },
         },
         methods: {
             generateToken() {
                 if (this.verification_step === null) {
-                    this.$toast.warning("Please provide the correct Organization/AppName");
+                    this.$moshaToast("Please provide the correct Organization/AppName", {type: 'warning',position: 'top-center', timeout: 3000})
                     return
                 }
                 const appOrgn = this.verification_step.split("/");
                 if (appOrgn.length < 2) {
-                    this.$toast.warning("Please provide the correct Organization/AppName");
+                    this.$moshaToast("Please provide the correct Organization/AppName", {type: 'warning',position: 'top-center', timeout: 3000})
                     return
                 }
                 let options = {
@@ -141,9 +141,9 @@
                 }, options).then(res => {
                     this.token_string = res.data.app_token?.jwt;
                     this.token_exp = res.data.app_token?.expiration;
-                    this.$toast.success("App Token generated");
+                    this.$moshaToast(res.data.msg, {type: 'success',position: 'top-center', timeout: 3000})
                 }).catch(err => {
-                    this.$toast.warning(err.response.data);
+                    this.$moshaToast(err.data.msg, {type: 'danger',position: 'top-center', timeout: 3000})
                 });
                 
             },

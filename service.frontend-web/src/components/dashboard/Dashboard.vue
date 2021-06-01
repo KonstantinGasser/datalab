@@ -2,8 +2,7 @@
   <div class="app-layout">
     
     <SideMenu class="app-menu" @setActive="showView"/>
-    <div class="app-header">
-    </div>
+    <div class="app-header"></div>
     <ViewApp v-if="active_view === 'view_app'" class="app-view" />
     <ViewAccount v-if="active_view === 'view_account'" class="app-view" />
     <ViewCharts v-if="active_view === 'view_dashboard'" class="app-view" />
@@ -80,11 +79,11 @@ export default {
 
 .app-header {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   align-content: center;
   grid-column: 2;
   grid-row: 1;
-  height: 45px;
+  height: 30px;
   /* background: linear-gradient(270deg, #50e3c2 0%,#10d574 100%); */
 }
 
