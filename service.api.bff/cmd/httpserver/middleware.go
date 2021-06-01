@@ -42,13 +42,13 @@ func (s *Server) WithAuth(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		accessToken := r.Header.Get("Authorization")
 		if accessToken == "" {
-			logrus.Warnf("<%v>[handler.WithAuth] %s is not authenticated", ctx_value.GetString(r.Context(), "tracingID"), r.Host)
+			logrus.Warnf("[%v][handler.WithAuth] %s is not authenticated", ctx_value.GetString(r.Context(), "tracingID"), r.Host)
 			s.onErr(w, http.StatusForbidden, "missing accesss token")
 			return
 		}
 		authedUser, err := s.userauthService.Authenticate(r.Context(), accessToken)
 		if err != nil {
-			logrus.Errorf("<%v>[Server.WithAuth] could not authenticate user: %v", ctx_value.GetString(r.Context(), "tracingID"), err)
+			logrus.Errorf("[%v][Server.WithAuth] could not authenticate user: %v", ctx_value.GetString(r.Context(), "tracingID"), err)
 			s.onErr(w, err.Code(), err.Info())
 			return
 		}

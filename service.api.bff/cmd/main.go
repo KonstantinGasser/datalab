@@ -127,6 +127,11 @@ func main() {
 		server.WithCors,
 		server.WithAuth,
 	)
+	server.Register("/api/v1/app/invite/reminder", server.SendAppInviteReminder,
+		server.WithTracing,
+		server.WithCors,
+		server.WithAuth,
+	)
 	server.Register("/api/v1/app/invite/accept", server.AcceptInvite,
 		server.WithTracing,
 		server.WithCors,

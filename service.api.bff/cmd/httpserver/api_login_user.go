@@ -10,7 +10,7 @@ import (
 
 func (s Server) LoginUser(w http.ResponseWriter, r *http.Request) {
 	tracingID := ctx_value.GetString(r.Context(), "tracingID")
-	logrus.Infof("<%v>[Server.LoginUser] received request: %v\n", tracingID, r.Host)
+	logrus.Infof("[%v][Server.LoginUser] received request: %v\n", tracingID, r.Host)
 
 	var request users.LoginRequest
 	if err := s.decode(r.Body, &request); err != nil {
@@ -19,7 +19,7 @@ func (s Server) LoginUser(w http.ResponseWriter, r *http.Request) {
 	}
 	resp := s.userauthService.Login(r.Context(), &request)
 	if resp.Status != http.StatusOK {
-		logrus.Errorf("<%v>[Server.LoginUser] could not login user: %v\n", tracingID, resp.Err)
+		logrus.Errorf("[%v][Server.LoginUser] could not login user: %v\n", tracingID, resp.Err)
 	}
 	s.onSuccess(w, resp.Status, resp)
 }

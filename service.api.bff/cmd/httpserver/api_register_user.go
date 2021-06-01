@@ -10,7 +10,7 @@ import (
 
 func (s Server) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	tracingID := ctx_value.GetString(r.Context(), "tracingID")
-	logrus.Infof("<%v>[Server.RegisterUser] received request: %v\n", tracingID, r.Host)
+	logrus.Infof("[%v][Server.RegisterUser] received request: %v\n", tracingID, r.Host)
 
 	var request users.RegisterRequest
 	if err := s.decode(r.Body, &request); err != nil {
@@ -19,7 +19,7 @@ func (s Server) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	}
 	resp := s.userauthService.Register(r.Context(), &request)
 	if resp.Status != http.StatusOK {
-		logrus.Errorf("<%v>[Server.RegisterUser] could not register user: %v\n", tracingID, resp.Err)
+		logrus.Errorf("[%v][Server.RegisterUser] could not register user: %v\n", tracingID, resp.Err)
 	}
 	s.onSuccess(w, resp.Status, resp)
 }

@@ -16,6 +16,8 @@ type VueMutation string
 const (
 	// indicates that a user has been invited to join an App
 	EventAppInvite MessageEvent = iota
+	// indicated that a user has been reminded to join an app
+	EventAppInviteReminder
 	// indicates that the App has changed and can be synced
 	EventSyncApp
 

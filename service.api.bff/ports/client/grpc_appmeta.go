@@ -112,6 +112,26 @@ func (client ClientAppMeta) SendInvite(ctx context.Context, r *apps.SendInviteRe
 	return resp.GetAppName(), nil
 }
 
+func (client ClientAppMeta) InviteReminderOK(ctx context.Context, r *apps.InviteReminderRequest) errors.Api {
+
+	resp, err := client.Conn.InviteReminderOK(ctx, &grpcAppMeta.InviteReminderOKRequest{
+		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
+		AppUuid:    r.AppUuid,
+		UserUuid:   r.UserUuid,
+	})
+	if err != nil {
+		return errors.New(http.StatusInternalServerError,
+			err,
+			"Could not check if Reminder can be send")
+	}
+	if resp.GetStatusCode() != http.StatusOK {
+		return errors.New(resp.GetStatusCode(),
+			fmt.Errorf(resp.GetMsg()),
+			resp.GetMsg())
+	}
+	return nil
+}
+
 func (client ClientAppMeta) AcceptInvite(ctx context.Context, r *apps.AcceptInviteRequest) errors.Api {
 
 	resp, err := client.Conn.AcceptInvite(ctx, &grpcAppMeta.AcceptInviteRequest{

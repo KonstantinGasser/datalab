@@ -12,6 +12,7 @@ import (
 
 type Service interface {
 	SendInvite(ctx context.Context, r *apps.SendInviteRequest) *apps.SendInviteResponse
+	SendReminder(ctx context.Context, r *apps.InviteReminderRequest) *apps.InviteReminderResponse
 	AcceptInvite(ctx context.Context, r *apps.AcceptInviteRequest) *apps.AcceptInviteResponse
 }
 
@@ -56,6 +57,38 @@ func (s service) SendInvite(ctx context.Context, r *apps.SendInviteRequest) *app
 	return &apps.SendInviteResponse{
 		Status: http.StatusOK,
 		Msg:    "Invite send",
+	}
+}
+
+func (s service) SendReminder(ctx context.Context, r *apps.InviteReminderRequest) *apps.InviteReminderResponse {
+	if err := required.Atomic(r); err != nil {
+		return &apps.InviteReminderResponse{
+			Status: http.StatusBadRequest,
+			Msg:    "Mandatory fields missing",
+			Err:    err.Error(),
+		}
+	}
+
+	err := s.appMetaClient.InviteReminderOK(ctx, r)
+	if err != nil {
+		return &apps.InviteReminderResponse{
+			Status: err.Code(),
+			Msg:    err.Info(),
+			Err:    err.Error(),
+		}
+	}
+	notifyErr := s.notifyLiveClient.EmitSendInvite(ctx, 1, client.MutationInviteReminder, r.UserUuid, r.AuthedUser.Organization, map[string]interface{}{
+		"app_uuid":  r.AppUuid,
+		"app_name":  r.AppName,
+		"app_owner": r.AuthedUser.Username,
+	})
+	// if message not send for now I dont care...will change in future
+	if notifyErr != nil {
+		logrus.Errorf("[service.inviting.SendInvite] could not send invite to notification service: %v\n", notifyErr)
+	}
+	return &apps.InviteReminderResponse{
+		Status: http.StatusOK,
+		Msg:    "Reminder send",
 	}
 }
 

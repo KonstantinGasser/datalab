@@ -13,6 +13,7 @@ service AppMeta {
     rpc GetList(GetListRequest) returns (GetListResponse) {}
 
     rpc Invite(InviteRequest) returns (InviteResponse) {}
+    rpc InviteReminderOK(InviteReminderOKRequest) returns (InviteReminderOKResponse) {}
     rpc AcceptInvite(AcceptInviteRequest) returns (AcceptInviteResponse) {}
 }
 
@@ -60,6 +61,15 @@ message GetListResponse {
 }
 // ***************************
 
+message InviteReminderOKRequest {
+    string tracing_ID = 1;
+    string app_uuid = 2;
+    string user_uuid = 3;
+}
+message InviteReminderOKResponse {
+    int32 status_code = 1;
+    string msg = 2;
+}
 // RPC GET APP
 message GetRequest {
     string tracing_ID = 1;

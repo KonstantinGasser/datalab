@@ -118,6 +118,18 @@ func (app *App) AddInvite(userUuid string) (*Member, error) {
 	return &member, nil
 }
 
+// InviteReminderOk checks if a user qualifys to be send an reminder
+// for an invite again
+func (app App) InviteReminderOk(userUuid string) bool {
+	fmt.Println("User uuid: ", userUuid)
+	for _, member := range app.Members {
+		if member.Uuid == userUuid && member.Status == InvitePending {
+			return true
+		}
+	}
+	return false
+}
+
 func (app App) HasReadAccess(userUuid string) error {
 	errO := app.IsOwner(userUuid)
 	errM := app.IsMember(userUuid, InviteAccepted)

@@ -196,12 +196,12 @@ export default {
                 app_uuid: this.$props.app_uuid,
                 stages: this.$props.app_config?.funnel,
             }
-            axios.post("http://192.168.0.177:8080/api/v1/app/config/update", payload, options).then(res => {
+            axios.post("http://localhost:8080/api/v1/app/config/update", payload, options).then(res => {
                 // this.$toast.success("Updated Funnel information");
                 this.$moshaToast(res.data.msg, {type: 'success',position: 'top-center', timeout: 3000})
                 this.$emit("appchange", {unsaved: false, type: "funnel-saved"});
 
-            }).catch(err => this.$moshaToast(err.response.data, {type: 'danger',position: 'top-center', timeout: 3000}));
+            }).catch(err => this.$moshaToast(err.response?.data?.msg, {type: 'danger',position: 'top-center', timeout: 3000}));
         },
         addCampaign() {
             if (this.campaign_invalid) this.campaign_invalid = false;
@@ -237,11 +237,11 @@ export default {
                 app_uuid: this.$props.app_uuid,
                 records: this.$props.app_config?.campaign,
             }
-            axios.post("http://192.168.0.177:8080/api/v1/app/config/update", payload, options).then(res => {
+            axios.post("http://localhost:8080/api/v1/app/config/update", payload, options).then(res => {
                 this.$moshaToast(res.data.msg, {type: 'success',position: 'top-center', timeout: 3000})
                 this.$emit("appchange", {unsaved: false, type: "campaign-saved"});
 
-            }).catch(err => this.$moshaToast(err.response.data, {type: 'danger',position: 'top-center', timeout: 3000}));
+            }).catch(err => this.$moshaToast(err.response?.data?.msg, {type: 'danger',position: 'top-center', timeout: 3000}));
         },
 
         addBtnTime() {
@@ -279,10 +279,10 @@ export default {
                 app_uuid: this.$props.app_uuid,
                 btn_defs: this.$props.app_config?.btn_time,
             }
-            axios.post("http://192.168.0.177:8080/api/v1/app/config/update", payload, options).then(res => {
+            axios.post("http://localhost:8080/api/v1/app/config/update", payload, options).then(res => {
                 this.$moshaToast(res.data.msg, {type: 'success',position: 'top-center', timeout: 3000})
                 this.$emit("appchange", {unsaved: false, type: "btn-saved"})
-            }).catch(err => this.$moshaToast(err.response.data, {type: 'danger',position: 'top-center', timeout: 3000}));
+            }).catch(err => this.$moshaToast(err.response?.data?.msg, {type: 'danger',position: 'top-center', timeout: 3000}));
         },
         showCfg(type) {
             this.$emit("setdoc", type);

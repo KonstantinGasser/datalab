@@ -32,7 +32,7 @@
                 <Tabs class="my-2" ref="Tabs" :update="activeTab" :initTab="activeTab" :tabs="tabs" @tabChange="tabChange"/>
                 <General v-if="activeTab === 'Overview'" :app_token="activeApp?.token" :app_uuid="activeApp?.app?.uuid" @drop_app="drop_app" />
                 <Config v-if="activeTab == 'Configuration'" @appchange="markUnsaved" :app_config="activeApp?.config" :app_uuid="activeApp?.app?.uuid" @setdoc="setdoc"/>
-                <InviteMember v-if="activeTab == 'Invite'" :app_uuid="activeApp?.app?.uuid" :member="activeApp?.app?.member" :app_owner="activeApp?.owner"/>
+                <InviteMember v-if="activeTab == 'Invite'" :app_uuid="activeApp?.app?.uuid" :member="activeApp?.app?.member" :app_owner="activeApp?.owner" :app_name="activeApp?.app?.name"/>
             </div>
         </div>
     </div>
@@ -131,7 +131,7 @@
                         'Authorization': localStorage.getItem("token"),
                     }
                 };
-                const resp = await axios.get("http://192.168.0.177:8080/api/v1/app/all", options)
+                const resp = await axios.get("http://localhost:8080/api/v1/app/all", options)
                 if (resp.status != 200) {
                     this.$toast.error(resp.data);
                 }
@@ -145,7 +145,7 @@
                 };
                 let resp = {}
                 try {
-                    resp = await axios.get("http://192.168.0.177:8080/api/v1/app?app="+uuid, options)
+                    resp = await axios.get("http://localhost:8080/api/v1/app?app="+uuid, options)
                     if (resp.status != 200) {
                         this.$toast.error(resp.data);
                     }

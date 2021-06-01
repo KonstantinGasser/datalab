@@ -7,23 +7,44 @@
             </div>
             <div class="notify-table">
                 <div v-for="item in notifications" :key="item" class="notify-row">
-                    <div v-if="item.event === 0">
-                        <div class="emoji-line d-flex justify-start"><strong>You got an App Invite</strong>&nbsp;- go check it out 🚀</div>
-                        <div  class="notify-title">
-                            👉 &nbsp;
-                            <strong>{{item.value?.app_owner}}</strong> invited you to join and contribute to&nbsp;
-                            <strong>"{{item.value?.app_name}}"</strong> <br>
+                    <div class="notify-item" v-if="item.event === 0">
+                        <div>
+                            <div class="emoji-line d-flex justify-start"><strong>You got an App Invite</strong>&nbsp;- go check it out 🚀</div>
+                            <div  class="notify-title">
+                                👉 &nbsp;
+                                <strong>{{item.value?.app_owner}}</strong> invited you to join and contribute to&nbsp;
+                                <strong>"{{item.value?.app_name}}"</strong> <br>
+                            </div>
                         </div>
-                    </div>
-                    <div class="actions">
-                        <div class="py-1">
-                            <button class="btn accept" @click="acceptInvite(item, item.value?.app_uuid)">Accept</button>
-                        </div>
+                        <div class="actions">
+                            <div class="py-1">
+                                <button class="btn accept" @click="acceptInvite(item, item.value?.app_uuid)">Accept</button>
+                            </div>
 
-                        <div class="py-1">
-                            <button class="btn reject" @click="rejectInvite(item, item.value?.app_uuid)">Reject</button>
+                            <div class="py-1">
+                                <button class="btn reject" @click="rejectInvite(item, item.value?.app_uuid)">Reject</button>
+                            </div>
                         </div>
                     </div>
+                    <div class="notify-item" v-if="item.event === 1">
+                        <div>
+                            <div class="emoji-line d-flex justify-start"><strong>Everyone should get a second change</strong>&nbsp;🤗</div>
+                            <div  class="notify-title">
+                                ❗️&nbsp;
+                                <strong>{{item.value?.app_owner}}</strong> reminds you to join&nbsp;
+                                <strong>"{{item.value?.app_name}}"</strong> <br>
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <div class="py-1">
+                                <button class="btn accept" @click="acceptInvite(item, item.value?.app_uuid)">Accept</button>
+                            </div>
+
+                            <div class="py-1">
+                                <button class="btn reject" @click="rejectInvite(item, item.value?.app_uuid)">Reject</button>
+                            </div>
+                        </div>
+                    </div>  
                 </div>
             </div>
         </div>
@@ -58,7 +79,7 @@ export default {
                 app_uuid: app_uuid,
                 event_timestamp: item.timestamp,
             }
-            const resp = await axios.post("http://192.168.0.177:8080/api/v1/app/invite/accept", payload, options);
+            const resp = await axios.post("http://localhost:8080/api/v1/app/invite/accept", payload, options);
             if (resp.status != 200) {
                 this.$toast.error("Could not send invite feedback");
                 return
@@ -102,6 +123,9 @@ export default {
 }
 
 .notify-row {
+    width: 100%;
+}
+.notify-item {
     width: 100%;
     height: max-content;
     max-width: 100%;

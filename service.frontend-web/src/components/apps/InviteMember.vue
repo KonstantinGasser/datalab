@@ -19,7 +19,7 @@
                             <button v-if="item.status === 0 && loggedInUser.sub === app_owner?.uuid" class="btn accept" @click="invite(item)">invite</button>
                             <button v-if="item.status === 0 && loggedInUser.sub !== app_owner?.uuid" class="btn accept" disabled>invite</button>
                             <div  v-if="item.status === 1" class="invited pending">Pending 
-                                <span v-if="loggedInUser.sub === app_owner?.uuid" class="ml-1 icon icon-external-link hover"></span>
+                                <span v-if="loggedInUser.sub === app_owner?.uuid" @click="reminder(item)" class="ml-1 icon icon-external-link hover"></span>
                             </div>
                             <div  v-if="item.status === 2 && item.uuid !== app_owner?.uuid" class="invited accepted">Accepted</div>
                             <div  v-if="item.uuid === app_owner?.uuid" class="invited owner">Owner</div>
@@ -48,6 +48,10 @@ export default {
         }
     },
     props: {
+        app_name: {
+            type: String,
+            default: null,
+        },
         app_owner: {
             type: Object,
             default: "",
@@ -73,7 +77,7 @@ export default {
         const payload = {
             app_uuid: this.$props.app_uuid
         }
-        const resp = await axios.post("http://192.168.0.177:8080/api/v1/app/member/invitable", payload, options);
+        const resp = await axios.post("http://localhost:8080/api/v1/app/member/invitable", payload, options);
         if (resp.status != 200) {
             this.$moshaToast(resp.data, {type: 'danger',position: 'top-center', timeout: 3000})
             return;
@@ -94,14 +98,36 @@ export default {
                 app_uuid: this.$props.app_uuid,
                 invited_uuid: user.uuid,
             }
-            const resp = await axios.post("http://192.168.0.177:8080/api/v1/app/invite", payload, options);
+            const resp = await axios.post("http://localhost:8080/api/v1/app/invite", payload, options);
             if (resp.status === 200) {
                 this.$moshaToast(resp.data.msg, {type: 'success',position: 'top-center', timeout: 3000})
                 this.inTeam.push(user.uuid)
                 user["status"] = 1
                 return
             }
-            this.$moshaToast(resp.response.data.msg, {type: 'error',position: 'top-center', timeout: 3000})
+            this.$moshaToast(resp.response.data.msg, {type: 'danger',position: 'top-center', timeout: 3000})   
+        },
+        async reminder(user) {
+            let options = {
+                headers: {
+                    'Authorization': localStorage.getItem("token"),
+                }
+            };
+            const payload = {
+                app_name: this.$props.app_name,
+                app_uuid: this.$props.app_uuid,
+                user_uuid: user.uuid,
+            }
+            try {
+                const resp = await axios.post("http://localhost:8080/api/v1/app/invite/reminder", payload, options);
+            if (resp.status === 200) {
+                this.$moshaToast(resp.data.msg, {type: 'success',position: 'top-center', timeout: 3000})
+                return
+            }
+            } catch(err) {
+                this.$moshaToast(err.response?.data?.msg, {type: 'danger',position: 'top-center', timeout: 3000})   
+            }
+            
             
         }
     },

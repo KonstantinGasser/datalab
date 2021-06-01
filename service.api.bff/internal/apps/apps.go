@@ -80,6 +80,18 @@ type SendInviteResponse struct {
 	Err    string `json:"error,omitempty"`
 }
 
+type InviteReminderRequest struct {
+	AuthedUser *common.AuthedUser
+	AppName    string `json:"app_name"`
+	AppUuid    string `json:"app_uuid"`
+	UserUuid   string `json:"user_uuid"`
+}
+type InviteReminderResponse struct {
+	Status int32  `json:"status"`
+	Msg    string `json:"msg"`
+	Err    string `json:"error,omitempty"`
+}
+
 type AcceptInviteRequest struct {
 	AuthedUser            *common.AuthedUser
 	AppUuid               string `json:"app_uuid"`

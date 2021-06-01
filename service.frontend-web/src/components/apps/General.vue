@@ -32,7 +32,7 @@
                     </div>
                     <div class=""><small v-if="expTimeSet">Token expires in {{expTimeSet?.days}} days {{expTimeSet?.hours}} hours</small></div>
                     <div class="mt-3">
-                        Checkout the <a href="http://192.168.0.177:3000/docs/lib" target="_blank">documentation</a> 
+                        Checkout the <a href="http://localhost:3000/docs/lib" target="_blank">documentation</a> 
                         on how to implement the client side
                     </div>
                 </div>
@@ -133,21 +133,22 @@
                     }
                 };
 
-                axios.post("http://192.168.0.177:8080/api/v1/app/token/issue", {
+                axios.post("http://localhost:8080/api/v1/app/token/issue", {
                     app_uuid: this.$props.app_uuid,
-                    // app_name: appOrgn[1],
-                    // owner_domain: appOrgn[0],
+                    app_name: appOrgn[1],
+                    orgn_domain: appOrgn[0],
                     // app_origin: this.$props.app?.app?.URL,
                 }, options).then(res => {
+                    console.log("Status: ", res.status)
                     this.token_string = res.data.app_token?.jwt;
                     this.token_exp = res.data.app_token?.expiration;
                     if (res.data.status == 200) {
                         this.$moshaToast(res.data.msg, {type: 'success',position: 'top-center', timeout: 3000})
                         return
                     }
-                    this.$moshaToast(res.data.msg, {type: 'warning',position: 'top-center', timeout: 3000})
+                  
                 }).catch(err => {
-                    this.$moshaToast(err.data.msg, {type: 'danger',position: 'top-center', timeout: 3000})
+                    this.$moshaToast(err.response?.data?.msg, {type: 'danger',position: 'top-center', timeout: 3000})
                 });
                 
             },
@@ -167,7 +168,7 @@
                         'Authorization': localStorage.getItem("token"),
                     }
                 };
-                axios.post("http://192.168.0.177:8080/api/v2/view/app/delete", {
+                axios.post("http://localhost:8080/api/v2/view/app/delete", {
                         app_uuid: id,
                         orgn_name: appOrgn[0],
                         app_name: appOrgn[1],

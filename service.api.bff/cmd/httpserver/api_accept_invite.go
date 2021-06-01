@@ -10,7 +10,7 @@ import (
 
 func (s Server) AcceptInvite(w http.ResponseWriter, r *http.Request) {
 	tracingID := ctx_value.GetString(r.Context(), "tracingID")
-	logrus.Infof("<%v>[Server.GetUserProfile] received request: %v\n", tracingID, r.Host)
+	logrus.Infof("[%v][Server.GetUserProfile] received request: %v\n", tracingID, r.Host)
 
 	authedUser := ctx_value.GetAuthedUser(r.Context())
 
@@ -23,7 +23,7 @@ func (s Server) AcceptInvite(w http.ResponseWriter, r *http.Request) {
 
 	resp := s.appInviteService.AcceptInvite(r.Context(), &request)
 	if resp.Status != http.StatusOK {
-		logrus.Errorf("<%v>[Server.AcceptInvite] could not accept invite: %v\n", tracingID, resp.Err)
+		logrus.Errorf("[%v][Server.AcceptInvite] could not accept invite: %v\n", tracingID, resp.Err)
 	}
 	s.onSuccess(w, resp.Status, resp)
 }

@@ -25,6 +25,9 @@ export default createStore({
     APP_INVITE(state, event) {
       state.notifications.push(event);
     },
+    APP_INVITE_REMINDER(state, event) {
+      state.notifications.push(event)
+    },
     POP_NOTIFICATION(state, event) {
       state.notifications = state.notifications.filter(item => !(item.timestamp === event.timestamp))
     },

@@ -23,6 +23,7 @@ type AppMetaClient interface {
 	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
 	GetList(ctx context.Context, in *GetListRequest, opts ...grpc.CallOption) (*GetListResponse, error)
 	Invite(ctx context.Context, in *InviteRequest, opts ...grpc.CallOption) (*InviteResponse, error)
+	InviteReminderOK(ctx context.Context, in *InviteReminderOKRequest, opts ...grpc.CallOption) (*InviteReminderOKResponse, error)
 	AcceptInvite(ctx context.Context, in *AcceptInviteRequest, opts ...grpc.CallOption) (*AcceptInviteResponse, error)
 }
 
@@ -79,6 +80,15 @@ func (c *appMetaClient) Invite(ctx context.Context, in *InviteRequest, opts ...g
 	return out, nil
 }
 
+func (c *appMetaClient) InviteReminderOK(ctx context.Context, in *InviteReminderOKRequest, opts ...grpc.CallOption) (*InviteReminderOKResponse, error) {
+	out := new(InviteReminderOKResponse)
+	err := c.cc.Invoke(ctx, "/app_proto.AppMeta/InviteReminderOK", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *appMetaClient) AcceptInvite(ctx context.Context, in *AcceptInviteRequest, opts ...grpc.CallOption) (*AcceptInviteResponse, error) {
 	out := new(AcceptInviteResponse)
 	err := c.cc.Invoke(ctx, "/app_proto.AppMeta/AcceptInvite", in, out, opts...)
@@ -97,6 +107,7 @@ type AppMetaServer interface {
 	Get(context.Context, *GetRequest) (*GetResponse, error)
 	GetList(context.Context, *GetListRequest) (*GetListResponse, error)
 	Invite(context.Context, *InviteRequest) (*InviteResponse, error)
+	InviteReminderOK(context.Context, *InviteReminderOKRequest) (*InviteReminderOKResponse, error)
 	AcceptInvite(context.Context, *AcceptInviteRequest) (*AcceptInviteResponse, error)
 	mustEmbedUnimplementedAppMetaServer()
 }
@@ -119,6 +130,9 @@ func (UnimplementedAppMetaServer) GetList(context.Context, *GetListRequest) (*Ge
 }
 func (UnimplementedAppMetaServer) Invite(context.Context, *InviteRequest) (*InviteResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Invite not implemented")
+}
+func (UnimplementedAppMetaServer) InviteReminderOK(context.Context, *InviteReminderOKRequest) (*InviteReminderOKResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method InviteReminderOK not implemented")
 }
 func (UnimplementedAppMetaServer) AcceptInvite(context.Context, *AcceptInviteRequest) (*AcceptInviteResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AcceptInvite not implemented")
@@ -226,6 +240,24 @@ func _AppMeta_Invite_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AppMeta_InviteReminderOK_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InviteReminderOKRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppMetaServer).InviteReminderOK(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/app_proto.AppMeta/InviteReminderOK",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppMetaServer).InviteReminderOK(ctx, req.(*InviteReminderOKRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _AppMeta_AcceptInvite_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AcceptInviteRequest)
 	if err := dec(in); err != nil {
@@ -270,6 +302,10 @@ var AppMeta_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Invite",
 			Handler:    _AppMeta_Invite_Handler,
+		},
+		{
+			MethodName: "InviteReminderOK",
+			Handler:    _AppMeta_InviteReminderOK_Handler,
 		},
 		{
 			MethodName: "AcceptInvite",

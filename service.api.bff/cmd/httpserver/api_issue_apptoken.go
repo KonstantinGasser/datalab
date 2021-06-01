@@ -10,7 +10,7 @@ import (
 
 func (s Server) IssueAppToken(w http.ResponseWriter, r *http.Request) {
 	tracingID := ctx_value.GetString(r.Context(), "tracingID")
-	logrus.Infof("<%v>[Server.IssueAppToken] received request: %v\n", tracingID, r.Host)
+	logrus.Infof("[%v][Server.IssueAppToken] received request: %v\n", tracingID, r.Host)
 
 	authedUser := ctx_value.GetAuthedUser(r.Context())
 
@@ -22,7 +22,7 @@ func (s Server) IssueAppToken(w http.ResponseWriter, r *http.Request) {
 	request.AuthedUser = authedUser
 	resp := s.appcreateService.CreateAppToken(r.Context(), &request)
 	if resp.Status != http.StatusOK {
-		logrus.Errorf("<%v>[Server.CreatIssueAppTokeneApp] could not create app token: %v\n", tracingID, resp.Err)
+		logrus.Errorf("[%v][Server.CreatIssueAppTokeneApp] could not create app token: %v\n", tracingID, resp.Err)
 	}
 	s.onSuccess(w, resp.Status, resp)
 }

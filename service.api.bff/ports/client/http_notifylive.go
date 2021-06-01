@@ -14,8 +14,9 @@ import (
 type VueMutation string
 
 const (
-	MutationAppInvite VueMutation = "APP_INVITE"
-	MutationSyncApp   VueMutation = "SYNC_APP"
+	MutationAppInvite      VueMutation = "APP_INVITE"
+	MutationInviteReminder VueMutation = "APP_INVITE_REMINDER"
+	MutationSyncApp        VueMutation = "SYNC_APP"
 )
 
 type ClientNotifiyLive struct {
@@ -81,6 +82,7 @@ func (client ClientNotifiyLive) EmitSendRemove(ctx context.Context, userUuid str
 	}()
 	return nil
 }
+
 func (client ClientNotifiyLive) AddrPublish() string {
 	return fmt.Sprintf("http://%s%s", client.addr, client.apiPublish)
 }

@@ -73,7 +73,7 @@ func (hub *NotifyHub) run() {
 		// if send fails looks up connection and kills it
 		case notification := <-hub.Notify:
 			switch notification.Event {
-			case EventAppInvite:
+			case EventAppInvite, EventAppInviteReminder:
 				err := hub.sendMessage(notification)
 				if err != nil {
 					// receiver not available: kill connection
