@@ -33,7 +33,7 @@ func NewClientNotifyLive(addr string) *ClientNotifiyLive {
 	}
 }
 
-func (client ClientNotifiyLive) EmitSendInvite(ctx context.Context, event int, mutation VueMutation, receiverUuid, receiverOrgn string, value map[string]interface{}) error {
+func (client ClientNotifiyLive) EmitSendEvent(ctx context.Context, event int, mutation VueMutation, receiverUuid, receiverOrgn string, value map[string]interface{}) error {
 
 	var payload = map[string]interface{}{
 		"receiver_uuid": receiverUuid,
@@ -50,7 +50,7 @@ func (client ClientNotifiyLive) EmitSendInvite(ctx context.Context, event int, m
 	c := &http.Client{}
 	res, err := c.Do(req)
 	if err != nil {
-		logrus.Warnf("[client.Notify.EmitSendInvite] could not send invite: %v\n", err)
+		logrus.Warnf("[client.Notify.EmitSendEvent] could not send invite: %v\n", err)
 	}
 	defer func() {
 		if res != nil {
@@ -63,8 +63,8 @@ func (client ClientNotifiyLive) EmitSendInvite(ctx context.Context, event int, m
 func (client ClientNotifiyLive) EmitSendRemove(ctx context.Context, userUuid string, timestamp int64) error {
 
 	var payload = map[string]interface{}{
-		"user_uuid": "",
-		"timestamp": 0,
+		"user_uuid": userUuid,
+		"timestamp": timestamp,
 	}
 	buf := new(bytes.Buffer)
 	_ = json.NewEncoder(buf).Encode(payload)
@@ -73,7 +73,7 @@ func (client ClientNotifiyLive) EmitSendRemove(ctx context.Context, userUuid str
 	c := &http.Client{}
 	res, err := c.Do(req)
 	if err != nil {
-		logrus.Warnf("[client.Notify.EmitSendInvite] could not send invite: %v\n", err)
+		logrus.Warnf("[client.Notify.EmitSendRemove] could not send invite: %v\n", err)
 	}
 	defer func() {
 		if res != nil {

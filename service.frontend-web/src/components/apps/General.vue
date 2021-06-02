@@ -144,6 +144,7 @@
                     this.token_exp = res.data.app_token?.expiration;
                     if (res.data.status == 200) {
                         this.$moshaToast(res.data.msg, {type: 'success',position: 'top-center', timeout: 3000})
+                        this.$store.commit("UNSYNC_APP")
                         return
                     }
                   
@@ -185,9 +186,9 @@
             },
             copyTokenToClipboard() {
                 navigator.clipboard.writeText(this.token).then(() => {
-                    this.$toast.success("Token copied to clipboard");
+                    this.$moshaToast("App Token copied", {type: 'success',position: 'top-center', timeout: 3000})
                 }).catch(() => {
-                    this.$toast.error("Failed to copy token...");
+                    this.$moshaToast("Failed to copy App Token", {type: 'danger',position: 'top-center', timeout: 3000})
                 });
             },
         },

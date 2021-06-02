@@ -45,7 +45,7 @@ func (s service) SendInvite(ctx context.Context, r *apps.SendInviteRequest) *app
 			Err:    err.Error(),
 		}
 	}
-	notifyErr := s.notifyLiveClient.EmitSendInvite(ctx, 0, client.MutationAppInvite, r.InvitedUuid, r.AuthedUser.Organization, map[string]interface{}{
+	notifyErr := s.notifyLiveClient.EmitSendEvent(ctx, 0, client.MutationAppInvite, r.InvitedUuid, r.AuthedUser.Organization, map[string]interface{}{
 		"app_uuid":  r.AppUuid,
 		"app_name":  appName,
 		"app_owner": r.AuthedUser.Username,
@@ -77,7 +77,7 @@ func (s service) SendReminder(ctx context.Context, r *apps.InviteReminderRequest
 			Err:    err.Error(),
 		}
 	}
-	notifyErr := s.notifyLiveClient.EmitSendInvite(ctx, 1, client.MutationInviteReminder, r.UserUuid, r.AuthedUser.Organization, map[string]interface{}{
+	notifyErr := s.notifyLiveClient.EmitSendEvent(ctx, 1, client.MutationInviteReminder, r.UserUuid, r.AuthedUser.Organization, map[string]interface{}{
 		"app_uuid":  r.AppUuid,
 		"app_name":  r.AppName,
 		"app_owner": r.AuthedUser.Username,

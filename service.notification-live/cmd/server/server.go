@@ -45,6 +45,10 @@ func Run(ctx context.Context, hostAddr, userauthAddr, dbAddr string) error {
 		notifySvc.WithTracing,
 		notifySvc.WithCors,
 	)
+	notifySvc.Register("/api/v1/datalab/hide/event", notifySvc.HandleHideNotification,
+		notifySvc.WithTracing,
+		notifySvc.WithCors,
+	)
 	notifySvc.Register("/api/v1/datalab/remove/event", notifySvc.HandleRemoveNotification,
 		notifySvc.WithTracing,
 		notifySvc.WithCors,

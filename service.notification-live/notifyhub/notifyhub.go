@@ -22,6 +22,7 @@ type NotifyHub struct {
 	unsubscribe  chan *Connection
 	Notify       chan *IncomingEvent
 	RemoveNotify chan *RemoveEvent
+	HideNotify   chan *HideEvent
 	batchNotify  chan *UserNotifications
 
 	// guards the Organizations map
@@ -39,6 +40,7 @@ func New(repo repo.Repo) *NotifyHub {
 		Notify:        make(chan *IncomingEvent),
 		RemoveNotify:  make(chan *RemoveEvent),
 		batchNotify:   make(chan *UserNotifications),
+		HideNotify:    make(chan *HideEvent),
 		mu:            sync.RWMutex{},
 		Organizations: make(map[string]*OrganizationPool),
 	}
@@ -84,11 +86,12 @@ func (hub *NotifyHub) run() {
 						}
 						hub.unsubscribe <- pool.Find(notification.UserUuid)
 					}
-					logrus.Errorf("[notifyHub.chan.Notify] could not send message: %v\n", err)
+					logrus.Errorf("[notifyHub.chan.Notify] could not send invite: %v\n", err)
 				}
 			case EventSyncApp:
 				err := hub.sendBroadcast(notification)
 				if err != nil {
+					fmt.Println(notification)
 					logrus.Errorf("[notifyHub.chan.Notify] could not broadcast message: %v\n", err)
 				}
 			}
@@ -104,7 +107,14 @@ func (hub *NotifyHub) run() {
 					}
 					hub.unsubscribe <- pool.Find(userNotifies.UserUuid)
 				}
-				logrus.Errorf("[notifyHub.chan.Notify] could not send message: %v\n", err)
+				logrus.Errorf("[notifyHub.chan.batchNotify] could not send message: %v\n", err)
+			}
+			// removes notifications with are no longer important
+			// and can be delete from the database
+		case notification := <-hub.HideNotify:
+			err := hub.HideNotification(notification)
+			if err != nil {
+				logrus.Errorf("[notifyHub.chan.HideNotify] could not hide message: %v\n", err)
 			}
 		// removes notifications with are no longer important
 		// and can be delete from the database
@@ -230,6 +240,10 @@ func (hub *NotifyHub) unsubscribeConn(conn *Connection) {
 
 func (hub *NotifyHub) removeNotification(notification *RemoveEvent) error {
 	return hub.Remove(notification)
+}
+
+func (hub *NotifyHub) HideNotification(notification *HideEvent) error {
+	return hub.Hide(notification)
 }
 
 func (hub *NotifyHub) find(orgn string) *OrganizationPool {

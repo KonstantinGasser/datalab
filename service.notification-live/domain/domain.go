@@ -15,6 +15,7 @@ type NotificationLogic interface {
 	OpenSocket(ctx context.Context, w http.ResponseWriter, r *http.Request) error
 	EventAppInvite(ctx context.Context, notification notifyhub.IncomingEvent)
 
+	HideNotification(ctx context.Context, notify notifyhub.HideEvent)
 	RemoveNotifcation(ctx context.Context, notify notifyhub.RemoveEvent)
 }
 

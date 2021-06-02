@@ -7,6 +7,9 @@
             </div>
             <div class="notify-table">
                 <div v-for="item in notifications" :key="item" class="notify-row">
+                    <!-- <div>
+                        <span @click="hideNotify(item)">hide</span>
+                    </div> -->
                     <div class="notify-item" v-if="item.event === 0">
                         <div>
                             <div class="emoji-line d-flex justify-start"><strong>You got an App Invite</strong>&nbsp;- go check it out 🚀</div>
@@ -17,12 +20,17 @@
                             </div>
                         </div>
                         <div class="actions">
-                            <div class="py-1">
-                                <button class="btn accept" @click="acceptInvite(item, item.value?.app_uuid)">Accept</button>
-                            </div>
+                            <div class="d-flex justify-between">
+                                <div class="">
+                                    <button class="btn accept" @click="acceptInvite(item, item.value?.app_uuid)">Accept</button>
+                                </div>
 
-                            <div class="py-1">
-                                <button class="btn reject" @click="rejectInvite(item, item.value?.app_uuid)">Reject</button>
+                                <div class="">
+                                    <button class="btn reject" @click="rejectInvite(item, item.value?.app_uuid)">Reject</button>
+                                </div>
+                            </div>
+                            <div>
+                                <span @click="hideNotify(item)" class="hover">❌</span>
                             </div>
                         </div>
                     </div>
@@ -36,12 +44,17 @@
                             </div>
                         </div>
                         <div class="actions">
-                            <div class="py-1">
-                                <button class="btn accept" @click="acceptInvite(item, item.value?.app_uuid)">Accept</button>
-                            </div>
+                            <div class="d-flex justify-between col-gap-15">
+                                <div class="">
+                                    <button class="btn accept" @click="acceptInvite(item, item.value?.app_uuid)">Accept</button>
+                                </div>
 
-                            <div class="py-1">
-                                <button class="btn reject" @click="rejectInvite(item, item.value?.app_uuid)">Reject</button>
+                                <div class="">
+                                    <button class="btn reject" @click="rejectInvite(item, item.value?.app_uuid)">Reject</button>
+                                </div>
+                            </div>
+                            <div class="d-flex align-center">
+                                <span @click="hideNotify(item)" class="hover">❌</span>
                             </div>
                         </div>
                     </div>  
@@ -53,11 +66,13 @@
 
 <script>
 import axios from "axios";
+import jwt_decode from "jwt-decode";
 
 export default {
   name: 'NotificationCenter',
   data() {
     return {
+        loggedInUser: null,
         notifies: [],
     };
   },
@@ -67,6 +82,9 @@ export default {
       notifications() {
           return this.$store.state.notifications;
       },
+  },
+  created() {
+      this.loggedInUser = jwt_decode(localStorage.getItem("token"));
   },
   methods: {
       async acceptInvite(item, app_uuid) {
@@ -81,11 +99,30 @@ export default {
             }
             const resp = await axios.post("http://localhost:8080/api/v1/app/invite/accept", payload, options);
             if (resp.status != 200) {
+                this.$moshaToast(resp.data.msg, {type: 'danger',position: 'top-center', timeout: 3000})
+                return
+            }
+        //     localStorage.setItem("token", resp.data.token)
+            this.$moshaToast(resp.data, {type: 'success',position: 'top-center', timeout: 3000})
+            this.popNotification(item)
+      },
+      async hideNotify(item) {
+          let options = {
+                headers: {
+                    'Authorization': localStorage.getItem("token"),
+                }
+            };
+            const payload = {
+                user_uuid: this.loggedInUser.sub,
+                timestamp: item.timestamp,
+            }
+            const resp = await axios.post("http://localhost:8008/api/v1/datalab/hide/event", payload, options);
+            if (resp.status != 200) {
                 this.$toast.error("Could not send invite feedback");
                 return
             }
         //     localStorage.setItem("token", resp.data.token)
-            this.$toast.success("Cool! You can now see the App")
+            this.$moshaToast(resp.data, {type: 'success',position: 'top-center', timeout: 3000})
             this.popNotification(item)
       },
       rejectInvite(app_uuid) {
@@ -99,6 +136,13 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+
+.hover {
+    cursor: pointer;
+}
+.col-gap-15 {
+    column-gap: 15px;
+}
 .app-view {
     height: 100%;
 }
@@ -147,8 +191,8 @@ export default {
 }
 
 .actions {
-    display: grid;
-    align-content: space-around;
+    display: flex;
+    column-gap: 15px;
 }
 
 .actions .btn {

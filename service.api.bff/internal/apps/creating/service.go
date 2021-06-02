@@ -67,7 +67,7 @@ func (s service) CreateAppToken(ctx context.Context, r *apps.CreateAppTokenReque
 			AppToken: nil,
 		}
 	}
-	s.notifyLiveClient.EmitSendInvite(ctx, 1, client.MutationSyncApp, "", r.AuthedUser.Organization, map[string]interface{}{
+	s.notifyLiveClient.EmitSendEvent(ctx, 2, client.MutationSyncApp, "", r.AuthedUser.Organization, map[string]interface{}{
 		"app_uuid": r.AppUuid,
 		"sync":     true,
 	})

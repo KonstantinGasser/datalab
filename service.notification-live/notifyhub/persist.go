@@ -2,6 +2,7 @@ package notifyhub
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/KonstantinGasser/datalab/service.notification-live/config"
 	"github.com/sirupsen/logrus"
@@ -35,6 +36,7 @@ func (hub *NotifyHub) PersistInitRecord(conn *Connection) error {
 
 func (hub *NotifyHub) SaveEvent(userUuid string, event *IncomingEvent) {
 	var notification = Notification{
+		Hidden:    false,
 		Timestamp: event.Timestamp,
 		Mutation:  event.Mutation,
 		Event:     event.Event,
@@ -67,8 +69,52 @@ func (hub *NotifyHub) LookUpAndSend(userUuid string) {
 		logrus.Errorf("[notifyhub.LoopUpAndSend] could not fetch notifications: %v\n", err)
 		return
 	}
+	var tmp = make([]Notification, 0)
+	for _, item := range stored.Notifications {
+		if item.Hidden {
+			continue
+		}
+		tmp = append(tmp, item)
+	}
+	stored.Notifications = tmp
 	// send all messages to client
 	hub.batchNotify <- &stored
+}
+
+func (hub *NotifyHub) Hide(hideEvent *HideEvent) error {
+	filter := bson.D{
+		{
+			Key: "$and",
+			Value: bson.A{
+				bson.D{
+					{
+						Key:   "_id",
+						Value: hideEvent.UserUuid,
+					},
+				},
+				bson.D{
+					{
+						Key:   "notifications.timestamp",
+						Value: hideEvent.Timestamp,
+					},
+				},
+			},
+		},
+	}
+	fmt.Println(filter)
+	query := bson.D{
+		{
+			Key: "$set",
+			Value: bson.M{
+				"notifications.$.hidden": true,
+			},
+		},
+	}
+	_, err := hub.repo.UpdateOne(context.Background(), config.NofifyDB, config.NotifyCol, filter, query, false)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // Remove removes one notification form a user notification array

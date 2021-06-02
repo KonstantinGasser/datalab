@@ -47,6 +47,7 @@ type UserNotifications struct {
 // Message represents a message as it will be streamed
 // to the client socket
 type Notification struct {
+	Hidden    bool                   `bson:"hidden"`
 	Timestamp int64                  `json:"timestamp"`
 	Mutation  VueMutation            `json:"mutation" bson:"mutation"`
 	Event     MessageEvent           `json:"event" bson:"event"`
@@ -64,6 +65,11 @@ type IncomingEvent struct {
 	Mutation     VueMutation            `json:"mutation"`
 	Event        MessageEvent           `json:"event"`
 	Value        map[string]interface{} `json:"value"`
+}
+
+type HideEvent struct {
+	UserUuid  string `json:"user_uuid"`
+	Timestamp int64  `json:"timestamp"`
 }
 
 type RemoveEvent struct {
