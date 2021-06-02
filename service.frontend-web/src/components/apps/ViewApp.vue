@@ -23,7 +23,7 @@
                     <div  v-if="app_unsaved" class="unsaved d-flex align-center justify-center">
                         <div>Unsaved Changes</div>
                     </div>
-                    <div v-if="activeApp?.app?.uuid == sync_app?.uuid && sync_app?.sync === true" class="sync d-flex align-center justify-center" @click="syncAppChanges(activeApp?.app?.uuid)">
+                    <div v-if="activeApp?.app?.uuid === sync_app?.uuid && sync_app?.sync" class="sync d-flex align-center justify-center" @click="syncAppChanges(activeApp?.app?.uuid)">
                         <div>sync data</div>
                     </div>
                 </h1>
@@ -131,7 +131,7 @@
                         'Authorization': localStorage.getItem("token"),
                     }
                 };
-                const resp = await axios.get("http://localhost:8080/api/v1/app/all", options)
+                const resp = await axios.get("http://192.168.0.177:8080/api/v1/app/all", options)
                 if (resp.status != 200) {
                     this.$toast.error(resp.data);
                 }
@@ -145,7 +145,7 @@
                 };
                 let resp = {}
                 try {
-                    resp = await axios.get("http://localhost:8080/api/v1/app?app="+uuid, options)
+                    resp = await axios.get("http://192.168.0.177:8080/api/v1/app?app="+uuid, options)
                     if (resp.status != 200) {
                         this.$toast.error(resp.data);
                     }

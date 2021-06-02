@@ -97,7 +97,7 @@ export default {
                 app_uuid: app_uuid,
                 event_timestamp: item.timestamp,
             }
-            const resp = await axios.post("http://localhost:8080/api/v1/app/invite/accept", payload, options);
+            const resp = await axios.post("http://192.168.0.177:8080/api/v1/app/invite/accept", payload, options);
             if (resp.status != 200) {
                 this.$moshaToast(resp.data.msg, {type: 'danger',position: 'top-center', timeout: 3000})
                 return
@@ -116,7 +116,7 @@ export default {
                 user_uuid: this.loggedInUser.sub,
                 timestamp: item.timestamp,
             }
-            const resp = await axios.post("http://localhost:8008/api/v1/datalab/hide/event", payload, options);
+            const resp = await axios.post("http://192.168.0.177:8008/api/v1/datalab/hide/event", payload, options);
             if (resp.status != 200) {
                 this.$toast.error("Could not send invite feedback");
                 return

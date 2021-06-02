@@ -77,7 +77,7 @@ export default {
         const payload = {
             app_uuid: this.$props.app_uuid
         }
-        const resp = await axios.post("http://localhost:8080/api/v1/app/member/invitable", payload, options);
+        const resp = await axios.post("http://192.168.0.177:8080/api/v1/app/member/invitable", payload, options);
         if (resp.status != 200) {
             this.$moshaToast(resp.data, {type: 'danger',position: 'top-center', timeout: 3000})
             return;
@@ -98,7 +98,7 @@ export default {
                 app_uuid: this.$props.app_uuid,
                 invited_uuid: user.uuid,
             }
-            const resp = await axios.post("http://localhost:8080/api/v1/app/invite", payload, options);
+            const resp = await axios.post("http://192.168.0.177:8080/api/v1/app/invite", payload, options);
             if (resp.status === 200) {
                 this.$moshaToast(resp.data.msg, {type: 'success',position: 'top-center', timeout: 3000})
                 this.inTeam.push(user.uuid)
@@ -119,7 +119,7 @@ export default {
                 user_uuid: user.uuid,
             }
             try {
-                const resp = await axios.post("http://localhost:8080/api/v1/app/invite/reminder", payload, options);
+                const resp = await axios.post("http://192.168.0.177:8080/api/v1/app/invite/reminder", payload, options);
             if (resp.status === 200) {
                 this.$moshaToast(resp.data.msg, {type: 'success',position: 'top-center', timeout: 3000})
                 return
