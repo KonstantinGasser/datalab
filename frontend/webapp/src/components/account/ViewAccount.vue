@@ -97,7 +97,7 @@
                     }
                 };
                 
-                const resp = await axios.post("http://192.168.178.103:8080/api/v1/user/profile/update", {
+                const resp = await axios.post("http://192.168.0.177:8080/api/v1/user/profile/update", {
                     first_name: this.user.first_name,
                     last_name: this.user.last_name,
                     orgn_position: this.user.orgn_position,
@@ -118,7 +118,7 @@
                 };
 
                 let uuid = this.getToken().uuid;
-                axios.get("http://192.168.178.103:8080/api/v1/user/profile", options).then(resp => {
+                axios.get("http://192.168.0.177:8080/api/v1/user/profile", options).then(resp => {
                     console.log(resp);
                     this.user = resp.data.user;
                     console.log(this.user);

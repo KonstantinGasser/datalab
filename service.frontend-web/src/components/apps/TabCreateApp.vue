@@ -73,19 +73,19 @@
                 
                 let formValid = true;
                 if (this.appURL === null || this.appURL === '') {
-                    this.$toast.error('App URL is required');
+                    this.$moshaToast('App URL is required', {type: 'danger',position: 'top-center', timeout: 3000})
                     formValid = false;
                 }
                 if (!this.validURL(this.appURL)) {
-                    this.$toast.error('Mhm does not look like an URL does it ?');
+                    this.$moshaToast('Mhm does not look like an URL does it ?', {type: 'danger',position: 'top-center', timeout: 3000})
                     formValid = false;
                 }
                 if (this.appName === null || this.appName === '') {
-                    this.$toast.error('App Name is required');
+                    this.$moshaToast('App Name is required', {type: 'danger',position: 'top-center', timeout: 3000})
                     formValid = false;
                 }
                 if (this.appDesc === null || this.appDesc === '') {
-                    this.$toast.error('App Description is required');
+                    this.$moshaToast('App Description is required', {type: 'danger',position: 'top-center', timeout: 3000})
                     formValid = false;
                 }
                 
@@ -96,16 +96,16 @@
                             'Authorization': localStorage.getItem("token"),
                         }
                     };
-                    await axios.post("http://192.168.178.103:8080/api/v1/app/create", {
+                    await axios.post("http://192.168.0.177:8080/api/v1/app/create", {
                             app_name: this.appName,
                             app_desc: this.appDesc,
                             app_url: this.appURL,
                         }, options
                     ).then((resp) => {
-                        this.$toast.success("App " + this.appName + " has been created");
+                        this.$moshaToast("App " + this.appName + " has been created", {type: 'success',position: 'top-center', timeout: 3000})
                         this.$emit("createdApp", {"type": "show_app", "app_uuid": resp.data.uuid});
                     }).catch(err => {
-                        this.$toast.error(err.response.data);
+                        this.$moshaToast(err.response?.data?.msg, {type: 'danger',position: 'top-center', timeout: 3000})
                         return;
                     });
                 }

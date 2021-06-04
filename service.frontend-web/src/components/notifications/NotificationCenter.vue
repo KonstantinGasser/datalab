@@ -20,7 +20,7 @@
                             </div>
                         </div>
                         <div class="actions">
-                            <div class="d-flex justify-between">
+                            <div class="d-flex justify-between col-gap-15">
                                 <div class="">
                                     <button class="btn accept" @click="acceptInvite(item, item.value?.app_uuid)">Accept</button>
                                 </div>
@@ -29,7 +29,7 @@
                                     <button class="btn reject" @click="rejectInvite(item, item.value?.app_uuid)">Reject</button>
                                 </div>
                             </div>
-                            <div>
+                            <div class="d-flex align-center">
                                 <span @click="hideNotify(item)" class="hover">❌</span>
                             </div>
                         </div>
@@ -97,13 +97,13 @@ export default {
                 app_uuid: app_uuid,
                 event_timestamp: item.timestamp,
             }
-            const resp = await axios.post("http://192.168.178.103:8080/api/v1/app/invite/accept", payload, options);
+            const resp = await axios.post("http://192.168.0.177:8080/api/v1/app/invite/accept", payload, options);
             if (resp.status != 200) {
                 this.$moshaToast(resp.data.msg, {type: 'danger',position: 'top-center', timeout: 3000})
                 return
             }
         //     localStorage.setItem("token", resp.data.token)
-            this.$moshaToast(resp.data, {type: 'success',position: 'top-center', timeout: 3000})
+            this.$moshaToast(resp.data?.msg, {type: 'success',position: 'top-center', timeout: 3000})
             this.popNotification(item)
       },
       async hideNotify(item) {
@@ -116,13 +116,12 @@ export default {
                 user_uuid: this.loggedInUser.sub,
                 timestamp: item.timestamp,
             }
-            const resp = await axios.post("http://192.168.178.103:8008/api/v1/datalab/hide/event", payload, options);
+            const resp = await axios.post("http://192.168.0.177:8008/api/v1/datalab/hide/event", payload, options);
             if (resp.status != 200) {
-                this.$toast.error("Could not send invite feedback");
+                this.$moshaToast(resp.data?.msg, {type: 'danger',position: 'top-center', timeout: 3000})
                 return
             }
-        //     localStorage.setItem("token", resp.data.token)
-            this.$moshaToast(resp.data, {type: 'success',position: 'top-center', timeout: 3000})
+            this.$moshaToast(resp.data?.msg, {type: 'success',position: 'top-center', timeout: 3000})
             this.popNotification(item)
       },
       rejectInvite(app_uuid) {

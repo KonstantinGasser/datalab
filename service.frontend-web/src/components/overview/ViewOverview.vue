@@ -58,7 +58,7 @@ export default {
     //     const payload = {
     //         app_uuid: this.$props.app_uuid
     //     }
-    //     const resp = await axios.post("http://192.168.178.103:8080/api/v1/app/member/invitable", payload, options);
+    //     const resp = await axios.post("http://192.168.0.177:8080/api/v1/app/member/invitable", payload, options);
     //     if (resp.status != 200) {
     //         this.$moshaToast(resp.data, {type: 'danger',position: 'top-center', timeout: 3000})
     //         return;

@@ -54,6 +54,9 @@ body {
 h2, h1 {
   color: var(--h-color); 
 }
+h4 {
+    color: var(--sub-bug);
+}
 a {
   text-decoration: underline;
   background: linear-gradient(135deg, #50e3c2 0%,#10d574 100%);
@@ -205,7 +208,7 @@ input[type="submit"]:hover {
 .avatar {
   border-radius: 50%;
   border: 2px solid var(--sub-border);
-  background: var(--sub-border);
+  background: #30363D/*var(--sub-border)*/;
 }
 .avatar img {
   object-fit: contain;

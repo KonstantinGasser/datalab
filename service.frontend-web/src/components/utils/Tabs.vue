@@ -42,10 +42,14 @@ hr {
     margin: 3px 0;
 }
 .tab-line {
-  display: flex;
+    display: grid;
+    grid-auto-flow: column;
+    column-gap: 5px;
+    justify-content: flex-start;
+  /* display: flex;
   justify-content: flex-start;
   align-items: center;
-  grid-column-gap: 5px;
+  grid-column-gap: 5px; */
 }
 .tab {
     background: var(--tab-bg);
@@ -53,7 +57,8 @@ hr {
     font-weight: bolder;
     border-radius: 8px;
     padding: 5px 10px;
-    border: 1px solid var(--tab-bg);
+    border: 1px solid var(--sub-border);
+    width: max-content;
 }
 .tab:hover {
     cursor: pointer;

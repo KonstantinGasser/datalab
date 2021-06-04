@@ -5,12 +5,12 @@
             <h2>Personal Information</h2>
             <div class="view_component">
                 <div class="d-flex justify-end align-center mt-2">
-                    <button class="btn btn-standard" @click="updateAccount()">Update Profile</button>
+                    <button class="btn btn-standard" @click="updateAccount()">Update</button>
                 </div>
                 <div class="form-row justfy-start">
                     <div class="form-group col d-grid justify-center align-center">
                         <div class="d-flex align-center justify-center">
-                            <div class="profile-img">
+                            <div class="avatar">
                                 <img class="circle-img big" :src="user.avatar" alt="">
                             </div>
                         </div>
@@ -35,7 +35,7 @@
                     </div> -->
                 </div>
             </div>
-
+            <br>
             <h2>Company Information</h2>
             <div class="view_component">
                 <div class="form-row">
@@ -49,12 +49,34 @@
                     </div>
                 </div>
             </div>
+            <br>
+            <h2>Colleagues</h2>
+            <br>
+            <div class="d-flex flex-wrap">
+                <div v-for="item in colleagues" :key="item.uuid">
+                    <div class="colleague d-grid align-center py-2 px-2">
+                        <div class="d-flex align-center justify-center">
+                            <div class="avatar medium">
+                                <img :src="item.avatar" alt="">
+                            </div>
+                        </div>
+                        <div class="d-grid align-center justify-center">
+                            <div class="d-flex align-center justify-center"><h2><strong>{{item.first_name}} {{item.last_name}}</strong></h2></div>
+                            <div class="d-flex align-center justify-center"><h4>@{{item.username}}</h4></div>
+                        </div>
+                        <div class="d-flex align-center justify-center">
+                            {{item.orgn_position}}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
 
 <script>
     import axios from 'axios';
+    import jwt_decode from 'jwt-decode';
 
     export default {
         name: 'ViewAccount',
@@ -62,7 +84,8 @@
         },
         data() {
             return {
-                // token: '',
+                loggedInUser: null,
+                colleagues: [],
                 user: {
                     first_name: null,
                     last_name: null,
@@ -71,6 +94,22 @@
                     username: null,
                 },
             };
+        },
+        created() {
+            this.loggedInUser = jwt_decode(localStorage.getItem("token"));
+
+            let options = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': localStorage.getItem("token"),
+                }
+            };
+            
+            axios.get("http://192.168.0.177:8080/api/v1/user/colleagues", options).then(resp => {
+                const tmp = resp?.data?.user;
+                this.colleagues = tmp.filter(item => item.uuid != this.loggedInUser.sub);
+            })
+            
         },
         mounted() {
             // this.getToken();
@@ -85,16 +124,16 @@
                     }
                 };
                 
-                const resp = await axios.post("http://192.168.178.103:8080/api/v1/user/profile/update", {
+                const resp = await axios.post("http://192.168.0.177:8080/api/v1/user/profile/update", {
                     firstname: this.user.first_name,
                     lastname: this.user.last_name,
                     position: this.user.orgn_position,
                 }, options)
                 if (resp.status !== 200) {
-                    this.$toast.error("Mhm sorry we could not update your account");
+                    this.$moshaToast(resp?.data?.msg, {type: 'danger',position: 'top-center', timeout: 3000})
                     return
                 }
-                this.$toast.success("Cool your account is updated!");
+                this.$moshaToast(resp?.data?.msg, {type: 'success',position: 'top-center', timeout: 3000})
                 // fetch updated user
                 this.fetchUpdate();
             },
@@ -105,7 +144,7 @@
                     }
                 };
 
-                axios.get("http://192.168.178.103:8080/api/v1/user/profile", options).then(resp => {
+                axios.get("http://192.168.0.177:8080/api/v1/user/profile", options).then(resp => {
                     this.user = resp.data.user;
                 }).catch(err => {
                     if (err.response.status === 401) {
@@ -119,6 +158,13 @@
 </script>
 
 <style scoped>
+h4 {
+    color: var(--btn-bg-hover);
+}
+.colleague {
+    width: 200px;
+}
+
 .tab-line {
     grid-column: 1;
     grid-row: 1;

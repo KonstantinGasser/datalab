@@ -33,7 +33,7 @@ createApp(App)
     .use(Toaster)
     .use(moshaToast)
     .use(VueMarkdownIt)
-    .use(VueNativeSock, "ws://192.168.178.103:8008/api/v1/datalab/live?token=", {
+    .use(VueNativeSock, "ws://192.168.0.177:8008/api/v1/datalab/live?token=", {
         store: store,
         format: "json",
         mutations: mutations,

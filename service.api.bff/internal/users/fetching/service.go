@@ -10,7 +10,7 @@ import (
 
 type Service interface {
 	FetchProfile(ctx context.Context, r *users.GetProfileRequest) *users.GetProfileResponse
-	// FetchColleagues(ctx context.Context, r *users.GetColleagueRequest) *users.GetColleagueResponse
+	FetchColleagues(ctx context.Context, r *users.GetColleagueRequest) *users.GetColleagueResponse
 	FetchInvitableUsers(ctx context.Context, r *users.GetInvitableUsersRequest) *users.GetInvitableUsersResponse
 }
 
@@ -39,6 +39,24 @@ func (s service) FetchProfile(ctx context.Context, r *users.GetProfileRequest) *
 		Status: http.StatusOK,
 		Msg:    "User Profile",
 		User:   user,
+	}
+}
+
+func (s service) FetchColleagues(ctx context.Context, r *users.GetColleagueRequest) *users.GetColleagueResponse {
+
+	colleagues, err := s.userMetaClient.GetColleagues(ctx, r)
+	if err != nil {
+		return &users.GetColleagueResponse{
+			Status:     err.Code(),
+			Msg:        err.Info(),
+			Err:        err.Error(),
+			Colleagues: nil,
+		}
+	}
+	return &users.GetColleagueResponse{
+		Status:     http.StatusOK,
+		Msg:        "User Profile",
+		Colleagues: colleagues,
 	}
 }
 

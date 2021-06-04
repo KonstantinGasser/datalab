@@ -90,7 +90,11 @@ func main() {
 		server.WithCors,
 		server.WithAuth,
 	)
-
+	server.Register("/api/v1/user/colleagues", server.GetColleagues,
+		server.WithTracing,
+		server.WithCors,
+		server.WithAuth,
+	)
 	server.Register("/api/v1/app/create", server.CreateApp,
 		server.WithTracing,
 		server.WithCors,

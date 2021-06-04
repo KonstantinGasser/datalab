@@ -1,10 +1,8 @@
 <template>
     <div>
-        <!-- <div class="view_component">
-            already invited {{colleagues}}
-        </div> -->
+        <br>
         <div class="">
-            <h2>Invite Colleagues</h2>
+            <h1>Invite Colleagues</h1>
             <br>
             <div class="notify-table">
                 <div v-for="item in colleagues" :key="item.uuid" class="notify-row">
@@ -19,12 +17,6 @@
                             <h4>@{{item.username}}</h4>
                         </div>
                     </div>
-                    <!-- <div>
-                        <div class="emoji-line d-flex justify-start">👉<strong>&nbsp;{{item.first_name}} {{item.last_name}} (@{{item.username}})</strong></div>
-                        <div  class="notify-title">
-                            Position <strong>{{item.position}}</strong>
-                        </div>
-                    </div> -->
                     <div class="actions">            
                         <div class="px-1"> 
                             <button v-if="item.status === 0 && loggedInUser.sub === app_owner?.uuid" class="btn accept" @click="invite(item)">invite</button>
@@ -88,7 +80,7 @@ export default {
         const payload = {
             app_uuid: this.$props.app_uuid
         }
-        const resp = await axios.post("http://192.168.178.103:8080/api/v1/app/member/invitable", payload, options);
+        const resp = await axios.post("http://192.168.0.177:8080/api/v1/app/member/invitable", payload, options);
         if (resp.status != 200) {
             this.$moshaToast(resp.data, {type: 'danger',position: 'top-center', timeout: 3000})
             return;
@@ -109,7 +101,7 @@ export default {
                 app_uuid: this.$props.app_uuid,
                 invited_uuid: user.uuid,
             }
-            const resp = await axios.post("http://192.168.178.103:8080/api/v1/app/invite", payload, options);
+            const resp = await axios.post("http://192.168.0.177:8080/api/v1/app/invite", payload, options);
             if (resp.status === 200) {
                 this.$moshaToast(resp.data.msg, {type: 'success',position: 'top-center', timeout: 3000})
                 this.inTeam.push(user.uuid)
@@ -130,7 +122,7 @@ export default {
                 user_uuid: user.uuid,
             }
             try {
-                const resp = await axios.post("http://192.168.178.103:8080/api/v1/app/invite/reminder", payload, options);
+                const resp = await axios.post("http://192.168.0.177:8080/api/v1/app/invite/reminder", payload, options);
             if (resp.status === 200) {
                 this.$moshaToast(resp.data.msg, {type: 'success',position: 'top-center', timeout: 3000})
                 return
@@ -147,7 +139,7 @@ export default {
 
 <style scoped>
 h4 {
-    color: var(--sub-bug);
+    color: var(--btn-bg-hover);
 }
 .t-row {
     padding: 10px 15px;

@@ -8,4 +8,4 @@ EXPOSE 8006
 
 ENTRYPOINT ["/usr/bin/service", \
                 "-host=:8006", \
-                "-db-srv=mongodb://apptokenissuer:secure@192.168.178.103:27020"]
+                "-db-srv=mongodb://apptokenissuer:secure@192.168.0.177:27020"]

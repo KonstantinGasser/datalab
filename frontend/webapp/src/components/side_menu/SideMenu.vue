@@ -2,7 +2,7 @@
   <div class="side_menu">
       <div class="menu">
         <!-- <h4>Analysis Functions</h4> -->
-        <!-- <a href="http://192.168.178.103:8080">Checkout referrer link</a> -->
+        <!-- <a href="http://192.168.0.177:8080">Checkout referrer link</a> -->
         <MenuItem @click="setActive('view_dashboard')" :tabName="'view_dashboard'" :item="'Dashboard'" />
         <MenuItem @click="setActive('view_queries')" :tabName="'view_queries'" :item="'Queries'" />
         <MenuItem @click="setActive('view_app')" :tabName="'view_app'" :item="'Apps'" />

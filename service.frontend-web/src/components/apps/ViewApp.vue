@@ -1,9 +1,9 @@
 <template>
     <div class="view_app">
         <div class="app_list">
-            <div class="add_new_app d-flex justify-center align-center">
+            <!-- <div class="add_new_app d-flex justify-center align-center">
                 <button @click="modeCreateApp()" class="btn btn-standard">Create App <span class="">🙌</span></button>
-            </div>
+            </div> -->
             <div class="app_name_list">
                 <p class="info-text" v-if="apps == null || apps.length === 0">
                     Mhm looks like you do not have any apps yet - <a @click="modeCreateApp()">go create one!</a>
@@ -11,6 +11,10 @@
                 <div :class="{selected: selectedApp===app.uuid}" class="app-name d-flex justify-start align-center" v-for="app in apps" :key="app.uuid" @click="loadApp(app.uuid)">
                     <span class="dots medium-font" >{{ app.name }}</span>
                 </div>
+                <button @click="modeCreateApp()" class="btn btn-standard w-100">Create App <span class="">🙌</span></button>
+                <!-- <div class="app-name d-flex justify-start align-center">
+                    <button @click="modeCreateApp()" class="btn btn-standard">Create App <span class="">🙌</span></button>
+                </div> -->
             </div>
         </div>
         <div>
@@ -29,8 +33,8 @@
                     </div>
                 </h1>
                 <div class="desc_test">{{activeApp.app?.description}}</div>
-                <hr>
-                <Tabs class="my-2" ref="Tabs" :update="activeTab" :initTab="activeTab" :tabs="tabs" @tabChange="tabChange"/>
+                <!-- <hr> -->
+                <Tabs class="mt-3 mb-4" ref="Tabs" :update="activeTab" :initTab="activeTab" :tabs="tabs" @tabChange="tabChange"/>
                 <General v-if="activeTab === 'Overview'" :app_token="activeApp?.token" :app_uuid="activeApp?.app?.uuid" @drop_app="drop_app" />
                 <Config v-if="activeTab == 'Configuration'" @appchange="markUnsaved" :app_config="activeApp?.config" :app_uuid="activeApp?.app?.uuid" @setdoc="setdoc"/>
                 <InviteMember v-if="activeTab == 'Invite'" :app_uuid="activeApp?.app?.uuid" :member="activeApp?.app?.member" :app_owner="activeApp?.owner" :app_name="activeApp?.app?.name"/>
@@ -148,7 +152,7 @@
                         'Authorization': localStorage.getItem("token"),
                     }
                 };
-                const resp = await axios.get("http://192.168.178.103:8080/api/v1/app/all", options)
+                const resp = await axios.get("http://192.168.0.177:8080/api/v1/app/all", options)
                 if (resp.status != 200) {
                     this.$toast.error(resp.data);
                 }
@@ -163,7 +167,7 @@
                 };
                 let resp = {}
                 try {
-                    resp = await axios.get("http://192.168.178.103:8080/api/v1/app?app="+uuid, options)
+                    resp = await axios.get("http://192.168.0.177:8080/api/v1/app?app="+uuid, options)
                     if (resp.status != 200) {
                         this.$toast.error(resp.data);
                     }

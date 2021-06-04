@@ -106,7 +106,7 @@ export default {
   },
   methods: {
     login() {
-      axios.post('http://192.168.178.103:8080/api/v1/user/login', {
+      axios.post('http://192.168.0.177:8080/api/v1/user/login', {
         username: this.input.username,
         password: this.input.password,
       }).then(resp => {
@@ -135,7 +135,7 @@ export default {
         lastname: this.signup.last_name,
         position: this.signup.orgn_position,
       };
-      axios.post('http://192.168.178.103:8080/api/v1/user/register', payload).then((resp) => {
+      axios.post('http://192.168.0.177:8080/api/v1/user/register', payload).then((resp) => {
         if (resp.status === 200) {
           this.hasRegistered = !this.hasRegistered;
           this.$toast.success("Your account has been created");
