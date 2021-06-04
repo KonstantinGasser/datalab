@@ -21,10 +21,14 @@ const (
 	// indicates that the App has changed and can be synced
 	EventSyncApp
 
+	EventIsOnline
+	EventIsOffline
+
 	// MutationAppInvite maps to the corresponding Vue function
 	// when the client socket receives a new message
 	MutationAppInvite  VueMutation = "APP_INVITE"
 	MutationLoadFromDB VueMutation = "INIT_LOAD"
+	MutationIsOnline   VueMutation = "IS_ONLINE"
 )
 
 var upgrader = websocket.Upgrader{

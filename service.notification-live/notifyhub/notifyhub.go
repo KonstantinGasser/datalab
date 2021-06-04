@@ -210,7 +210,15 @@ func (hub *NotifyHub) subscribeConn(conn *Connection) error {
 			return err
 		}
 	}
-
+	// inform colleagues about online user
+	go hub.Organizations[conn.Organization].BroadcastOnline(&IncomingEvent{
+		UserUuid:     conn.Uuid,
+		Organization: conn.Organization,
+		Timestamp:    time.Now().Unix(),
+		Mutation:     MutationIsOnline,
+		Event:        EventIsOnline,
+		Value:        nil,
+	})
 	// send persisted notification in background
 	go hub.LookUpAndSend(conn.Uuid)
 	return nil
@@ -236,6 +244,15 @@ func (hub *NotifyHub) unsubscribeConn(conn *Connection) {
 	if orgnPool.Length() == 0 {
 		delete(hub.Organizations, conn.Organization)
 	}
+	// inform colleagues about online user
+	go hub.Organizations[conn.Organization].BroadcastOnline(&IncomingEvent{
+		UserUuid:     conn.Uuid,
+		Organization: conn.Organization,
+		Timestamp:    time.Now().Unix(),
+		Mutation:     MutationIsOnline,
+		Event:        EventIsOffline,
+		Value:        nil,
+	})
 }
 
 func (hub *NotifyHub) removeNotification(notification *RemoveEvent) error {

@@ -39,6 +39,19 @@ func (pool *OrganizationPool) Broadcast(msg *IncomingEvent) error {
 	return nil
 }
 
+func (pool *OrganizationPool) BroadcastOnline(msg *IncomingEvent) error {
+	for _, conn := range *pool {
+		if conn.Uuid == msg.UserUuid {
+			continue
+		}
+		err := conn.Conn.WriteJSON(msg)
+		if err != nil {
+			return ErrWriteToConn
+		}
+	}
+	return nil
+}
+
 // Send iterate over the pool and sends the message to the connection
 // which uuid matches with the receiver ones. If not receiver is found
 // Send returns an ErrNoRecevierFound
