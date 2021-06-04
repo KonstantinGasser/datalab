@@ -4,8 +4,8 @@ import (
 	cfgsvc "github.com/KonstantinGasser/datalab/service.app.config.agent/cmd/grpcserver/proto"
 	appsvc "github.com/KonstantinGasser/datalab/service.app.meta.agent/cmd/grpcserver/proto"
 	apptokensvc "github.com/KonstantinGasser/datalab/service.app.token.agent/cmd/grpcserver/proto"
-	usersvc "github.com/KonstantinGasser/datalab/service.user-administer/proto"
 	userauthsvc "github.com/KonstantinGasser/datalab/service.user.auth.agent/cmd/grpcserver/proto"
+	usersvc "github.com/KonstantinGasser/datalab/service.user.meta.agent/cmd/grpcserver/proto"
 	"google.golang.org/grpc"
 )
 
@@ -35,12 +35,12 @@ func CreateAppTokenIssuerClient(listenon string) (apptokensvc.AppTokenClient, er
 	return client, nil
 }
 
-func CreateUserAdminClient(listenon string) (usersvc.UserAdministerClient, error) {
+func CreateUserAdminClient(listenon string) (usersvc.UserMetaClient, error) {
 	conn, err := grpc.Dial(listenon, grpc.WithInsecure())
 	if err != nil {
 		return nil, err
 	}
-	client := usersvc.NewUserAdministerClient(conn)
+	client := usersvc.NewUserMetaClient(conn)
 	return client, nil
 }
 func CreateUserAuthClient(listenon string) (userauthsvc.UserAuthenticationClient, error) {

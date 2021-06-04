@@ -3,9 +3,10 @@
     
     <SideMenu class="app-menu" @setActive="showView"/>
     <div class="app-header"></div>
-    <ViewApp v-if="active_view === 'view_app'" class="app-view" />
-    <ViewAccount v-if="active_view === 'view_account'" class="app-view" />
-    <ViewCharts v-if="active_view === 'view_dashboard'" class="app-view" />
+    <ViewApp v-if="active_view === 'view_app'" class="app-view" :use_uuid="selected_uuid"/>
+    <ViewAccount v-if="active_view === 'view_account'" class="app-view"/>
+    <ViewOverview v-if="active_view === 'view_dashboard'" class="app-view" @openApp="openApp"/>
+    <!-- <ViewCharts v-if="active_view === 'view_dashboard'" class="app-view" /> -->
     <DocClient v-if="active_view === 'view_docs'" class="app-view" />
     <NotificationCenter v-if="active_view === 'view_notify'" class="app-view" />
   </div>
@@ -17,6 +18,7 @@ import SideMenu from '@/components/side_menu/SideMenu.vue';
 import CompanyThumb from '@/components/company/CompanyThumb.vue';
 import ViewApp from '@/components/apps/ViewApp.vue';
 import ViewAccount from '@/components/account/ViewAccount.vue';
+import ViewOverview from '@/components/overview/ViewOverview';
 import ViewCharts from '@/components/charts/ViewCharts';
 import DocClient from '@/components/docs/DocClient';
 import NotificationCenter from '@/components/notifications/NotificationCenter';
@@ -25,12 +27,14 @@ export default {
   name: 'Dashboard',
   data() {
     return {
+      selected_uuid: null,
       active_view: 'view_app',
     };
   },
   components: {
     CompanyThumb,
     ViewApp,
+    ViewOverview,
     ViewCharts,
     ViewAccount,
     NotificationCenter,
@@ -38,7 +42,7 @@ export default {
     SideMenu,
   },
   created() {
-    const url = "ws://192.168.0.177:8008/api/v1/datalab/live?token="+ localStorage.getItem("token");
+    const url = "ws://192.168.178.103:8008/api/v1/datalab/live?token="+ localStorage.getItem("token");
     this.$connect(url);
   },
   methods: {
@@ -51,6 +55,12 @@ export default {
       // serve view
       this.active_view = view;
     },
+    openApp(uuid) {
+      
+      this.selected_uuid = uuid;
+      console.log("hello world ", this.selected_uuid);
+      this.active_view = "view_app";
+    }
   },
 };
 </script>

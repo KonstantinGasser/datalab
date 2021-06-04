@@ -37,17 +37,6 @@ message UpdateResponse {
     string msg = 2;
 }
 
-// message GetListRequest {
-//     string tracing_ID = 1;
-//     string organization = 2;
-//     repeated string uuid_list = 3;
-// }
-// message GetListResponse {
-//     int32 status_code = 1;
-//     string msg = 2;
-//     repeated common.UserInfo user_list = 3;
-// }
-
 
 message GetRequest {
     string tracing_ID = 1;

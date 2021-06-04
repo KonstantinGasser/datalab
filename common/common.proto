@@ -55,7 +55,7 @@ message UserInfo {
     string last_name = 4;
     string orgn_domain = 5;
     string orgn_position = 6;
-    string profile_img_url = 7;
+    string avatar = 7;
 }
 
 message UserMetaInfo {

@@ -81,4 +81,5 @@ type InvitableUser struct {
 	Organization string `json:"orgn"`
 	Position     string `json:"position"`
 	Status       int32  `json:"status"`
+	Avatar       string `bson:"avatar"`
 }

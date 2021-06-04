@@ -42,24 +42,6 @@ func (s service) FetchProfile(ctx context.Context, r *users.GetProfileRequest) *
 	}
 }
 
-// func (s service) FetchColleagues(ctx context.Context, r *users.GetColleagueRequest) *users.GetColleagueResponse {
-
-// 	colleagues, err := s.userMetaClient.GetColleagues(ctx, r)
-// 	if err != nil {
-// 		return &users.GetColleagueResponse{
-// 			Status:     err.Code(),
-// 			Msg:        err.Info(),
-// 			Err:        err.Error(),
-// 			Colleagues: nil,
-// 		}
-// 	}
-// 	return &users.GetColleagueResponse{
-// 		Status:     http.StatusOK,
-// 		Msg:        "Colleagues",
-// 		Colleagues: colleagues,
-// 	}
-// }
-
 func (s service) FetchInvitableUsers(ctx context.Context, r *users.GetInvitableUsersRequest) *users.GetInvitableUsersResponse {
 
 	// get all users from the same organization
@@ -86,6 +68,7 @@ func (s service) FetchInvitableUsers(ctx context.Context, r *users.GetInvitableU
 			Organization: item.OrgnDomain,
 			Position:     item.OrgnPosition,
 			Status:       0, // indicate no connection to app yet
+			Avatar:       item.Avatar,
 		}
 		for _, member := range r.AppMember {
 			if member.Uuid == user.Uuid {

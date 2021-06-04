@@ -32,6 +32,7 @@ func (server UserMetaServer) GetColleagues(ctx context.Context, in *proto.GetCol
 			LastName:     user.LastName,
 			OrgnDomain:   user.Organization,
 			OrgnPosition: user.Position,
+			Avatar:       user.Avatar,
 		}
 	}
 	return &proto.GetColleaguesResponse{

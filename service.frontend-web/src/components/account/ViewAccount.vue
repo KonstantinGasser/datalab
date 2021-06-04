@@ -11,13 +11,11 @@
                     <div class="form-group col d-grid justify-center align-center">
                         <div class="d-flex align-center justify-center">
                             <div class="profile-img">
-                                <img class="circle-img big" :src="user.profile_img_url" alt="">
+                                <img class="circle-img big" :src="user.avatar" alt="">
                             </div>
                         </div>
                         <div class="flex-wrap d-flex align-center justify-center">
                             <span class="text-capture big">@{{user.username}}</span>
-                            <!-- <label for="">Username</label>
-                            <input class="form-control" type="text" name="" id="username" readonly :placeholder="'@'+user.username"> -->
                         </div>
                     </div>
                     <div class="form-group col">
@@ -87,7 +85,7 @@
                     }
                 };
                 
-                const resp = await axios.post("http://192.168.0.177:8080/api/v1/user/profile/update", {
+                const resp = await axios.post("http://192.168.178.103:8080/api/v1/user/profile/update", {
                     firstname: this.user.first_name,
                     lastname: this.user.last_name,
                     position: this.user.orgn_position,
@@ -107,7 +105,7 @@
                     }
                 };
 
-                axios.get("http://192.168.0.177:8080/api/v1/user/profile", options).then(resp => {
+                axios.get("http://192.168.178.103:8080/api/v1/user/profile", options).then(resp => {
                     this.user = resp.data.user;
                 }).catch(err => {
                     if (err.response.status === 401) {

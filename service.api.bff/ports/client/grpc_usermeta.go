@@ -33,13 +33,12 @@ func (client ClientUserMeta) CreateUserProfile(ctx context.Context, r *users.Reg
 	resp, err := client.Conn.Create(ctx, &grpcUserMeta.CreateRequest{
 		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
 		User: &common.UserInfo{
-			Uuid:          r.UserUuid,
-			Username:      r.Username,
-			FirstName:     r.FirstName,
-			LastName:      r.LastName,
-			OrgnDomain:    r.Organization,
-			OrgnPosition:  r.Position,
-			ProfileImgUrl: "",
+			Uuid:         r.UserUuid,
+			Username:     r.Username,
+			FirstName:    r.FirstName,
+			LastName:     r.LastName,
+			OrgnDomain:   r.Organization,
+			OrgnPosition: r.Position,
 		},
 	})
 	if err != nil {
@@ -61,10 +60,9 @@ func (client ClientUserMeta) UpdateUserProfile(ctx context.Context, r *users.Upd
 		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
 		CallerUuid: r.UserUuid,
 		User: &grpcUserMeta.UpdatableUser{
-			FirstName:     r.FirstName,
-			LastName:      r.LastName,
-			OrgnPosition:  r.Position,
-			ProfileImgUrl: "",
+			FirstName:    r.FirstName,
+			LastName:     r.LastName,
+			OrgnPosition: r.Position,
 		},
 	})
 	if err != nil {

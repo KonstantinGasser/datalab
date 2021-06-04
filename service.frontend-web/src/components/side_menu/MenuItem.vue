@@ -3,7 +3,7 @@
         <div class="menu_text">
             {{ item }}
         </div>
-        <span v-if="bubble && notifications > 0" class="bubble"><i class="icon icon-bell"></i></span>
+        <span v-if="bubble && notifications > 0" class="bubble"><i class=""></i></span>
     </div>
 </template>
 
@@ -82,7 +82,7 @@ export default {
     width: 25px;
     height: 25px;
     position: absolute;
-    margin-left: 125px;
+    margin-left: 118px;
     margin-top: -25px;
     display: flex;
     align-items: center;

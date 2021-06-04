@@ -2,14 +2,13 @@
   <div class="side_menu">
       <div class="menu">
         <!-- <h4>Analysis Functions</h4> -->
-        <!-- <a href="http://192.168.0.177:8080">Checkout referrer link</a> -->
-        <MenuItem @click="setActive('view_dashboard')" :tabName="'view_dashboard'" :item="'Dashboard'" />
+        <!-- <a href="http://192.168.178.103:8080">Checkout referrer link</a> -->
+        <!-- <MenuItem @click="setActive('view_dashboard')" :tabName="'view_dashboard'" :item="'Dashboard'" /> -->
         <MenuItem @click="setActive('view_queries')" :tabName="'view_queries'" :item="'Queries'" />
         <MenuItem @click="setActive('view_app')" :tabName="'view_app'" :item="'Apps'" />
         <MenuItem @click="setActive('view_docs')" :tabName="'view_docs'" :item="'Docs'" />
         <MenuItem @click="setActive('view_account')" :tabName="'view_account'" :item="'Account'" />
         <MenuItem @click="setActive('view_notify')" :tabName="'view_notify'" :item="'Notification'" :bubble="true"/>
-        <!-- <MenuItem :tabName="'this_is_me'" :thisIsMe="true"/> -->
 
         <!-- <MenuItem @click="setActive('view_settings')" :tabName="'view_settings'" :item="'Settings'" /> -->
       </div>

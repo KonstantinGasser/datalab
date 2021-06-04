@@ -16,7 +16,8 @@
         <div>
             <TabCreateApp v-if="isInCreateMode" @createdApp="updateState" :orgn_domain="activeApp.owner?.orgn_domain" />
             <div v-if="!isInCreateMode">
-                <h1 class="super-lg d-flex align-center">{{activeApp.owner?.orgn_domain}}/{{activeApp.app?.name}}
+                <h1 class="super-lg d-flex align-center">
+                    {{activeApp.owner?.orgn_domain}}/{{activeApp.app?.name}}
                     <div  v-if="!app_unsaved" class="saved d-flex align-center justify-center">
                         <div>Saved</div>
                     </div>
@@ -68,6 +69,12 @@
                 return this.isInCreateMode;
             },
         },
+        props: {
+            use_uuid: {
+                type: String,
+                default: null,
+            },
+        },
         data() {
             return {
                 loggedInUser: null,
@@ -91,20 +98,30 @@
         async created() {
             this.loggedInUser = jwt_decode(localStorage.getItem("token"));
             // fetch initial data of app list
+            
             const init_data = await this.getAppList();
             if (init_data.data.apps === undefined || init_data.data.apps === null || init_data.data.apps.length <= 0 || init_data.status != 200) {
                 this.apps = [];
                 this.isInCreateMode = true;
             }
             else {
-                this.apps = init_data.data.apps.reverse();
+                this.apps = init_data.data.apps;
                 const init_app = await this.getApp(this.apps[0].uuid);
+                // console.log("props type: ", this.$props.use_uuid === null)
+                // if (this.$props.use_uuid === undefined ||this.$props.use_uuid === null || this.$props.use_uuid !== "") {
+                //         console.log("props null")
+                //         init_app = await this.getApp(this.apps[0].uuid);
+                    
+                // } else {
+                //     console.log("ok then use this uuid???? ")
+                //     init_app = await this.getApp(this.$props.use_uuid);
+                // }
+
                 this.activeApp = init_app;
                 this.selectedApp = this.activeApp?.app?.uuid;
                 this.isInCreateMode = false;
             }    
         },
-        props: ['status'],
         methods: {
             async syncAppChanges(uuid){
                 const data = await this.getApp(uuid);
@@ -131,13 +148,14 @@
                         'Authorization': localStorage.getItem("token"),
                     }
                 };
-                const resp = await axios.get("http://192.168.0.177:8080/api/v1/app/all", options)
+                const resp = await axios.get("http://192.168.178.103:8080/api/v1/app/all", options)
                 if (resp.status != 200) {
                     this.$toast.error(resp.data);
                 }
                 return resp
             },
             async getApp(uuid) {
+                console.log("fetching for: ", uuid)
                 let options = {
                     headers: {
                         'Authorization': localStorage.getItem("token"),
@@ -145,7 +163,7 @@
                 };
                 let resp = {}
                 try {
-                    resp = await axios.get("http://192.168.0.177:8080/api/v1/app?app="+uuid, options)
+                    resp = await axios.get("http://192.168.178.103:8080/api/v1/app?app="+uuid, options)
                     if (resp.status != 200) {
                         this.$toast.error(resp.data);
                     }

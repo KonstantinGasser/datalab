@@ -15,8 +15,8 @@ import (
 
 func main() {
 	host := flag.String("host", ":8008", "address to run the server on")
-	userauthAddr := flag.String("token-srv", "192.168.0.177:8002", "address to connect to token-service")
-	dbAddr := flag.String("db-srv", "mongodb://notificationstorage:secure@192.168.0.177:27022", "address to connect to notification-database")
+	userauthAddr := flag.String("token-srv", "192.168.178.103:8002", "address to connect to token-service")
+	dbAddr := flag.String("db-srv", "mongodb://notificationstorage:secure@192.168.178.103:27022", "address to connect to notification-database")
 	flag.Parse()
 
 	// SIG chan to handle interruptions and so on...

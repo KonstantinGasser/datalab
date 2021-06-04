@@ -32,6 +32,7 @@ func (server UserMetaServer) Get(ctx context.Context, in *proto.GetRequest) (*pr
 			LastName:     user.LastName,
 			OrgnDomain:   user.Organization,
 			OrgnPosition: user.Position,
+			Avatar:       user.Avatar,
 		},
 	}, nil
 }
