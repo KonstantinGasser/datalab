@@ -208,7 +208,7 @@ input[type="submit"]:hover {
 .avatar {
   border-radius: 50%;
   border: 2px solid var(--sub-border);
-  background: #30363D/*var(--sub-border)*/;
+  background: var(--sub-border);
 }
 .avatar img {
   object-fit: contain;

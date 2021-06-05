@@ -56,7 +56,7 @@
                 <div v-for="item in colleagues" :key="item.uuid">
                     <div class="colleague d-grid align-center py-2 px-2">
                         <div class="d-flex align-center justify-center">
-                            <div class="avatar medium">
+                            <div class="avatar medium" :class="{'online': isOnline(item.uuid)}">
                                 <img :src="item.avatar" alt="">
                             </div>
                         </div>
@@ -112,10 +112,20 @@
             
         },
         mounted() {
-            // this.getToken();
             this.user = this.fetchUpdate();
         },
         methods: {
+            isOnline(uuid) {
+                if (this.$store.state.online === undefined) {
+                    return false
+                }
+                for (let i = 0; i < this.$store.state.online?.length; i++) {
+                    if (this.$store.state.online[i] === uuid) {
+                        return true
+                    }
+                }
+                return false
+            },
             async updateAccount() {
                 let options = {
                     headers: {
@@ -160,6 +170,9 @@
 <style scoped>
 h4 {
     color: var(--btn-bg-hover);
+}
+.online {
+    border: 2px solid var(--btn-bg-hover) !important;
 }
 .colleague {
     width: 200px;

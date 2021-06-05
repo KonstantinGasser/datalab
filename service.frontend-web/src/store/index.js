@@ -32,9 +32,13 @@ export default createStore({
     IS_ONLINE(state, event) {
       switch (event?.event) {
         case 3: // new user came online
-          state.online.push(event?.recevier_uuid)
+          console.log("Event: ",event)
+          state.online.push(event?.receiver_uuid)
+          console.log("State: ",state.online)
+          break;
         case 4: // user goes offline
-          state.online = state.online.filter(uuid => uuid != event?.recevier_uuid)
+          state.online = state.online.filter(uuid => uuid != event?.receiver_uuid)
+          break;
       }
       console.log("State: ",state.online)
     },
