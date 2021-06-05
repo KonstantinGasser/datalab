@@ -40,12 +40,31 @@ func (pool *OrganizationPool) Broadcast(msg *IncomingEvent) error {
 }
 
 func (pool *OrganizationPool) BroadcastOnline(msg *IncomingEvent) error {
+	// tell everyone how is online
+	var newConn *Connection
 	for _, conn := range *pool {
 		if conn.Uuid == msg.UserUuid {
+			newConn = conn
 			continue
 		}
 		err := conn.Conn.WriteJSON(msg)
 		if err != nil {
+			return ErrWriteToConn
+		}
+	}
+	// tell new connection how is online
+	if newConn == nil {
+		return nil
+	}
+	for _, conn := range *pool {
+		if err := newConn.Conn.WriteJSON(&IncomingEvent{
+			UserUuid:     conn.Uuid,
+			Organization: msg.Organization,
+			Timestamp:    msg.Timestamp,
+			Mutation:     msg.Mutation,
+			Event:        msg.Event,
+			Value:        nil,
+		}); err != nil {
 			return ErrWriteToConn
 		}
 	}
