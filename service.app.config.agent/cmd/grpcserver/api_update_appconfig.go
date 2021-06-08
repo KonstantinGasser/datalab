@@ -23,6 +23,7 @@ func (server AppConfigServer) Update(ctx context.Context, in *proto.UpdateReques
 				Id:         item.Id,
 				Name:       item.Name,
 				Transition: item.Transition,
+				Trigger:    int32(item.Trigger),
 			}
 		}
 		err = server.modifyService.UpdateFunnel(ctx, in.GetAppRefUuid(), in.GetAuthedUser(), stages)

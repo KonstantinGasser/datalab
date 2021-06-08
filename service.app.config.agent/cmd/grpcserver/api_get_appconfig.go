@@ -26,7 +26,7 @@ func (server AppConfigServer) Get(ctx context.Context, in *proto.GetRequest) (*p
 	// translate AppConfig struct to protobuf struct
 	var stages = make([]*common.Stage, len(appConfig.Funnel))
 	for i, item := range appConfig.Funnel {
-		stages[i] = &common.Stage{Id: item.Id, Name: item.Name, Transition: item.Transition}
+		stages[i] = &common.Stage{Id: item.Id, Name: item.Name, Transition: item.Transition, Trigger: item.Trigger}
 	}
 	var records = make([]*common.Record, len(appConfig.Campaign))
 	for i, item := range appConfig.Campaign {
@@ -40,6 +40,7 @@ func (server AppConfigServer) Get(ctx context.Context, in *proto.GetRequest) (*p
 		StatusCode: http.StatusOK,
 		Msg:        "App Config fetched",
 		Configs: &common.AppConfigurations{
+			Locked:   appConfig.Locked,
 			Funnel:   stages,
 			Campaign: records,
 			BtnTime:  btnDefs,

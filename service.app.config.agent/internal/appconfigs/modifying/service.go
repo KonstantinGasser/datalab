@@ -2,6 +2,7 @@ package modifying
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/KonstantinGasser/datalab/common"
@@ -14,6 +15,8 @@ type Service interface {
 	UpdateFunnel(ctx context.Context, appRefUuid string, authedUser *common.AuthedUser, stages []appconfigs.Stage) errors.Api
 	UpdateCampaign(ctx context.Context, appRefUuid string, authedUser *common.AuthedUser, records []appconfigs.Record) errors.Api
 	UpdateBtnTime(ctx context.Context, appRefUuid string, authedUser *common.AuthedUser, btnDefs []appconfigs.BtnDef) errors.Api
+
+	LockConfig(ctx context.Context, appRefUuid string, authedUser *common.AuthedUser) errors.Api
 }
 
 type service struct {
@@ -38,6 +41,11 @@ func (s *service) UpdateFunnel(ctx context.Context, appRefUuid string, authedUse
 		return errors.New(http.StatusInternalServerError,
 			err,
 			"Could not get App Config")
+	}
+	if storedAppConfig.Locked {
+		return errors.New(http.StatusUnauthorized,
+			fmt.Errorf("app is locked and cannot be changed"),
+			"App is locked and cannot be changed")
 	}
 	// check user permissions
 	if err := storedAppConfig.HasReadOrWrite(authedUser.Uuid, authedUser.ReadWriteApps...); err != nil {
@@ -93,6 +101,30 @@ func (s *service) UpdateBtnTime(ctx context.Context, appRefUuid string, authedUs
 	storedAppConfig.ApplyBtnTime(btnDefs...)
 	if err := s.repo.UpdateByFlag(ctx, appRefUuid, appconfigs.FlagBtnTime, btnDefs); err != nil {
 		return errors.New(http.StatusInternalServerError, err, "Could not update Btn Time Config")
+	}
+	return nil
+}
+
+func (s *service) LockConfig(ctx context.Context, appRefUuid string, authedUser *common.AuthedUser) errors.Api {
+	var storedAppConfig appconfigs.AppConfig
+	err := s.repo.GetById(ctx, appRefUuid, &storedAppConfig)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return errors.New(http.StatusNotFound, err, "Could not find any App Config")
+		}
+		return errors.New(http.StatusInternalServerError, err, "Could not get App Config")
+	}
+
+	if err := storedAppConfig.HasReadWrite(authedUser.Uuid); err != nil {
+		return errors.New(http.StatusUnauthorized,
+			fmt.Errorf("user has no permissions to lock app configs"),
+			"User has no permission for this action")
+	}
+	storedAppConfig.Locked = true
+	if err := s.repo.SetAppConfigLock(ctx, appRefUuid); err != nil {
+		return errors.New(http.StatusInternalServerError,
+			err,
+			"Could not update App Config")
 	}
 	return nil
 }

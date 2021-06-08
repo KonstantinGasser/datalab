@@ -15,6 +15,7 @@ message AppInfo {
     string description = 4;
     string owner = 5;
     repeated AppMember member = 6;
+    bool locked = 7;
 }
 message AppMember {
     string uuid = 1;
@@ -31,6 +32,7 @@ message AppConfigInfo {
     repeated Funnel funnel = 1;
     repeated Campaign campaign = 2;
     repeated BtnTime btn_time = 3;
+    bool locked = 4;
 }
 message Funnel {
     int32 id = 1;
@@ -111,18 +113,22 @@ message ReadWriteApps {
 message AppAccessToken {
     string jwt = 1;
     int64 expiration = 2;
+    bool locked = 3;
 }
 
 message AppConfigurations {
     repeated Stage funnel = 1;
     repeated Record campaign = 2;
     repeated BtnDef btn_time = 3;
+    bool locked = 4;
 }
+
 
 message Stage {
     int32 id = 1;
     string name = 2;
     string transition = 3;
+    int32 trigger = 4;
 }
 message Record {
     int32 id = 1;

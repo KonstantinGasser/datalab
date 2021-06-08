@@ -39,6 +39,7 @@ func (server AppMetaServer) Get(ctx context.Context, in *proto.GetRequest) (*pro
 		Msg:        "App found",
 		App: &common.AppInfo{
 			Uuid:        app.Uuid,
+			Locked:      app.Locked,
 			Name:        app.Name,
 			URL:         app.URL,
 			Description: app.Description,

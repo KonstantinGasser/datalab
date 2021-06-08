@@ -15,6 +15,8 @@ service AppMeta {
     rpc Invite(InviteRequest) returns (InviteResponse) {}
     rpc InviteReminderOK(InviteReminderOKRequest) returns (InviteReminderOKResponse) {}
     rpc AcceptInvite(AcceptInviteRequest) returns (AcceptInviteResponse) {}
+
+    rpc LockApp(LockAppRequest) returns (LockAppResponse) {}
 }
 
 
@@ -31,6 +33,17 @@ message CreateResponse {
     int32 status_code = 1;
     string msg = 2;
     string app_uuid = 3;
+}
+
+
+message LockAppRequest {
+    string tracing_ID = 1;
+    string app_uuid = 2;
+    common.AuthedUser authed_user = 3;
+}
+message LockAppResponse {
+    int32 status_code = 1;
+    string msg = 2;
 }
 // ***************************
 

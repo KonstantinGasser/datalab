@@ -42,6 +42,11 @@ func (s *service) IssueAppToken(ctx context.Context, orgn, appName, appUuid, cal
 			err,
 			"User must be owner to generate AppToken")
 	}
+	if storedAppToken.Locked {
+		return "", 0, errors.New(http.StatusUnauthorized,
+			fmt.Errorf("app is locked"),
+			"App is in locked state - change not possible")
+	}
 
 	// verifiy that the user has provided the correct organization-name/app-name
 	// which is part of the verification process

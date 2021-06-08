@@ -9,6 +9,7 @@ service AppToken {
     rpc Initialize(InitializeRequest) returns (InitializeResponse) {}
     rpc Issue(IssueRequest) returns (IssueResponse) {}
     rpc Validate(ValidateRequest) returns (ValidateResponse) {}
+    rpc InValidate(InValidateRequest) returns (InValidateResponse) {}
     rpc Get(GetRequest) returns (GetResponse) {}
 }
 
@@ -58,6 +59,19 @@ message ValidateRequest {
 }
 
 message ValidateResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    string app_uuid = 3;
+    string app_origin = 4;
+}
+
+message InValidateRequest {
+    string tracing_ID = 1;
+    common.AuthedUser authed_user = 2;
+    string app_token = 3;
+}
+
+message InValidateResponse {
     int32 status_code = 1;
     string msg = 2;
     string app_uuid = 3;

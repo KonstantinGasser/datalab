@@ -10,12 +10,12 @@
                 <div class="form-row justfy-start">
                     <div class="form-group col d-grid justify-center align-center">
                         <div class="d-flex align-center justify-center">
-                            <div class="avatar">
-                                <img class="circle-img big" :src="user.avatar" alt="">
+                            <div class="avatar big">
+                                <img :src="user.avatar" alt="">
                             </div>
                         </div>
-                        <div class="flex-wrap d-flex align-center justify-center">
-                            <span class="text-capture big">@{{user.username}}</span>
+                        <div>
+                            <span class="text-capture big flex-wrap d-flex justify-center">@{{user.username}}</span>
                         </div>
                     </div>
                     <div class="form-group col">
@@ -173,6 +173,7 @@ h4 {
 }
 .online {
     border: 2px solid var(--btn-bg-hover) !important;
+    background: #10d57475 !important;
 }
 .colleague {
     width: 200px;

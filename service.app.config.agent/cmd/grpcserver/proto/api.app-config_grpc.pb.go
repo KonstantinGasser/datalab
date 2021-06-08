@@ -21,6 +21,7 @@ type AppConfigurationClient interface {
 	Initialize(ctx context.Context, in *InitRequest, opts ...grpc.CallOption) (*InitResponse, error)
 	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
 	Update(ctx context.Context, in *UpdateRequest, opts ...grpc.CallOption) (*UpdateResponse, error)
+	LockConfig(ctx context.Context, in *LockConfigRequest, opts ...grpc.CallOption) (*LockConfigResponse, error)
 }
 
 type appConfigurationClient struct {
@@ -58,6 +59,15 @@ func (c *appConfigurationClient) Update(ctx context.Context, in *UpdateRequest, 
 	return out, nil
 }
 
+func (c *appConfigurationClient) LockConfig(ctx context.Context, in *LockConfigRequest, opts ...grpc.CallOption) (*LockConfigResponse, error) {
+	out := new(LockConfigResponse)
+	err := c.cc.Invoke(ctx, "/config_proto.AppConfiguration/LockConfig", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AppConfigurationServer is the server API for AppConfiguration service.
 // All implementations must embed UnimplementedAppConfigurationServer
 // for forward compatibility
@@ -65,6 +75,7 @@ type AppConfigurationServer interface {
 	Initialize(context.Context, *InitRequest) (*InitResponse, error)
 	Get(context.Context, *GetRequest) (*GetResponse, error)
 	Update(context.Context, *UpdateRequest) (*UpdateResponse, error)
+	LockConfig(context.Context, *LockConfigRequest) (*LockConfigResponse, error)
 	mustEmbedUnimplementedAppConfigurationServer()
 }
 
@@ -80,6 +91,9 @@ func (UnimplementedAppConfigurationServer) Get(context.Context, *GetRequest) (*G
 }
 func (UnimplementedAppConfigurationServer) Update(context.Context, *UpdateRequest) (*UpdateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
+}
+func (UnimplementedAppConfigurationServer) LockConfig(context.Context, *LockConfigRequest) (*LockConfigResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LockConfig not implemented")
 }
 func (UnimplementedAppConfigurationServer) mustEmbedUnimplementedAppConfigurationServer() {}
 
@@ -148,6 +162,24 @@ func _AppConfiguration_Update_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AppConfiguration_LockConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LockConfigRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppConfigurationServer).LockConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/config_proto.AppConfiguration/LockConfig",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppConfigurationServer).LockConfig(ctx, req.(*LockConfigRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AppConfiguration_ServiceDesc is the grpc.ServiceDesc for AppConfiguration service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -166,6 +198,10 @@ var AppConfiguration_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Update",
 			Handler:    _AppConfiguration_Update_Handler,
+		},
+		{
+			MethodName: "LockConfig",
+			Handler:    _AppConfiguration_LockConfig_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

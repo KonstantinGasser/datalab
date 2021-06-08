@@ -38,6 +38,7 @@ func (server AppTokenServer) Get(ctx context.Context, in *proto.GetRequest) (*pr
 		StatusCode: http.StatusOK,
 		Msg:        "Fetched App Token",
 		Token: &common.AppAccessToken{
+			Locked:     appToken.Locked,
 			Jwt:        appToken.Jwt,
 			Expiration: appToken.Exp,
 		},

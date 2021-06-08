@@ -207,8 +207,9 @@ input[type="submit"]:hover {
 
 .avatar {
   border-radius: 50%;
-  border: 2px solid var(--sub-border);
-  background: var(--sub-border);
+  border: 2px solid #5465ff;
+  background: #5465ff54;
+  padding: 5px;
 }
 .avatar img {
   object-fit: contain;
@@ -221,7 +222,10 @@ input[type="submit"]:hover {
   width: 35px;
   height: 35px;
 }
-
+.big {
+  width: 100px;
+  height: 100px;
+}
 input {
   color: #30363D;
 }

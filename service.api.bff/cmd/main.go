@@ -54,7 +54,7 @@ func main() {
 	userupdateService := updating.NewService(*grpcUserMeta)
 	userfetchService := fetching.NewService(*grpcUserMeta)
 
-	appcreateService := creating.NewService(*grpcAppMeta, *grpcAppToken, *httpNotifyClient)
+	appcreateService := creating.NewService(*grpcAppMeta, *grpcAppToken, *grpcAppConfig, *httpNotifyClient)
 	appcollectService := collecting.NewService(*grpcAppMeta, *grpcUserMeta, *grpcAppToken, *grpcAppConfig)
 	appmodifyService := modifying.NewService(*grpcAppConfig, *httpNotifyClient)
 	appinviteService := inviting.NewService(*grpcAppMeta, *httpNotifyClient)

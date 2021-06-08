@@ -10,6 +10,7 @@ import (
 	"github.com/KonstantinGasser/datalab/service.app.token.agent/internal/apptokens/initializing"
 	"github.com/KonstantinGasser/datalab/service.app.token.agent/internal/apptokens/modifying"
 	"github.com/KonstantinGasser/datalab/service.app.token.agent/internal/apptokens/storage/mongo"
+	"github.com/KonstantinGasser/datalab/service.app.token.agent/internal/apptokens/validating"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )
@@ -36,8 +37,9 @@ func main() {
 	initService := initializing.NewService(apptokenRepo)
 	modifyService := modifying.NewService(apptokenRepo)
 	fetchService := fetching.NewService(apptokenRepo)
+	validateServcie := validating.NewService(apptokenRepo)
 
-	appTokenServer, err := grpcserver.NewAppTokenServer(initService, modifyService, fetchService)
+	appTokenServer, err := grpcserver.NewAppTokenServer(initService, modifyService, fetchService, validateServcie)
 	if err != nil {
 		logrus.Fatal(err)
 	}

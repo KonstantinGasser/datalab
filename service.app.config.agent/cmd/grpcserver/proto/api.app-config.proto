@@ -10,6 +10,8 @@ service AppConfiguration {
     rpc Initialize(InitRequest) returns (InitResponse) {}
     rpc Get(GetRequest) returns (GetResponse) {}
     rpc Update(UpdateRequest) returns (UpdateResponse) {}
+
+    rpc LockConfig(LockConfigRequest) returns (LockConfigResponse) {}
 }
 
 
@@ -19,6 +21,16 @@ message InitRequest {
     string app_owner = 3;
 }
 message InitResponse {
+    int32 status_code = 1;
+    string msg = 2;
+}
+
+message LockConfigRequest {
+    string tracing_ID = 1;
+    string app_ref_uuid = 2;
+    common.AuthedUser authed_user = 3;
+}
+message LockConfigResponse {
     int32 status_code = 1;
     string msg = 2;
 }

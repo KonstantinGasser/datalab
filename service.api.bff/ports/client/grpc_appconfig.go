@@ -76,3 +76,22 @@ func (client ClientAppConfig) UpdateConfig(ctx context.Context, r *apps.UpdateCo
 	}
 	return nil
 }
+
+func (client ClientAppConfig) LockAppConfig(ctx context.Context, appUuid string, authedUser *common.AuthedUser) errors.Api {
+	resp, err := client.Conn.LockConfig(ctx, &grpcAppConfig.LockConfigRequest{
+		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
+		AuthedUser: authedUser,
+		AppRefUuid: appUuid,
+	})
+	if err != nil {
+		return errors.New(http.StatusInternalServerError,
+			err,
+			"Could not lock app config")
+	}
+	if resp.GetStatusCode() != http.StatusOK {
+		return errors.New(resp.GetStatusCode(),
+			fmt.Errorf(resp.GetMsg()),
+			resp.GetMsg())
+	}
+	return nil
+}

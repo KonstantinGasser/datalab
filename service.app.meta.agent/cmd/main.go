@@ -10,6 +10,7 @@ import (
 	"github.com/KonstantinGasser/datalab/service.app.meta.agent/internal/apps/fetching"
 	"github.com/KonstantinGasser/datalab/service.app.meta.agent/internal/apps/inviting"
 	"github.com/KonstantinGasser/datalab/service.app.meta.agent/internal/apps/storage/mongo"
+	"github.com/KonstantinGasser/datalab/service.app.meta.agent/internal/apps/updating"
 	"github.com/KonstantinGasser/datalab/service.app.meta.agent/ports/client"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
@@ -54,8 +55,10 @@ func main() {
 	createSerivce := creating.NewService(appmetaRepo, apptokenEmitter, appConfigEmitter, userAuthEmitter)
 	fechtService := fetching.NewService(appmetaRepo)
 	inviteService := inviting.NewService(appmetaRepo, userAuthEmitter)
+	updateService := updating.NewService(appmetaRepo)
 
-	appMetaServer := grpcserver.NewAppMetaServer(createSerivce, fechtService, inviteService)
+	appMetaServer := grpcserver.NewAppMetaServer(
+		createSerivce, fechtService, inviteService, updateService)
 	proto.RegisterAppMetaServer(server, appMetaServer)
 
 	if err := server.Serve(listener); err != nil {

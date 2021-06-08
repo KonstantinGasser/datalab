@@ -21,11 +21,14 @@ type AppconfigRepo interface {
 	Initialize(ctx context.Context, appConfig AppConfig) error
 	GetById(ctx context.Context, uuid string, result interface{}) error
 	UpdateByFlag(ctx context.Context, uuid, flag string, data interface{}) error
+
+	SetAppConfigLock(ctx context.Context, uuid string) error
 }
 
 type AppConfig struct {
 	AppUuid     string   `bson:"_id"`
 	ConfigOwner string   `bson:"config_owner"`
+	Locked      bool     `bson:"locked"`
 	Funnel      []Stage  `bson:"funnel"`
 	Campaign    []Record `bson:"campaign"`
 	BtnTime     []BtnDef `bson:"btntime"`
@@ -35,6 +38,7 @@ type Stage struct {
 	Id         int32  `bson:"id"`
 	Name       string `bson:"name"`
 	Transition string `bson:"transition"`
+	Trigger    int32  `bson:"trigger"`
 }
 
 type Record struct {

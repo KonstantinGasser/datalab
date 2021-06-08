@@ -2,12 +2,13 @@ package apptokens
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/KonstantinGasser/datalab/library/hasher"
 	"github.com/KonstantinGasser/required"
-	"github.com/dgrijalva/jwt-go"
+	jwt "github.com/dgrijalva/jwt-go"
 )
 
 const (
@@ -32,12 +33,14 @@ type ApptokenRepo interface {
 
 // AppToken represents the token data as it will be stored in the datbase
 type AppToken struct {
-	AppRefUuid string `bson:"_id" required:"yes"`
-	AppHash    string `bson:"app_hash" required:"yes"`
-	AppOwner   string `bson:"app_owner" required:"yes"`
-	AppOrigin  string `bson:"app_origin"`
-	Jwt        string `bson:"app_jwt"`
-	Exp        int64  `bson:"app_jwt_exp"`
+	AppRefUuid   string `bson:"_id" required:"yes"`
+	Locked       bool   `bson:"locked"`
+	AppHash      string `bson:"app_hash" required:"yes"`
+	AppOwner     string `bson:"app_owner" required:"yes"`
+	AppOrigin    string `bson:"app_origin"`
+	Jwt          string `bson:"app_jwt"`
+	Exp          int64  `bson:"app_jwt_exp"`
+	RefreshCount int32  `bson:"refresh_count"`
 }
 
 // NewDefault creates a new default AppToken with only the meta data but no valid
@@ -69,6 +72,7 @@ func (appToken *AppToken) Issue() (*AppToken, error) {
 	}
 	return &AppToken{
 		AppRefUuid: appToken.AppRefUuid,
+		Locked:     true,
 		AppHash:    appToken.AppHash,
 		AppOwner:   appToken.AppOwner,
 		AppOrigin:  appToken.AppOrigin,
@@ -82,12 +86,13 @@ func (appToken AppToken) JWT() (string, int64, error) {
 
 	exp := time.Now().Add(appTokenExpTime)
 	claims := jwt.MapClaims{
-		"sub":    appToken.AppRefUuid,
-		"origin": appToken.AppOrigin,
-		"hash":   appToken.AppHash,
-		"iss":    issuerService,
-		"iat":    time.Now().Unix(),
-		"exp":    exp.Unix(),
+		"sub":      appToken.AppRefUuid,
+		"origin":   appToken.AppOrigin,
+		"hash":     appToken.AppHash,
+		"iss":      issuerService,
+		"iat":      time.Now().Unix(),
+		"exp":      exp.Unix(),
+		"rf_count": appToken.RefreshCount,
 	}
 
 	_token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -97,6 +102,22 @@ func (appToken AppToken) JWT() (string, int64, error) {
 	}
 	return token, exp.Unix(), nil
 }
+
+func Validate(jwtString string) (string, string, error) {
+	token, err := verifyToken(jwtString, secretAppToken)
+	if err != nil {
+		return "", "", err
+	}
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok && !token.Valid {
+		return "", "", errors.New("apptoken invalid")
+	}
+	return claims["sub"].(string), claims["origin"].(string), nil
+}
+
+// func tokenValid(claims jwt.MapClaims) (bool, error) {
+
+// }
 
 // CompareHash compares if the provided meta data (orgnanization name and app name)
 // match with the apptoken.Hash.
@@ -138,4 +159,17 @@ func (appToken AppToken) HasReadOrWrite(userUuid string, readWriteUuids ...strin
 // expired checks if the current jwt is already expired or not
 func (appToken *AppToken) expired() bool {
 	return time.Now().Unix() >= appToken.Exp
+}
+
+func verifyToken(tokenString, secret string) (*jwt.Token, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(secret), nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("[jwts.verifyToken] could not parse JWT: %v", err)
+	}
+	return token, nil
 }

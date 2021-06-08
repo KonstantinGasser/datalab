@@ -22,13 +22,16 @@
             <div v-if="!isInCreateMode">
                 <h1 class="super-lg d-flex align-center">
                     {{activeApp.owner?.orgn_domain}}/{{activeApp.app?.name}}
-                    <div  v-if="!app_unsaved" class="saved d-flex align-center justify-center">
+                    <div v-if="activeApp?.app?.locked" class="locked d-flex align-center justify-center">
+                        <div><span class="icon icon-lock"></span>Locked</div>
+                    </div>
+                    <div  v-if="!app_unsaved && !activeApp?.app?.locked" class="saved d-flex align-center justify-center">
                         <div>Saved</div>
                     </div>
-                    <div  v-if="app_unsaved" class="unsaved d-flex align-center justify-center">
+                    <div  v-if="app_unsaved && !activeApp?.app?.locked" class="unsaved d-flex align-center justify-center">
                         <div>Unsaved Changes</div>
                     </div>
-                    <div v-if="activeApp?.app?.uuid === sync_app?.uuid && sync_app?.sync" class="sync d-flex align-center justify-center" @click="syncAppChanges(activeApp?.app?.uuid)">
+                    <div v-if="activeApp?.app?.uuid === sync_app?.uuid && sync_app?.sync && !activeApp?.app?.locked" class="sync d-flex align-center justify-center" @click="syncAppChanges(activeApp?.app?.uuid)">
                         <div>sync data</div>
                     </div>
                 </h1>
@@ -36,7 +39,7 @@
                 <!-- <hr> -->
                 <Tabs class="mt-3 mb-4" ref="Tabs" :update="activeTab" :initTab="activeTab" :tabs="tabs" @tabChange="tabChange"/>
                 <General v-if="activeTab === 'Overview'" :app_token="activeApp?.token" :app_uuid="activeApp?.app?.uuid" @drop_app="drop_app" />
-                <Config v-if="activeTab == 'Configuration'" @appchange="markUnsaved" :app_config="activeApp?.config" :app_uuid="activeApp?.app?.uuid" @setdoc="setdoc"/>
+                <Config v-if="activeTab == 'Configuration'" @appchange="markUnsaved" :app_locekd="activeApp?.app?.locked" :app_config="activeApp?.config" :app_uuid="activeApp?.app?.uuid" @setdoc="setdoc"/>
                 <InviteMember v-if="activeTab == 'Invite'" :app_uuid="activeApp?.app?.uuid" :member="activeApp?.app?.member" :app_owner="activeApp?.owner" :app_name="activeApp?.app?.name"/>
             </div>
         </div>
@@ -111,15 +114,6 @@
             else {
                 this.apps = init_data.data.apps;
                 const init_app = await this.getApp(this.apps[0].uuid);
-                // console.log("props type: ", this.$props.use_uuid === null)
-                // if (this.$props.use_uuid === undefined ||this.$props.use_uuid === null || this.$props.use_uuid !== "") {
-                //         console.log("props null")
-                //         init_app = await this.getApp(this.apps[0].uuid);
-                    
-                // } else {
-                //     console.log("ok then use this uuid???? ")
-                //     init_app = await this.getApp(this.$props.use_uuid);
-                // }
 
                 this.activeApp = init_app;
                 this.selectedApp = this.activeApp?.app?.uuid;
@@ -310,31 +304,42 @@ h2 {
 
 .saved {
     margin-left: 15px;
-    width: auto;
-    height: 25px;
+    /* width: auto;
+    height: 25px; */
     border-radius: 8px;
     background: var(--menu-bg);
     padding: 5px 15px;
-}
-
-.saved div {
     color: var(--sub-bg);
     font-size: 16px;
     font-weight: bold;
 }
+
 .unsaved {
     margin-left: 15px;
     width: auto;
     height: 25px;
     border-radius: 8px;
-    background: orange;
+    background: #ffa500;
     padding: 5px 15px;
-}
-
-.unsaved div {
     color: var(--sub-bg);
     font-size: 16px;
     font-weight: bold;
+}
+
+.locked {
+    margin-left: 15px;
+    background: #ffa50050;
+    border: 1px solid #ffa500;
+    border-radius: 8px;
+    padding: 5px 15px;
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--sub-bg);
+}
+.locked .icon {
+    margin-right: 5px;
+    font-size: 18px;
+    font-weight: bolder;
 }
 
 .sync {
@@ -346,8 +351,6 @@ h2 {
     background: #ffa50050;
     border: 1px solid #ffa500;
     padding: 5px 15px;
-}
-.sync div {
     color: var(--sub-bg);
     font-size: 16px;
     font-weight: bold;

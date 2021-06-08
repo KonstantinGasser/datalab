@@ -32,6 +32,7 @@ type AppsRepository interface {
 	Store(ctx context.Context, app App) error
 	GetById(ctx context.Context, uuid string, stored interface{}) error
 	GetAll(ctx context.Context, userUuid string, stored interface{}) error
+	SetAppLock(ctx context.Context, uuid string) error
 	AddMember(ctx context.Context, appUuid string, invitedMember Member) error
 	MemberStatus(ctx context.Context, appUuid string, openInvite Member) error
 }
@@ -46,6 +47,7 @@ type App struct {
 	Description string   `bson:"description" required:"yes"`
 	Members     []Member `bson:"member"`
 	Hash        string   `bson:"hash" required:"yes"`
+	Locked      bool     `bson:"locked"`
 }
 
 // Member refers to a user added to an app
@@ -76,6 +78,7 @@ func NewDefault(name, URL, ownerUuid, ownerOrgn, desc string) (*App, error) {
 				Status: InviteAccepted,
 			},
 		},
+		Locked: false,
 	}
 	app.Init()
 	if err := required.Atomic(&app); err != nil {
@@ -121,7 +124,6 @@ func (app *App) AddInvite(userUuid string) (*Member, error) {
 // InviteReminderOk checks if a user qualifys to be send an reminder
 // for an invite again
 func (app App) InviteReminderOk(userUuid string) bool {
-	fmt.Println("User uuid: ", userUuid)
 	for _, member := range app.Members {
 		if member.Uuid == userUuid && member.Status == InvitePending {
 			return true
@@ -163,6 +165,8 @@ func (app App) OpenInvite(userUuid string) *Member {
 	}
 	return nil
 }
+
+func (app App) IsLocked() bool { return app.Locked }
 
 // IsNotMember checks if user is listed as member of app regardles of InviteStatus
 func (app App) IsNotMember(userUuid string) bool {

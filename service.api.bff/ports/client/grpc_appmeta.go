@@ -151,3 +151,22 @@ func (client ClientAppMeta) AcceptInvite(ctx context.Context, r *apps.AcceptInvi
 	}
 	return nil
 }
+
+func (client ClientAppMeta) LockApp(ctx context.Context, appUuid string, authedUser *common.AuthedUser) errors.Api {
+	resp, err := client.Conn.LockApp(ctx, &grpcAppMeta.LockAppRequest{
+		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
+		AuthedUser: authedUser,
+		AppUuid:    appUuid,
+	})
+	if err != nil {
+		return errors.New(http.StatusInternalServerError,
+			err,
+			"Could not lock app")
+	}
+	if resp.GetStatusCode() != http.StatusOK {
+		return errors.New(resp.GetStatusCode(),
+			fmt.Errorf(resp.GetMsg()),
+			resp.GetMsg())
+	}
+	return nil
+}
