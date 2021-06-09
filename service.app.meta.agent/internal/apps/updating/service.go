@@ -13,6 +13,7 @@ import (
 
 type Service interface {
 	LockApp(ctx context.Context, appUuid string, authedUser *common.AuthedUser) errors.Api
+	UnlockApp(ctx context.Context, appUuid string, authedUser *common.AuthedUser) errors.Api
 }
 
 type service struct {
@@ -50,8 +51,7 @@ func (s service) LockApp(ctx context.Context, appUuid string, authedUser *common
 			"User not authorized to perform action")
 	}
 
-	storedApp.Locked = true
-	if err := s.repo.SetAppLock(ctx, storedApp.Uuid); err != nil {
+	if err := s.repo.SetAppLock(ctx, storedApp.Uuid, true); err != nil {
 		if err == mongo.ErrNoDocuments {
 			return errors.New(http.StatusNotFound,
 				err,
@@ -59,7 +59,39 @@ func (s service) LockApp(ctx context.Context, appUuid string, authedUser *common
 		}
 		return errors.New(http.StatusInternalServerError,
 			err,
-			"Could not update App data")
+			"Could not lock App data")
+	}
+	return nil
+}
+
+func (s service) UnlockApp(ctx context.Context, appUuid string, authedUser *common.AuthedUser) errors.Api {
+	var storedApp apps.App
+	if err := s.repo.GetById(ctx, appUuid, &storedApp); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return errors.New(http.StatusNotFound,
+				err,
+				"Could not find App data")
+		}
+		return errors.New(http.StatusInternalServerError,
+			err,
+			"Could not get App data")
+	}
+
+	if err := storedApp.IsOwner(authedUser.Uuid); err != nil {
+		return errors.New(http.StatusUnauthorized,
+			err,
+			"User has no permissions for this action")
+	}
+
+	if err := s.repo.SetAppLock(ctx, storedApp.Uuid, false); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return errors.New(http.StatusNotFound,
+				err,
+				"Could not find App data")
+		}
+		return errors.New(http.StatusInternalServerError,
+			err,
+			"Could not unlock App data")
 	}
 	return nil
 }

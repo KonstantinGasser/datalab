@@ -26,6 +26,7 @@ type AppMetaClient interface {
 	InviteReminderOK(ctx context.Context, in *InviteReminderOKRequest, opts ...grpc.CallOption) (*InviteReminderOKResponse, error)
 	AcceptInvite(ctx context.Context, in *AcceptInviteRequest, opts ...grpc.CallOption) (*AcceptInviteResponse, error)
 	LockApp(ctx context.Context, in *LockAppRequest, opts ...grpc.CallOption) (*LockAppResponse, error)
+	UnlockApp(ctx context.Context, in *UnlockAppRequest, opts ...grpc.CallOption) (*UnlockAppResponse, error)
 }
 
 type appMetaClient struct {
@@ -108,6 +109,15 @@ func (c *appMetaClient) LockApp(ctx context.Context, in *LockAppRequest, opts ..
 	return out, nil
 }
 
+func (c *appMetaClient) UnlockApp(ctx context.Context, in *UnlockAppRequest, opts ...grpc.CallOption) (*UnlockAppResponse, error) {
+	out := new(UnlockAppResponse)
+	err := c.cc.Invoke(ctx, "/app_proto.AppMeta/UnlockApp", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AppMetaServer is the server API for AppMeta service.
 // All implementations must embed UnimplementedAppMetaServer
 // for forward compatibility
@@ -120,6 +130,7 @@ type AppMetaServer interface {
 	InviteReminderOK(context.Context, *InviteReminderOKRequest) (*InviteReminderOKResponse, error)
 	AcceptInvite(context.Context, *AcceptInviteRequest) (*AcceptInviteResponse, error)
 	LockApp(context.Context, *LockAppRequest) (*LockAppResponse, error)
+	UnlockApp(context.Context, *UnlockAppRequest) (*UnlockAppResponse, error)
 	mustEmbedUnimplementedAppMetaServer()
 }
 
@@ -150,6 +161,9 @@ func (UnimplementedAppMetaServer) AcceptInvite(context.Context, *AcceptInviteReq
 }
 func (UnimplementedAppMetaServer) LockApp(context.Context, *LockAppRequest) (*LockAppResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LockApp not implemented")
+}
+func (UnimplementedAppMetaServer) UnlockApp(context.Context, *UnlockAppRequest) (*UnlockAppResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UnlockApp not implemented")
 }
 func (UnimplementedAppMetaServer) mustEmbedUnimplementedAppMetaServer() {}
 
@@ -308,6 +322,24 @@ func _AppMeta_LockApp_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AppMeta_UnlockApp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UnlockAppRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppMetaServer).UnlockApp(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/app_proto.AppMeta/UnlockApp",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppMetaServer).UnlockApp(ctx, req.(*UnlockAppRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AppMeta_ServiceDesc is the grpc.ServiceDesc for AppMeta service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -346,6 +378,10 @@ var AppMeta_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "LockApp",
 			Handler:    _AppMeta_LockApp_Handler,
+		},
+		{
+			MethodName: "UnlockApp",
+			Handler:    _AppMeta_UnlockApp_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

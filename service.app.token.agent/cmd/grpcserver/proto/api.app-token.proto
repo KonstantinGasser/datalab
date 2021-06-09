@@ -11,6 +11,8 @@ service AppToken {
     rpc Validate(ValidateRequest) returns (ValidateResponse) {}
     rpc InValidate(InValidateRequest) returns (InValidateResponse) {}
     rpc Get(GetRequest) returns (GetResponse) {}
+
+    rpc UnlockAppToken(UnlockAppTokenRequest) returns (UnlockAppTokenResponse) {}
 }
 
 message InitializeRequest {
@@ -38,6 +40,16 @@ message IssueResponse {
     int32 status_code = 1;
     string msg = 2;
     common.AppAccessToken token = 3;
+}
+
+message UnlockAppTokenRequest {
+    string tracing_ID = 1;
+    string app_uuid = 2;
+    common.AuthedUser authed_user = 3;
+}
+message UnlockAppTokenResponse {
+    int32 status_code = 1;
+    string msg = 2;
 }
 
 message GetRequest {

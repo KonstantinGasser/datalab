@@ -38,9 +38,26 @@
                 <div class="desc_test">{{activeApp.app?.description}}</div>
                 <!-- <hr> -->
                 <Tabs class="mt-3 mb-4" ref="Tabs" :update="activeTab" :initTab="activeTab" :tabs="tabs" @tabChange="tabChange"/>
-                <General v-if="activeTab === 'Overview'" :app_token="activeApp?.token" :app_uuid="activeApp?.app?.uuid" @drop_app="drop_app" />
-                <Config v-if="activeTab == 'Configuration'" @appchange="markUnsaved" :app_locekd="activeApp?.app?.locked" :app_config="activeApp?.config" :app_uuid="activeApp?.app?.uuid" @setdoc="setdoc"/>
-                <InviteMember v-if="activeTab == 'Invite'" :app_uuid="activeApp?.app?.uuid" :member="activeApp?.app?.member" :app_owner="activeApp?.owner" :app_name="activeApp?.app?.name"/>
+                <General v-if="activeTab === 'Overview'" 
+                    :app_locked="activeApp?.app?.locked === true" 
+                    :app_token="activeApp?.token" 
+                    :app_uuid="activeApp?.app?.uuid" 
+                    :app_owner="activeApp?.owner?.uuid"
+                    @drop_app="drop_app" 
+                    @loadApp="loadApp"/>
+
+                <Config v-if="activeTab == 'Configuration'" 
+                    :app_locked="activeApp?.app?.locked === true" 
+                    :app_config="activeApp?.config" 
+                    :app_uuid="activeApp?.app?.uuid"
+                    @setdoc="setdoc" 
+                    @appchange="markUnsaved"/>
+
+                <InviteMember v-if="activeTab == 'Invite'" 
+                    :app_uuid="activeApp?.app?.uuid" 
+                    :member="activeApp?.app?.member" 
+                    :app_owner="activeApp?.owner" 
+                    :app_name="activeApp?.app?.name"/>
             </div>
         </div>
     </div>
@@ -130,6 +147,7 @@
                 this.$store.commit("UNSYNC_APP")
             },
             async loadApp(uuid) {
+                console.log("UUID: ", uuid)
                 this.isInCreateMode = false;
                 const data = await this.getApp(uuid);
                 if (data.app === undefined || data.app == null) {

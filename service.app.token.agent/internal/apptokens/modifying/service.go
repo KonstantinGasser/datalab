@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/KonstantinGasser/datalab/common"
 	"github.com/KonstantinGasser/datalab/library/errors"
 	"github.com/KonstantinGasser/datalab/service.app.token.agent/internal/apptokens"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -12,6 +13,7 @@ import (
 
 type Service interface {
 	IssueAppToken(ctx context.Context, orgn, appName, appUuid, callerUuid string) (string, int64, errors.Api)
+	UnlockAppToken(ctx context.Context, appUuid string, authedUser *common.AuthedUser) errors.Api
 }
 
 type service struct {
@@ -74,4 +76,30 @@ func (s *service) IssueAppToken(ctx context.Context, orgn, appName, appUuid, cal
 			"Could not update App Token")
 	}
 	return modifiedAppToken.Jwt, modifiedAppToken.Exp, nil
+}
+
+func (s service) UnlockAppToken(ctx context.Context, appUuid string, authedUser *common.AuthedUser) errors.Api {
+	var storedAppToken apptokens.AppToken
+	if err := s.repo.GetById(ctx, appUuid, &storedAppToken); err != nil {
+		return errors.New(http.StatusInternalServerError, err, "Could not get AppToken")
+	}
+
+	if err := storedAppToken.HasReadWrite(authedUser.Uuid); err != nil {
+		return errors.New(http.StatusUnauthorized,
+			err,
+			"User has no permissions for this action")
+	}
+
+	if err := s.repo.SetAppTokenLock(ctx, appUuid, false); err != nil {
+		return errors.New(http.StatusInternalServerError,
+			err,
+			"Could not unlock App-Token")
+	}
+	repoErr := s.repo.Update(ctx, appUuid, "", 0)
+	if repoErr != nil {
+		return errors.New(http.StatusInternalServerError,
+			repoErr,
+			"Could not reset App Token")
+	}
+	return nil
 }

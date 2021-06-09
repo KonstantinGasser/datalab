@@ -75,3 +75,22 @@ func (client ClientAppToken) IssueAppToken(ctx context.Context, r *apps.CreateAp
 	}
 	return resp.GetToken(), nil
 }
+
+func (client ClientAppToken) UnlockAppToken(ctx context.Context, r *apps.UnlockRequest) errors.Api {
+	resp, err := client.Conn.UnlockAppToken(ctx, &grpcAppToken.UnlockAppTokenRequest{
+		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
+		AuthedUser: r.AuthedUser,
+		AppUuid:    r.AppUuid,
+	})
+	if err != nil {
+		return errors.New(http.StatusInternalServerError,
+			err,
+			"Could not unlock App Token")
+	}
+	if resp.GetStatusCode() != http.StatusOK {
+		return errors.New(resp.GetStatusCode(),
+			err,
+			resp.GetMsg())
+	}
+	return nil
+}

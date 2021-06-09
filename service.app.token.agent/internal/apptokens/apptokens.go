@@ -29,6 +29,7 @@ type ApptokenRepo interface {
 	Initialize(ctx context.Context, appToken AppToken) error
 	GetById(ctx context.Context, uuid string, result interface{}) error
 	Update(ctx context.Context, uuid, jwt string, exp int64) error
+	SetAppTokenLock(ctx context.Context, uuid string, lock bool) error
 }
 
 // AppToken represents the token data as it will be stored in the datbase

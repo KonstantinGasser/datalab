@@ -32,7 +32,7 @@ type AppsRepository interface {
 	Store(ctx context.Context, app App) error
 	GetById(ctx context.Context, uuid string, stored interface{}) error
 	GetAll(ctx context.Context, userUuid string, stored interface{}) error
-	SetAppLock(ctx context.Context, uuid string) error
+	SetAppLock(ctx context.Context, uuid string, lock bool) error
 	AddMember(ctx context.Context, appUuid string, invitedMember Member) error
 	MemberStatus(ctx context.Context, appUuid string, openInvite Member) error
 }

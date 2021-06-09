@@ -56,7 +56,7 @@ func main() {
 
 	appcreateService := creating.NewService(*grpcAppMeta, *grpcAppToken, *grpcAppConfig, *httpNotifyClient)
 	appcollectService := collecting.NewService(*grpcAppMeta, *grpcUserMeta, *grpcAppToken, *grpcAppConfig)
-	appmodifyService := modifying.NewService(*grpcAppConfig, *httpNotifyClient)
+	appmodifyService := modifying.NewService(*grpcAppConfig, *grpcAppMeta, *grpcAppToken, *httpNotifyClient)
 	appinviteService := inviting.NewService(*grpcAppMeta, *httpNotifyClient)
 
 	server := httpserver.NewDefault(
@@ -142,6 +142,11 @@ func main() {
 		server.WithAuth,
 	)
 	server.Register("/api/v1/app/member/invitable", server.GetInvitableUsers,
+		server.WithTracing,
+		server.WithCors,
+		server.WithAuth,
+	)
+	server.Register("/api/v1/app/unlock", server.UnlockApp,
 		server.WithTracing,
 		server.WithCors,
 		server.WithAuth,

@@ -102,3 +102,13 @@ type AcceptInviteResponse struct {
 	Msg    string `json:"msg"`
 	Err    string `json:"error,omitempty"`
 }
+
+type UnlockRequest struct {
+	AppUuid    string `json:"app_uuid"`
+	AuthedUser *common.AuthedUser
+}
+type UnlockResponse struct {
+	Status int32  `json:"status"`
+	Msg    string `json:"msg"`
+	Err    string `json:"error,omitempty"`
+}

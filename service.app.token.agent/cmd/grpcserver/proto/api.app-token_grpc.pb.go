@@ -21,7 +21,9 @@ type AppTokenClient interface {
 	Initialize(ctx context.Context, in *InitializeRequest, opts ...grpc.CallOption) (*InitializeResponse, error)
 	Issue(ctx context.Context, in *IssueRequest, opts ...grpc.CallOption) (*IssueResponse, error)
 	Validate(ctx context.Context, in *ValidateRequest, opts ...grpc.CallOption) (*ValidateResponse, error)
+	InValidate(ctx context.Context, in *InValidateRequest, opts ...grpc.CallOption) (*InValidateResponse, error)
 	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
+	UnlockAppToken(ctx context.Context, in *UnlockAppTokenRequest, opts ...grpc.CallOption) (*UnlockAppTokenResponse, error)
 }
 
 type appTokenClient struct {
@@ -59,9 +61,27 @@ func (c *appTokenClient) Validate(ctx context.Context, in *ValidateRequest, opts
 	return out, nil
 }
 
+func (c *appTokenClient) InValidate(ctx context.Context, in *InValidateRequest, opts ...grpc.CallOption) (*InValidateResponse, error) {
+	out := new(InValidateResponse)
+	err := c.cc.Invoke(ctx, "/issuer_proto.AppToken/InValidate", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *appTokenClient) Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error) {
 	out := new(GetResponse)
 	err := c.cc.Invoke(ctx, "/issuer_proto.AppToken/Get", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *appTokenClient) UnlockAppToken(ctx context.Context, in *UnlockAppTokenRequest, opts ...grpc.CallOption) (*UnlockAppTokenResponse, error) {
+	out := new(UnlockAppTokenResponse)
+	err := c.cc.Invoke(ctx, "/issuer_proto.AppToken/UnlockAppToken", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +95,9 @@ type AppTokenServer interface {
 	Initialize(context.Context, *InitializeRequest) (*InitializeResponse, error)
 	Issue(context.Context, *IssueRequest) (*IssueResponse, error)
 	Validate(context.Context, *ValidateRequest) (*ValidateResponse, error)
+	InValidate(context.Context, *InValidateRequest) (*InValidateResponse, error)
 	Get(context.Context, *GetRequest) (*GetResponse, error)
+	UnlockAppToken(context.Context, *UnlockAppTokenRequest) (*UnlockAppTokenResponse, error)
 	mustEmbedUnimplementedAppTokenServer()
 }
 
@@ -92,8 +114,14 @@ func (UnimplementedAppTokenServer) Issue(context.Context, *IssueRequest) (*Issue
 func (UnimplementedAppTokenServer) Validate(context.Context, *ValidateRequest) (*ValidateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Validate not implemented")
 }
+func (UnimplementedAppTokenServer) InValidate(context.Context, *InValidateRequest) (*InValidateResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method InValidate not implemented")
+}
 func (UnimplementedAppTokenServer) Get(context.Context, *GetRequest) (*GetResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
+}
+func (UnimplementedAppTokenServer) UnlockAppToken(context.Context, *UnlockAppTokenRequest) (*UnlockAppTokenResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UnlockAppToken not implemented")
 }
 func (UnimplementedAppTokenServer) mustEmbedUnimplementedAppTokenServer() {}
 
@@ -162,6 +190,24 @@ func _AppToken_Validate_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AppToken_InValidate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InValidateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppTokenServer).InValidate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/issuer_proto.AppToken/InValidate",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppTokenServer).InValidate(ctx, req.(*InValidateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _AppToken_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetRequest)
 	if err := dec(in); err != nil {
@@ -176,6 +222,24 @@ func _AppToken_Get_Handler(srv interface{}, ctx context.Context, dec func(interf
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AppTokenServer).Get(ctx, req.(*GetRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AppToken_UnlockAppToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UnlockAppTokenRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppTokenServer).UnlockAppToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/issuer_proto.AppToken/UnlockAppToken",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppTokenServer).UnlockAppToken(ctx, req.(*UnlockAppTokenRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -200,8 +264,16 @@ var AppToken_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _AppToken_Validate_Handler,
 		},
 		{
+			MethodName: "InValidate",
+			Handler:    _AppToken_InValidate_Handler,
+		},
+		{
 			MethodName: "Get",
 			Handler:    _AppToken_Get_Handler,
+		},
+		{
+			MethodName: "UnlockAppToken",
+			Handler:    _AppToken_UnlockAppToken_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

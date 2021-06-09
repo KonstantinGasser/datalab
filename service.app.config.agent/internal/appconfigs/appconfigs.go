@@ -22,7 +22,7 @@ type AppconfigRepo interface {
 	GetById(ctx context.Context, uuid string, result interface{}) error
 	UpdateByFlag(ctx context.Context, uuid, flag string, data interface{}) error
 
-	SetAppConfigLock(ctx context.Context, uuid string) error
+	SetAppConfigLock(ctx context.Context, uuid string, lock bool) error
 }
 
 type AppConfig struct {

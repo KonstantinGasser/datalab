@@ -170,3 +170,22 @@ func (client ClientAppMeta) LockApp(ctx context.Context, appUuid string, authedU
 	}
 	return nil
 }
+
+func (client ClientAppMeta) UnlockApp(ctx context.Context, r *apps.UnlockRequest) error {
+	resp, err := client.Conn.UnlockApp(ctx, &grpcAppMeta.UnlockAppRequest{
+		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
+		AuthedUser: r.AuthedUser,
+		AppUuid:    r.AppUuid,
+	})
+	if err != nil {
+		return errors.New(http.StatusInternalServerError,
+			err,
+			"Could not unlock app")
+	}
+	if resp.GetStatusCode() != http.StatusOK {
+		return errors.New(resp.GetStatusCode(),
+			fmt.Errorf(resp.GetMsg()),
+			resp.GetMsg())
+	}
+	return nil
+}

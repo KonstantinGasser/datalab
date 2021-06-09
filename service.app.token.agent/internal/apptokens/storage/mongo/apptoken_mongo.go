@@ -82,3 +82,18 @@ func (client MongoClient) Update(ctx context.Context, uuid, jwt string, exp int6
 	}
 	return nil
 }
+
+func (client MongoClient) SetAppTokenLock(ctx context.Context, uuid string, lock bool) error {
+	filter := bson.M{"_id": uuid}
+	query := bson.D{
+		{
+			Key:   "$set",
+			Value: bson.M{"locked": lock},
+		},
+	}
+	coll := client.conn.Database(nameDB).Collection(nameColl)
+	if _, err := coll.UpdateOne(ctx, filter, query); err != nil {
+		return err
+	}
+	return nil
+}

@@ -82,12 +82,12 @@ func (client MongoClient) UpdateByFlag(ctx context.Context, uuid, flag string, d
 	return nil
 }
 
-func (client MongoClient) SetAppConfigLock(ctx context.Context, uuid string) error {
+func (client MongoClient) SetAppConfigLock(ctx context.Context, uuid string, lock bool) error {
 	filter := bson.M{"_id": uuid}
 	query := bson.D{
 		{
 			Key:   "$set",
-			Value: bson.M{"locked": true},
+			Value: bson.M{"locked": lock},
 		},
 	}
 	coll := client.conn.Database(nameDB).Collection(nameColl)

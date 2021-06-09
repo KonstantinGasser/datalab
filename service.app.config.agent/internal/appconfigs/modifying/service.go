@@ -17,6 +17,7 @@ type Service interface {
 	UpdateBtnTime(ctx context.Context, appRefUuid string, authedUser *common.AuthedUser, btnDefs []appconfigs.BtnDef) errors.Api
 
 	LockConfig(ctx context.Context, appRefUuid string, authedUser *common.AuthedUser) errors.Api
+	UnlockConfig(ctx context.Context, appRefUuid string, authedUser *common.AuthedUser) errors.Api
 }
 
 type service struct {
@@ -120,11 +121,39 @@ func (s *service) LockConfig(ctx context.Context, appRefUuid string, authedUser 
 			fmt.Errorf("user has no permissions to lock app configs"),
 			"User has no permission for this action")
 	}
-	storedAppConfig.Locked = true
-	if err := s.repo.SetAppConfigLock(ctx, appRefUuid); err != nil {
+
+	if err := s.repo.SetAppConfigLock(ctx, appRefUuid, true); err != nil {
 		return errors.New(http.StatusInternalServerError,
 			err,
-			"Could not update App Config")
+			"Could not lock App Config")
+	}
+	return nil
+}
+
+func (s *service) UnlockConfig(ctx context.Context, appRefUuid string, authedUser *common.AuthedUser) errors.Api {
+	var storedAppConfig appconfigs.AppConfig
+	err := s.repo.GetById(ctx, appRefUuid, &storedAppConfig)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return errors.New(http.StatusNotFound, err, "Could not find any App Config")
+		}
+		return errors.New(http.StatusInternalServerError, err, "Could not get App Config")
+	}
+
+	if err := storedAppConfig.HasReadWrite(authedUser.Uuid); err != nil {
+		return errors.New(http.StatusUnauthorized,
+			fmt.Errorf("user has no permissions to lock app configs"),
+			"User has no permission for this action")
+	}
+
+	if !storedAppConfig.Locked {
+		return nil
+	}
+
+	if err := s.repo.SetAppConfigLock(ctx, appRefUuid, false); err != nil {
+		return errors.New(http.StatusInternalServerError,
+			err,
+			"Could not unlock App Config")
 	}
 	return nil
 }

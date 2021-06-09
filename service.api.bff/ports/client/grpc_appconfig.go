@@ -95,3 +95,22 @@ func (client ClientAppConfig) LockAppConfig(ctx context.Context, appUuid string,
 	}
 	return nil
 }
+
+func (client ClientAppConfig) UnlockAppConfig(ctx context.Context, r *apps.UnlockRequest) errors.Api {
+	resp, err := client.Conn.UnlockConfig(ctx, &grpcAppConfig.UnlockConfigRequest{
+		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
+		AuthedUser: r.AuthedUser,
+		AppRefUuid: r.AppUuid,
+	})
+	if err != nil {
+		return errors.New(http.StatusInternalServerError,
+			err,
+			"Could not unlock app config")
+	}
+	if resp.GetStatusCode() != http.StatusOK {
+		return errors.New(resp.GetStatusCode(),
+			fmt.Errorf(resp.GetMsg()),
+			resp.GetMsg())
+	}
+	return nil
+}

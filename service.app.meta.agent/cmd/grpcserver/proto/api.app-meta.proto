@@ -17,6 +17,7 @@ service AppMeta {
     rpc AcceptInvite(AcceptInviteRequest) returns (AcceptInviteResponse) {}
 
     rpc LockApp(LockAppRequest) returns (LockAppResponse) {}
+    rpc UnlockApp(UnlockAppRequest) returns (UnlockAppResponse) {}
 }
 
 
@@ -42,6 +43,16 @@ message LockAppRequest {
     common.AuthedUser authed_user = 3;
 }
 message LockAppResponse {
+    int32 status_code = 1;
+    string msg = 2;
+}
+
+message UnlockAppRequest {
+    string tracing_ID = 1;
+    string app_uuid = 2;
+    common.AuthedUser authed_user = 3;
+}
+message UnlockAppResponse {
     int32 status_code = 1;
     string msg = 2;
 }
