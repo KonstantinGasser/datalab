@@ -18,7 +18,7 @@ import (
 
 func main() {
 	host := flag.String("host", "localhost:8002", "address to run the server on")
-	dbAddr := flag.String("db-srv", "mongodb://userauthstorage:secure@192.168.0.177:27021", "address to connect to user-auth-database")
+	dbAddr := flag.String("db-srv", "mongodb://user-auth-agent:secure@user-auth-agent-db:27017", "address to connect to user-auth-database")
 	flag.Parse()
 
 	server := grpc.NewServer()

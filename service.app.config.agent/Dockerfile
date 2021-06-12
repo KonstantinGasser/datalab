@@ -8,4 +8,4 @@ EXPOSE 8005
 
 ENTRYPOINT ["/usr/bin/service", \
                 "-host=:8005", \
-                "-db-srv=mongodb://appconfigstorage:secure@192.168.0.177:27019"]
+                "-db-srv=mongodb://app-config-agent:secure@app-config-agent-db:27019"]

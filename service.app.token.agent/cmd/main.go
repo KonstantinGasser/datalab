@@ -19,7 +19,7 @@ func main() {
 
 	// collect flags
 	host := flag.String("host", "localhost:8006", "address to run the server on")
-	dbAddr := flag.String("db-srv", "mongodb://apptokenissuer:secure@192.168.0.177:27020", "address to connect to apptoken-database")
+	dbAddr := flag.String("db-srv", "mongodb://app-token-agent:secure@app-token-agent-db:27020", "address to connect to apptoken-database")
 	flag.Parse()
 
 	server := grpc.NewServer()

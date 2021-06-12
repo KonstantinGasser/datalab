@@ -16,7 +16,7 @@ import (
 
 func main() {
 	host := flag.String("host", "localhost:8005", "address to run the server on")
-	dbAddr := flag.String("db-srv", "mongodb://appconfigstorage:secure@192.168.0.177:27019", "address to connect to config-database")
+	dbAddr := flag.String("db-srv", "mongodb://app-config-agent:secure@app-config-agent-db:27019", "address to connect to config-database")
 	flag.Parse()
 
 	server := grpc.NewServer()

@@ -1,4 +1,16 @@
-# datalab analysis platform for user activity data
+# datalab - mind your business
+
+## Purpose of the App
+The goal of the application is to allow companies to understand their customer behaviors better. In the app datalab you can register apps that you want to monitor. After creating the app you can define things like how your business funnel looks like, what campaigns your currently running. There is one more thing - did you ever wanted to know how long your customers need until they click the "buy" button, with "interesting buttons" datalab will tell you! 
+
+## System Architecture
+![](git-resources/datalab_sys_arch.png)
+
+## Basic information
+*remark: further information about what each service does can be found in its `READEME` file*
+
+The entry point for each request is the `service.api.bff` which is connected to each available service either through a `gRPC-Client` or through Kafka. 
+<!-- # datalab analysis platform for user activity data
 
 
 # Client Library: Data Flow
@@ -110,28 +122,30 @@ EVENT: MOUSEMOVE<br>
 <!-- The swarm lives on a Raspberry-PI4 (linux/arm64) consisting out of one node.
 Each service (api,app,user,token,frontend) have their own `Makefile` with the `deploy` target. `make deploy` cross-compilies the executable for `linux/arm64` and builds a docker image also with cross-compilation for `linux/arm64`. Docker cross-compilation is achieved with the `docker buildx build` tool from docker which allows to build images on your local machine for a different OS/Arch. After the build `deploy` pushes the image to the `datalab-registry.dev:5000/<image-name>:<git-commit-hash>` which lives within the `swarm`. From their services can pull the latest images. -->
 
-
+<!--
 
 ## Service - DNS Table (some say they can see a pattern..not sure where??)
-| Service               | swarm-name           | port in:out | credentials                |
-|-----------------------|----------------------|-------------|----------------------------|
-| gateway               | gateway              | 8080:8080   |                            |
-| app                   | appservice           | 8003:8003   |                            |
-| user                  | userservice          | 8001:8001   |                            |
-| userauth              | userauth             | 8002:8002   |                            |
-| config                | configservice        | 8005:8005   |                            |
-| apptoken              | apptokenservice      | 8006:8006   |                            |
-| frontend              | vuefrontend          | 80:80       |                            |
-| mongo-app             | appstorage           | 27018:27017 | appstorage:secure          |
-| monog-user            | userstorage          | 27017:27017 | userstorage:secure         |
-| monog-config          | configstorage        | 27019:27017 | configstorage:secure       |
-| monog-apptoken        | apptokenstorage      | 27020:27017 | apptokenstorage:secure     |
-| monog-userauth        | userauthstorage      | 27021:27017 | userauthstorage:secure     |
+| Service               | swarm-name                  | port in:out | credentials                |
+|-----------------------|-----------------------------|-------------|----------------------------|
+| gateway               | api-bff                     | 8080:8080   |                            |
+| app                   | app-meta-agent              | 8003:8003   |                            |
+| user                  | user-meta-agent             | 8001:8001   |                            |
+| userauth              | user-auth-agent             | 8002:8002   |                            |
+| config                | app-config-agent            | 8005:8005   |                            |
+| apptoken              | app-token-agent             | 8006:8006   |                            |
+| frontend              | frontend-web                | 80:80       |                            |
+| mongo-app             | app-meta-agent-db           | 270121:27017 | app-meta-agent:secure     |
+| monog-user            | user-meta-agent-db          | 27018:27017 | user-meta-agent:secure     |
+| monog-config          | app-config-agent-db         | 27019:27017 | app-config-agent:secure    |
+| monog-apptoken        | app-token-agent-db          | 27020:27017 | app-token-agent:secure     |
+| monog-userauth        | user-auth-agent-db          | 27018:27017 | user-auth-agent:secure     |
+| monog-notify          | notify-live-agent-db        | 27022:27017 | notify-live-agent:secure   |
 
+-->
 
-
+<!--
 # So fare...
- 
+
 ![](git-resources/demo_img_1.png)
 
-![](git-resources/demo_img_2.png)
+![](git-resources/demo_img_2.png) -->
