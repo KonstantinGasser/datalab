@@ -73,6 +73,11 @@ func (s *service) UpdateCampaign(ctx context.Context, appRefUuid string, authedU
 		}
 		return errors.New(http.StatusInternalServerError, err, "Could not get App Config")
 	}
+	if storedAppConfig.Locked {
+		return errors.New(http.StatusUnauthorized,
+			fmt.Errorf("app is locked and cannot be changed"),
+			"App is locked and cannot be changed")
+	}
 	// check user permissions
 	if err := storedAppConfig.HasReadOrWrite(authedUser.Uuid, authedUser.ReadWriteApps...); err != nil {
 		return errors.New(http.StatusUnauthorized, err, "User has no rights to change App Config")
@@ -93,6 +98,11 @@ func (s *service) UpdateBtnTime(ctx context.Context, appRefUuid string, authedUs
 			return errors.New(http.StatusNotFound, err, "Could not find any App Config")
 		}
 		return errors.New(http.StatusInternalServerError, err, "Could not get App Config")
+	}
+	if storedAppConfig.Locked {
+		return errors.New(http.StatusUnauthorized,
+			fmt.Errorf("app is locked and cannot be changed"),
+			"App is locked and cannot be changed")
 	}
 	// check user permissions
 	if err := storedAppConfig.HasReadOrWrite(authedUser.Uuid, authedUser.ReadWriteApps...); err != nil {
