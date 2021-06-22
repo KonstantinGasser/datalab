@@ -15,7 +15,7 @@ func (server AppMetaServer) Get(ctx context.Context, in *proto.GetRequest) (*pro
 
 	app, err := server.fechtService.FetchAppByID(ctx,
 		in.GetAppUuid(),
-		in.GetAuthedUser(),
+		// in.GetAuthedUser(),
 	)
 	if err != nil {
 		logrus.Errorf("[%v][server.Get] could not get App: %v\n", tracingId, err.Error())
@@ -53,7 +53,7 @@ func (server AppMetaServer) GetList(ctx context.Context, in *proto.GetListReques
 	tracingId := in.GetTracing_ID()
 	logrus.Infof("[%v][server.GetList] received request\n", tracingId)
 
-	apps, err := server.fechtService.FetchAppSubsets(ctx, in.GetAuthedUser())
+	apps, err := server.fechtService.FetchAppSubsets(ctx)
 	if err != nil {
 		logrus.Errorf("[%v][server.GetList] could not get Apps: %v\n", tracingId, err.Error())
 		return &proto.GetListResponse{

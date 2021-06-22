@@ -64,6 +64,7 @@ func (s *Server) WithCookie(next http.HandlerFunc) http.HandlerFunc {
 
 		cookie, err = r.Cookie(keyCookie)
 		if err != nil || cookie.Value == "" {
+			logrus.Warnf("[middleware.WithCookie] no cookie present - setting new cookie\n")
 			// set new cookie for request
 			uuid, err := unique.UUID()
 			if err != nil {
@@ -74,6 +75,7 @@ func (s *Server) WithCookie(next http.HandlerFunc) http.HandlerFunc {
 				Value:   uuid,
 				Expires: time.Now().Add(1 * time.Hour),
 				Path:    "/",
+				Domain:  "sample.router.dev",
 			}
 			http.SetCookie(w, cookie)
 		}
@@ -84,17 +86,35 @@ func (s *Server) WithCookie(next http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
+// MustCookie ensures that a request has a cookie present else aborts the request with a 403.
+func (s *Server) MustCookie(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		logrus.Info("[middleware.MustCookie] applying\n")
+		cookie, err := r.Cookie(keyCookie)
+		if err != nil || cookie == nil {
+			logrus.Errorf("[middleware.MustCookie] no cookie present. Want: cookie - have: %v\n", cookie)
+			http.Error(w, http.ErrNoCookie.Error(), http.StatusForbidden)
+			return
+		}
+		ctx := context.WithValue(r.Context(), typeKeyCookie(keyCookie), cookie)
+		next(w, r.WithContext(ctx))
+	}
+}
+
 // WithTicketAuth looks for the from this service issued web-socket ticket
 // and validates the ticket - if of it passed the request forward to the next caller
 // else returns with a http error
 func (s *Server) WithTicketAuth(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		logrus.Info("[middleware.WithTicketAuth] applying\n")
 		ticket := r.URL.Query().Get("ticket")
 		if ticket == "" {
+			logrus.Errorf("could not find any ws-ticket want: jwt - have: %s\n", ticket)
 			s.onErr(w, http.StatusUnauthorized, "no ws ticket found")
 			return
 		}
 		if err := jwts.Validate(ticket); err != nil {
+			logrus.Error("provided ws-ticket is not valid")
 			s.onErr(w, http.StatusUnauthorized, "not authorized")
 			return
 		}

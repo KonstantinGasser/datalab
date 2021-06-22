@@ -8,4 +8,4 @@ EXPOSE 8002
 
 ENTRYPOINT ["/usr/bin/service", \
                 "-host=:8002", \
-                "-db-srv=mongodb://user-auth-agent:secure@user-auth-agent-db:27017"]
+                "-db-srv=mongodb://dev-datalab-user:secure@192.168.0.177:27018"]

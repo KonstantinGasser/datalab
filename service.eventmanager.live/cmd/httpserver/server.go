@@ -7,7 +7,8 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/KonstantinGasser/datalab/service.eventmanager.live/internal/metadata/fetching"
+	"github.com/KonstantinGasser/datalab/service.eventmanager.live/internal/sessions"
+	"github.com/KonstantinGasser/datalab/service.eventmanager.live/internal/stream"
 	"github.com/KonstantinGasser/datalab/service.eventmanager.live/ports/client"
 	"github.com/sirupsen/logrus"
 )
@@ -82,13 +83,14 @@ type Server struct {
 	// marshaling the passed data allowing to avoid code duplication
 	// content-type will always be application/json
 	onSuccess func(w http.ResponseWriter, status int32, data interface{})
-	// *** Server dependiencies ***
-	appTokenClient      client.ClientAppToken
-	metaFetchingService fetching.Service
+	// *** Server dependencies ***
+	appTokenClient client.ClientAppToken
+	sessionSvc     sessions.Service
+	stream         *stream.Stream
 }
 
-func NewDefault(appTokenClient client.ClientAppToken, metaFetchingService fetching.Service) *Server {
-	return &Server{
+func NewDefault(appTokenClient client.ClientAppToken, sessionSvc sessions.Service, stream *stream.Stream) *Server {
+	srv := &Server{
 		// *** CORS-Configurations ***
 		allowedOrigins:   []string{"*"},
 		allowedMethods:   []string{"GET", "POST", "OPTIONS"},
@@ -97,12 +99,17 @@ func NewDefault(appTokenClient client.ClientAppToken, metaFetchingService fetchi
 		onErr:            onErr,
 		onSuccess:        onSuccess,
 		// *** service dependencies ***
-		appTokenClient:      appTokenClient,
-		metaFetchingService: metaFetchingService,
+		appTokenClient: appTokenClient,
+		sessionSvc:     sessionSvc,
+		stream:         stream,
 	}
+	return srv
 }
 
 func (s Server) Start(host string) error {
+	// let the stream service listen to incoming events
+	go s.stream.Listen()
+
 	listener, err := net.Listen("tcp", host)
 	if err != nil {
 		return err

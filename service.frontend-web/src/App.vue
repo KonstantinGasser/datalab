@@ -361,13 +361,35 @@ input {
   margin-top: 0;
   color: #42b983;
 }
-
+x
 .modal-body {
   margin: 20px 0;
 }
 
 .modal-default-button {
   float: right;
+}
+
+.tooltip1 {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip1 .tooltiptext1 {
+  visibility: hidden;
+  width: max-content;
+  background-color: #ccc;
+  color: #000;
+  opacity: 0.6;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 5px;
+  position: absolute;
+  z-index: 1;
+}
+
+.tooltip1:hover .tooltiptext1 {
+  visibility: visible;
 }
 
 

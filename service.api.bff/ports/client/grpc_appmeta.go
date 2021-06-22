@@ -9,6 +9,7 @@ import (
 	"github.com/KonstantinGasser/datalab/library/errors"
 	"github.com/KonstantinGasser/datalab/library/utils/ctx_value"
 	"github.com/KonstantinGasser/datalab/service.api.bff/internal/apps"
+	"github.com/KonstantinGasser/datalab/service.api.bff/ports/client/intercepter"
 	grpcAppMeta "github.com/KonstantinGasser/datalab/service.app.meta.agent/cmd/grpcserver/proto"
 	"google.golang.org/grpc"
 )
@@ -18,7 +19,7 @@ type ClientAppMeta struct {
 }
 
 func NewClientAppMeta(clientAddr string) (*ClientAppMeta, error) {
-	conn, err := grpc.Dial(clientAddr, grpc.WithInsecure())
+	conn, err := grpc.Dial(clientAddr, grpc.WithInsecure(), intercepter.WithUnary(intercepter.WithAuth))
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +30,6 @@ func NewClientAppMeta(clientAddr string) (*ClientAppMeta, error) {
 }
 
 func (client ClientAppMeta) CreateApp(ctx context.Context, r *apps.CreateAppRequest) (string, errors.Api) {
-
 	resp, err := client.Conn.Create(ctx, &grpcAppMeta.CreateRequest{
 		Tracing_ID:   ctx_value.GetString(ctx, "tracingID"),
 		OwnerUuid:    r.OwnerUuid,
@@ -56,7 +56,6 @@ func (client ClientAppMeta) GetApp(ctx context.Context, r *apps.GetAppRequest) (
 
 	resp, err := client.Conn.Get(ctx, &grpcAppMeta.GetRequest{
 		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
-		AuthedUser: r.AuthedUser,
 		AppUuid:    r.AppUuid,
 	})
 	if err != nil {
@@ -76,7 +75,6 @@ func (client ClientAppMeta) GetAppList(ctx context.Context, r *apps.GetAppListRe
 
 	resp, err := client.Conn.GetList(ctx, &grpcAppMeta.GetListRequest{
 		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
-		AuthedUser: r.AuthedUser,
 	})
 	if err != nil {
 		return nil, errors.New(http.StatusInternalServerError,
@@ -113,7 +111,6 @@ func (client ClientAppMeta) SendInvite(ctx context.Context, r *apps.SendInviteRe
 }
 
 func (client ClientAppMeta) InviteReminderOK(ctx context.Context, r *apps.InviteReminderRequest) errors.Api {
-
 	resp, err := client.Conn.InviteReminderOK(ctx, &grpcAppMeta.InviteReminderOKRequest{
 		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
 		AppUuid:    r.AppUuid,
@@ -133,7 +130,6 @@ func (client ClientAppMeta) InviteReminderOK(ctx context.Context, r *apps.Invite
 }
 
 func (client ClientAppMeta) AcceptInvite(ctx context.Context, r *apps.AcceptInviteRequest) errors.Api {
-
 	resp, err := client.Conn.AcceptInvite(ctx, &grpcAppMeta.AcceptInviteRequest{
 		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
 		AuthedUser: r.AuthedUser,

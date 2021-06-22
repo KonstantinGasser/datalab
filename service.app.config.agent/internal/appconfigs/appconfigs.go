@@ -3,6 +3,7 @@ package appconfigs
 import (
 	"context"
 	"fmt"
+	"regexp"
 )
 
 const (
@@ -15,6 +16,8 @@ var (
 	ErrInvalidFlag       = fmt.Errorf("provided config-flag is invalid")
 	ErrNoReadWriteAccess = fmt.Errorf("user read/write access for AppToken")
 	ErrNoReadAccess      = fmt.Errorf("user has no read access for AppToken")
+
+	ErrInvalidRegex = fmt.Errorf("provided stage-regex is not a regex")
 )
 
 type AppconfigRepo interface {
@@ -38,6 +41,7 @@ type Stage struct {
 	Id         int32  `bson:"id"`
 	Name       string `bson:"name"`
 	Transition string `bson:"transition"`
+	Regex      string `bson:"regex"`
 	Trigger    int32  `bson:"trigger"`
 }
 
@@ -64,8 +68,17 @@ func NewDefault(appRefUuid, configOwner string) *AppConfig {
 	}
 }
 
-func (appConf *AppConfig) ApplyFunnel(stages ...Stage) {
+func (appConf *AppConfig) ApplyFunnel(stages ...Stage) error {
+	// check if regex is set and if regex is valid
+	for _, stage := range stages {
+		if len(stage.Regex) > 0 {
+			if err := isRegex(stage.Regex); err != nil {
+				return err
+			}
+		}
+	}
 	appConf.Funnel = stages
+	return nil
 }
 
 func (appConf *AppConfig) ApplyCampaign(records ...Record) {
@@ -101,6 +114,15 @@ func (appConfig AppConfig) HasReadOrWrite(userUuid string, readWriteUuids ...str
 	rwErr := appConfig.HasReadWrite(userUuid)
 	if readErr != nil && rwErr != nil {
 		return ErrNoReadAccess
+	}
+	return nil
+}
+
+// isRegex checks if a given pattern can be parsed to a regex
+func isRegex(pattern string) error {
+	_, err := regexp.Compile(pattern)
+	if err != nil {
+		return ErrInvalidRegex
 	}
 	return nil
 }

@@ -19,4 +19,3 @@ type StartRequest struct {
 	AppUuid, AppOrigin string
 	Session            *Session
 }
-type StartResponse struct{}

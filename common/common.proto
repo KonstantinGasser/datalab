@@ -128,7 +128,8 @@ message Stage {
     int32 id = 1;
     string name = 2;
     string transition = 3;
-    int32 trigger = 4;
+    string regex = 4;
+    int32 trigger = 5;
 }
 message Record {
     int32 id = 1;

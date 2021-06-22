@@ -108,10 +108,8 @@ func (s service) collectAttachedAppData(ctx context.Context, appUuid string, app
 			if err != nil {
 				logrus.Errorf("[%s][creating.EmitInit] emit cause error: %v\n", ctx_value.GetString(ctx, "tracingID"), err)
 				// if there is an error while emitting events
-				// here the emiited events must succed in order for the
-				// transaction to succeed - hence if err cancel context and
-				// role back (if that would have been implmeneted)
-				// return nil, nil, nil, err
+				// the call to collect this specific app information will be skipped.
+				// partial data will be returned
 				continue
 			}
 		case result := <-resC:

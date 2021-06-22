@@ -1,11 +1,5 @@
 package notifyhub
 
-import (
-	"net/http"
-
-	"github.com/gorilla/websocket"
-)
-
 type MessageEvent int
 
 // VueMutation represents the actual function names
@@ -30,14 +24,6 @@ const (
 	MutationLoadFromDB VueMutation = "INIT_LOAD"
 	MutationIsOnline   VueMutation = "IS_ONLINE"
 )
-
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-	CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
-}
 
 // Notification represents one notification as it will
 // be stored in the database.

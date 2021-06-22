@@ -4,7 +4,9 @@ import (
 	"flag"
 
 	"github.com/KonstantinGasser/datalab/service.eventmanager.live/cmd/httpserver"
-	"github.com/KonstantinGasser/datalab/service.eventmanager.live/internal/metadata/fetching"
+	"github.com/KonstantinGasser/datalab/service.eventmanager.live/internal/sessions"
+	"github.com/KonstantinGasser/datalab/service.eventmanager.live/internal/stream"
+	"github.com/KonstantinGasser/datalab/service.eventmanager.live/ports/cassandra"
 	"github.com/KonstantinGasser/datalab/service.eventmanager.live/ports/client"
 	"github.com/sirupsen/logrus"
 )
@@ -23,19 +25,25 @@ func main() {
 	if err != nil {
 		logrus.Fatal(err)
 	}
-	metaFetchingService := fetching.NewService(*grpcAppConfig)
+	sessionSvc := sessions.NewService(*grpcAppConfig)
 
-	server := httpserver.NewDefault(*grpcAppToken, metaFetchingService)
+	streamSvc := stream.New(&cassandra.Client{})
+	server := httpserver.NewDefault(*grpcAppToken, sessionSvc, streamSvc)
 	server.Apply(
 		httpserver.WithAllowedOrgins("*"),
 		httpserver.WithAllowedHeaders("x-datalab-token", "content-type"),
 		httpserver.WithAllowedCreds,
 	)
 
-	server.Register("/api/v1/hello", server.StartSession,
+	server.Register("/api/v1/hello", server.Hello,
 		server.WithCors,
 		server.WithAuth,
 		server.WithCookie,
+	)
+	server.Register("/api/v1/open", server.OpenSocket,
+		// server.WithCors,
+		server.WithTicketAuth,
+		server.MustCookie,
 	)
 
 	logrus.Fatal(server.Start(*host))

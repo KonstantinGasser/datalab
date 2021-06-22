@@ -48,7 +48,7 @@ func (s service) CreateDefaultApp(ctx context.Context, name, URL, ownerUuid, own
 }
 
 // emitInitEvent distributes the event that a new app has been created triggering the init endpoints
-// of the AppTokenSerivce and AppConfigService
+// of the AppTokenService and AppConfigService
 func (s service) emitInitEvent(ctx context.Context, app *apps.App) error {
 	withCancel, cancel := context.WithCancel(ctx)
 	defer cancel()

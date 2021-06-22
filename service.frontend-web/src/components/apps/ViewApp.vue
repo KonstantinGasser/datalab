@@ -164,7 +164,7 @@
                         'Authorization': localStorage.getItem("token"),
                     }
                 };
-                const resp = await axios.get("http://192.168.0.177:8080/api/v1/app/all", options)
+                const resp = await axios.get("http://localhost:8080/api/v1/app/all", options)
                 if (resp.status != 200) {
                     this.$toast.error(resp.data);
                 }
@@ -179,7 +179,7 @@
                 };
                 let resp = {}
                 try {
-                    resp = await axios.get("http://192.168.0.177:8080/api/v1/app?app="+uuid, options)
+                    resp = await axios.get("http://localhost:8080/api/v1/app?app="+uuid, options)
                     if (resp.status != 200) {
                         this.$toast.error(resp.data);
                     }

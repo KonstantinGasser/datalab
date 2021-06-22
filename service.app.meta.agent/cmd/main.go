@@ -5,6 +5,7 @@ import (
 	"net"
 
 	"github.com/KonstantinGasser/datalab/service.app.meta.agent/cmd/grpcserver"
+	"github.com/KonstantinGasser/datalab/service.app.meta.agent/cmd/grpcserver/intercepter"
 	"github.com/KonstantinGasser/datalab/service.app.meta.agent/cmd/grpcserver/proto"
 	"github.com/KonstantinGasser/datalab/service.app.meta.agent/internal/apps/creating"
 	"github.com/KonstantinGasser/datalab/service.app.meta.agent/internal/apps/fetching"
@@ -21,10 +22,12 @@ func main() {
 	appconfigAddr := flag.String("config-srv", "localhost:8005", "address to connect to app-config-service")
 	userauthAddr := flag.String("permissions-srv", "localhost:8002", "address to connect to user-authentication-service")
 	apptokenAddr := flag.String("apptoken-srv", "localhost:8006", "address to connect to user-authentication-service")
-	dbAddr := flag.String("db-srv", "mongodb://app-meta-agent:secure@app-meta-agent-db:27021", "address to connect to app-database")
+	dbAddr := flag.String("db-srv", "mongodb://dev-datalab-user:secure@192.168.0.177:27018", "address to connect to app-database")
 	flag.Parse()
 
-	server := grpc.NewServer()
+	server := grpc.NewServer(
+		intercepter.WithUnary(intercepter.WithJwtAuth),
+	)
 	listener, err := net.Listen("tcp", *host)
 	if err != nil {
 		logrus.Fatal(err)

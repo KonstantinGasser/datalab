@@ -53,9 +53,10 @@ func (s *Server) WithAuth(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 		// add JWT claims of user in r.Context()
-		ctxWithVal := ctx_value.AddValue(r.Context(), "user", authedUser)
+		ctxAuthedUser := ctx_value.AddValue(r.Context(), "user", authedUser)
+		ctxJwtToken := ctx_value.AddValue(ctxAuthedUser, "authorization", accessToken)
 		// serve request with user claims in context
-		next(w, r.WithContext(ctxWithVal))
+		next(w, r.WithContext(ctxJwtToken))
 	}
 }
 

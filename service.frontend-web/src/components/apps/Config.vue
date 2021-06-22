@@ -20,7 +20,10 @@
                                     <div v-if="f.trigger == 1" class="dots"><span class="icon icon-at-sign standard-font"></span>URL</div>
                                     <div v-if="f.trigger == 2" class="dots"><span class="icon icon-at-sign standard-font"></span>OnClick</div>
                                 </div>
-                                <div class="stage-transition dots">{{f.transition}}</div>
+                                <div class="stage-transition tooltip1">
+                                    <div class="dots">{{f.transition}}</div>
+                                    <span class="tooltiptext1">{{f.transition}}</span>
+                                </div>
                             </div>
                         </div>
                         <div>
@@ -80,9 +83,9 @@
                     <th>{{item.id}}</th>
                     <th>{{item.name}}</th>
                     <th>{{item.suffix}}</th>
-                    <th><span class="icon icon-trash-2 hover" @click="removeCampaign(item.id)"></span></th>
+                    <th><span v-if="app_locked === undefined || !app_locked"  class="icon icon-trash-2 hover" @click="removeCampaign(item.id)"></span></th>
                 </tr>
-                <tr>
+                <tr v-if="app_locked === undefined || !app_locked">
                     <th class="v-center"></th>
                     <td><input v-model="campaign_name" type="text" placeholder="Name (E-Mail Campaign)" class="form-control border" :class="{'border-danger': campaign_invalid}" ></td>
                     <td>
@@ -120,9 +123,9 @@
                     <th>{{item.id}}</th>
                     <th>{{item.name}}</th>
                     <th>{{item.btn_name}}</th>
-                    <th><span class="icon icon-trash-2 hover" @click="removeBtnTime(item.id)"></span></th>
+                    <th><span v-if="app_locked === undefined || !app_locked" class="icon icon-trash-2 hover" @click="removeBtnTime(item.id)"></span></th>
                 </tr>
-                <tr>
+                <tr v-if="app_locked === undefined || !app_locked">
                     <th class="v-center"></th>
                     <td><input v-model="button_name" type="text" placeholder="Name (ex. Btn-Order)" class="form-control border" :class="{'border-danger': button_invalid}" ></td>
                     <td><input v-model="button_btn" type="text" placeholder="Btn (ex. btn_order)" class="form-control border" :class="{'border-danger': button_invalid}" ></td>
@@ -178,6 +181,22 @@ export default {
 
     },
     methods: {
+        isRegex(pattern) {
+            var parts = pattern.split('/'),
+                regex = pattern,
+                options = "";
+            if (parts.length > 1) {
+                regex = parts[1];
+                options = parts[2];
+            }
+            try {
+                new RegExp(regex, options);
+                return true;
+            }
+            catch(e) {
+                return false;
+            }
+        },
         addStage() {
             if (this.stage_invalid) this.stage_invalid = false;
             const tmp = this.$props.app_config?.funnel?.filter(item => item.name === this.stage_name || item.transition === this.stage_transition)
@@ -191,6 +210,13 @@ export default {
             if (tmp2?.length === 0) {
                 this.$moshaToast("Please select a Stage-Trigger", {type: 'danger',position: 'top-center', timeout: 3000})
             }
+            // extract regex pattern from transition
+            const regex_pattern = this.stage_transition.substring(
+                this.stage_transition.search("{"),this.stage_transition.search("}")+1
+            )
+            if (regex_pattern?.length > 0 && !this.isRegex(regex_pattern)) {
+                this.$moshaToast("Provided Regex might be wrong", {type: 'warning',position: 'top-center', timeout: 3000})
+            }
             let count = this.$props.app_config?.funnel?.length + 1
             if (Number.isNaN(count)) {
                 count = 1
@@ -199,6 +225,7 @@ export default {
                     id: count,
                     name: this.stage_name,
                     transition: this.stage_transition,
+                    regex: regex_pattern,
                     trigger: this.stage_trigger.id,
                 }
             })
@@ -220,7 +247,7 @@ export default {
                 app_uuid: this.$props.app_uuid,
                 stages: this.$props.app_config?.funnel,
             }
-            axios.post("http://192.168.0.177:8080/api/v1/app/config/update", payload, options).then(res => {
+            axios.post("http://localhost:8080/api/v1/app/config/update", payload, options).then(res => {
                 // this.$toast.success("Updated Funnel information");
                 this.$moshaToast(res.data.msg, {type: 'success',position: 'top-center', timeout: 3000})
                 this.$emit("appchange", {unsaved: false, type: "funnel-saved"});
@@ -261,7 +288,7 @@ export default {
                 app_uuid: this.$props.app_uuid,
                 records: this.$props.app_config?.campaign,
             }
-            axios.post("http://192.168.0.177:8080/api/v1/app/config/update", payload, options).then(res => {
+            axios.post("http://localhost:8080/api/v1/app/config/update", payload, options).then(res => {
                 this.$moshaToast(res.data.msg, {type: 'success',position: 'top-center', timeout: 3000})
                 this.$emit("appchange", {unsaved: false, type: "campaign-saved"});
 
@@ -303,7 +330,7 @@ export default {
                 app_uuid: this.$props.app_uuid,
                 btn_defs: this.$props.app_config?.btn_time,
             }
-            axios.post("http://192.168.0.177:8080/api/v1/app/config/update", payload, options).then(res => {
+            axios.post("http://localhost:8080/api/v1/app/config/update", payload, options).then(res => {
                 this.$moshaToast(res.data.msg, {type: 'success',position: 'top-center', timeout: 3000})
                 this.$emit("appchange", {unsaved: false, type: "btn-saved"})
             }).catch(err => this.$moshaToast(err.response?.data?.msg, {type: 'danger',position: 'top-center', timeout: 3000}));
@@ -370,6 +397,8 @@ td .icon {
     color: var(--h-color);
 }
 .funnel .stage-transition {
+    text-align: center;
+    width: 100%;
     font-size: 14px;
     color: var(--txt-small);
 }

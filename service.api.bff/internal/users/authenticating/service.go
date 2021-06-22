@@ -2,6 +2,7 @@ package authenticating
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/KonstantinGasser/datalab/common"
@@ -9,6 +10,18 @@ import (
 	"github.com/KonstantinGasser/datalab/service.api.bff/internal/users"
 	"github.com/KonstantinGasser/datalab/service.api.bff/ports/client"
 	"github.com/KonstantinGasser/required"
+	"github.com/dgrijalva/jwt-go"
+)
+
+const (
+	secretUser = "super_secure"
+)
+
+var (
+	ErrNotAuthenticated = fmt.Errorf("user is not authenticated")
+	ErrJWTParse         = fmt.Errorf("could not parse jwt token")
+	ErrCorruptJWT       = fmt.Errorf("jwt could not be parsed (JWT might be corrupted)")
+	ErrExpiredJWT       = fmt.Errorf("provided JWT has expired")
 )
 
 type Service interface {
@@ -86,9 +99,35 @@ func (s service) Login(ctx context.Context, r *users.LoginRequest) *users.LoginR
 }
 
 func (s service) Authenticate(ctx context.Context, accessToken string) (*common.AuthedUser, errors.Api) {
-	authedUser, err := s.userAuthClient.Authenticate(ctx, accessToken)
+
+	token, err := verifyToken(accessToken, secretUser)
 	if err != nil {
-		return nil, err
+		return nil, errors.New(http.StatusUnauthorized, ErrNotAuthenticated, "User not authenticated")
 	}
-	return authedUser, nil
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok && !token.Valid {
+		return nil, errors.New(http.StatusUnauthorized, ErrNotAuthenticated, "User not authenticated")
+	}
+	if err := claims.Valid(); err != nil {
+		return nil, errors.New(http.StatusUnauthorized, ErrExpiredJWT, "User not authenticated")
+	}
+
+	return &common.AuthedUser{
+		Uuid:         claims["sub"].(string),
+		Organization: claims["orgn"].(string),
+		Username:     claims["uname"].(string),
+	}, nil
+}
+
+func verifyToken(tokenString, secret string) (*jwt.Token, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, ErrCorruptJWT
+		}
+		return []byte(secret), nil
+	})
+	if err != nil {
+		return nil, ErrJWTParse
+	}
+	return token, nil
 }

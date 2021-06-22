@@ -13,7 +13,7 @@ enum LISTENER {
 }
 
 export class DataKraken {   
-    private API_WS = "ws://localhost:8004/api/v1/event/live?ticket=" 
+    private API_WS = "ws://localhost:8004/api/v1/open?ticket=" 
     private URL_TIMEOUT_RATE: number = 1000
     private URL_TIME: number = new Date().getTime()
     private CURRENT_URL: string = history.state.current
@@ -55,7 +55,7 @@ export class DataKraken {
             headers: {
                 "x-datalab-token": token
             },
-            withCredentials: true,
+            // withCredentials: true,
         }
         const resp: any = await axios.post("http://localhost:8004/api/v1/hello", {
             referrer: this.getReferrer(),

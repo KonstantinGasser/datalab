@@ -2,6 +2,7 @@ package fetching
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/KonstantinGasser/datalab/common"
@@ -11,8 +12,8 @@ import (
 )
 
 type Service interface {
-	FetchAppByID(ctx context.Context, appUuid string, authedUser *common.AuthedUser) (*apps.App, errors.Api)
-	FetchAppSubsets(ctx context.Context, authedUser *common.AuthedUser) ([]apps.AppSubset, errors.Api)
+	FetchAppByID(ctx context.Context, appUuid string) (*apps.App, errors.Api)
+	FetchAppSubsets(ctx context.Context) ([]apps.AppSubset, errors.Api)
 }
 
 type service struct {
@@ -25,7 +26,12 @@ func NewService(repo apps.AppsRepository) Service {
 	}
 }
 
-func (s service) FetchAppByID(ctx context.Context, appUuid string, authedUser *common.AuthedUser) (*apps.App, errors.Api) {
+func (s service) FetchAppByID(ctx context.Context, appUuid string) (*apps.App, errors.Api) {
+	authedUser, ok := ctx.Value("user").(*common.AuthedUser)
+	if !ok {
+		return nil, errors.New(http.StatusUnauthorized, fmt.Errorf("missing authentication"), "User not authenticated")
+	}
+
 	var app apps.App
 	err := s.repo.GetById(ctx, appUuid, &app)
 	if err != nil {
@@ -42,7 +48,12 @@ func (s service) FetchAppByID(ctx context.Context, appUuid string, authedUser *c
 }
 
 // FetchAllApps collects all Apps the user has permission to read from
-func (s service) FetchAppSubsets(ctx context.Context, authedUser *common.AuthedUser) ([]apps.AppSubset, errors.Api) {
+func (s service) FetchAppSubsets(ctx context.Context) ([]apps.AppSubset, errors.Api) {
+	authedUser, ok := ctx.Value("user").(*common.AuthedUser)
+	if !ok {
+		return nil, errors.New(http.StatusUnauthorized, fmt.Errorf("missing authentication"), "User not authenticated")
+	}
+
 	var storedApps []apps.App
 	err := s.repo.GetAll(ctx, authedUser.Uuid, &storedApps)
 	if err != nil {

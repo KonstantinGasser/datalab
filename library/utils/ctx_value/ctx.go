@@ -31,7 +31,7 @@ func GetString(ctx context.Context, key string) string {
 func GetAuthedUser(ctx context.Context) *common.AuthedUser {
 	value := ctx.Value(ctxKey("user"))
 	if value == nil {
-		return nil
+		return &common.AuthedUser{}
 	}
 	return value.(*common.AuthedUser)
 }

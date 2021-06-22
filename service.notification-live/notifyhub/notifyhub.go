@@ -9,8 +9,17 @@ import (
 	"time"
 
 	"github.com/KonstantinGasser/datalab/service.notification-live/repo"
+	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
 )
+
+var upgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
+}
 
 const (
 	healthTimeOut = 10 * time.Second

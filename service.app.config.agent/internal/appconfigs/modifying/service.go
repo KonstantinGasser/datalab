@@ -55,7 +55,11 @@ func (s *service) UpdateFunnel(ctx context.Context, appRefUuid string, authedUse
 			"User has no rights to change App Config")
 	}
 	// update config
-	storedAppConfig.ApplyFunnel(stages...)
+	if err := storedAppConfig.ApplyFunnel(stages...); err != nil {
+		return errors.New(http.StatusBadRequest,
+			err,
+			"Stage with regex is no regex")
+	}
 	if err := s.repo.UpdateByFlag(ctx, appRefUuid, appconfigs.FlagFunnel, stages); err != nil {
 		return errors.New(http.StatusInternalServerError,
 			err,
