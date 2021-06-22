@@ -158,7 +158,9 @@ func (app App) IsMember(userUuid string, status InviteStatus) error {
 }
 
 func (app App) OpenInvite(userUuid string) *Member {
+	fmt.Println(userUuid)
 	for _, member := range app.Members {
+		fmt.Println(member)
 		if member.Uuid == userUuid && member.Status == InvitePending {
 			return &member
 		}

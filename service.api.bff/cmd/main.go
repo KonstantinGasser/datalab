@@ -23,7 +23,7 @@ func main() {
 	apptokenAddr := flag.String("apptoken-srv", "localhost:8006", "address to connect to app-service")
 	appconfigAddr := flag.String("config-srv", "localhost:8005", "address to connect to app-service")
 	userauthAddr := flag.String("auth-srv", "localhost:8002", "address to connect to token-service")
-	notifyliveAddr := flag.String("notify-srv", "localhost:8008", "address to connect to notification-service")
+	notifyliveAddr := flag.String("notify-srv", "192.168.0.177:8008", "address to connect to notification-service")
 	flag.Parse()
 
 	// create grpc service dependencies

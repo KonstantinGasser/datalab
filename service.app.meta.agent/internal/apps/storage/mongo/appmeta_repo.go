@@ -76,13 +76,14 @@ func (client MongoClient) GetAll(ctx context.Context, userUuid string, stored in
 				bson.M{"owner_uuid": userUuid},
 				bson.D{
 					{
-						Key: "$and",
-						Value: bson.A{
-							bson.M{
-								"member.uuid": userUuid,
-							},
-							bson.M{
-								"member.status": apps.InviteAccepted,
+						Key: "member",
+						Value: bson.D{
+							{
+								Key: "$elemMatch",
+								Value: bson.M{
+									"uuid":   userUuid,
+									"status": apps.InviteAccepted,
+								},
 							},
 						},
 					},

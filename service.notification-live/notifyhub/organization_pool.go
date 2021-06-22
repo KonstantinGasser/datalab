@@ -52,7 +52,7 @@ func (pool *OrganizationPool) BroadcastOnline(msg *IncomingEvent) error {
 			return ErrWriteToConn
 		}
 	}
-	// tell new connection how is online
+	// tell new connection who is online
 	if newConn == nil {
 		return nil
 	}

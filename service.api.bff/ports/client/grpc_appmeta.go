@@ -93,7 +93,6 @@ func (client ClientAppMeta) SendInvite(ctx context.Context, r *apps.SendInviteRe
 
 	resp, err := client.Conn.Invite(ctx, &grpcAppMeta.InviteRequest{
 		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
-		AuthedUser: r.AuthedUser,
 		AppUuid:    r.AppUuid,
 		UserUuid:   r.InvitedUuid,
 	})
@@ -132,7 +131,6 @@ func (client ClientAppMeta) InviteReminderOK(ctx context.Context, r *apps.Invite
 func (client ClientAppMeta) AcceptInvite(ctx context.Context, r *apps.AcceptInviteRequest) errors.Api {
 	resp, err := client.Conn.AcceptInvite(ctx, &grpcAppMeta.AcceptInviteRequest{
 		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
-		AuthedUser: r.AuthedUser,
 		AppUuid:    r.AppUuid,
 	})
 	if err != nil {
@@ -151,7 +149,6 @@ func (client ClientAppMeta) AcceptInvite(ctx context.Context, r *apps.AcceptInvi
 func (client ClientAppMeta) LockApp(ctx context.Context, appUuid string, authedUser *common.AuthedUser) errors.Api {
 	resp, err := client.Conn.LockApp(ctx, &grpcAppMeta.LockAppRequest{
 		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
-		AuthedUser: authedUser,
 		AppUuid:    appUuid,
 	})
 	if err != nil {
@@ -170,7 +167,6 @@ func (client ClientAppMeta) LockApp(ctx context.Context, appUuid string, authedU
 func (client ClientAppMeta) UnlockApp(ctx context.Context, r *apps.UnlockRequest) error {
 	resp, err := client.Conn.UnlockApp(ctx, &grpcAppMeta.UnlockAppRequest{
 		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
-		AuthedUser: r.AuthedUser,
 		AppUuid:    r.AppUuid,
 	})
 	if err != nil {

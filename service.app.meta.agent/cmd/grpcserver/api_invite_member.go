@@ -15,7 +15,6 @@ func (s AppMetaServer) Invite(ctx context.Context, in *proto.InviteRequest) (*pr
 	appName, err := s.inviteService.SendInvite(ctx,
 		in.GetAppUuid(),
 		in.GetUserUuid(),
-		in.GetAuthedUser(),
 	)
 	if err != nil {
 		return &proto.InviteResponse{

@@ -13,9 +13,9 @@ import (
 )
 
 type Service interface {
-	SendInvite(ctx context.Context, appUuid, invitedUuid string, authedUser *common.AuthedUser) (string, errors.Api)
+	SendInvite(ctx context.Context, appUuid, invitedUuid string) (string, errors.Api)
 	SendInviteReminderOK(ctx context.Context, appUuid, userUuid string) errors.Api
-	AcceptInvite(ctx context.Context, appUuid, userUuid string) errors.Api
+	AcceptInvite(ctx context.Context, appUuid string) errors.Api
 }
 
 type service struct {
@@ -31,7 +31,12 @@ func NewService(repo apps.AppsRepository, userAuthClient *client.ClientUserAuth)
 }
 
 // SendInvite adds the given user to the App.Member in state InvitePending
-func (s service) SendInvite(ctx context.Context, appUuid, invitedUuid string, authedUser *common.AuthedUser) (string, errors.Api) {
+func (s service) SendInvite(ctx context.Context, appUuid, invitedUuid string) (string, errors.Api) {
+	authedUser, ok := ctx.Value("user").(*common.AuthedUser)
+	if !ok {
+		return "", errors.New(http.StatusUnauthorized, fmt.Errorf("missing authentication"), "User not authenticated")
+	}
+
 	var storedApp apps.App
 	if err := s.repo.GetById(ctx, appUuid, &storedApp); err != nil {
 		if err == mongo.ErrNoDocuments {
@@ -87,7 +92,12 @@ func (s service) SendInviteReminderOK(ctx context.Context, appUuid, userUuid str
 }
 
 // AcceptInvite updates the App.Member for the given user to state InviteAccepted
-func (s service) AcceptInvite(ctx context.Context, appUuid, userUuid string) errors.Api {
+func (s service) AcceptInvite(ctx context.Context, appUuid string) errors.Api {
+	authedUser, ok := ctx.Value("user").(*common.AuthedUser)
+	if !ok {
+		return errors.New(http.StatusUnauthorized, fmt.Errorf("missing authentication"), "User not authenticated")
+	}
+
 	var storedApp apps.App
 	if err := s.repo.GetById(ctx, appUuid, &storedApp); err != nil {
 		if err == mongo.ErrNoDocuments {
@@ -101,7 +111,7 @@ func (s service) AcceptInvite(ctx context.Context, appUuid, userUuid string) err
 	}
 
 	// user must have an open invite for the app
-	openInvite := storedApp.OpenInvite(userUuid)
+	openInvite := storedApp.OpenInvite(authedUser.Uuid)
 	if openInvite == nil {
 		return errors.New(http.StatusUnauthorized,
 			fmt.Errorf("could not find open invite for user"),

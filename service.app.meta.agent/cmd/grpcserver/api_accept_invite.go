@@ -14,7 +14,6 @@ func (s AppMetaServer) AcceptInvite(ctx context.Context, in *proto.AcceptInviteR
 
 	err := s.inviteService.AcceptInvite(ctx,
 		in.GetAppUuid(),
-		in.GetAuthedUser().GetUuid(),
 	)
 	if err != nil {
 		logrus.Errorf("[%v][server.AcceptInvite] could not accept invite: %v\n", tracingId, err.Error())
