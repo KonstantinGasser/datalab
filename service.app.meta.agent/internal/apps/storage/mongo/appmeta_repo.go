@@ -53,6 +53,16 @@ func (client MongoClient) Store(ctx context.Context, app apps.App) error {
 	return nil
 }
 
+// CompensateCreate rolls back the creation of an app by removing all references in the store
+func (client MongoClient) CompensateCreate(ctx context.Context, appUuid string) error {
+	coll := client.conn.Database(nameDB).Collection(nameColl)
+	_, err := coll.DeleteOne(ctx, bson.M{"_id": appUuid})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // GetById looks up the app  behind the uuid and writes the result in the passed pointer
 // to the result. If none found returns mongo.ErrNoDocuments
 func (client MongoClient) GetById(ctx context.Context, uuid string, result interface{}) error {

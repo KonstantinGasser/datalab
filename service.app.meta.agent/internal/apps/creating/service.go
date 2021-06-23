@@ -2,6 +2,7 @@ package creating
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/KonstantinGasser/datalab/library/errors"
@@ -42,9 +43,18 @@ func (s service) CreateDefaultApp(ctx context.Context, name, URL, ownerUuid, own
 	}
 	err = s.emitInitEvent(ctx, app)
 	if err != nil {
+		// if transaction fails - rollback app creation
+		if err := s.compentsateCreate(ctx, app.Uuid); err != nil {
+			logrus.Errorf("[create.Rollback] could not rollback App creation: %v\n", err)
+		}
 		return "", errors.New(http.StatusInternalServerError, err, "Could not create App")
 	}
 	return app.Uuid, nil
+}
+
+func (s service) compentsateCreate(ctx context.Context, appUuid string) error {
+	fmt.Println("running rollback")
+	return s.repo.CompensateCreate(ctx, appUuid)
 }
 
 // emitInitEvent distributes the event that a new app has been created triggering the init endpoints

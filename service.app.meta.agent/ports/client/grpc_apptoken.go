@@ -7,6 +7,7 @@ import (
 
 	"github.com/KonstantinGasser/datalab/library/utils/ctx_value"
 	"github.com/KonstantinGasser/datalab/service.app.meta.agent/ports"
+	"github.com/KonstantinGasser/datalab/service.app.meta.agent/ports/client/intercepter"
 	grpcAppToken "github.com/KonstantinGasser/datalab/service.app.token.agent/cmd/grpcserver/proto"
 	"google.golang.org/grpc"
 )
@@ -16,7 +17,7 @@ type ClientAppToken struct {
 }
 
 func NewClientAppToken(clientAddr string) (*ClientAppToken, error) {
-	conn, err := grpc.Dial(clientAddr, grpc.WithInsecure())
+	conn, err := grpc.Dial(clientAddr, grpc.WithInsecure(), intercepter.WithUnary(intercepter.WithAuth))
 	if err != nil {
 		return nil, err
 	}

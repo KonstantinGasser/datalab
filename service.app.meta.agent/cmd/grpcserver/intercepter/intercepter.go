@@ -32,18 +32,6 @@ func WithUnary(middleware grpc.UnaryServerInterceptor) grpc.ServerOption {
 
 func WithJwtAuth(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 	logrus.Info("[intercepter.WithJwtAuth] receiced request\n")
-
-	authedUser, err := validateJWT(ctx)
-	if err != nil {
-		return nil, err
-	}
-	authCtx := context.WithValue(ctx, "user", authedUser)
-	resp, err := handler(authCtx, req)
-
-	return resp, err
-}
-
-func validateJWT(ctx context.Context) (*common.AuthedUser, error) {
 	meta, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return nil, fmt.Errorf("could not find correct context details")
@@ -52,7 +40,21 @@ func validateJWT(ctx context.Context) (*common.AuthedUser, error) {
 	if !ok {
 		return nil, ErrNotAuthenticated
 	}
-	token, err := verifyToken(accessToken[0], secretUser)
+
+	authedUser, err := validateJWT(accessToken[0])
+	if err != nil {
+		return nil, err
+	}
+	withAuthCtx := context.WithValue(ctx, "user", authedUser)
+	withJwtCtx := context.WithValue(withAuthCtx, "authorization", accessToken[0])
+
+	resp, err := handler(withJwtCtx, req)
+
+	return resp, err
+}
+
+func validateJWT(accessToken string) (*common.AuthedUser, error) {
+	token, err := verifyToken(accessToken, secretUser)
 	if err != nil {
 		return nil, err
 	}
