@@ -13,7 +13,7 @@ func (server AppConfigServer) Get(ctx context.Context, in *proto.GetRequest) (*p
 	tracingId := in.GetTracing_ID()
 	logrus.Infof("[%v][server.Get] received request\n", tracingId)
 
-	appConfig, err := server.fetchService.GetById(ctx, in.GetAppUuid(), in.GetAuthedUser())
+	appConfig, err := server.fetchService.GetById(ctx, in.GetAppUuid())
 	if err != nil {
 		logrus.Errorf("[%v][server.Get] could not get App Config: %v\n", tracingId, err.Error())
 		return &proto.GetResponse{

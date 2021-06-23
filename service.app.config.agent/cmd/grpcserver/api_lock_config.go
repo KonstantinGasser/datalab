@@ -12,7 +12,7 @@ func (server AppConfigServer) LockConfig(ctx context.Context, in *proto.LockConf
 	tracingId := in.GetTracing_ID()
 	logrus.Infof("[%v][server.LockConfig] received request\n", tracingId)
 
-	err := server.modifyService.LockConfig(ctx, in.GetAppRefUuid(), in.GetAuthedUser())
+	err := server.modifyService.LockConfig(ctx, in.GetAppRefUuid())
 	if err != nil {
 		logrus.Errorf("[%v][server.LockConfig] could not lock app config: %v\n", tracingId, err)
 		return &proto.LockConfigResponse{

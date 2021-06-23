@@ -26,7 +26,7 @@ func (server AppConfigServer) Update(ctx context.Context, in *proto.UpdateReques
 				Trigger:    int32(item.Trigger),
 			}
 		}
-		err = server.modifyService.UpdateFunnel(ctx, in.GetAppRefUuid(), in.GetAuthedUser(), stages)
+		err = server.modifyService.UpdateFunnel(ctx, in.GetAppRefUuid(), stages)
 	case "campaign":
 		var records = make([]appconfigs.Record, len(in.GetRecords()))
 		for i, item := range in.GetRecords() {
@@ -36,7 +36,7 @@ func (server AppConfigServer) Update(ctx context.Context, in *proto.UpdateReques
 				Suffix: item.Suffix,
 			}
 		}
-		err = server.modifyService.UpdateCampaign(ctx, in.GetAppRefUuid(), in.GetAuthedUser(), records)
+		err = server.modifyService.UpdateCampaign(ctx, in.GetAppRefUuid(), records)
 	case "btntime":
 		var btnDefs = make([]appconfigs.BtnDef, len(in.GetBtnDefs()))
 		for i, item := range in.GetBtnDefs() {
@@ -46,7 +46,7 @@ func (server AppConfigServer) Update(ctx context.Context, in *proto.UpdateReques
 				BtnName: item.BtnName,
 			}
 		}
-		err = server.modifyService.UpdateBtnTime(ctx, in.GetAppRefUuid(), in.GetAuthedUser(), btnDefs)
+		err = server.modifyService.UpdateBtnTime(ctx, in.GetAppRefUuid(), btnDefs)
 	default:
 		logrus.Errorf("[%v][server.Update] invalid update flag: %s\n", tracingId, in.GetUpdateFlag())
 		return &proto.UpdateResponse{

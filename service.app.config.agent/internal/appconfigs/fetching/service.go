@@ -4,14 +4,13 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/KonstantinGasser/datalab/common"
 	"github.com/KonstantinGasser/datalab/library/errors"
 	"github.com/KonstantinGasser/datalab/service.app.config.agent/internal/appconfigs"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type Service interface {
-	GetById(ctx context.Context, uuid string, authedUser *common.AuthedUser) (*appconfigs.AppConfig, errors.Api)
+	GetById(ctx context.Context, uuid string) (*appconfigs.AppConfig, errors.Api)
 }
 
 type service struct {
@@ -22,7 +21,8 @@ func NewService(repo appconfigs.AppconfigRepo) Service {
 	return &service{repo: repo}
 }
 
-func (s service) GetById(ctx context.Context, uuid string, authedUser *common.AuthedUser) (*appconfigs.AppConfig, errors.Api) {
+func (s service) GetById(ctx context.Context, uuid string) (*appconfigs.AppConfig, errors.Api) {
+
 	var storedAppConfig appconfigs.AppConfig
 	if err := s.repo.GetById(ctx, uuid, &storedAppConfig); err != nil {
 		if err == mongo.ErrNoDocuments {

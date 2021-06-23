@@ -12,7 +12,7 @@ func (server AppConfigServer) UnlockConfig(ctx context.Context, in *proto.Unlock
 	tracingId := in.GetTracing_ID()
 	logrus.Infof("[%v][server.UnlockConfig] received request\n", tracingId)
 
-	err := server.modifyService.UnlockConfig(ctx, in.GetAppRefUuid(), in.GetAuthedUser())
+	err := server.modifyService.UnlockConfig(ctx, in.GetAppRefUuid())
 	if err != nil {
 		logrus.Errorf("[%v][server.UnlockConfig] could not unlock app config: %v\n", tracingId, err)
 		return &proto.UnlockConfigResponse{

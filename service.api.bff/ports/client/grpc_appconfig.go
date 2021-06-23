@@ -9,6 +9,7 @@ import (
 	"github.com/KonstantinGasser/datalab/library/errors"
 	"github.com/KonstantinGasser/datalab/library/utils/ctx_value"
 	"github.com/KonstantinGasser/datalab/service.api.bff/internal/apps"
+	"github.com/KonstantinGasser/datalab/service.api.bff/ports/client/intercepter"
 	grpcAppConfig "github.com/KonstantinGasser/datalab/service.app.config.agent/cmd/grpcserver/proto"
 	"google.golang.org/grpc"
 )
@@ -18,7 +19,7 @@ type ClientAppConfig struct {
 }
 
 func NewClientAppConfig(clientAddr string) (*ClientAppConfig, error) {
-	conn, err := grpc.Dial(clientAddr, grpc.WithInsecure())
+	conn, err := grpc.Dial(clientAddr, grpc.WithInsecure(), intercepter.WithUnary(intercepter.WithAuth))
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +35,6 @@ func (client ClientAppConfig) CollectAppConfig(ctx context.Context, appUuid stri
 }, errC chan error) {
 	resp, err := client.Conn.Get(ctx, &grpcAppConfig.GetRequest{
 		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
-		AuthedUser: authedUser,
 		AppUuid:    appUuid,
 	})
 	if err != nil {
@@ -57,7 +57,6 @@ func (client ClientAppConfig) CollectAppConfig(ctx context.Context, appUuid stri
 func (client ClientAppConfig) UpdateConfig(ctx context.Context, r *apps.UpdateConfigRequest) errors.Api {
 	resp, err := client.Conn.Update(ctx, &grpcAppConfig.UpdateRequest{
 		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
-		AuthedUser: r.AuthedUser,
 		AppRefUuid: r.AppRefUuid,
 		UpdateFlag: r.UpdateFlag,
 		Stages:     r.Stages,
@@ -80,7 +79,6 @@ func (client ClientAppConfig) UpdateConfig(ctx context.Context, r *apps.UpdateCo
 func (client ClientAppConfig) LockAppConfig(ctx context.Context, appUuid string, authedUser *common.AuthedUser) errors.Api {
 	resp, err := client.Conn.LockConfig(ctx, &grpcAppConfig.LockConfigRequest{
 		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
-		AuthedUser: authedUser,
 		AppRefUuid: appUuid,
 	})
 	if err != nil {
@@ -99,7 +97,6 @@ func (client ClientAppConfig) LockAppConfig(ctx context.Context, appUuid string,
 func (client ClientAppConfig) UnlockAppConfig(ctx context.Context, r *apps.UnlockRequest) errors.Api {
 	resp, err := client.Conn.UnlockConfig(ctx, &grpcAppConfig.UnlockConfigRequest{
 		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
-		AuthedUser: r.AuthedUser,
 		AppRefUuid: r.AppUuid,
 	})
 	if err != nil {

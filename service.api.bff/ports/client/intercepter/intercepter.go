@@ -14,12 +14,8 @@ func WithUnary(f grpc.UnaryClientInterceptor) grpc.DialOption {
 
 // WithAuth serves as an grpc client intercepter appending the grpc context with the
 // JWT user token for authentication on service level
-func WithAuth(
-	ctx context.Context,
-	method string,
-	req interface{}, reply interface{},
-	cc *grpc.ClientConn, invoker grpc.UnaryInvoker,
-	opts ...grpc.CallOption,
+func WithAuth(ctx context.Context, method string, req interface{}, reply interface{},
+	cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption,
 ) error {
 	accessToken := ctx_value.GetString(ctx, "authorization")
 	meta := metadata.Pairs("authorization", accessToken)

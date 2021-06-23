@@ -12,12 +12,12 @@ import (
 )
 
 type Service interface {
-	UpdateFunnel(ctx context.Context, appRefUuid string, authedUser *common.AuthedUser, stages []appconfigs.Stage) errors.Api
-	UpdateCampaign(ctx context.Context, appRefUuid string, authedUser *common.AuthedUser, records []appconfigs.Record) errors.Api
-	UpdateBtnTime(ctx context.Context, appRefUuid string, authedUser *common.AuthedUser, btnDefs []appconfigs.BtnDef) errors.Api
+	UpdateFunnel(ctx context.Context, appRefUuid string, stages []appconfigs.Stage) errors.Api
+	UpdateCampaign(ctx context.Context, appRefUuid string, records []appconfigs.Record) errors.Api
+	UpdateBtnTime(ctx context.Context, appRefUuid string, btnDefs []appconfigs.BtnDef) errors.Api
 
-	LockConfig(ctx context.Context, appRefUuid string, authedUser *common.AuthedUser) errors.Api
-	UnlockConfig(ctx context.Context, appRefUuid string, authedUser *common.AuthedUser) errors.Api
+	LockConfig(ctx context.Context, appRefUuid string) errors.Api
+	UnlockConfig(ctx context.Context, appRefUuid string) errors.Api
 }
 
 type service struct {
@@ -30,7 +30,12 @@ func NewService(repo appconfigs.AppconfigRepo) Service {
 
 // InitializeAppConfig creates the core data object to represent an AppConfig and stores it in the
 // database
-func (s *service) UpdateFunnel(ctx context.Context, appRefUuid string, authedUser *common.AuthedUser, stages []appconfigs.Stage) errors.Api {
+func (s *service) UpdateFunnel(ctx context.Context, appRefUuid string, stages []appconfigs.Stage) errors.Api {
+	authedUser, ok := ctx.Value("user").(*common.AuthedUser)
+	if !ok {
+		return errors.New(http.StatusUnauthorized, fmt.Errorf("missing authentication"), "User not authenticated")
+	}
+
 	var storedAppConfig appconfigs.AppConfig
 	err := s.repo.GetById(ctx, appRefUuid, &storedAppConfig)
 	if err != nil {
@@ -68,7 +73,12 @@ func (s *service) UpdateFunnel(ctx context.Context, appRefUuid string, authedUse
 	return nil
 }
 
-func (s *service) UpdateCampaign(ctx context.Context, appRefUuid string, authedUser *common.AuthedUser, records []appconfigs.Record) errors.Api {
+func (s *service) UpdateCampaign(ctx context.Context, appRefUuid string, records []appconfigs.Record) errors.Api {
+	authedUser, ok := ctx.Value("user").(*common.AuthedUser)
+	if !ok {
+		return errors.New(http.StatusUnauthorized, fmt.Errorf("missing authentication"), "User not authenticated")
+	}
+
 	var storedAppConfig appconfigs.AppConfig
 	err := s.repo.GetById(ctx, appRefUuid, &storedAppConfig)
 	if err != nil {
@@ -94,7 +104,12 @@ func (s *service) UpdateCampaign(ctx context.Context, appRefUuid string, authedU
 	return nil
 }
 
-func (s *service) UpdateBtnTime(ctx context.Context, appRefUuid string, authedUser *common.AuthedUser, btnDefs []appconfigs.BtnDef) errors.Api {
+func (s *service) UpdateBtnTime(ctx context.Context, appRefUuid string, btnDefs []appconfigs.BtnDef) errors.Api {
+	authedUser, ok := ctx.Value("user").(*common.AuthedUser)
+	if !ok {
+		return errors.New(http.StatusUnauthorized, fmt.Errorf("missing authentication"), "User not authenticated")
+	}
+
 	var storedAppConfig appconfigs.AppConfig
 	err := s.repo.GetById(ctx, appRefUuid, &storedAppConfig)
 	if err != nil {
@@ -120,7 +135,12 @@ func (s *service) UpdateBtnTime(ctx context.Context, appRefUuid string, authedUs
 	return nil
 }
 
-func (s *service) LockConfig(ctx context.Context, appRefUuid string, authedUser *common.AuthedUser) errors.Api {
+func (s *service) LockConfig(ctx context.Context, appRefUuid string) errors.Api {
+	authedUser, ok := ctx.Value("user").(*common.AuthedUser)
+	if !ok {
+		return errors.New(http.StatusUnauthorized, fmt.Errorf("missing authentication"), "User not authenticated")
+	}
+
 	var storedAppConfig appconfigs.AppConfig
 	err := s.repo.GetById(ctx, appRefUuid, &storedAppConfig)
 	if err != nil {
@@ -144,7 +164,12 @@ func (s *service) LockConfig(ctx context.Context, appRefUuid string, authedUser 
 	return nil
 }
 
-func (s *service) UnlockConfig(ctx context.Context, appRefUuid string, authedUser *common.AuthedUser) errors.Api {
+func (s *service) UnlockConfig(ctx context.Context, appRefUuid string) errors.Api {
+	authedUser, ok := ctx.Value("user").(*common.AuthedUser)
+	if !ok {
+		return errors.New(http.StatusUnauthorized, fmt.Errorf("missing authentication"), "User not authenticated")
+	}
+
 	var storedAppConfig appconfigs.AppConfig
 	err := s.repo.GetById(ctx, appRefUuid, &storedAppConfig)
 	if err != nil {
