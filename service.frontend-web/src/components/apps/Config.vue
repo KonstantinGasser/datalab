@@ -21,7 +21,7 @@
                                     <div v-if="f.trigger == 2" class="dots"><span class="icon icon-at-sign standard-font"></span>OnClick</div>
                                 </div>
                                 <div class="stage-transition tooltip1">
-                                    <div class="dots">{{f.transition}}</div>
+                                    <div class="dots">{{f.transition}}{{f.regex}}</div>
                                     <span class="tooltiptext1">{{f.transition}}</span>
                                 </div>
                             </div>
@@ -212,7 +212,7 @@ export default {
             }
             // extract regex pattern from transition
             const regex_pattern = this.stage_transition.substring(
-                this.stage_transition.search("{"),this.stage_transition.search("}")+1
+                this.stage_transition.search("{")+1,this.stage_transition.search("}")
             )
             if (regex_pattern?.length > 0 && !this.isRegex(regex_pattern)) {
                 this.$moshaToast("Provided Regex might be wrong", {type: 'warning',position: 'top-center', timeout: 3000})
@@ -224,7 +224,7 @@ export default {
             this.$emit("appchange", {unsaved: true, type: "funnel-add", item: {
                     id: count,
                     name: this.stage_name,
-                    transition: this.stage_transition,
+                    transition: this.stage_transition.substring(0,this.stage_transition.search("{")), // cut-off regex
                     regex: regex_pattern,
                     trigger: this.stage_trigger.id,
                 }
@@ -247,7 +247,7 @@ export default {
                 app_uuid: this.$props.app_uuid,
                 stages: this.$props.app_config?.funnel,
             }
-            axios.post("http://localhost:8080/api/v1/app/config/update", payload, options).then(res => {
+            axios.post("http://192.168.0.177:8080/api/v1/app/config/update", payload, options).then(res => {
                 // this.$toast.success("Updated Funnel information");
                 this.$moshaToast(res.data.msg, {type: 'success',position: 'top-center', timeout: 3000})
                 this.$emit("appchange", {unsaved: false, type: "funnel-saved"});
@@ -288,7 +288,7 @@ export default {
                 app_uuid: this.$props.app_uuid,
                 records: this.$props.app_config?.campaign,
             }
-            axios.post("http://localhost:8080/api/v1/app/config/update", payload, options).then(res => {
+            axios.post("http://192.168.0.177:8080/api/v1/app/config/update", payload, options).then(res => {
                 this.$moshaToast(res.data.msg, {type: 'success',position: 'top-center', timeout: 3000})
                 this.$emit("appchange", {unsaved: false, type: "campaign-saved"});
 
@@ -330,7 +330,7 @@ export default {
                 app_uuid: this.$props.app_uuid,
                 btn_defs: this.$props.app_config?.btn_time,
             }
-            axios.post("http://localhost:8080/api/v1/app/config/update", payload, options).then(res => {
+            axios.post("http://192.168.0.177:8080/api/v1/app/config/update", payload, options).then(res => {
                 this.$moshaToast(res.data.msg, {type: 'success',position: 'top-center', timeout: 3000})
                 this.$emit("appchange", {unsaved: false, type: "btn-saved"})
             }).catch(err => this.$moshaToast(err.response?.data?.msg, {type: 'danger',position: 'top-center', timeout: 3000}));

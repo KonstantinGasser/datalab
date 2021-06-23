@@ -13,19 +13,7 @@ func (server AppTokenServer) Get(ctx context.Context, in *proto.GetRequest) (*pr
 	tracingId := in.GetTracing_ID()
 	logrus.Infof("[%v][server.Get] received request\n", tracingId)
 
-	authedUser := in.GetAuthedUser()
-	if authedUser == nil {
-		return &proto.GetResponse{
-			StatusCode: http.StatusUnauthorized,
-			Msg:        "User is not authroized to get App Token",
-			Token:      nil,
-		}, nil
-	}
-	appToken, err := server.fetchService.FetchById(
-		ctx, in.GetAppUuid(),
-		authedUser.Uuid,
-		authedUser.GetReadWriteApps()...,
-	)
+	appToken, err := server.fetchService.FetchById(ctx, in.GetAppUuid())
 	if err != nil {
 		logrus.Errorf("[%v][server.Get] could not get app token: %v\n", tracingId, err.Error())
 		return &proto.GetResponse{

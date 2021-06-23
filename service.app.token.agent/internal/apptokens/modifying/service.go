@@ -12,8 +12,8 @@ import (
 )
 
 type Service interface {
-	IssueAppToken(ctx context.Context, orgn, appName, appUuid, callerUuid string) (string, int64, errors.Api)
-	UnlockAppToken(ctx context.Context, appUuid string, authedUser *common.AuthedUser) errors.Api
+	IssueAppToken(ctx context.Context, orgn, appName, appUuid string) (string, int64, errors.Api)
+	UnlockAppToken(ctx context.Context, appUuid string) errors.Api
 }
 
 type service struct {
@@ -26,7 +26,12 @@ func NewService(repo apptokens.ApptokenRepo) Service {
 
 // IssueAppToken issues an new Jwt based on the stored App Token information and updates its
 // expiration time. Returns the new Jwt and Exp
-func (s *service) IssueAppToken(ctx context.Context, orgn, appName, appUuid, callerUuid string) (string, int64, errors.Api) {
+func (s *service) IssueAppToken(ctx context.Context, orgn, appName, appUuid string) (string, int64, errors.Api) {
+	authedUser, ok := ctx.Value("user").(*common.AuthedUser)
+	if !ok {
+		return "", 0, errors.New(http.StatusUnauthorized, fmt.Errorf("missing authentication"), "User not authenticated")
+	}
+
 	var storedAppToken apptokens.AppToken
 	if err := s.repo.GetById(ctx, appUuid, &storedAppToken); err != nil {
 		if err == mongo.ErrNoDocuments {
@@ -39,7 +44,7 @@ func (s *service) IssueAppToken(ctx context.Context, orgn, appName, appUuid, cal
 			"Could not get App Token data")
 	}
 	// verify that the user is the actual owner of the AppToken
-	if err := storedAppToken.HasReadWrite(callerUuid); err != nil {
+	if err := storedAppToken.HasReadWrite(authedUser.Uuid); err != nil {
 		return "", 0, errors.New(http.StatusUnauthorized,
 			err,
 			"User must be owner to generate AppToken")
@@ -78,7 +83,12 @@ func (s *service) IssueAppToken(ctx context.Context, orgn, appName, appUuid, cal
 	return modifiedAppToken.Jwt, modifiedAppToken.Exp, nil
 }
 
-func (s service) UnlockAppToken(ctx context.Context, appUuid string, authedUser *common.AuthedUser) errors.Api {
+func (s service) UnlockAppToken(ctx context.Context, appUuid string) errors.Api {
+	authedUser, ok := ctx.Value("user").(*common.AuthedUser)
+	if !ok {
+		return errors.New(http.StatusUnauthorized, fmt.Errorf("missing authentication"), "User not authenticated")
+	}
+
 	var storedAppToken apptokens.AppToken
 	if err := s.repo.GetById(ctx, appUuid, &storedAppToken); err != nil {
 		return errors.New(http.StatusInternalServerError, err, "Could not get AppToken")

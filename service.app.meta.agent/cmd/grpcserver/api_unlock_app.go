@@ -12,7 +12,7 @@ func (server AppMetaServer) UnlockApp(ctx context.Context, in *proto.UnlockAppRe
 	tracingId := in.GetTracing_ID()
 	logrus.Infof("[%v][server.UnlockApp] received request\n", tracingId)
 
-	err := server.updateService.UnlockApp(ctx, in.GetAppUuid(), in.GetAuthedUser())
+	err := server.updateService.UnlockApp(ctx, in.GetAppUuid())
 	if err != nil {
 		logrus.Errorf("[%v][server.UnlockApp] could not unlock app: %v\n", tracingId, err.Error())
 		return &proto.UnlockAppResponse{

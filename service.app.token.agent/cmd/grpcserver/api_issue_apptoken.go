@@ -17,7 +17,6 @@ func (server AppTokenServer) Issue(ctx context.Context, in *proto.IssueRequest) 
 		in.GetOrganization(),
 		in.GetAppName(),
 		in.GetAppUuid(),
-		in.GetCallerUuid(),
 	)
 	if err != nil {
 		logrus.Errorf("[%v][server.Issue] could not issue App Token: %v\n", tracingId, err.Error())

@@ -13,7 +13,7 @@ func (server UserMetaServer) GetColleagues(ctx context.Context, in *proto.GetCol
 	tracingId := in.GetTracing_ID()
 	logrus.Infof("[%v][server.GetColleagues] received request\n", tracingId)
 
-	userList, err := server.fetchService.FetchByOrganization(ctx, in.GetOrganization())
+	userList, err := server.fetchService.FetchByOrganization(ctx)
 	if err != nil {
 		logrus.Errorf("[%v][server.GetColleagues] could not get users: %v\n", tracingId, err.Error())
 		return &proto.GetColleaguesResponse{

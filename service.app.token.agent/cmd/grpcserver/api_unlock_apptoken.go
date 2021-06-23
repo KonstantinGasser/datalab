@@ -12,7 +12,7 @@ func (server AppTokenServer) UnlockAppToken(ctx context.Context, in *proto.Unloc
 	tracingId := in.GetTracing_ID()
 	logrus.Infof("[%v][server.UnlockAppToken] received request\n", tracingId)
 
-	err := server.modifySevice.UnlockAppToken(ctx, in.GetAppUuid(), in.GetAuthedUser())
+	err := server.modifySevice.UnlockAppToken(ctx, in.GetAppUuid())
 	if err != nil {
 		logrus.Errorf("[%v][server.UnlockAppToken] could not unlock App Token: %v\n", tracingId, err.Error())
 		return &proto.UnlockAppTokenResponse{

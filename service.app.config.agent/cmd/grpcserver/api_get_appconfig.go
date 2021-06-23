@@ -26,7 +26,7 @@ func (server AppConfigServer) Get(ctx context.Context, in *proto.GetRequest) (*p
 	// translate AppConfig struct to protobuf struct
 	var stages = make([]*common.Stage, len(appConfig.Funnel))
 	for i, item := range appConfig.Funnel {
-		stages[i] = &common.Stage{Id: item.Id, Name: item.Name, Transition: item.Transition, Trigger: item.Trigger}
+		stages[i] = &common.Stage{Id: item.Id, Name: item.Name, Transition: item.Transition, Regex: item.Regex, Trigger: item.Trigger}
 	}
 	var records = make([]*common.Record, len(appConfig.Campaign))
 	for i, item := range appConfig.Campaign {

@@ -9,6 +9,7 @@ import (
 	"github.com/KonstantinGasser/datalab/library/errors"
 	"github.com/KonstantinGasser/datalab/library/utils/ctx_value"
 	"github.com/KonstantinGasser/datalab/service.api.bff/internal/apps"
+	"github.com/KonstantinGasser/datalab/service.api.bff/ports/client/intercepter"
 	grpcAppToken "github.com/KonstantinGasser/datalab/service.app.token.agent/cmd/grpcserver/proto"
 	"google.golang.org/grpc"
 )
@@ -18,7 +19,7 @@ type ClientAppToken struct {
 }
 
 func NewClientAppToken(clientAddr string) (*ClientAppToken, error) {
-	conn, err := grpc.Dial(clientAddr, grpc.WithInsecure())
+	conn, err := grpc.Dial(clientAddr, grpc.WithInsecure(), intercepter.WithUnary(intercepter.WithAuth))
 	if err != nil {
 		return nil, err
 	}
@@ -28,13 +29,12 @@ func NewClientAppToken(clientAddr string) (*ClientAppToken, error) {
 	}, nil
 }
 
-func (client ClientAppToken) CollectAppToken(ctx context.Context, appUuid string, authedUser *common.AuthedUser, resC chan struct {
+func (client ClientAppToken) CollectAppToken(ctx context.Context, appUuid string, resC chan struct {
 	Field string
 	Value interface{}
 }, errC chan error) {
 	resp, err := client.Conn.Get(ctx, &grpcAppToken.GetRequest{
 		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
-		AuthedUser: authedUser,
 		AppUuid:    appUuid,
 	})
 	if err != nil {
@@ -58,7 +58,6 @@ func (client ClientAppToken) IssueAppToken(ctx context.Context, r *apps.CreateAp
 
 	resp, err := client.Conn.Issue(ctx, &grpcAppToken.IssueRequest{
 		Tracing_ID:   ctx_value.GetString(ctx, "tracingID"),
-		CallerUuid:   r.AuthedUser.Uuid,
 		AppUuid:      r.AppUuid,
 		AppName:      r.AppName,
 		Organization: r.Organization,
@@ -79,7 +78,6 @@ func (client ClientAppToken) IssueAppToken(ctx context.Context, r *apps.CreateAp
 func (client ClientAppToken) UnlockAppToken(ctx context.Context, r *apps.UnlockRequest) errors.Api {
 	resp, err := client.Conn.UnlockAppToken(ctx, &grpcAppToken.UnlockAppTokenRequest{
 		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
-		AuthedUser: r.AuthedUser,
 		AppUuid:    r.AppUuid,
 	})
 	if err != nil {

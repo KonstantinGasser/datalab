@@ -12,8 +12,8 @@ import (
 )
 
 type Service interface {
-	LockApp(ctx context.Context, appUuid string, authedUser *common.AuthedUser) errors.Api
-	UnlockApp(ctx context.Context, appUuid string, authedUser *common.AuthedUser) errors.Api
+	LockApp(ctx context.Context, appUuid string) errors.Api
+	UnlockApp(ctx context.Context, appUuid string) errors.Api
 }
 
 type service struct {
@@ -26,7 +26,12 @@ func NewService(repo apps.AppsRepository) Service {
 	}
 }
 
-func (s service) LockApp(ctx context.Context, appUuid string, authedUser *common.AuthedUser) errors.Api {
+func (s service) LockApp(ctx context.Context, appUuid string) errors.Api {
+	authedUser, ok := ctx.Value("user").(*common.AuthedUser)
+	if !ok {
+		return errors.New(http.StatusUnauthorized, fmt.Errorf("missing authentication"), "User not authenticated")
+	}
+
 	var storedApp apps.App
 	if err := s.repo.GetById(ctx, appUuid, &storedApp); err != nil {
 		if err == mongo.ErrNoDocuments {
@@ -64,7 +69,12 @@ func (s service) LockApp(ctx context.Context, appUuid string, authedUser *common
 	return nil
 }
 
-func (s service) UnlockApp(ctx context.Context, appUuid string, authedUser *common.AuthedUser) errors.Api {
+func (s service) UnlockApp(ctx context.Context, appUuid string) errors.Api {
+	authedUser, ok := ctx.Value("user").(*common.AuthedUser)
+	if !ok {
+		return errors.New(http.StatusUnauthorized, fmt.Errorf("missing authentication"), "User not authenticated")
+	}
+
 	var storedApp apps.App
 	if err := s.repo.GetById(ctx, appUuid, &storedApp); err != nil {
 		if err == mongo.ErrNoDocuments {

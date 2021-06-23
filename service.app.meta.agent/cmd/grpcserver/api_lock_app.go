@@ -12,7 +12,7 @@ func (server AppMetaServer) LockApp(ctx context.Context, in *proto.LockAppReques
 	tracingId := in.GetTracing_ID()
 	logrus.Infof("[%v][server.LockApp] received request\n", tracingId)
 
-	err := server.updateService.LockApp(ctx, in.GetAppUuid(), in.GetAuthedUser())
+	err := server.updateService.LockApp(ctx, in.GetAppUuid())
 	if err != nil {
 		logrus.Errorf("[%v][server.LockApp] could not lock app: %v\n", tracingId, err.Error())
 		return &proto.LockAppResponse{

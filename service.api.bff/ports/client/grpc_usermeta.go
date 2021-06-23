@@ -9,6 +9,7 @@ import (
 	"github.com/KonstantinGasser/datalab/library/errors"
 	"github.com/KonstantinGasser/datalab/library/utils/ctx_value"
 	"github.com/KonstantinGasser/datalab/service.api.bff/internal/users"
+	"github.com/KonstantinGasser/datalab/service.api.bff/ports/client/intercepter"
 	grpcUserMeta "github.com/KonstantinGasser/datalab/service.user.meta.agent/cmd/grpcserver/proto"
 	"google.golang.org/grpc"
 )
@@ -18,7 +19,7 @@ type ClientUserMeta struct {
 }
 
 func NewClientUserMeta(clientAddr string) (*ClientUserMeta, error) {
-	conn, err := grpc.Dial(clientAddr, grpc.WithInsecure())
+	conn, err := grpc.Dial(clientAddr, grpc.WithInsecure(), intercepter.WithUnary(intercepter.WithAuth))
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +59,6 @@ func (client ClientUserMeta) UpdateUserProfile(ctx context.Context, r *users.Upd
 
 	resp, err := client.Conn.Update(ctx, &grpcUserMeta.UpdateRequest{
 		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
-		CallerUuid: r.UserUuid,
 		User: &grpcUserMeta.UpdatableUser{
 			FirstName:    r.FirstName,
 			LastName:     r.LastName,
@@ -82,7 +82,6 @@ func (client ClientUserMeta) GetProfile(ctx context.Context, r *users.GetProfile
 
 	resp, err := client.Conn.Get(ctx, &grpcUserMeta.GetRequest{
 		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
-		CallerUuid: r.UserUuid,
 		ForUuid:    r.UserUuid,
 	})
 	if err != nil {
@@ -101,8 +100,7 @@ func (client ClientUserMeta) GetProfile(ctx context.Context, r *users.GetProfile
 func (client ClientUserMeta) GetColleagues(ctx context.Context, r *users.GetColleagueRequest) ([]*common.UserInfo, errors.Api) {
 
 	resp, err := client.Conn.GetColleagues(ctx, &grpcUserMeta.GetColleaguesRequest{
-		Tracing_ID:   ctx_value.GetString(ctx, "tracingID"),
-		Organization: r.Organization,
+		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
 	})
 	if err != nil {
 		return nil, errors.New(http.StatusInternalServerError,
@@ -121,10 +119,9 @@ func (client ClientUserMeta) CollectOwnerInfo(ctx context.Context, appOwner stri
 	Field string
 	Value interface{}
 }, errC chan error) {
-	resp, err := client.Conn.Get(ctx, &grpcUserMeta.GetRequest{
+	resp, err := client.Conn.GetById(ctx, &grpcUserMeta.GetByIdRequest{
 		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
-		CallerUuid: appOwner,
-		ForUuid:    appOwner,
+		UserUuid:   appOwner,
 	})
 	if err != nil {
 		errC <- err

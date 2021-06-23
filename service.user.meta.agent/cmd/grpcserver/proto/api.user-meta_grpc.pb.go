@@ -21,6 +21,7 @@ type UserMetaClient interface {
 	Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateResponse, error)
 	Update(ctx context.Context, in *UpdateRequest, opts ...grpc.CallOption) (*UpdateResponse, error)
 	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
+	GetById(ctx context.Context, in *GetByIdRequest, opts ...grpc.CallOption) (*GetByIdResponse, error)
 	GetColleagues(ctx context.Context, in *GetColleaguesRequest, opts ...grpc.CallOption) (*GetColleaguesResponse, error)
 }
 
@@ -59,6 +60,15 @@ func (c *userMetaClient) Get(ctx context.Context, in *GetRequest, opts ...grpc.C
 	return out, nil
 }
 
+func (c *userMetaClient) GetById(ctx context.Context, in *GetByIdRequest, opts ...grpc.CallOption) (*GetByIdResponse, error) {
+	out := new(GetByIdResponse)
+	err := c.cc.Invoke(ctx, "/user_proto.UserMeta/GetById", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *userMetaClient) GetColleagues(ctx context.Context, in *GetColleaguesRequest, opts ...grpc.CallOption) (*GetColleaguesResponse, error) {
 	out := new(GetColleaguesResponse)
 	err := c.cc.Invoke(ctx, "/user_proto.UserMeta/GetColleagues", in, out, opts...)
@@ -75,6 +85,7 @@ type UserMetaServer interface {
 	Create(context.Context, *CreateRequest) (*CreateResponse, error)
 	Update(context.Context, *UpdateRequest) (*UpdateResponse, error)
 	Get(context.Context, *GetRequest) (*GetResponse, error)
+	GetById(context.Context, *GetByIdRequest) (*GetByIdResponse, error)
 	GetColleagues(context.Context, *GetColleaguesRequest) (*GetColleaguesResponse, error)
 	mustEmbedUnimplementedUserMetaServer()
 }
@@ -91,6 +102,9 @@ func (UnimplementedUserMetaServer) Update(context.Context, *UpdateRequest) (*Upd
 }
 func (UnimplementedUserMetaServer) Get(context.Context, *GetRequest) (*GetResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
+}
+func (UnimplementedUserMetaServer) GetById(context.Context, *GetByIdRequest) (*GetByIdResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetById not implemented")
 }
 func (UnimplementedUserMetaServer) GetColleagues(context.Context, *GetColleaguesRequest) (*GetColleaguesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetColleagues not implemented")
@@ -162,6 +176,24 @@ func _UserMeta_Get_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserMeta_GetById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserMetaServer).GetById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user_proto.UserMeta/GetById",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserMetaServer).GetById(ctx, req.(*GetByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _UserMeta_GetColleagues_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetColleaguesRequest)
 	if err := dec(in); err != nil {
@@ -198,6 +230,10 @@ var UserMeta_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Get",
 			Handler:    _UserMeta_Get_Handler,
+		},
+		{
+			MethodName: "GetById",
+			Handler:    _UserMeta_GetById_Handler,
 		},
 		{
 			MethodName: "GetColleagues",

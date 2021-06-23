@@ -95,8 +95,8 @@ func (s service) collectAttachedAppData(ctx context.Context, appUuid string, app
 		Field string
 		Value interface{}
 	})
-	go s.appTokenClient.CollectAppToken(withCancel, appUuid, authedUser, resC, errC)
-	go s.appConfigClient.CollectAppConfig(withCancel, appUuid, authedUser, resC, errC)
+	go s.appTokenClient.CollectAppToken(withCancel, appUuid, resC, errC)
+	go s.appConfigClient.CollectAppConfig(withCancel, appUuid, resC, errC)
 	go s.userMetaClient.CollectOwnerInfo(withCancel, appOwner, resC, errC)
 
 	var apptoken *common.AppAccessToken

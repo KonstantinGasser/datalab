@@ -29,7 +29,7 @@ func NewClientAppConfig(clientAddr string) (*ClientAppConfig, error) {
 	}, nil
 }
 
-func (client ClientAppConfig) CollectAppConfig(ctx context.Context, appUuid string, authedUser *common.AuthedUser, resC chan struct {
+func (client ClientAppConfig) CollectAppConfig(ctx context.Context, appUuid string, resC chan struct {
 	Field string
 	Value interface{}
 }, errC chan error) {

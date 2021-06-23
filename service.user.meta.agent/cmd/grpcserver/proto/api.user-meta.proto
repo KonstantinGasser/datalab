@@ -10,6 +10,7 @@ service UserMeta {
     rpc Create(CreateRequest) returns (CreateResponse) {}
     rpc Update(UpdateRequest) returns (UpdateResponse) {}
     rpc Get(GetRequest) returns (GetResponse) {}
+    rpc GetById(GetByIdRequest) returns (GetByIdResponse) {}
     rpc GetColleagues(GetColleaguesRequest) returns (GetColleaguesResponse) {}
     // rpc GetList(GetListRequest) returns (GetListResponse) {}
 }
@@ -45,6 +46,17 @@ message GetRequest {
 }
 
 message GetResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    common.UserInfo user = 3;
+}
+
+message GetByIdRequest {
+    string tracing_ID = 1;
+    string user_uuid = 2;
+}
+
+message GetByIdResponse {
     int32 status_code = 1;
     string msg = 2;
     common.UserInfo user = 3;

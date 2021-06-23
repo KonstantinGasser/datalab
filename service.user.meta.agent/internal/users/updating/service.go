@@ -2,14 +2,16 @@ package updating
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
+	"github.com/KonstantinGasser/datalab/common"
 	"github.com/KonstantinGasser/datalab/library/errors"
 	"github.com/KonstantinGasser/datalab/service.user.meta.agent/internal/users"
 )
 
 type Service interface {
-	UpadeUser(ctx context.Context, uuid, firstname, lastname, position string) errors.Api
+	UpadeUser(ctx context.Context, firstname, lastname, position string) errors.Api
 }
 
 type service struct {
@@ -22,10 +24,14 @@ func NewService(repo users.UserRepository) Service {
 	}
 }
 
-func (s service) UpadeUser(ctx context.Context, uuid, firstname, lastname, position string) errors.Api {
+func (s service) UpadeUser(ctx context.Context, firstname, lastname, position string) errors.Api {
+	authedUser, ok := ctx.Value("user").(*common.AuthedUser)
+	if !ok {
+		return errors.New(http.StatusUnauthorized, fmt.Errorf("missing authentication"), "User not authenticated")
+	}
 
 	updatable := users.UpdatableUser{
-		Uuid:      uuid,
+		Uuid:      authedUser.Uuid,
 		FirstName: firstname,
 		LastName:  lastname,
 		Position:  position,

@@ -2,6 +2,7 @@ package intercepter
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/KonstantinGasser/datalab/library/utils/ctx_value"
 	"google.golang.org/grpc"
@@ -19,6 +20,7 @@ func WithAuth(ctx context.Context, method string, req interface{}, reply interfa
 ) error {
 	accessToken := ctx_value.GetString(ctx, "authorization")
 	meta := metadata.Pairs("authorization", accessToken)
+	fmt.Println(meta)
 	newCtx := metadata.NewOutgoingContext(ctx, meta)
 	return invoker(newCtx, method, req, reply, cc, opts...)
 }
