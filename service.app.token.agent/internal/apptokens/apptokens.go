@@ -20,6 +20,7 @@ const (
 
 var (
 	ErrMissingFields      = fmt.Errorf("AppToken must have appRefUuid/hash/owner")
+	ErrWrongAppHash       = fmt.Errorf("provided org/app-name hash does not match with db record")
 	ErrAppTokenStillValid = fmt.Errorf("current AppToken is still valid")
 	ErrNoReadWriteAccess  = fmt.Errorf("user read/write access for AppToken")
 	ErrNoReadAccess       = fmt.Errorf("user has no read access for AppToken")
@@ -48,10 +49,11 @@ type AppToken struct {
 // Jwt nor Expiration time
 func NewDefault(AppRefUuid, appHash, appOwner, appOrigin string) (*AppToken, error) {
 	appToken := AppToken{
-		AppRefUuid: AppRefUuid,
-		AppHash:    appHash,
-		AppOwner:   appOwner,
-		AppOrigin:  appOrigin,
+		AppRefUuid:   AppRefUuid,
+		AppHash:      appHash,
+		AppOwner:     appOwner,
+		AppOrigin:    appOrigin,
+		RefreshCount: 0, // i know default would handle this - but sometime explicte is nice :)
 	}
 	if err := required.Atomic(&appToken); err != nil {
 		return nil, ErrMissingFields
@@ -61,7 +63,12 @@ func NewDefault(AppRefUuid, appHash, appOwner, appOrigin string) (*AppToken, err
 
 // Issue issues a new AppToken with an updated Jwt and Exp. The operation fails
 // if the current AppToken.Exp has not yet expired
-func (appToken *AppToken) Issue() (*AppToken, error) {
+func (appToken *AppToken) Issue(orgn, appName string) (*AppToken, error) {
+	// as a verification step the user must provide
+	// the org/appname which must match the stored data
+	if !appToken.CompareHash(orgn, appName) {
+		return nil, ErrWrongAppHash
+	}
 	// current AppToken must be expired in order to issue a new one
 	// if non set (first time issuing) case will be ignored
 	if ok := appToken.expired(); !ok && appToken.Jwt != "" {
@@ -72,13 +79,14 @@ func (appToken *AppToken) Issue() (*AppToken, error) {
 		return nil, err
 	}
 	return &AppToken{
-		AppRefUuid: appToken.AppRefUuid,
-		Locked:     true,
-		AppHash:    appToken.AppHash,
-		AppOwner:   appToken.AppOwner,
-		AppOrigin:  appToken.AppOrigin,
-		Jwt:        jwt,
-		Exp:        exp,
+		AppRefUuid:   appToken.AppRefUuid,
+		Locked:       true,
+		AppHash:      appToken.AppHash,
+		AppOwner:     appToken.AppOwner,
+		AppOrigin:    appToken.AppOrigin,
+		RefreshCount: appToken.RefreshCount + 1, // increment refresh-count to invalidate current app token
+		Jwt:          jwt,
+		Exp:          exp,
 	}, nil
 }
 
@@ -87,13 +95,14 @@ func (appToken AppToken) JWT() (string, int64, error) {
 
 	exp := time.Now().Add(appTokenExpTime)
 	claims := jwt.MapClaims{
-		"sub":      appToken.AppRefUuid,
-		"origin":   appToken.AppOrigin,
-		"hash":     appToken.AppHash,
-		"iss":      issuerService,
-		"iat":      time.Now().Unix(),
-		"exp":      exp.Unix(),
-		"rf_count": appToken.RefreshCount,
+		"sub":    appToken.AppRefUuid,
+		"origin": appToken.AppOrigin,
+		"hash":   appToken.AppHash,
+		"iss":    issuerService,
+		"iat":    time.Now().Unix(),
+		"exp":    exp.Unix(),
+		// for some reason the JWT spec uses only three chars so it's ugly but rfc == refresh-count
+		"rfc": appToken.RefreshCount,
 	}
 
 	_token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -104,6 +113,7 @@ func (appToken AppToken) JWT() (string, int64, error) {
 	return token, exp.Unix(), nil
 }
 
+// TODO needs to check refresh count
 func Validate(jwtString string) (string, string, error) {
 	token, err := verifyToken(jwtString, secretAppToken)
 	if err != nil {
@@ -115,10 +125,6 @@ func Validate(jwtString string) (string, string, error) {
 	}
 	return claims["sub"].(string), claims["origin"].(string), nil
 }
-
-// func tokenValid(claims jwt.MapClaims) (bool, error) {
-
-// }
 
 // CompareHash compares if the provided meta data (orgnanization name and app name)
 // match with the apptoken.Hash.

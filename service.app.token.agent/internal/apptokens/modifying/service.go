@@ -55,16 +55,13 @@ func (s *service) IssueAppToken(ctx context.Context, orgn, appName, appUuid stri
 			"App is in locked state - change not possible")
 	}
 
-	// verifiy that the user has provided the correct organization-name/app-name
-	// which is part of the verification process
-	if ok := storedAppToken.CompareHash(orgn, appName); !ok {
-		return "", 0, errors.New(http.StatusUnauthorized,
-			fmt.Errorf("app hash do not match"),
-			"Organization-Name/App-Name are incorrect")
-	}
-
-	modifiedAppToken, err := storedAppToken.Issue()
+	modifiedAppToken, err := storedAppToken.Issue(orgn, appName)
 	if err != nil {
+		if err == apptokens.ErrWrongAppHash {
+			return "", 0, errors.New(http.StatusUnauthorized,
+				err,
+				"Organization-Name/App-Name ist incorrect")
+		}
 		if err == apptokens.ErrAppTokenStillValid {
 			return "", 0, errors.New(http.StatusBadRequest,
 				err,
@@ -74,6 +71,8 @@ func (s *service) IssueAppToken(ctx context.Context, orgn, appName, appUuid stri
 			err,
 			"Could not issue new App Token")
 	}
+
+	// update new app-token in database
 	repoErr := s.repo.Update(ctx, modifiedAppToken.AppRefUuid, modifiedAppToken.Jwt, modifiedAppToken.Exp)
 	if repoErr != nil {
 		return "", 0, errors.New(http.StatusInternalServerError,
@@ -83,6 +82,8 @@ func (s *service) IssueAppToken(ctx context.Context, orgn, appName, appUuid stri
 	return modifiedAppToken.Jwt, modifiedAppToken.Exp, nil
 }
 
+// UnlockAppToken deletes the current app token incrementing the refresh-count in order to invalidate the current
+// app token
 func (s service) UnlockAppToken(ctx context.Context, appUuid string) errors.Api {
 	authedUser, ok := ctx.Value("user").(*common.AuthedUser)
 	if !ok {
@@ -105,6 +106,11 @@ func (s service) UnlockAppToken(ctx context.Context, appUuid string) errors.Api 
 			err,
 			"Could not unlock App-Token")
 	}
+
+	// if an app gets unlocked the current apptoken will get invalid
+	// TODO: implement invalidation of app token with cound in JWT and db.
+	// for verification app token cound and db count must match else token has been
+	// invalidated
 	repoErr := s.repo.Update(ctx, appUuid, "", 0)
 	if repoErr != nil {
 		return errors.New(http.StatusInternalServerError,
