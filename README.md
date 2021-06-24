@@ -1,15 +1,33 @@
 # datalab - mind your business
 
-## Purpose of the App
-The goal of the application is to allow companies to understand their customer behaviors better. In the app datalab you can register apps that you want to monitor. After creating the app you can define things like how your business funnel looks like, what campaigns your currently running. There is one more thing - did you ever wanted to know how long your customers need until they click the "buy" button, with "interesting buttons" datalab will tell you! 
+## Kontext und Idee 
+Hintergrund des Systems ist es User-Verhalten auf Plattformen oder Web-Seiten besser zu verstehen. Dem Nutzer soll es einfach möglich sein, User-/Nutzer Verhalten nachvollziehen zu können. `datalab` wird neben bekannten Informationen, wie zum Beispiel `page views`, `views per route`, `most common browser`, es erlauben ***Conversion Rates*** zu berechnen oder auch Einblicke bieten können wie viele Nutzer sich pro Funnel-Stage aufgehalten haben (Customer Journey). Ist für den Nutzer relevant zu verstehen, wie User mit verschiedenen Elementen interagieren, können spezielle `Element Konfigurationen` gesetzt werden, welche mehr Informationen über dieses spezielle Element liefert.
+
+## Tech-Stack
+- goLang (für alle Micro-Services) https://golang.org
+- gRPC für die interne Kommunikation der Services https://grpc.io
+- gorilla-websocket https://github.com/gorilla/websocket
+- MongoDB als Datenbank (eine Instance pro Service)
+- Docker plus Docker-Swarm (perspektivisch Kubernetes) https://docs.docker.com/engine/swarm/
+- Vue3 für das Frontend
+
+
+## Aufbau aus User-Sicht
+User geben bei der Registrierung ihre Organization an, zu welcher sie gehören (z.B. datalab.dev). Dies erlaubt die Interaktion mit anderen Kollegen mit der gleichen Organization-Domain (Cross-Organization matching is not supported - if you want it open an Issue:) ).
+
+Auf der Platform kann jeder User **Apps** anlegen, die man Monitoren möchte und diese zielgerecht Konfigurieren. Damit andere auch mit wirken und Daten einsehen können, können Kollegen der gleichen Domain eingeladen werden. Um Daten zu generieren generiert man einen ***App-Token*** um Client-Devices zu authenticated and zu authorization. Zu gleich wird dem User beim Erstellen eines ***App-Token*** ein Code-Snippet beigefügt, welches in die Ziel Seite/Application eingebaut werden muss (entsprechende Installation Guides können der Dokumentation entnommen werden). Nach der Erstellung eines ***App-Token*** befindet sich die ***App*** in einem `locked state` und erlaubt keine weiteren Änderungen an den Konfigurationen mehr (das Entsprechen von ***Apps*** ist ohne Probleme möglich, wobei die Partition mit den Daten archiviert wird (not yet implemented)).
+
+## Rollen in der App
+Als Ersteller einen ***App*** ist auch nur dieser User Admin der ***App*** und hat volle rechte. Eingeladene Kollegen, können zwar Konfigurationen anpassen und ändern, jedoch keine ***App-Token*** erstellen, die ***App*** zurück in einen `unlocked state` setzen oder diese löschen.
 
 ## System Architecture
+***behandelt nur die System Architecture der Plattform - NICHT die des Daten-Backendes***
+
+!!!remark: Kafka is not yet implemented since Raspberry-Pi and its arch (`arm64`) does not support Kafka and Zookeeper on docker..however will be implemented ASAP once shifted to new hardware!!
 ![](git-resources/datalab_sys_arch.png)
 
-## Basic information
-*remark: further information about what each service does can be found in its `READEME` file*
-
-The entry point for each request is the `service.api.bff` which is connected to each available service either through a `gRPC-Client` or through Kafka. 
+## Service Responsibilities
+Was die einzelnen Services machen, kann in deren `README` nachgelesen werden.
 <!-- # datalab analysis platform for user activity data
 
 
