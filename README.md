@@ -28,6 +28,22 @@ Als Ersteller einen ***App*** ist auch nur dieser User Admin der ***App*** und h
 
 ## Service Responsibilities
 Was die einzelnen Services machen, kann in deren `README` nachgelesen werden.
+- [readme -> Service-Api-BFF](https://github.com/KonstantinGasser/datalab/tree/main/service.api.bff)
+
+- [readme -> Service-User-Auth](https://github.com/KonstantinGasser/datalab/tree/main/service.user.auth.agent)
+- [readme -> Service-User-Meta](https://github.com/KonstantinGasser/datalab/tree/main/service.user.meta.agent)
+
+- [readme -> Service-App-Meta](https://github.com/KonstantinGasser/datalab/tree/main/service.app.meta.agent)
+- [readme -> Service-App-Config](https://github.com/KonstantinGasser/datalab/tree/main/service.app.config.agent)
+- [readme -> Service-App-Token](https://github.com/KonstantinGasser/datalab/tree/main/service.app.token.agent)
+
+- [readme -> Service-Notification-Live](https://github.com/KonstantinGasser/datalab/tree/main/service.notification-live)
+- [readme -> Service-Eventmanager-Live](https://github.com/KonstantinGasser/datalab/tree/main/service.eventmananger.live)
+
+
+
+
+
 <!-- # datalab analysis platform for user activity data
 
 
