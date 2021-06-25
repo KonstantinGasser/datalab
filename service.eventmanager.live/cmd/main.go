@@ -36,7 +36,6 @@ func main() {
 		server.WithAuth,
 	)
 	server.Register("/api/v1/open", server.OpenSocket,
-		// server.WithCors,
 		server.WithTicketAuth,
 	)
 

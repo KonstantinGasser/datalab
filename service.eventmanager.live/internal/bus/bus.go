@@ -3,10 +3,13 @@ package bus
 import (
 	"fmt"
 	"net/http"
+	"runtime"
 	"sync"
+	"time"
 
 	"github.com/KonstantinGasser/datalab/service.eventmanager.live/internal/session"
 	"github.com/gorilla/websocket"
+	"github.com/sirupsen/logrus"
 )
 
 var upgrader = websocket.Upgrader{
@@ -41,18 +44,34 @@ func NewPubSub() *PubSub {
 // Start starts all goroutines and effectivly allowing to connect and interact with the
 // PupSub
 func (hub *PubSub) Start() {
-	go hub.run()
+	hub.run()
 }
 
 // run runs the event-loop in its own goroutine handling incoming events
 func (hub *PubSub) run() {
+	// ticker for health logs
+	var ticker = time.NewTicker(15 * time.Second)
 
 	for {
 		select {
 		case user := <-hub.sub:
 			fmt.Printf("RECORD: %v\n", *user)
+			hub.mu.Lock()
+			if _, ok := hub.session[user.IpPort]; ok {
+				hub.mu.Unlock()
+				continue
+			}
+			hub.session[user.IpPort] = user
+			hub.mu.Unlock()
+		case user := <-hub.drop:
+			logrus.Infof("[event-bus.drop] deleting for %s\n", user.IpPort)
+			hub.mu.Lock()
+			delete(hub.session, user.IpPort)
+			hub.mu.Unlock()
 		case event := <-hub.pub:
 			fmt.Printf("EVENT: %v\n", event)
+		case <-ticker.C:
+			logrus.Infof("[event-bus.run] connections: %d - goroutines: %d\n", len(hub.session), runtime.NumGoroutine())
 		}
 	}
 }

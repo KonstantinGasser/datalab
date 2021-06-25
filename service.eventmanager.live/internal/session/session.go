@@ -66,7 +66,9 @@ func NewUser(req *http.Request, conn *websocket.Conn, pub chan<- Event, drop cha
 // Listen runs in its own goroutine listening for incoming user events
 // and sending them to the publish chan
 func (u User) Listen() {
+	fmt.Println("Listen")
 	defer func() {
+		logrus.Infof("[user.Listen] closing for %s\n", u.IpPort)
 		// wraping up user session sending before deletion
 		u.drop <- u.finish()
 	}()
@@ -92,12 +94,16 @@ func (u User) Event(bytes []byte) (Event, error) {
 		return nil, err
 	}
 
-	evtType, ok := rawEvent["type"].(EventType)
+	evtType, ok := rawEvent["type"]
+	if !ok {
+		return nil, ErrNoTypeFound
+	}
+	_type, ok := evtType.(float64)
 	if !ok {
 		return nil, ErrNoSuchType
 	}
 
-	switch evtType {
+	switch EventType(_type) {
 	case RawClick:
 		var evt RawClickEvent
 		if err := json.Unmarshal(bytes, &evt); err != nil {

@@ -126,13 +126,15 @@ export class DataKraken {
             
              const elapsed: number = DataKraken.elapsed(new Date().getTime(), this.URL_TIME)
              this.URL_TIME = new Date().getTime()
-             const data_point: any = DataKraken.Event(
-                 EVENT.URL_CHANGE,
-                 {
-                     from: history.state.back,
-                     to: history.state.current,
-                     elapsed: elapsed,
-                 })
+             const data_point: any = {
+                type: 0,
+                timestamp: new Date().getTime(),
+                action: "url_change",
+                from: history.state.back,
+                to: history.state.current,
+                elapsed_time: elapsed,
+    
+            }
             console.log(data_point)
             this.CURRENT_URL = history.state.current
         }, this.URL_TIMEOUT_RATE)
@@ -150,13 +152,15 @@ export class DataKraken {
             return
         const elapsed: number = DataKraken.elapsed(new Date().getTime(), this.LAST_CLICK)
         const URL: string = history.state.current
-        const data_point: any = DataKraken.Event(
-            EVENT.ELEMENT_CLICK,
-            {
-                url: URL,
-                target: target,
-                elapsed: elapsed,
-            })
+        const data_point: any = {
+            type: 0,
+            timestamp: new Date().getTime(),
+            current_url: URL,
+            action: "element_clicked",
+            target: target,
+            elapsed_time: elapsed,
+
+        }
         console.log("Clicked: ", data_point)
         this.WEB_SOCKET.send(JSON.stringify(data_point))
         this.LAST_CLICK = new Date().getTime()

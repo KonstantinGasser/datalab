@@ -2,10 +2,9 @@ package httpserver
 
 import (
 	"encoding/json"
-	"fmt"
-	"io"
 	"net"
 	"net/http"
+	_ "net/http/pprof"
 
 	"github.com/KonstantinGasser/datalab/service.eventmanager.live/internal/bus"
 	"github.com/KonstantinGasser/datalab/service.eventmanager.live/ports/client"
@@ -35,8 +34,6 @@ const (
 	accessControlAllowMethods = "Access-Control-Allow-Methods"
 	// accessControlAllowHeaders refers to the http.Header
 	accessControlAllowHeaders = "Access-Control-Allow-Headers"
-	// accessControlAllowCreds refers to the http.Header
-	accessControlAllowCreds = "Access-Control-Allow-Credentials"
 )
 
 func onErr(w http.ResponseWriter, status int32, message string) {
@@ -129,19 +126,6 @@ func (s *Server) Apply(options ...func(*Server)) {
 	for _, option := range options {
 		option(s)
 	}
-}
-
-func (s Server) decode(body io.ReadCloser, data interface{}) error {
-	if data == nil {
-		return fmt.Errorf("passed data can not be nil")
-	}
-	defer body.Close()
-
-	if err := json.NewDecoder(body).Decode(data); err != nil {
-		logrus.Errorf("[Server.decode] could not decode r.Body: %v", err)
-		return fmt.Errorf("cloud not decode r.Body: %v", err)
-	}
-	return nil
 }
 
 // WithAllowedOrigins apply the given Origins to the
