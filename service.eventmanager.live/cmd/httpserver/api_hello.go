@@ -29,16 +29,16 @@ func (server *Server) Hello(w http.ResponseWriter, r *http.Request) {
 		server.onErr(w, http.StatusUnauthorized, "not authorized")
 		return
 	}
-	var request = sessions.StartRequest{
-		AppUuid:   appUuid,
-		AppOrigin: appOrigin,
-		Session:   &session,
-	}
-	config, err := server.sessionSvc.FetchConfigMetaData(r.Context(), request.AppUuid)
-	if err != nil {
-		server.onErr(w, http.StatusInternalServerError, "could not load meta data")
-		return
-	}
+	// var request = sessions.StartRequest{
+	// 	AppUuid:   appUuid,
+	// 	AppOrigin: appOrigin,
+	// 	Session:   &session,
+	// }
+	// config, err := server.sessionSvc.FetchConfigMetaData(r.Context(), request.AppUuid)
+	// if err != nil {
+	// 	server.onErr(w, http.StatusInternalServerError, "could not load meta data")
+	// 	return
+	// }
 	cookie, ok := r.Context().Value(typeKeyCookie(keyCookie)).(*http.Cookie)
 	if !ok || cookie == nil {
 		logrus.Errorf("<%v>[service.StartSession] could not find cookie\n", r.Host)
@@ -52,8 +52,8 @@ func (server *Server) Hello(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	server.onSuccess(w, http.StatusOK, map[string]interface{}{
-		"ticket":   wsTicket,
-		"btn_defs": config.GetBtnTime(),
-		"stages":   config.GetFunnel(),
+		"ticket": wsTicket,
+		// "btn_defs": config.GetBtnTime(),
+		// "stages":   config.GetFunnel(),
 	})
 }

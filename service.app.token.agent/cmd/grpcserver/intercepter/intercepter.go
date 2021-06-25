@@ -32,6 +32,14 @@ func WithUnary(middleware grpc.UnaryServerInterceptor) grpc.ServerOption {
 }
 
 func WithJwtAuth(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+
+	// validating the app token must be excluded from user-JWT middelware since
+	// the call for validation is send by a unknown client who uses the app token
+	// to authenticate.
+	if info.FullMethod == "/issuer_proto.AppToken/Validate" {
+		return handler(ctx, req)
+	}
+
 	logrus.Info("[intercepter.WithJwtAuth] receiced request\n")
 
 	authedUser, err := validateJWT(ctx)
