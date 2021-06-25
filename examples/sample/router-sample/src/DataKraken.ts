@@ -65,9 +65,9 @@ export class DataKraken {
         if (resp.status != 200)
             return false
         
-        resp.data?.btn_defs.forEach((def:any) => {
-            this.BTN_DEFS.push(def.btn_name)
-        })
+        // resp.data?.btn_defs.forEach((def:any) => {
+        //     this.BTN_DEFS.push(def.btn_name)
+        // })
         this.WS_TICKET = resp.data?.ticket
 
         return true

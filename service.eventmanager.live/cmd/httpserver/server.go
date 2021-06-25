@@ -7,14 +7,12 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/KonstantinGasser/datalab/service.eventmanager.live/internal/sessions"
-	"github.com/KonstantinGasser/datalab/service.eventmanager.live/internal/stream"
 	"github.com/KonstantinGasser/datalab/service.eventmanager.live/ports/client"
 	"github.com/sirupsen/logrus"
 )
 
 // typeKeyCookie is the key to the cookie value in a request
-type typeKeyCookie string
+type typeKeyIP string
 type typeKeyClaims string
 type typeKeyTicket string
 
@@ -23,7 +21,7 @@ type typeKeyDatalabToken string
 
 const (
 	// keyCookie is the key to the cookie value in a request
-	keyCookie = "x-datalab-cookie"
+	keyIP = "tracking_ip"
 	// keyClaims is the key in the context for the app claims
 	keyClaims = "claims"
 	// keyTicket is the key in the context holding the web-socket jwt-ticket
@@ -85,11 +83,9 @@ type Server struct {
 	onSuccess func(w http.ResponseWriter, status int32, data interface{})
 	// *** Server dependencies ***
 	appTokenClient client.ClientAppToken
-	sessionSvc     sessions.Service
-	stream         *stream.Stream
 }
 
-func NewDefault(appTokenClient client.ClientAppToken, sessionSvc sessions.Service, stream *stream.Stream) *Server {
+func NewDefault(appTokenClient client.ClientAppToken) *Server {
 	srv := &Server{
 		// *** CORS-Configurations ***
 		allowedOrigins:   []string{"*"},
@@ -100,15 +96,13 @@ func NewDefault(appTokenClient client.ClientAppToken, sessionSvc sessions.Servic
 		onSuccess:        onSuccess,
 		// *** service dependencies ***
 		appTokenClient: appTokenClient,
-		sessionSvc:     sessionSvc,
-		stream:         stream,
 	}
 	return srv
 }
 
 func (s Server) Start(host string) error {
 	// let the stream service listen to incoming events
-	go s.stream.Listen()
+	// go s.stream.Listen()
 
 	listener, err := net.Listen("tcp", host)
 	if err != nil {

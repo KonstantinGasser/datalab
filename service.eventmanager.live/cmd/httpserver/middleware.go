@@ -5,10 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/KonstantinGasser/datalab/library/utils/ctx_value"
-	"github.com/KonstantinGasser/datalab/library/utils/unique"
 	"github.com/KonstantinGasser/datalab/service.eventmanager.live/jwts"
 	"github.com/gofrs/uuid"
 	"github.com/sirupsen/logrus"
@@ -54,50 +52,18 @@ func (s *Server) WithAuth(next http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-// WithCookie looks-up if a request already has an x-datalab cookie set
-// else sets a new x-datalab cookie. In both cases the cookie information
-// gets passed into the r.Context
-func (s *Server) WithCookie(next http.HandlerFunc) http.HandlerFunc {
+// WithTraceIP adds the requester's IP:Port pair to the request context
+// serving as device identifier - if none present request is not accpeted
+func (s *Server) WithTraceIP(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var cookie *http.Cookie
-		var err error
-
-		cookie, err = r.Cookie(keyCookie)
-		if err != nil || cookie.Value == "" {
-			logrus.Warnf("[middleware.WithCookie] no cookie present - setting new cookie\n")
-			// set new cookie for request
-			uuid, err := unique.UUID()
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-			}
-			cookie = &http.Cookie{
-				Name:    keyCookie,
-				Value:   uuid,
-				Expires: time.Now().Add(1 * time.Hour),
-				Path:    "/",
-				Domain:  "sample.router.dev",
-			}
-			http.SetCookie(w, cookie)
-		}
-		// pass cookie via context
-		ctx := context.WithValue(r.Context(), typeKeyCookie(keyCookie), cookie)
-		// move to next handler
-		next(w, r.WithContext(ctx))
-	}
-}
-
-// MustCookie ensures that a request has a cookie present else aborts the request with a 403.
-func (s *Server) MustCookie(next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		logrus.Info("[middleware.MustCookie] applying\n")
-		cookie, err := r.Cookie(keyCookie)
-		if err != nil || cookie == nil {
-			logrus.Errorf("[middleware.MustCookie] no cookie present. Want: cookie - have: %v\n", cookie)
-			http.Error(w, http.ErrNoCookie.Error(), http.StatusForbidden)
+		deviceIP := r.RemoteAddr
+		if deviceIP == "" {
+			s.onErr(w, http.StatusBadRequest, "not sufficiant information provided")
 			return
 		}
-		ctx := context.WithValue(r.Context(), typeKeyCookie(keyCookie), cookie)
-		next(w, r.WithContext(ctx))
+		ipCtx := context.WithValue(r.Context(), typeKeyIP(keyIP), deviceIP)
+
+		next(w, r.WithContext(ipCtx))
 	}
 }
 
@@ -106,7 +72,6 @@ func (s *Server) MustCookie(next http.HandlerFunc) http.HandlerFunc {
 // else returns with a http error
 func (s *Server) WithTicketAuth(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		logrus.Info("[middleware.WithTicketAuth] applying\n")
 		ticket := r.URL.Query().Get("ticket")
 		if ticket == "" {
 			logrus.Errorf("could not find any ws-ticket want: jwt - have: %s\n", ticket)
