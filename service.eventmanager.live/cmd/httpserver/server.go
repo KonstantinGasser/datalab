@@ -7,6 +7,7 @@ import (
 	"net"
 	"net/http"
 
+	"github.com/KonstantinGasser/datalab/service.eventmanager.live/internal/bus"
 	"github.com/KonstantinGasser/datalab/service.eventmanager.live/ports/client"
 	"github.com/sirupsen/logrus"
 )
@@ -83,6 +84,7 @@ type Server struct {
 	onSuccess func(w http.ResponseWriter, status int32, data interface{})
 	// *** Server dependencies ***
 	appTokenClient client.ClientAppToken
+	eventBus       *bus.PubSub
 }
 
 func NewDefault(appTokenClient client.ClientAppToken) *Server {
@@ -96,13 +98,14 @@ func NewDefault(appTokenClient client.ClientAppToken) *Server {
 		onSuccess:        onSuccess,
 		// *** service dependencies ***
 		appTokenClient: appTokenClient,
+		eventBus:       bus.NewPubSub(),
 	}
 	return srv
 }
 
 func (s Server) Start(host string) error {
-	// let the stream service listen to incoming events
-	// go s.stream.Listen()
+	// start pub-sub server
+	go s.eventBus.Start()
 
 	listener, err := net.Listen("tcp", host)
 	if err != nil {

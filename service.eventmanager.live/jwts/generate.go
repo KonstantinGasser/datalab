@@ -10,7 +10,7 @@ import (
 const (
 	issuerService = "com.datalab.service.eventmanager-live"
 	secretTicket  = "secure"
-	ticketExp     = 15 * time.Second
+	ticketExp     = 5 * time.Second
 )
 
 var (
@@ -23,9 +23,9 @@ type AppClaims struct {
 	AppUuid, AppOrigin string
 }
 
-func WebSocketTicket(cookie string) (string, error) {
+func WebSocketTicket(sub interface{}) (string, error) {
 	claims := jwt.MapClaims{
-		"sub": cookie,
+		"sub": sub,
 		"iss": issuerService,
 		"iat": time.Now().Unix(),
 		"exp": time.Now().Add(ticketExp).Unix(),

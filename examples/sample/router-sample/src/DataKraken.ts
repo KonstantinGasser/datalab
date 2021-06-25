@@ -13,7 +13,7 @@ enum LISTENER {
 }
 
 export class DataKraken {   
-    private API_WS = "ws://localhost:8004/api/v1/open?ticket=" 
+    private API_WS = "ws://localhost:8004/api/v1/open?" 
     private URL_TIMEOUT_RATE: number = 1000
     private URL_TIME: number = new Date().getTime()
     private CURRENT_URL: string = history.state.current
@@ -57,24 +57,18 @@ export class DataKraken {
             },
             // withCredentials: true,
         }
-        const resp: any = await axios.post("http://localhost:8004/api/v1/hello", {
-            referrer: this.getReferrer(),
-            meta: this.getDevice(),
-        }, opts)
+        const resp: any = await axios.get("http://localhost:8004/api/v1/hello", opts)
         
         if (resp.status != 200)
             return false
-        
-        // resp.data?.btn_defs.forEach((def:any) => {
-        //     this.BTN_DEFS.push(def.btn_name)
-        // })
-        this.WS_TICKET = resp.data?.ticket
-
+        this.WS_TICKET = resp?.data?.ticket
         return true
     }
 
     private open(ticket: string): any {
-        const ws = new WebSocket(this.API_WS+ticket)
+        const deviceInfo = this.getDevice()
+        const URL_PARAMS = "ticket="+ticket+"&ref="+this.getReferrer()+"&os_name="+deviceInfo.OS?.name+"&os_vs="+deviceInfo.OS?.version+"&device="+deviceInfo.device+"&browser="+deviceInfo.browser
+        const ws = new WebSocket(this.API_WS+URL_PARAMS)
         ws.onerror = function(err: any){
             console.log(err)
         }
@@ -164,6 +158,7 @@ export class DataKraken {
                 elapsed: elapsed,
             })
         console.log("Clicked: ", data_point)
+        this.WEB_SOCKET.send(JSON.stringify(data_point))
         this.LAST_CLICK = new Date().getTime()
     }
 
