@@ -23,7 +23,8 @@ const (
 	// keyCookie is the key to the cookie value in a request
 	keyIP = "tracking_ip"
 	// keyClaims is the key in the context for the app claims
-	keyClaims = "claims"
+	keyOrigin  = "app.origin"
+	keyAppUuid = "app.uuid"
 	// keyTicket is the key in the context holding the web-socket jwt-ticket
 	keyTicket = "wsTicket"
 	// keyDatalabToken is the header key holding the auth-token

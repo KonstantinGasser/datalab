@@ -12,7 +12,19 @@ import (
 func (server *Server) Hello(w http.ResponseWriter, r *http.Request) {
 	logrus.Infof("[server.Hello] received request\n")
 
-	wsTicket, errTicket := jwts.WebSocketTicket(r.Context().Value(typeKeyIP(keyIP)))
+	ctxOrigin := r.Context().Value(typeKeyClaims(keyOrigin))
+	origin, ok := ctxOrigin.(string)
+	if !ok {
+		logrus.Errorf("<%v>[service.StartSession] origin of app-token not valid\n", r.Host)
+		server.onErr(w, http.StatusUnauthorized, "app-token tamppered")
+		return
+	}
+	if len(origin) == 0 {
+		logrus.Errorf("<%v>[service.StartSession] origin of app-token not valid - length violation\n", r.Host)
+		server.onErr(w, http.StatusUnauthorized, "app-token tamppered")
+		return
+	}
+	wsTicket, errTicket := jwts.WebSocketTicket(r.Context().Value(typeKeyIP(keyIP)), origin)
 	if errTicket != nil {
 		logrus.Errorf("<%v>[service.StartSession] could not issue ws ticket\n", r.Host)
 		server.onErr(w, http.StatusInternalServerError, "could not issue ws ticket")

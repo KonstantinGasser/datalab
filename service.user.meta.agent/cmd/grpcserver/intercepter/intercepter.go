@@ -34,6 +34,10 @@ func WithUnary(middleware grpc.UnaryServerInterceptor) grpc.ServerOption {
 func WithJwtAuth(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 	logrus.Info("[intercepter.WithJwtAuth] receiced request\n")
 
+	if info.FullMethod == "/user_proto.UserMeta/Create" {
+		return handler(ctx, req)
+	}
+
 	authedUser, err := validateJWT(ctx)
 	if err != nil {
 		return nil, err

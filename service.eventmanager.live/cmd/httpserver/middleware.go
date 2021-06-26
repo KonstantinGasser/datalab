@@ -45,8 +45,8 @@ func (s *Server) WithAuth(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 		// add JWT claims of user in r.Context()
-		ctxWithVal := ctx_value.AddValue(r.Context(), "app.uuid", appUuid)
-		ctxWithVal = ctx_value.AddValue(ctxWithVal, "app.origin", appOrigin)
+		ctxWithVal := context.WithValue(r.Context(), typeKeyClaims(keyAppUuid), appUuid)
+		ctxWithVal = context.WithValue(ctxWithVal, typeKeyClaims(keyOrigin), appOrigin)
 		// serve request with user claims in context
 		next(w, r.WithContext(ctxWithVal))
 	}
@@ -78,12 +78,13 @@ func (s *Server) WithTicketAuth(next http.HandlerFunc) http.HandlerFunc {
 			s.onErr(w, http.StatusUnauthorized, "no ws ticket found")
 			return
 		}
-		if err := jwts.Validate(ticket); err != nil {
+		claims, err := jwts.Validate(ticket)
+		if err != nil {
 			logrus.Error("provided ws-ticket is not valid")
 			s.onErr(w, http.StatusUnauthorized, "not authorized")
 			return
 		}
-		ctx := context.WithValue(r.Context(), typeKeyTicket(keyTicket), ticket)
+		ctx := ctx_value.AddValue(r.Context(), keyOrigin, claims["origin"])
 		next(w, r.WithContext(ctx))
 	}
 }

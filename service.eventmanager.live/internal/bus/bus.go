@@ -7,15 +7,25 @@ import (
 	"sync"
 	"time"
 
+	"github.com/KonstantinGasser/datalab/library/utils/ctx_value"
 	"github.com/KonstantinGasser/datalab/service.eventmanager.live/internal/session"
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
 )
 
+// originFromAppToken checks if the request origin matches with the app-token origin
+// alloing to block connection from unwanted clients
+var originFromAppToken = func(r *http.Request) bool {
+	allowedOrigin := r.Header.Get("Origin")
+	requestedOrigin := ctx_value.GetString(r.Context(), "app.origin")
+
+	return len(allowedOrigin) != 0 && requestedOrigin == allowedOrigin
+}
+
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
-	CheckOrigin:     func(r *http.Request) bool { return true },
+	CheckOrigin:     originFromAppToken,
 }
 
 type PubSub struct {

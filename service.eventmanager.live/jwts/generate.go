@@ -23,12 +23,13 @@ type AppClaims struct {
 	AppUuid, AppOrigin string
 }
 
-func WebSocketTicket(sub interface{}) (string, error) {
+func WebSocketTicket(sub, origin interface{}) (string, error) {
 	claims := jwt.MapClaims{
-		"sub": sub,
-		"iss": issuerService,
-		"iat": time.Now().Unix(),
-		"exp": time.Now().Add(ticketExp).Unix(),
+		"sub":    sub,
+		"origin": origin,
+		"iss":    issuerService,
+		"iat":    time.Now().Unix(),
+		"exp":    time.Now().Add(ticketExp).Unix(),
 	}
 
 	_token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -40,16 +41,16 @@ func WebSocketTicket(sub interface{}) (string, error) {
 
 }
 
-func Validate(tokenString string) error {
+func Validate(tokenString string) (jwt.MapClaims, error) {
 	token, err := verifyToken(tokenString, secretTicket)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	_, ok := token.Claims.(jwt.MapClaims)
+	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok || !token.Valid {
-		return ErrInvalidJWT
+		return nil, ErrInvalidJWT
 	}
-	return nil
+	return claims, nil
 }
 
 func verifyToken(tokenString, secret string) (*jwt.Token, error) {
