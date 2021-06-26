@@ -198,14 +198,17 @@ export default {
             }
         },
         addStage() {
+            
             if (this.stage_invalid) this.stage_invalid = false;
+            // check for naming conflict (values must be unique)
             const tmp = this.$props.app_config?.funnel?.filter(item => item.name === this.stage_name || item.transition === this.stage_transition)
             if (tmp?.length > 0) {
                 this.$moshaToast("Funnel Name and Transition must be unique", {type: 'danger',position: 'top-center', timeout: 3000})
                 this.stage_invalid = true;
                 return
             }
-            console.log(this.stage_trigger)
+
+            // selecting and checking for state trigger 0,1,2
             const tmp2 = this.stage_triggers.filter(item => item.id === this.stage_trigger.id)
             if (tmp2?.length === 0) {
                 this.$moshaToast("Please select a Stage-Trigger", {type: 'danger',position: 'top-center', timeout: 3000})
@@ -214,6 +217,8 @@ export default {
             const regex_pattern = this.stage_transition.substring(
                 this.stage_transition.search("{")+1,this.stage_transition.search("}")
             )
+            console.log("Regex: ", regex_pattern)
+            console.log("stage transition: ", this.stage_transition)
             if (regex_pattern?.length > 0 && !this.isRegex(regex_pattern)) {
                 this.$moshaToast("Provided Regex might be wrong", {type: 'warning',position: 'top-center', timeout: 3000})
             }
@@ -224,7 +229,7 @@ export default {
             this.$emit("appchange", {unsaved: true, type: "funnel-add", item: {
                     id: count,
                     name: this.stage_name,
-                    transition: this.stage_transition.substring(0,this.stage_transition.search("{")), // cut-off regex
+                    transition: this.stage_transition.replace("{"+regex_pattern+"}", ""), // cut-off regex
                     regex: regex_pattern,
                     trigger: this.stage_trigger.id,
                 }

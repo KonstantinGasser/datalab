@@ -73,7 +73,7 @@ func (s *service) IssueAppToken(ctx context.Context, orgn, appName, appUuid stri
 	}
 
 	// update new app-token in database
-	repoErr := s.repo.Update(ctx, modifiedAppToken.AppRefUuid, modifiedAppToken.Jwt, modifiedAppToken.Exp)
+	repoErr := s.repo.Update(ctx, modifiedAppToken.AppRefUuid, modifiedAppToken.Jwt, modifiedAppToken.Exp, modifiedAppToken.RefreshCount)
 	if repoErr != nil {
 		return "", 0, errors.New(http.StatusInternalServerError,
 			repoErr,
@@ -107,11 +107,12 @@ func (s service) UnlockAppToken(ctx context.Context, appUuid string) errors.Api 
 			"Could not unlock App-Token")
 	}
 
+	dirtyToken := storedAppToken.MarkDirty()
 	// if an app gets unlocked the current apptoken will get invalid
 	// TODO: implement invalidation of app token with cound in JWT and db.
 	// for verification app token cound and db count must match else token has been
 	// invalidated
-	repoErr := s.repo.Update(ctx, appUuid, "", 0)
+	repoErr := s.repo.Update(ctx, dirtyToken.AppRefUuid, dirtyToken.Jwt, dirtyToken.Exp, dirtyToken.RefreshCount)
 	if repoErr != nil {
 		return errors.New(http.StatusInternalServerError,
 			repoErr,

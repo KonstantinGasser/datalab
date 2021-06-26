@@ -2,6 +2,7 @@ package validating
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/KonstantinGasser/datalab/library/errors"
@@ -26,11 +27,28 @@ func NewService(repo apptokens.ApptokenRepo) Service {
 // expiration time. Returns the new Jwt and Exp
 func (s *service) ValidateAppToken(ctx context.Context, jwt string) (string, string, errors.Api) {
 
-	appUuid, appOrigin, err := apptokens.Validate(jwt)
+	appUuid, appOrigin, refreshCount, err := apptokens.ClaimsFromJwt(jwt)
 	if err != nil {
 		return "", "", errors.New(http.StatusUnauthorized,
 			err,
-			"Token not valid")
+			"App Token corrputed")
+	}
+
+	var storedAppToken apptokens.AppToken
+	if err := s.repo.GetById(ctx, appUuid, &storedAppToken); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return "", "", errors.New(http.StatusNotFound,
+				err,
+				"Could not find App Token data")
+		}
+		return "", "", errors.New(http.StatusInternalServerError,
+			err,
+			"Could not get App Token data")
+	}
+
+	if !storedAppToken.IsValid(refreshCount) {
+		return "", "", errors.New(http.StatusUnauthorized,
+			fmt.Errorf("app-token is no longer valid"), "This App-Token has been invalidated")
 	}
 	return appUuid, appOrigin, nil
 }

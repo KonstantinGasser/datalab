@@ -29,7 +29,7 @@ var (
 type ApptokenRepo interface {
 	Initialize(ctx context.Context, appToken AppToken) error
 	GetById(ctx context.Context, uuid string, result interface{}) error
-	Update(ctx context.Context, uuid, jwt string, exp int64) error
+	Update(ctx context.Context, uuid, jwt string, exp int64, refreshCount int32) error
 	SetAppTokenLock(ctx context.Context, uuid string, lock bool) error
 }
 
@@ -53,7 +53,7 @@ func NewDefault(AppRefUuid, appHash, appOwner, appOrigin string) (*AppToken, err
 		AppHash:      appHash,
 		AppOwner:     appOwner,
 		AppOrigin:    appOrigin,
-		RefreshCount: 0, // i know default would handle this - but sometime explicte is nice :)
+		RefreshCount: -1, // will be updated on every issue -1 therefor represents "nil"/no prior app-token exists
 	}
 	if err := required.Atomic(&appToken); err != nil {
 		return nil, ErrMissingFields
@@ -61,7 +61,7 @@ func NewDefault(AppRefUuid, appHash, appOwner, appOrigin string) (*AppToken, err
 	return &appToken, nil
 }
 
-// Issue issues a new AppToken with an updated Jwt and Exp. The operation fails
+// Issue issues a new AppToken with an updated Jwt and Exp and RefreshCount. The operation fails
 // if the current AppToken.Exp has not yet expired
 func (appToken *AppToken) Issue(orgn, appName string) (*AppToken, error) {
 	// as a verification step the user must provide
@@ -74,20 +74,26 @@ func (appToken *AppToken) Issue(orgn, appName string) (*AppToken, error) {
 	if ok := appToken.expired(); !ok && appToken.Jwt != "" {
 		return nil, ErrAppTokenStillValid
 	}
-	jwt, exp, err := appToken.JWT()
-	if err != nil {
-		return nil, err
-	}
-	return &AppToken{
+
+	issuedToken := AppToken{
 		AppRefUuid:   appToken.AppRefUuid,
 		Locked:       true,
 		AppHash:      appToken.AppHash,
 		AppOwner:     appToken.AppOwner,
 		AppOrigin:    appToken.AppOrigin,
 		RefreshCount: appToken.RefreshCount + 1, // increment refresh-count to invalidate current app token
-		Jwt:          jwt,
-		Exp:          exp,
-	}, nil
+		Jwt:          "",
+		Exp:          0,
+	}
+
+	jwt, exp, err := issuedToken.JWT()
+	if err != nil {
+		return nil, err
+	}
+	issuedToken.Jwt = jwt
+	issuedToken.Exp = exp
+	return &issuedToken, nil
+
 }
 
 // JWT creates a new JSON-Web-Token based on the current AppToken information
@@ -113,17 +119,52 @@ func (appToken AppToken) JWT() (string, int64, error) {
 	return token, exp.Unix(), nil
 }
 
-// TODO needs to check refresh count
-func Validate(jwtString string) (string, string, error) {
+// IsValid matches the JWT refresh count with the refresh count from the database
+// if they dont match, the app-token is marked as invalid
+func (appToken AppToken) IsValid(jwtRefreshCount int) bool {
+	return jwtRefreshCount == int(appToken.RefreshCount)
+}
+
+// TODO: needs to check refresh count
+// IsCorrupted checks if the Json-Web-Token it self is valid and be decoded using the secure
+// further more it checks if the token has been expired
+func IsCorrupted(jwtString string) (string, string, int, error) {
 	token, err := verifyToken(jwtString, secretAppToken)
 	if err != nil {
-		return "", "", err
+		return "", "", 0, err
 	}
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok && !token.Valid {
-		return "", "", errors.New("apptoken invalid")
+		return "", "", 0, errors.New("apptoken invalid")
 	}
-	return claims["sub"].(string), claims["origin"].(string), nil
+	return claims["sub"].(string), claims["origin"].(string), claims["rfc"].(int), nil
+}
+
+func ClaimsFromJwt(jwtString string) (string, string, int, error) {
+	token, err := verifyToken(jwtString, secretAppToken)
+	if err != nil {
+		return "", "", 0, err
+	}
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok && !token.Valid {
+		return "", "", 0, errors.New("apptoken invalid")
+	}
+	return claims["sub"].(string), claims["origin"].(string), int(claims["rfc"].(float64)), nil
+}
+
+// MarkDirty updates the refresh count of an app token invalidating the all other app tokens
+// it will unset the jwt, ext
+func (appToken AppToken) MarkDirty() *AppToken {
+	return &AppToken{
+		AppRefUuid:   appToken.AppRefUuid,
+		AppHash:      appToken.AppHash,
+		AppOwner:     appToken.AppOwner,
+		AppOrigin:    appToken.AppOrigin,
+		Locked:       appToken.Locked,
+		Jwt:          "",
+		Exp:          0,
+		RefreshCount: appToken.RefreshCount + 1,
+	}
 }
 
 // CompareHash compares if the provided meta data (orgnanization name and app name)
