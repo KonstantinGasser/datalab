@@ -116,13 +116,13 @@ func (s service) AcceptInvite(ctx context.Context, appUuid string) errors.Api {
 	}
 
 	// user must have an open invite for the app
-	openInvite := storedApp.OpenInvite(authedUser.Uuid)
-	if openInvite == nil {
+	invitedUser := storedApp.CloseInvite(authedUser.Uuid)
+	if invitedUser == nil {
 		return errors.New(http.StatusUnauthorized,
 			fmt.Errorf("could not find open invite for user"),
 			"User does not have an open invite")
 	}
-	err := s.repo.MemberStatus(ctx, appUuid, *openInvite, apps.InviteAccepted)
+	err := s.repo.MemberStatus(ctx, appUuid, *invitedUser, apps.InviteAccepted)
 	if err != nil {
 		return errors.New(http.StatusInternalServerError,
 			err,
@@ -132,10 +132,7 @@ func (s service) AcceptInvite(ctx context.Context, appUuid string) errors.Api {
 	// tell other app related services to add new user as member of app
 	if err := s.emitAppendPermissions(ctx, appUuid, authedUser.Uuid); err != nil {
 		// if either call to a service failes - rollback all
-		if err := s.compensateInvite(ctx, appUuid, apps.Member{
-			Uuid:   authedUser.Uuid,
-			Status: apps.InvitePending,
-		}); err != nil {
+		if err := s.compensateInvite(ctx, appUuid, *invitedUser); err != nil {
 			logrus.Errorf("[invite.Rollback] could not rollback App Invite accept: %v\n", err)
 		}
 		if err := s.emitRollbackAppendPermissions(ctx, appUuid, authedUser.Uuid); err != nil {
@@ -162,7 +159,7 @@ func (s service) emitAppendPermissions(ctx context.Context, appUuid, joinedUser 
 	for i := 0; i < 2; i++ {
 		err := <-errC
 		if err != nil {
-			logrus.Errorf("[%s][inviting.EmitAppendPermissions] emit cause error: %v\n", ctx.Value("tracingID"), err)
+			logrus.Errorf("[inviting.EmitAppendPermissions] emit cause error: %v\n", err)
 			// if there is an error while emitting events
 			// here the emiited events must succed in order for the
 			// transaction to succeed - hence if err cancel context and
@@ -191,7 +188,7 @@ func (s service) emitRollbackAppendPermissions(ctx context.Context, appUuid, joi
 	for i := 0; i < 2; i++ {
 		err := <-errC
 		if err != nil {
-			logrus.Errorf("[%s][inviting.EmitRollbackAppendPermissions] emit cause error: %v\n", ctx.Value("tracingID"), err)
+			logrus.Errorf("[inviting.EmitRollbackAppendPermissions] emit cause error: %v\n", err)
 			// if there is an error while emitting the rollback event
 			// ignore error since at least one error is to be expected since an error happend in the forward
 			// transaction

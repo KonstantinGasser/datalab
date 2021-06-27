@@ -51,7 +51,7 @@ func (client ClientAppConfig) EmitInit(ctx context.Context, event *ports.InitEve
 // append its app config permissions with the new user joining the application
 func (client ClientAppConfig) EmitAppendPermissions(ctx context.Context, event *ports.PermissionEvent, errC chan error) {
 	resp, err := client.conn.AppendPermission(ctx, &grpcAppConfig.AppendPermissionRequest{
-		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
+		Tracing_ID: "1",
 		AppUuid:    event.AppUuid,
 		UserUuid:   event.UserUuid,
 	})
@@ -70,7 +70,7 @@ func (client ClientAppConfig) EmitAppendPermissions(ctx context.Context, event *
 // add the joined user permissions to the app token
 func (client ClientAppConfig) EmitRollbackAppendPermissions(ctx context.Context, event *ports.PermissionEvent, errC chan error) {
 	resp, err := client.conn.RollbackAppendPermission(ctx, &grpcAppConfig.RollbackAppendPermissionRequest{
-		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
+		Tracing_ID: "1",
 		AppUuid:    event.AppUuid,
 		UserUuid:   event.UserUuid,
 	})

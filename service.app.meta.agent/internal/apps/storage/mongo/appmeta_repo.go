@@ -2,6 +2,7 @@ package mongo
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/KonstantinGasser/datalab/service.app.meta.agent/internal/apps"
@@ -170,6 +171,8 @@ func (client MongoClient) MemberStatus(ctx context.Context, appUuid string, open
 			},
 		},
 	}
+	fmt.Printf("Filter: %+v\n", filter)
+	fmt.Printf("Query: %+v\n", query)
 	coll := client.conn.Database(nameDB).Collection(nameColl)
 	_, err := coll.UpdateOne(ctx, filter, query)
 	if err != nil {

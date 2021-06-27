@@ -1,0 +1,11 @@
+### Create new App-Token
+POST http://localhost:8080/api/v1/app/token/issue HTTP/1.1
+content-type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjQ4MDY0ODYsImlhdCI6ImRhdGFsYWIuc2VydmljZS51c2VyLmF1dGguYWdlbnQiLCJvcmduIjoiZGF0YWxhYi5kZXYiLCJzdWIiOiIzOWJjZTBlZi0xYTAxLTRjZmEtOTU1NS0wZjgzMDhlMDBkY2EiLCJ1bmFtZSI6ImtnYXNzZXIifQ.F3RZVISYaqStxJ2e7BocssdZb-NSo3g2wBRhPc3qGlQ
+
+{
+    "app_name": "dummy#1",
+    "app_uuid": "2692042e-df8f-45a4-a50d-fdc0828782d6",
+    "owner_domain": "datalab.dev",
+    "app_origin": "http://test.io"
+}

@@ -159,9 +159,11 @@ func (app App) IsMember(userUuid string, status InviteStatus) error {
 	return ErrNotAMember
 }
 
-func (app App) OpenInvite(userUuid string) *Member {
+// CloseInvite sets the invite status to accepted if open invite present
+func (app App) CloseInvite(userUuid string) *Member {
 	for _, member := range app.Members {
 		if member.Uuid == userUuid && member.Status == InvitePending {
+			member.Status = InviteAccepted
 			return &member
 		}
 	}
