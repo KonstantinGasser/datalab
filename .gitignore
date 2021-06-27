@@ -18,7 +18,7 @@ frontend/webapp/dist
 .DS_Store
 
 # Build artifacts
-target
+build/
 
 # Test binary, built with `go test -c`
 *.test
