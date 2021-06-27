@@ -2,7 +2,6 @@ package creating
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"github.com/KonstantinGasser/datalab/library/errors"
@@ -16,19 +15,18 @@ type Service interface {
 }
 
 type service struct {
-	repo                   apps.AppsRepository
-	emitterAppToken        ports.EventEmitter
-	emitterAppConf         ports.EventEmitter
-	emitterUserPermissions ports.EventEmitter
+	repo            apps.AppsRepository
+	emitterAppToken ports.EventEmitter
+	emitterAppConf  ports.EventEmitter
+	// emitterUserPermissions ports.EventEmitter
 }
 
 func NewService(repo apps.AppsRepository, emitterAppToken ports.EventEmitter,
-	emitterAppConf ports.EventEmitter, emitterUserPermissions ports.EventEmitter) Service {
+	emitterAppConf ports.EventEmitter) Service {
 	return &service{
-		repo:                   repo,
-		emitterAppToken:        emitterAppToken,
-		emitterAppConf:         emitterAppConf,
-		emitterUserPermissions: emitterUserPermissions,
+		repo:            repo,
+		emitterAppToken: emitterAppToken,
+		emitterAppConf:  emitterAppConf,
 	}
 }
 
@@ -53,7 +51,6 @@ func (s service) CreateDefaultApp(ctx context.Context, name, URL, ownerUuid, own
 }
 
 func (s service) compentsateCreate(ctx context.Context, appUuid string) error {
-	fmt.Println("running rollback")
 	return s.repo.CompensateCreate(ctx, appUuid)
 }
 
@@ -64,13 +61,13 @@ func (s service) emitInitEvent(ctx context.Context, app *apps.App) error {
 	defer cancel()
 
 	var errC = make(chan error)
-	emitterEvent := ports.NewEvent(app)
+	emitterEvent := ports.NewInitEvent(app)
 
-	go s.emitterAppToken.Emit(withCancel, emitterEvent, errC)
-	go s.emitterAppConf.Emit(withCancel, emitterEvent, errC)
-	go s.emitterUserPermissions.Emit(withCancel, emitterEvent, errC)
+	go s.emitterAppToken.EmitInit(withCancel, emitterEvent, errC)
+	go s.emitterAppConf.EmitInit(withCancel, emitterEvent, errC)
+	// go s.emitterUserPermissions.Emit(withCancel, emitterEvent, errC)
 
-	for i := 0; i < 3; i++ {
+	for i := 0; i < 2; i++ {
 		err := <-errC
 		if err != nil {
 			logrus.Errorf("[%s][creating.EmitInit] emit cause error: %v\n", ctx.Value("tracingID"), err)

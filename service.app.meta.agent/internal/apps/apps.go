@@ -35,7 +35,8 @@ type AppsRepository interface {
 	GetAll(ctx context.Context, userUuid string, stored interface{}) error
 	SetAppLock(ctx context.Context, uuid string, lock bool) error
 	AddMember(ctx context.Context, appUuid string, invitedMember Member) error
-	MemberStatus(ctx context.Context, appUuid string, openInvite Member) error
+	MemberStatus(ctx context.Context, appUuid string, openInvite Member, with InviteStatus) error
+	CompensateMemberStatus(ctx context.Context, appUuid string, member Member) error
 }
 
 type App struct {
@@ -159,9 +160,7 @@ func (app App) IsMember(userUuid string, status InviteStatus) error {
 }
 
 func (app App) OpenInvite(userUuid string) *Member {
-	fmt.Println(userUuid)
 	for _, member := range app.Members {
-		fmt.Println(member)
 		if member.Uuid == userUuid && member.Status == InvitePending {
 			return &member
 		}

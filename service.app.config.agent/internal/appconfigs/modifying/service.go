@@ -12,6 +12,9 @@ import (
 )
 
 type Service interface {
+	AddPermission(ctx context.Context, appUuid, userUuid string) errors.Api
+	RollbackPermission(ctx context.Context, appUuid, userUuid string) errors.Api
+
 	UpdateFunnel(ctx context.Context, appRefUuid string, stages []appconfigs.Stage) errors.Api
 	UpdateCampaign(ctx context.Context, appRefUuid string, records []appconfigs.Record) errors.Api
 	UpdateBtnTime(ctx context.Context, appRefUuid string, btnDefs []appconfigs.BtnDef) errors.Api
@@ -54,7 +57,7 @@ func (s *service) UpdateFunnel(ctx context.Context, appRefUuid string, stages []
 			"App is locked and cannot be changed")
 	}
 	// check user permissions
-	if err := storedAppConfig.HasReadOrWrite(authedUser.Uuid, authedUser.ReadWriteApps...); err != nil {
+	if err := storedAppConfig.HasReadOrWrite(authedUser.Uuid); err != nil {
 		return errors.New(http.StatusUnauthorized,
 			err,
 			"User has no rights to change App Config")
@@ -93,7 +96,7 @@ func (s *service) UpdateCampaign(ctx context.Context, appRefUuid string, records
 			"App is locked and cannot be changed")
 	}
 	// check user permissions
-	if err := storedAppConfig.HasReadOrWrite(authedUser.Uuid, authedUser.ReadWriteApps...); err != nil {
+	if err := storedAppConfig.HasReadOrWrite(authedUser.Uuid); err != nil {
 		return errors.New(http.StatusUnauthorized, err, "User has no rights to change App Config")
 	}
 	// update config
@@ -124,7 +127,7 @@ func (s *service) UpdateBtnTime(ctx context.Context, appRefUuid string, btnDefs 
 			"App is locked and cannot be changed")
 	}
 	// check user permissions
-	if err := storedAppConfig.HasReadOrWrite(authedUser.Uuid, authedUser.ReadWriteApps...); err != nil {
+	if err := storedAppConfig.HasReadOrWrite(authedUser.Uuid); err != nil {
 		return errors.New(http.StatusUnauthorized, err, "User has no rights to change App Config")
 	}
 	// update config
@@ -195,4 +198,28 @@ func (s *service) UnlockConfig(ctx context.Context, appRefUuid string) errors.Ap
 			"Could not unlock App Config")
 	}
 	return nil
+}
+
+func (s service) AddPermission(ctx context.Context, appUuid, userUuid string) errors.Api {
+	var storedAppConfig appconfigs.AppConfig
+	err := s.repo.GetById(ctx, appUuid, &storedAppConfig)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return errors.New(http.StatusNotFound, err, "Could not find any App Config")
+		}
+		return errors.New(http.StatusInternalServerError, err, "Could not get App Config")
+	}
+
+	storedAppConfig.AddMember(userUuid)
+	if err := s.repo.AddMember(ctx, appUuid, userUuid); err != nil {
+		return errors.New(http.StatusInternalServerError,
+			err,
+			"Could not add member to App-Config")
+	}
+	return nil
+}
+
+func (s service) RollbackPermission(ctx context.Context, appUuid, userUuid string) errors.Api {
+	err := s.repo.RollbackAddMember(ctx, appUuid, userUuid)
+	return errors.New(http.StatusInternalServerError, err, "Could not rollback member permission")
 }

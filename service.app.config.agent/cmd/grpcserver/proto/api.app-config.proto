@@ -11,10 +11,33 @@ service AppConfiguration {
     rpc Get(GetRequest) returns (GetResponse) {}
     rpc Update(UpdateRequest) returns (UpdateResponse) {}
 
+    rpc AppendPermission(AppendPermissionRequest) returns (AppendPermissionResponse) {}
+    rpc RollbackAppendPermission(RollbackAppendPermissionRequest) returns (RollbackAppendPermissionResponse) {}
+
     rpc LockConfig(LockConfigRequest) returns (LockConfigResponse) {}
     rpc UnlockConfig(UnlockConfigRequest) returns (UnlockConfigResponse) {}
 }
 
+
+message AppendPermissionRequest {
+    string tracing_ID = 1;
+    string app_uuid = 2;
+    string user_uuid = 3;
+}
+message AppendPermissionResponse {
+    int32 status_code = 1;
+    string msg = 2;
+}
+
+message RollbackAppendPermissionRequest {
+    string tracing_ID = 1;
+    string app_uuid = 2;
+    string user_uuid = 3;
+}
+message RollbackAppendPermissionResponse {
+    int32 status_code = 1;
+    string msg = 2;
+}
 
 message InitRequest {
     string tracing_ID = 1;

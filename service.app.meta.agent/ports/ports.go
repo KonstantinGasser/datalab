@@ -7,13 +7,27 @@ import (
 )
 
 type EventEmitter interface {
-	Emit(ctx context.Context, event *Event, errC chan error)
+	EmitInit(ctx context.Context, event *InitEvent, errC chan error)
+	EmitAppendPermissions(ctx context.Context, event *PermissionEvent, errC chan error)
+	EmitRollbackAppendPermissions(ctx context.Context, event *PermissionEvent, errC chan error)
 }
 
-type Event struct {
+type InitEvent struct {
 	App *apps.App
 }
 
-func NewEvent(app *apps.App) *Event {
-	return &Event{App: app}
+func NewInitEvent(app *apps.App) *InitEvent {
+	return &InitEvent{App: app}
+}
+
+type PermissionEvent struct {
+	AppUuid  string
+	UserUuid string
+}
+
+func NewPermissionEvent(appUuid, userUuid string) *PermissionEvent {
+	return &PermissionEvent{
+		AppUuid:  appUuid,
+		UserUuid: userUuid,
+	}
 }

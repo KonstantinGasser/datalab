@@ -14,6 +14,9 @@ import (
 type Service interface {
 	IssueAppToken(ctx context.Context, orgn, appName, appUuid string) (string, int64, errors.Api)
 	UnlockAppToken(ctx context.Context, appUuid string) errors.Api
+
+	AddPermission(ctx context.Context, appUuid, userUuid string) errors.Api
+	RollbackPermission(ctx context.Context, appUuid, userUuid string) errors.Api
 }
 
 type service struct {
@@ -117,6 +120,27 @@ func (s service) UnlockAppToken(ctx context.Context, appUuid string) errors.Api 
 		return errors.New(http.StatusInternalServerError,
 			repoErr,
 			"Could not reset App Token")
+	}
+	return nil
+}
+
+func (s service) AddPermission(ctx context.Context, appUuid, userUuid string) errors.Api {
+	var storedAppToken apptokens.AppToken
+	if err := s.repo.GetById(ctx, appUuid, &storedAppToken); err != nil {
+		return errors.New(http.StatusInternalServerError, err, "Could not get AppToken")
+	}
+
+	storedAppToken.AddMember(userUuid)
+	if err := s.repo.AddMember(ctx, storedAppToken.AppRefUuid, userUuid); err != nil {
+		return errors.New(http.StatusInternalServerError, err, "Could append App-Token permissons")
+	}
+	return nil
+}
+
+func (s service) RollbackPermission(ctx context.Context, appUuid, userUuid string) errors.Api {
+	err := s.repo.RollbackAddMember(ctx, appUuid, userUuid)
+	if err != nil {
+		return errors.New(http.StatusInternalServerError, err, "Could not rollback App-Token permissions")
 	}
 	return nil
 }

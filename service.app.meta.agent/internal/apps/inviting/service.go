@@ -8,7 +8,8 @@ import (
 	"github.com/KonstantinGasser/datalab/common"
 	"github.com/KonstantinGasser/datalab/library/errors"
 	"github.com/KonstantinGasser/datalab/service.app.meta.agent/internal/apps"
-	"github.com/KonstantinGasser/datalab/service.app.meta.agent/ports/client"
+	"github.com/KonstantinGasser/datalab/service.app.meta.agent/ports"
+	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -19,14 +20,18 @@ type Service interface {
 }
 
 type service struct {
-	repo           apps.AppsRepository
-	userAuthClient *client.ClientUserAuth
+	repo            apps.AppsRepository
+	emitterAppConf  ports.EventEmitter
+	emitterAppToken ports.EventEmitter
+	// userAuthClient *client.ClientUserAuth
 }
 
-func NewService(repo apps.AppsRepository, userAuthClient *client.ClientUserAuth) Service {
+func NewService(repo apps.AppsRepository, emitterAppConfSvc ports.EventEmitter, emitterAppTknSvc ports.EventEmitter) Service {
 	return &service{
-		repo:           repo,
-		userAuthClient: userAuthClient,
+		repo:            repo,
+		emitterAppConf:  emitterAppConfSvc,
+		emitterAppToken: emitterAppTknSvc,
+		// userAuthClient: userAuthClient,
 	}
 }
 
@@ -117,15 +122,82 @@ func (s service) AcceptInvite(ctx context.Context, appUuid string) errors.Api {
 			fmt.Errorf("could not find open invite for user"),
 			"User does not have an open invite")
 	}
-	err := s.repo.MemberStatus(ctx, appUuid, *openInvite)
+	err := s.repo.MemberStatus(ctx, appUuid, *openInvite, apps.InviteAccepted)
 	if err != nil {
 		return errors.New(http.StatusInternalServerError,
 			err,
 			"Could not update invite status")
 	}
-	// append users permission with new app
-	if err := s.userAuthClient.AddAppAccess(ctx, openInvite.Uuid, storedApp.Uuid); err != nil {
-		return err
+
+	// tell other app related services to add new user as member of app
+	if err := s.emitAppendPermissions(ctx, appUuid, authedUser.Uuid); err != nil {
+		// if either call to a service failes - rollback all
+		if err := s.compensateInvite(ctx, appUuid, apps.Member{
+			Uuid:   authedUser.Uuid,
+			Status: apps.InvitePending,
+		}); err != nil {
+			logrus.Errorf("[invite.Rollback] could not rollback App Invite accept: %v\n", err)
+		}
+		if err := s.emitRollbackAppendPermissions(ctx, appUuid, authedUser.Uuid); err != nil {
+			logrus.Errorf("[invite.Rollback] could not rollback append permissions: %v\n", err)
+		}
+		return errors.New(http.StatusInternalServerError, err, "Could not accept App-Invite")
 	}
+	return nil
+}
+
+// emitInitEvent distributes the event that a new app has been created triggering the init endpoints
+// of the AppTokenService and AppConfigService
+func (s service) emitAppendPermissions(ctx context.Context, appUuid, joinedUser string) error {
+	withCancel, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	var errC = make(chan error)
+	emitterEvent := ports.NewPermissionEvent(appUuid, joinedUser)
+
+	go s.emitterAppToken.EmitAppendPermissions(withCancel, emitterEvent, errC)
+	go s.emitterAppConf.EmitAppendPermissions(withCancel, emitterEvent, errC)
+	// go s.emitterUserPermissions.Emit(withCancel, emitterEvent, errC)
+
+	for i := 0; i < 2; i++ {
+		err := <-errC
+		if err != nil {
+			logrus.Errorf("[%s][inviting.EmitAppendPermissions] emit cause error: %v\n", ctx.Value("tracingID"), err)
+			// if there is an error while emitting events
+			// here the emiited events must succed in order for the
+			// transaction to succeed - hence if err cancel context and
+			// role back (if that would have been implmeneted)
+			return err
+		}
+	}
+	close(errC)
+	return nil
+}
+
+// emitInitEvent distributes the event that a new app has been created triggering the init endpoints
+// of the AppTokenService and AppConfigService
+func (s service) emitRollbackAppendPermissions(ctx context.Context, appUuid, joinedUser string) error {
+	withCancel, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	var errC = make(chan error)
+	emitterEvent := ports.NewPermissionEvent(appUuid, joinedUser)
+
+	go s.emitterAppToken.EmitRollbackAppendPermissions(withCancel, emitterEvent, errC)
+	go s.emitterAppConf.EmitRollbackAppendPermissions(withCancel, emitterEvent, errC)
+
+	// go s.emitterUserPermissions.Emit(withCancel, emitterEvent, errC)
+
+	for i := 0; i < 2; i++ {
+		err := <-errC
+		if err != nil {
+			logrus.Errorf("[%s][inviting.EmitRollbackAppendPermissions] emit cause error: %v\n", ctx.Value("tracingID"), err)
+			// if there is an error while emitting the rollback event
+			// ignore error since at least one error is to be expected since an error happend in the forward
+			// transaction
+			continue
+		}
+	}
+	close(errC)
 	return nil
 }

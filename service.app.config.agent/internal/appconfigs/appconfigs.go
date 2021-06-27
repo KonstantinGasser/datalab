@@ -25,12 +25,16 @@ type AppconfigRepo interface {
 	GetById(ctx context.Context, uuid string, result interface{}) error
 	UpdateByFlag(ctx context.Context, uuid, flag string, data interface{}) error
 
+	AddMember(ctx context.Context, uuid, userUuid string) error
+	RollbackAddMember(ctx context.Context, uuid, userUuid string) error
+
 	SetAppConfigLock(ctx context.Context, uuid string, lock bool) error
 }
 
 type AppConfig struct {
 	AppUuid     string   `bson:"_id"`
 	ConfigOwner string   `bson:"config_owner"`
+	Member      []string `bson:"member"`
 	Locked      bool     `bson:"locked"`
 	Funnel      []Stage  `bson:"funnel"`
 	Campaign    []Record `bson:"campaign"`
@@ -62,6 +66,7 @@ func NewDefault(appRefUuid, configOwner string) *AppConfig {
 	return &AppConfig{
 		AppUuid:     appRefUuid,
 		ConfigOwner: configOwner,
+		Member:      make([]string, 0),
 		Funnel:      make([]Stage, 0),
 		Campaign:    make([]Record, 0),
 		BtnTime:     make([]BtnDef, 0),
@@ -89,6 +94,16 @@ func (appConf *AppConfig) ApplyBtnTime(btnDefs ...BtnDef) {
 	appConf.BtnTime = btnDefs
 }
 
+// AddMember appends the member list of an AppConfig. Skips operation if already exists
+func (appConf *AppConfig) AddMember(userUuid string) {
+	for _, member := range appConf.Member {
+		if member == userUuid {
+			return
+		}
+	}
+	appConf.Member = append(appConf.Member, userUuid)
+}
+
 // HasReadWrite checks if the provided user uuid is listed as owner of
 // AppToken
 func (appConfig AppConfig) HasReadWrite(userUuid string) error {
@@ -99,9 +114,9 @@ func (appConfig AppConfig) HasReadWrite(userUuid string) error {
 }
 
 // HasRead checks if the user has read access on the AppToken
-func (appConfig AppConfig) HasRead(readWriteUuids ...string) error {
-	for _, uuid := range readWriteUuids {
-		if uuid == appConfig.AppUuid {
+func (appConfig AppConfig) HasRead(userUuid string) error {
+	for _, member := range appConfig.Member {
+		if member == userUuid {
 			return nil
 		}
 	}
@@ -109,8 +124,8 @@ func (appConfig AppConfig) HasRead(readWriteUuids ...string) error {
 }
 
 // HasReadOrWrite checks if the user has either read or write acces on the AppToken
-func (appConfig AppConfig) HasReadOrWrite(userUuid string, readWriteUuids ...string) error {
-	readErr := appConfig.HasRead(readWriteUuids...)
+func (appConfig AppConfig) HasReadOrWrite(userUuid string) error {
+	readErr := appConfig.HasRead(userUuid)
 	rwErr := appConfig.HasReadWrite(userUuid)
 	if readErr != nil && rwErr != nil {
 		return ErrNoReadAccess

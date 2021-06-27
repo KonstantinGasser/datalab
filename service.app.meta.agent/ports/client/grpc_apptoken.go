@@ -27,10 +27,10 @@ func NewClientAppToken(clientAddr string) (*ClientAppToken, error) {
 	}, nil
 }
 
-// Emit tirggers the initialize endpoint for the AppTokenSerivce asking it to
+// EmitInit tirggers the initialize endpoint for the AppTokenSerivce asking it to
 // initialize and acknowlege that a new app token with the given reference needs to be
 // created
-func (client ClientAppToken) Emit(ctx context.Context, event *ports.Event, errC chan error) {
+func (client ClientAppToken) EmitInit(ctx context.Context, event *ports.InitEvent, errC chan error) {
 	resp, err := client.conn.Initialize(ctx, &grpcAppToken.InitializeRequest{
 		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
 		AppRefUuid: event.App.Uuid,
@@ -44,6 +44,44 @@ func (client ClientAppToken) Emit(ctx context.Context, event *ports.Event, errC 
 	}
 	if resp.GetStatusCode() != http.StatusOK {
 		errC <- fmt.Errorf("apptoken.init err: %s", resp.GetMsg())
+		return
+	}
+	errC <- nil
+}
+
+// EmitAppendPermissions tirggers the add permissions endpoint for the AppTokenSerivce asking it to
+// add the joined user permissions to the app token
+func (client ClientAppToken) EmitAppendPermissions(ctx context.Context, event *ports.PermissionEvent, errC chan error) {
+	resp, err := client.conn.AppendPermission(ctx, &grpcAppToken.AppendPermissionRequest{
+		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
+		AppUuid:    event.AppUuid,
+		UserUuid:   event.UserUuid,
+	})
+	if err != nil {
+		errC <- err
+		return
+	}
+	if resp.GetStatusCode() != http.StatusOK {
+		errC <- fmt.Errorf("apptoken.AppendPermisson err: %s", resp.GetMsg())
+		return
+	}
+	errC <- nil
+}
+
+// EmitAppendPermissions tirggers the add permissions endpoint for the AppTokenSerivce asking it to
+// add the joined user permissions to the app token
+func (client ClientAppToken) EmitRollbackAppendPermissions(ctx context.Context, event *ports.PermissionEvent, errC chan error) {
+	resp, err := client.conn.RollbackAppendPermission(ctx, &grpcAppToken.RollbackAppendPermissionRequest{
+		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
+		AppUuid:    event.AppUuid,
+		UserUuid:   event.UserUuid,
+	})
+	if err != nil {
+		errC <- err
+		return
+	}
+	if resp.GetStatusCode() != http.StatusOK {
+		errC <- fmt.Errorf("apptoken.AppendPermisson err: %s", resp.GetMsg())
 		return
 	}
 	errC <- nil

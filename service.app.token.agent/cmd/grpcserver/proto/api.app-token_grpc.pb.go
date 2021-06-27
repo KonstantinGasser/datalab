@@ -23,6 +23,8 @@ type AppTokenClient interface {
 	Validate(ctx context.Context, in *ValidateRequest, opts ...grpc.CallOption) (*ValidateResponse, error)
 	InValidate(ctx context.Context, in *InValidateRequest, opts ...grpc.CallOption) (*InValidateResponse, error)
 	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
+	AppendPermission(ctx context.Context, in *AppendPermissionRequest, opts ...grpc.CallOption) (*AppendPermissionResponse, error)
+	RollbackAppendPermission(ctx context.Context, in *RollbackAppendPermissionRequest, opts ...grpc.CallOption) (*RollbackAppendPermissionResponse, error)
 	UnlockAppToken(ctx context.Context, in *UnlockAppTokenRequest, opts ...grpc.CallOption) (*UnlockAppTokenResponse, error)
 }
 
@@ -79,6 +81,24 @@ func (c *appTokenClient) Get(ctx context.Context, in *GetRequest, opts ...grpc.C
 	return out, nil
 }
 
+func (c *appTokenClient) AppendPermission(ctx context.Context, in *AppendPermissionRequest, opts ...grpc.CallOption) (*AppendPermissionResponse, error) {
+	out := new(AppendPermissionResponse)
+	err := c.cc.Invoke(ctx, "/issuer_proto.AppToken/AppendPermission", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *appTokenClient) RollbackAppendPermission(ctx context.Context, in *RollbackAppendPermissionRequest, opts ...grpc.CallOption) (*RollbackAppendPermissionResponse, error) {
+	out := new(RollbackAppendPermissionResponse)
+	err := c.cc.Invoke(ctx, "/issuer_proto.AppToken/RollbackAppendPermission", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *appTokenClient) UnlockAppToken(ctx context.Context, in *UnlockAppTokenRequest, opts ...grpc.CallOption) (*UnlockAppTokenResponse, error) {
 	out := new(UnlockAppTokenResponse)
 	err := c.cc.Invoke(ctx, "/issuer_proto.AppToken/UnlockAppToken", in, out, opts...)
@@ -97,6 +117,8 @@ type AppTokenServer interface {
 	Validate(context.Context, *ValidateRequest) (*ValidateResponse, error)
 	InValidate(context.Context, *InValidateRequest) (*InValidateResponse, error)
 	Get(context.Context, *GetRequest) (*GetResponse, error)
+	AppendPermission(context.Context, *AppendPermissionRequest) (*AppendPermissionResponse, error)
+	RollbackAppendPermission(context.Context, *RollbackAppendPermissionRequest) (*RollbackAppendPermissionResponse, error)
 	UnlockAppToken(context.Context, *UnlockAppTokenRequest) (*UnlockAppTokenResponse, error)
 	mustEmbedUnimplementedAppTokenServer()
 }
@@ -119,6 +141,12 @@ func (UnimplementedAppTokenServer) InValidate(context.Context, *InValidateReques
 }
 func (UnimplementedAppTokenServer) Get(context.Context, *GetRequest) (*GetResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
+}
+func (UnimplementedAppTokenServer) AppendPermission(context.Context, *AppendPermissionRequest) (*AppendPermissionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AppendPermission not implemented")
+}
+func (UnimplementedAppTokenServer) RollbackAppendPermission(context.Context, *RollbackAppendPermissionRequest) (*RollbackAppendPermissionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RollbackAppendPermission not implemented")
 }
 func (UnimplementedAppTokenServer) UnlockAppToken(context.Context, *UnlockAppTokenRequest) (*UnlockAppTokenResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UnlockAppToken not implemented")
@@ -226,6 +254,42 @@ func _AppToken_Get_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AppToken_AppendPermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AppendPermissionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppTokenServer).AppendPermission(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/issuer_proto.AppToken/AppendPermission",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppTokenServer).AppendPermission(ctx, req.(*AppendPermissionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AppToken_RollbackAppendPermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RollbackAppendPermissionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppTokenServer).RollbackAppendPermission(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/issuer_proto.AppToken/RollbackAppendPermission",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppTokenServer).RollbackAppendPermission(ctx, req.(*RollbackAppendPermissionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _AppToken_UnlockAppToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UnlockAppTokenRequest)
 	if err := dec(in); err != nil {
@@ -270,6 +334,14 @@ var AppToken_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Get",
 			Handler:    _AppToken_Get_Handler,
+		},
+		{
+			MethodName: "AppendPermission",
+			Handler:    _AppToken_AppendPermission_Handler,
+		},
+		{
+			MethodName: "RollbackAppendPermission",
+			Handler:    _AppToken_RollbackAppendPermission_Handler,
 		},
 		{
 			MethodName: "UnlockAppToken",

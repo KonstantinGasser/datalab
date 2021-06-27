@@ -21,6 +21,8 @@ type AppConfigurationClient interface {
 	Initialize(ctx context.Context, in *InitRequest, opts ...grpc.CallOption) (*InitResponse, error)
 	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
 	Update(ctx context.Context, in *UpdateRequest, opts ...grpc.CallOption) (*UpdateResponse, error)
+	AppendPermission(ctx context.Context, in *AppendPermissionRequest, opts ...grpc.CallOption) (*AppendPermissionResponse, error)
+	RollbackAppendPermission(ctx context.Context, in *RollbackAppendPermissionRequest, opts ...grpc.CallOption) (*RollbackAppendPermissionResponse, error)
 	LockConfig(ctx context.Context, in *LockConfigRequest, opts ...grpc.CallOption) (*LockConfigResponse, error)
 	UnlockConfig(ctx context.Context, in *UnlockConfigRequest, opts ...grpc.CallOption) (*UnlockConfigResponse, error)
 }
@@ -60,6 +62,24 @@ func (c *appConfigurationClient) Update(ctx context.Context, in *UpdateRequest, 
 	return out, nil
 }
 
+func (c *appConfigurationClient) AppendPermission(ctx context.Context, in *AppendPermissionRequest, opts ...grpc.CallOption) (*AppendPermissionResponse, error) {
+	out := new(AppendPermissionResponse)
+	err := c.cc.Invoke(ctx, "/config_proto.AppConfiguration/AppendPermission", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *appConfigurationClient) RollbackAppendPermission(ctx context.Context, in *RollbackAppendPermissionRequest, opts ...grpc.CallOption) (*RollbackAppendPermissionResponse, error) {
+	out := new(RollbackAppendPermissionResponse)
+	err := c.cc.Invoke(ctx, "/config_proto.AppConfiguration/RollbackAppendPermission", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *appConfigurationClient) LockConfig(ctx context.Context, in *LockConfigRequest, opts ...grpc.CallOption) (*LockConfigResponse, error) {
 	out := new(LockConfigResponse)
 	err := c.cc.Invoke(ctx, "/config_proto.AppConfiguration/LockConfig", in, out, opts...)
@@ -85,6 +105,8 @@ type AppConfigurationServer interface {
 	Initialize(context.Context, *InitRequest) (*InitResponse, error)
 	Get(context.Context, *GetRequest) (*GetResponse, error)
 	Update(context.Context, *UpdateRequest) (*UpdateResponse, error)
+	AppendPermission(context.Context, *AppendPermissionRequest) (*AppendPermissionResponse, error)
+	RollbackAppendPermission(context.Context, *RollbackAppendPermissionRequest) (*RollbackAppendPermissionResponse, error)
 	LockConfig(context.Context, *LockConfigRequest) (*LockConfigResponse, error)
 	UnlockConfig(context.Context, *UnlockConfigRequest) (*UnlockConfigResponse, error)
 	mustEmbedUnimplementedAppConfigurationServer()
@@ -102,6 +124,12 @@ func (UnimplementedAppConfigurationServer) Get(context.Context, *GetRequest) (*G
 }
 func (UnimplementedAppConfigurationServer) Update(context.Context, *UpdateRequest) (*UpdateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
+}
+func (UnimplementedAppConfigurationServer) AppendPermission(context.Context, *AppendPermissionRequest) (*AppendPermissionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AppendPermission not implemented")
+}
+func (UnimplementedAppConfigurationServer) RollbackAppendPermission(context.Context, *RollbackAppendPermissionRequest) (*RollbackAppendPermissionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RollbackAppendPermission not implemented")
 }
 func (UnimplementedAppConfigurationServer) LockConfig(context.Context, *LockConfigRequest) (*LockConfigResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LockConfig not implemented")
@@ -176,6 +204,42 @@ func _AppConfiguration_Update_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AppConfiguration_AppendPermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AppendPermissionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppConfigurationServer).AppendPermission(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/config_proto.AppConfiguration/AppendPermission",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppConfigurationServer).AppendPermission(ctx, req.(*AppendPermissionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AppConfiguration_RollbackAppendPermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RollbackAppendPermissionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppConfigurationServer).RollbackAppendPermission(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/config_proto.AppConfiguration/RollbackAppendPermission",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppConfigurationServer).RollbackAppendPermission(ctx, req.(*RollbackAppendPermissionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _AppConfiguration_LockConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(LockConfigRequest)
 	if err := dec(in); err != nil {
@@ -230,6 +294,14 @@ var AppConfiguration_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Update",
 			Handler:    _AppConfiguration_Update_Handler,
+		},
+		{
+			MethodName: "AppendPermission",
+			Handler:    _AppConfiguration_AppendPermission_Handler,
+		},
+		{
+			MethodName: "RollbackAppendPermission",
+			Handler:    _AppConfiguration_RollbackAppendPermission_Handler,
 		},
 		{
 			MethodName: "LockConfig",

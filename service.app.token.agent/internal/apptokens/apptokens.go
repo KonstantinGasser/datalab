@@ -31,18 +31,22 @@ type ApptokenRepo interface {
 	GetById(ctx context.Context, uuid string, result interface{}) error
 	Update(ctx context.Context, uuid, jwt string, exp int64, refreshCount int32) error
 	SetAppTokenLock(ctx context.Context, uuid string, lock bool) error
+
+	AddMember(ctx context.Context, uuid, userUuid string) error
+	RollbackAddMember(ctx context.Context, uuid, userUuid string) error
 }
 
 // AppToken represents the token data as it will be stored in the datbase
 type AppToken struct {
-	AppRefUuid   string `bson:"_id" required:"yes"`
-	Locked       bool   `bson:"locked"`
-	AppHash      string `bson:"app_hash" required:"yes"`
-	AppOwner     string `bson:"app_owner" required:"yes"`
-	AppOrigin    string `bson:"app_origin"`
-	Jwt          string `bson:"app_jwt"`
-	Exp          int64  `bson:"app_jwt_exp"`
-	RefreshCount int32  `bson:"refresh_count"`
+	AppRefUuid   string   `bson:"_id" required:"yes"`
+	Locked       bool     `bson:"locked"`
+	AppHash      string   `bson:"app_hash" required:"yes"`
+	AppOwner     string   `bson:"app_owner" required:"yes"`
+	AppOrigin    string   `bson:"app_origin"`
+	Member       []string `bson:"member"`
+	Jwt          string   `bson:"app_jwt"`
+	Exp          int64    `bson:"app_jwt_exp"`
+	RefreshCount int32    `bson:"refresh_count"`
 }
 
 // NewDefault creates a new default AppToken with only the meta data but no valid
@@ -53,12 +57,23 @@ func NewDefault(AppRefUuid, appHash, appOwner, appOrigin string) (*AppToken, err
 		AppHash:      appHash,
 		AppOwner:     appOwner,
 		AppOrigin:    appOrigin,
+		Member:       make([]string, 0),
+		Locked:       false,
 		RefreshCount: -1, // will be updated on every issue -1 therefor represents "nil"/no prior app-token exists
 	}
 	if err := required.Atomic(&appToken); err != nil {
 		return nil, ErrMissingFields
 	}
 	return &appToken, nil
+}
+
+func (appToken *AppToken) AddMember(userUuid string) {
+	for _, member := range appToken.Member {
+		if member == userUuid {
+			return
+		}
+	}
+	appToken.Member = append(appToken.Member, userUuid)
 }
 
 // Issue issues a new AppToken with an updated Jwt and Exp and RefreshCount. The operation fails
@@ -81,6 +96,7 @@ func (appToken *AppToken) Issue(orgn, appName string) (*AppToken, error) {
 		AppHash:      appToken.AppHash,
 		AppOwner:     appToken.AppOwner,
 		AppOrigin:    appToken.AppOrigin,
+		Member:       appToken.Member,
 		RefreshCount: appToken.RefreshCount + 1, // increment refresh-count to invalidate current app token
 		Jwt:          "",
 		Exp:          0,
@@ -161,6 +177,7 @@ func (appToken AppToken) MarkDirty() *AppToken {
 		AppOwner:     appToken.AppOwner,
 		AppOrigin:    appToken.AppOrigin,
 		Locked:       appToken.Locked,
+		Member:       appToken.Member,
 		Jwt:          "",
 		Exp:          0,
 		RefreshCount: appToken.RefreshCount + 1,
@@ -184,9 +201,9 @@ func (appToken AppToken) HasReadWrite(userUuid string) error {
 }
 
 // HasRead checks if the user has read access on the AppToken
-func (appToken AppToken) HasRead(readWriteUuids ...string) error {
-	for _, uuid := range readWriteUuids {
-		if uuid == appToken.AppRefUuid {
+func (appToken AppToken) HasRead(userUuid string) error {
+	for _, member := range appToken.Member {
+		if member == userUuid {
 			return nil
 		}
 	}
@@ -194,8 +211,8 @@ func (appToken AppToken) HasRead(readWriteUuids ...string) error {
 }
 
 // HasReadOrWrite checks if the user has either read or write acces on the AppToken
-func (appToken AppToken) HasReadOrWrite(userUuid string, readWriteUuids ...string) error {
-	rErr := appToken.HasRead(readWriteUuids...)
+func (appToken AppToken) HasReadOrWrite(userUuid string) error {
+	rErr := appToken.HasRead(userUuid)
 
 	rwErr := appToken.HasReadWrite(userUuid)
 	if rErr != nil && rwErr != nil {

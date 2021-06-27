@@ -137,7 +137,7 @@ func (client MongoClient) AddMember(ctx context.Context, appUuid string, invited
 }
 
 // MemberStatus updates the status of an member to apps.InviteAccepted
-func (client MongoClient) MemberStatus(ctx context.Context, appUuid string, openInvite apps.Member) error {
+func (client MongoClient) MemberStatus(ctx context.Context, appUuid string, openInvite apps.Member, with apps.InviteStatus) error {
 	// filter for member where uuid AND current (not accepted) status are equal
 	// the to openInvite data
 	filter := bson.D{
@@ -166,7 +166,7 @@ func (client MongoClient) MemberStatus(ctx context.Context, appUuid string, open
 		{
 			Key: "$set",
 			Value: bson.M{
-				"member.$.status": apps.InviteAccepted,
+				"member.$.status": with,
 			},
 		},
 	}
@@ -176,6 +176,11 @@ func (client MongoClient) MemberStatus(ctx context.Context, appUuid string, open
 		return nil
 	}
 	return nil
+}
+
+// CompensateMemberStatus rolles back the invite status of a member to pending
+func (client MongoClient) CompensateMemberStatus(ctx context.Context, appUuid string, member apps.Member) error {
+	return client.MemberStatus(ctx, appUuid, member, apps.InvitePending)
 }
 
 func (client MongoClient) SetAppLock(ctx context.Context, uuid string, lock bool) error {

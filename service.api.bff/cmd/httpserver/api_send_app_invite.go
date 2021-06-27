@@ -32,6 +32,7 @@ func (s Server) SendAppInviteReminder(w http.ResponseWriter, r *http.Request) {
 	logrus.Infof("[%v][Server.SendAppInviteReminder] received request: %v\n", tracingID, r.Host)
 
 	authedUser := ctx_value.GetAuthedUser(r.Context())
+
 	var request apps.InviteReminderRequest
 	if err := s.decode(r.Body, &request); err != nil {
 		s.onErr(w, http.StatusBadRequest, "Could not decode r.Body")

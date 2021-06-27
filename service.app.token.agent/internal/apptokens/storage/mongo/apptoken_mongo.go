@@ -98,3 +98,37 @@ func (client MongoClient) SetAppTokenLock(ctx context.Context, uuid string, lock
 	}
 	return nil
 }
+
+func (client MongoClient) AddMember(ctx context.Context, uuid, userUuid string) error {
+	filter := bson.M{"_id": uuid}
+	query := bson.D{
+		{
+			Key: "$addToSet",
+			Value: bson.M{
+				"member": userUuid,
+			},
+		},
+	}
+	coll := client.conn.Database(nameDB).Collection(nameColl)
+	if _, err := coll.UpdateOne(ctx, filter, query); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (client MongoClient) RollbackAddMember(ctx context.Context, uuid, userUuid string) error {
+	filter := bson.M{"_id": uuid}
+	query := bson.D{
+		{
+			Key: "$pull",
+			Value: bson.M{
+				"member": userUuid,
+			},
+		},
+	}
+	coll := client.conn.Database(nameDB).Collection(nameColl)
+	if _, err := coll.UpdateOne(ctx, filter, query); err != nil {
+		return err
+	}
+	return nil
+}
