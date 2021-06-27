@@ -35,7 +35,7 @@ type Record struct {
 }
 
 type User struct {
-	IpPort string
+	DeviceIP string
 	// AppUuid refers to the app the user is located on
 	AppUuid string
 	// MappedOrgn refers to the organization in the system
@@ -54,7 +54,7 @@ func NewUser(req *http.Request, conn *websocket.Conn, pub chan<- Event, drop cha
 		return nil, ErrNoIpPort
 	}
 	user := User{
-		IpPort:     req.RemoteAddr,
+		DeviceIP:   fromRemoteAddr(req.RemoteAddr),
 		connection: conn,
 		publish:    pub,
 		drop:       drop,
@@ -68,7 +68,7 @@ func NewUser(req *http.Request, conn *websocket.Conn, pub chan<- Event, drop cha
 func (u User) Listen() {
 	fmt.Println("Listen")
 	defer func() {
-		logrus.Infof("[user.Listen] closing for %s\n", u.IpPort)
+		logrus.Infof("[user.Listen] closing for %s\n", u.DeviceIP)
 		// wraping up user session sending before deletion
 		u.drop <- u.finish()
 	}()
@@ -143,4 +143,13 @@ func (u User) finish() User {
 func isIpPort(ipPort string) bool {
 	parts := strings.Split(ipPort, ":")
 	return len(parts) == 2
+}
+
+// fromRemoteAddr returns the IP address of a IP:Port pair
+func fromRemoteAddr(ipPort string) string {
+	pair := strings.Split(ipPort, ":")
+	if len(pair) != 2 {
+		return ""
+	}
+	return pair[0]
 }

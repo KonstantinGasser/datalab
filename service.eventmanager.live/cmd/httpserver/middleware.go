@@ -52,16 +52,16 @@ func (s *Server) WithAuth(next http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-// WithTraceIP adds the requester's IP:Port pair to the request context
+// WithTraceIP adds the requester's client IP to the request context
 // serving as device identifier - if none present request is not accpeted
 func (s *Server) WithTraceIP(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		deviceIP := r.RemoteAddr
-		if deviceIP == "" {
+		deviceIP := strings.Split(r.RemoteAddr, ":")
+		if len(deviceIP) == 0 {
 			s.onErr(w, http.StatusBadRequest, "not sufficiant information provided")
 			return
 		}
-		ipCtx := context.WithValue(r.Context(), typeKeyIP(keyIP), deviceIP)
+		ipCtx := context.WithValue(r.Context(), typeKeyIP(keyIP), deviceIP[1])
 
 		next(w, r.WithContext(ipCtx))
 	}

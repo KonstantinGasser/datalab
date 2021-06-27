@@ -67,16 +67,16 @@ func (hub *PubSub) run() {
 		case user := <-hub.sub:
 			fmt.Printf("RECORD: %v\n", *user)
 			hub.mu.Lock()
-			if _, ok := hub.session[user.IpPort]; ok {
+			if _, ok := hub.session[user.DeviceIP]; ok {
 				hub.mu.Unlock()
 				continue
 			}
-			hub.session[user.IpPort] = user
+			hub.session[user.DeviceIP] = user
 			hub.mu.Unlock()
 		case user := <-hub.drop:
-			logrus.Infof("[event-bus.drop] deleting for %s\n", user.IpPort)
+			logrus.Infof("[event-bus.drop] deleting for %s\n", user.DeviceIP)
 			hub.mu.Lock()
-			delete(hub.session, user.IpPort)
+			delete(hub.session, user.DeviceIP)
 			hub.mu.Unlock()
 		case event := <-hub.pub:
 			fmt.Printf("EVENT: %v\n", event)
@@ -86,8 +86,9 @@ func (hub *PubSub) run() {
 	}
 }
 
+// UpgradeProtocoll hajiecks the ResponseWriter and upgrdares the http protocoll to a ws
+// if successful starts the listener on the connection.
 func (hub *PubSub) UpgradeProtocoll(w http.ResponseWriter, r *http.Request) error {
-
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		return err
