@@ -42,6 +42,26 @@ Was die einzelnen Services machen, kann in deren `README` nachgelesen werden.
 
 
 
+# Thoughts and Ideas
+
+## Using Event Sourcing for Client-Events
+
+Idea: each client event can be treated as a trigger for a state change - if a client clicks a button, the customer journey for `App` changes, the `Meta Data` for `btn-click-count` updates. Rather than just storing the data and
+later on-demand perform complex and time-consuming queries, the event could not just be persisted by directly applied at an `aggregate`. Furthermore, this would allow doing more complex real-time computations while serving the data for the
+dashboard from memory lighting fast. On a service, failure events could be loaded from the database into the `aggregate` recreating the last state of the system.
+
+![Aggregate Example](git-resources/aggregate_model.jpg)
+might have multiple `aggregates` depending on the context and domain - for simplicity, I will only use one to make my point.
+
+`Aggregate A` is responsible for maintaining the state of the `page meta data` (page views today, last 30 days see figure). If an event occurs the event will be persisted but also consumed by the `aggregate`. Lets say the event triggered reflects a `URL-Change Event`, following the logic, the `aggregate` consumes the event and updates its local state for `page views per URL` and so on. 
+
+Questions:
+
+- Scalability of `aggregate service`: since the service must maintain the current state - horizontal scalability needs to be figured out. 
+- does the `aggregate need to be aware of unique connections? Yes for internal logic. How to handle this in a performant fashion?
+
+
+
 
 
 <!-- # datalab analysis platform for user activity data
