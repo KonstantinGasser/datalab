@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"runtime"
-	"sync"
 	"time"
 
 	"github.com/KonstantinGasser/datalab/library/utils/ctx_value"
@@ -30,58 +29,45 @@ var upgrader = websocket.Upgrader{
 
 type PubSub struct {
 	// sub creates a new active session based on the session.Record
-	sub chan *session.User
-	// pub publishes an incoming event, distributing it to the right sink
-	pub chan session.Event
+	// sub chan *session.User
+	// publish publishlishes an incoming event, distributing it to the right sink
+	publish chan session.Event
 	// drop deletes lost or droped connections, finishing a session
-	drop chan session.User // ip:port
-	// mu garudes session map
-	mu      sync.RWMutex
-	session map[string]*session.User
+	// drop chan session.User // ip:port
+	// // mu garudes session map
+	// mu      sync.RWMutex
+	// session map[string]*session.User
 }
 
 // NewPubSub returns a new instance of a PubSub
 func NewPubSub() *PubSub {
 	return &PubSub{
-		sub:  make(chan *session.User),
-		pub:  make(chan session.Event),
-		drop: make(chan session.User),
+		// sub:  make(chan *session.User),
+		publish: make(chan session.Event),
+		// drop: make(chan session.User),
 
-		session: make(map[string]*session.User),
+		// session: make(map[string]*session.User),
 	}
 }
 
-// Start starts all goroutines and effectivly allowing to connect and interact with the
-// PupSub
-func (hub *PubSub) Start() {
-	hub.run()
+// Start starts N hub to listen to incoming events and handle protocoll upgrades
+func (hub *PubSub) Start(scaler int) {
+	for i := 1; i <= scaler; i++ {
+		go hub.run(i)
+	}
 }
 
 // run runs the event-loop in its own goroutine handling incoming events
-func (hub *PubSub) run() {
+func (hub *PubSub) run(workerID int) {
 	// ticker for health logs
 	var ticker = time.NewTicker(15 * time.Second)
 
 	for {
 		select {
-		case user := <-hub.sub:
-			fmt.Printf("RECORD: %v\n", *user)
-			hub.mu.Lock()
-			if _, ok := hub.session[user.DeviceIP]; ok {
-				hub.mu.Unlock()
-				continue
-			}
-			hub.session[user.DeviceIP] = user
-			hub.mu.Unlock()
-		case user := <-hub.drop:
-			logrus.Infof("[event-bus.drop] deleting for %s\n", user.DeviceIP)
-			hub.mu.Lock()
-			delete(hub.session, user.DeviceIP)
-			hub.mu.Unlock()
-		case event := <-hub.pub:
+		case event := <-hub.publish:
 			fmt.Printf("EVENT: %v\n", event)
 		case <-ticker.C:
-			logrus.Infof("[event-bus.run] connections: %d - goroutines: %d\n", len(hub.session), runtime.NumGoroutine())
+			logrus.Infof("[event-bus.run-%d] goroutines: %d\n", workerID, runtime.NumGoroutine())
 		}
 	}
 }
@@ -93,12 +79,10 @@ func (hub *PubSub) UpgradeProtocoll(w http.ResponseWriter, r *http.Request) erro
 	if err != nil {
 		return err
 	}
-	user, err := session.NewUser(r, conn, hub.pub, hub.drop)
+	user, err := session.NewUser(r, conn, hub.publish)
 	if err != nil {
 		return err
 	}
 	go user.Listen()
-	hub.sub <- user
-
 	return nil
 }

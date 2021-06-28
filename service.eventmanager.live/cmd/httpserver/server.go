@@ -103,7 +103,7 @@ func NewDefault(appTokenClient client.ClientAppToken) *Server {
 
 func (s Server) Start(host string) error {
 	// start pub-sub server
-	go s.eventBus.Start()
+	s.eventBus.Start(1)
 
 	listener, err := net.Listen("tcp", host)
 	if err != nil {

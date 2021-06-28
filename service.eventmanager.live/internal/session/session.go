@@ -25,13 +25,11 @@ var (
 
 // Record defines the initialization data to start tracking user sessions
 type Record struct {
-	OS struct {
-		Name    string `json:"name"`
-		Version string `json:"version"`
-	} `json:"OS"`
-	Browser  string `json:"browser"`
-	Device   string `json:"device"`
-	Referrer string `json:"referrer"`
+	OsName    string `json:"os_name"`
+	OsVersion string `json:"os_version"`
+	Browser   string `json:"browser"`
+	Device    string `json:"device"`
+	Referrer  string `json:"referrer"`
 }
 
 type User struct {
@@ -49,7 +47,7 @@ type User struct {
 	drop    chan<- User
 }
 
-func NewUser(req *http.Request, conn *websocket.Conn, pub chan<- Event, drop chan<- User) (*User, error) {
+func NewUser(req *http.Request, conn *websocket.Conn, pub chan<- Event) (*User, error) {
 	if !isIpPort(req.RemoteAddr) {
 		return nil, ErrNoIpPort
 	}
@@ -57,9 +55,9 @@ func NewUser(req *http.Request, conn *websocket.Conn, pub chan<- Event, drop cha
 		DeviceIP:   fromRemoteAddr(req.RemoteAddr),
 		connection: conn,
 		publish:    pub,
-		drop:       drop,
+		Record:     recordFromURL(req.URL),
 	}
-	user.RecordFromURL(req.URL)
+
 	return &user, nil
 }
 
@@ -121,17 +119,15 @@ func (u User) Event(bytes []byte) (Event, error) {
 	}
 }
 
-// RecordFromURL queries for record data in the URL and assigns record
-// to user
-func (u *User) RecordFromURL(url *url.URL) {
-	var r Record
-	r.Referrer = url.Query().Get(QueryRef)
-	r.OS.Name = url.Query().Get(QueryOsName)
-	r.OS.Version = url.Query().Get(QueryOsVersion)
-	r.Device = url.Query().Get(QueryDevice)
-	r.Browser = url.Query().Get(QueryBrowser)
-
-	u.Record = r
+// recordFromURL queries for record data in the URL return a Record
+func recordFromURL(url *url.URL) Record {
+	return Record{
+		Referrer:  url.Query().Get(QueryRef),
+		OsName:    url.Query().Get(QueryOsName),
+		OsVersion: url.Query().Get(QueryOsVersion),
+		Browser:   url.Query().Get(QueryBrowser),
+		Device:    url.Query().Get(QueryDevice),
+	}
 }
 
 // finish: not yet sure what it needs to do but pretty sure I will need it
