@@ -114,6 +114,18 @@ func (u User) Event(bytes []byte) (Event, error) {
 			return nil, err
 		}
 		return evt, nil
+	case BtnTime:
+		var evt BtnTimeEvent
+		if err := json.Unmarshal(bytes, &evt); err != nil {
+			return nil, err
+		}
+		return evt, nil
+	case FunnelChange:
+		var evt FunnelChangeEvent
+		if err := json.Unmarshal(bytes, &evt); err != nil {
+			return nil, err
+		}
+		return evt, nil
 	default:
 		return nil, ErrNoSuchType
 	}

@@ -37,7 +37,6 @@
 }
 ```
 
-
 ### Config-Based-Event: Funnel-Change (onClick / URL-Change if part of funnel config)
 ```json 
 {
@@ -45,6 +44,7 @@
     "timestamp": "int64", 
     "device_id": "string", // see above
     "action": "string", // onClick || onUrlChange
-    "trigger": "int", // enum 
+    "entered": "int", // stage id
+    "elapsed_time": "int64" 
 }
 ```

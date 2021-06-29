@@ -15,7 +15,7 @@
                             </div>
                         </div>
                         <div>
-                            <span class="text-capture big flex-wrap d-flex justify-center">@{{user.username}}</span>
+                            <span class="text-capture big flex-wrap d-flex justify-center" style="height:35px;">@{{user.username}}</span>
                         </div>
                     </div>
                     <div class="form-group col">
@@ -105,7 +105,7 @@
                 }
             };
             
-            axios.get("http://localhost:8080/api/v1/user/colleagues", options).then(resp => {
+            axios.get("http://192.168.0.177:8080/api/v1/user/colleagues", options).then(resp => {
                 const tmp = resp?.data?.user;
                 this.colleagues = tmp.filter(item => item.uuid != this.loggedInUser.sub);
             })
@@ -134,7 +134,7 @@
                     }
                 };
                 
-                const resp = await axios.post("http://localhost:8080/api/v1/user/profile/update", {
+                const resp = await axios.post("http://192.168.0.177:8080/api/v1/user/profile/update", {
                     firstname: this.user.first_name,
                     lastname: this.user.last_name,
                     position: this.user.orgn_position,
@@ -154,7 +154,7 @@
                     }
                 };
 
-                axios.get("http://localhost:8080/api/v1/user/profile", options).then(resp => {
+                axios.get("http://192.168.0.177:8080/api/v1/user/profile", options).then(resp => {
                     this.user = resp.data.user;
                 }).catch(err => {
                     if (err.response.status === 401) {

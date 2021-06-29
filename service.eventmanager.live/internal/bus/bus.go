@@ -12,9 +12,9 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// originFromAppToken checks if the request origin matches with the app-token origin
+// matchOriginFromToken checks if the request origin matches with the app-token origin
 // alloing to block connection from unwanted clients
-var originFromAppToken = func(r *http.Request) bool {
+var matchOriginFromToken = func(r *http.Request) bool {
 	allowedOrigin := r.Header.Get("Origin")
 	requestedOrigin := ctx_value.GetString(r.Context(), "app.origin")
 
@@ -24,7 +24,7 @@ var originFromAppToken = func(r *http.Request) bool {
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
-	CheckOrigin:     originFromAppToken,
+	CheckOrigin:     matchOriginFromToken,
 }
 
 type PubSub struct {

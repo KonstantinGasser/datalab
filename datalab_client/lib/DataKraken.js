@@ -153,10 +153,12 @@ var DataKraken = /** @class */ (function () {
     };
     // urlListener periodically checks if the url has changed. If so it captures the
     // prevues URL and the current URL along with the time passed in-between.
-    // data-point: {
-    //     from,
-    //     to,
-    //     elapsed
+    // {   
+    //     "type": "int", // indicates what type of event
+    //     "timestamp": "int64", 
+    //     "from": "string", // URL jumped from
+    //     "to": "string", // URL jumped to
+    //     "elapsed_time": "int64", // passed time on "from" URL
     // }
     DataKraken.prototype.urlListener = function () {
         var _this = this;
@@ -166,22 +168,24 @@ var DataKraken = /** @class */ (function () {
             var elapsed = DataKraken.elapsed(new Date().getTime(), _this.URL_TIME);
             _this.URL_TIME = new Date().getTime();
             var data_point = {
-                type: 0,
+                type: 1,
                 timestamp: new Date().getTime(),
-                action: "url_change",
                 from: history.state.back,
                 to: history.state.current,
                 elapsed_time: elapsed,
             };
             console.log(data_point);
+            _this.WEB_SOCKET.send(JSON.stringify(data_point));
             _this.CURRENT_URL = history.state.current;
         }, this.URL_TIMEOUT_RATE);
     };
     // onClick captures any click event
-    // data-point: {
-    //     url,
-    //     target,
-    //     elapsed
+    // {   
+    //     "type": "int", // indicates what type of event
+    //     "timestamp": "int64", 
+    //     "target": "string", // clicked HTML element - if given HTML-Name-Tag else whatever if find lol
+    //     "elapsed_time": "int64", // passed time since last click
+    //     "current_url": "string" // URL clicked happened
     // }
     DataKraken.prototype.onClick = function (event) {
         var target = event.target.name;
@@ -192,12 +196,11 @@ var DataKraken = /** @class */ (function () {
         var data_point = {
             type: 0,
             timestamp: new Date().getTime(),
-            current_url: URL,
-            action: "element_clicked",
             target: target,
             elapsed_time: elapsed,
+            current_url: URL,
         };
-        console.log("Clicked: ", data_point);
+        console.log("Clicked: ", data_point, event);
         this.WEB_SOCKET.send(JSON.stringify(data_point));
         this.LAST_CLICK = new Date().getTime();
     };

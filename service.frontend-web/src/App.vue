@@ -70,6 +70,9 @@ a {
   font-family: 'Signika', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-image: url("assets/img.svg");
+  background-repeat: no-repeat;
+  background-position: left bottom;
 }
 
 .view_component {

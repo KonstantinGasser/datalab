@@ -1,7 +1,9 @@
 <template>
-  <div id="nav">
+  <div id="nav" style="width: 60%;margin-left:auto;margin-right:auto;">
     <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
+    <router-link to="/about">About</router-link> | 
+    <router-link to="/products">Products</router-link> | 
+    <router-link to="/basket">Shoping Basket</router-link>
   </div>
   <router-view/>
 </template>
