@@ -19,6 +19,13 @@ func (server *Server) Hello(w http.ResponseWriter, r *http.Request) {
 		server.onErr(w, http.StatusUnauthorized, "app-token tamppered")
 		return
 	}
+	ctxAppUuid := r.Context().Value(typeKeyClaims(keyAppUuid))
+	uuid, ok := ctxAppUuid.(string)
+	if !ok {
+		logrus.Errorf("<%v>[service.StartSession] uuid of app-token not valid\n", r.Host)
+		server.onErr(w, http.StatusUnauthorized, "app-token tamppered")
+		return
+	}
 	if len(origin) == 0 {
 		logrus.Errorf("<%v>[service.StartSession] origin of app-token not valid - length violation\n", r.Host)
 		server.onErr(w, http.StatusUnauthorized, "app-token tamppered")
@@ -30,7 +37,14 @@ func (server *Server) Hello(w http.ResponseWriter, r *http.Request) {
 		server.onErr(w, http.StatusInternalServerError, "could not issue ws ticket")
 		return
 	}
+	config, err := server.appConfigClient.GetAppConfig(r.Context(), uuid)
+	if err != nil {
+		logrus.Errorf("<%v>[service.StartSession] could not get app-config data: %v\n", r.Host, err)
+		server.onErr(w, http.StatusInternalServerError, "Could not load meta data")
+		return
+	}
 	server.onSuccess(w, http.StatusOK, map[string]interface{}{
 		"ticket": wsTicket,
+		"meta":   config,
 	})
 }

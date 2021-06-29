@@ -15,13 +15,14 @@ enum LISTENER {
 }
 
 export class DataKraken {   
-    private API_WS = "ws://192.168.0.177:8004/api/v1/open?" 
+    private API_WS = "ws://localhost:8004/api/v1/open?" 
     private URL_TIMEOUT_RATE: number = 1000
     private URL_TIME: number = new Date().getTime()
     private CURRENT_URL: string = history.state.current
 
     private LAST_CLICK: number = new Date().getTime()
-    private BTN_DEFS: Array<string> = []
+    private BTN_DEFS: Array<any> = []
+    private STAGES: Array<any> = []
 
     private WS_TICKET: string = ""
 
@@ -50,7 +51,7 @@ export class DataKraken {
     // assigns a new cookie (also indicating that the client is new). The session start is handled
     // server-side. If the authentication succeeds the response will hole the web-socket ticket to establish 
     // the web-socket connection further, the response holds meat-data such as button-definitions.
-    // If the authentication fails or the server fails respond (including re-tries) the function returns a -1
+    // If the authentication fails or the server fails respond (including re-tries) the function returns a false
     // indicating to not do anything further.
     private async sayHello(token: string): Promise<any> {
         const opts = {
@@ -59,11 +60,13 @@ export class DataKraken {
             },
             // withCredentials: true,
         }
-        const resp: any = await axios.get("http://192.168.0.177:8004/api/v1/hello", opts)
+        const resp: any = await axios.get("http://localhost:8004/api/v1/hello", opts)
         
         if (resp.status != 200)
             return false
         this.WS_TICKET = resp?.data?.ticket
+        this.STAGES = resp?.data?.meta?.stages
+        this.BTN_DEFS = resp?.data?.meta?.btn_defs
         return true
     }
 

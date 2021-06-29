@@ -47,3 +47,34 @@ func (server AppConfigServer) Get(ctx context.Context, in *proto.GetRequest) (*p
 		},
 	}, nil
 }
+
+func (server AppConfigServer) GetForClient(ctx context.Context, in *proto.GetForClientRequest) (*proto.GetForClientResponse, error) {
+	logrus.Infof("[-][server.GetForClient] received request\n")
+
+	config, err := server.libFetchService.FromStore(ctx, in.GetAppUuid())
+	if err != nil {
+		return &proto.GetForClientResponse{
+			StatusCode: err.Code(),
+			Msg:        err.Info(),
+			Config:     nil,
+		}, nil
+	}
+
+	var stages = make([]*proto.ClientStage, len(config.Stages))
+	for i, item := range config.Stages {
+		stages[i] = &proto.ClientStage{Type: int32(item.Type), Transition: item.Transition, Regex: item.Regex}
+	}
+	var btnDefs = make([]*proto.ClientBtnDef, len(config.BtnDefs))
+	for i, item := range config.BtnDefs {
+		btnDefs[i] = &proto.ClientBtnDef{Name: item.Name}
+	}
+
+	return &proto.GetForClientResponse{
+		StatusCode: http.StatusOK,
+		Msg:        "Client Configs",
+		Config: &proto.ClientConfig{
+			Stages:  stages,
+			BtnDefs: btnDefs,
+		},
+	}, nil
+}

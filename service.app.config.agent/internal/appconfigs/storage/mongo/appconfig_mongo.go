@@ -2,12 +2,10 @@ package mongo
 
 import (
 	"context"
-	"time"
 
 	"github.com/KonstantinGasser/datalab/service.app.config.agent/internal/appconfigs"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 const (
@@ -20,19 +18,8 @@ type MongoClient struct {
 	conn *mongo.Client
 }
 
-func NewMongoClient(addr string) (*MongoClient, error) {
-	opts := options.Client().ApplyURI(addr)
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
-	defer cancel()
-	conn, err := mongo.Connect(ctx, opts)
-	if err != nil {
-		return nil, err
-	}
-	if err := conn.Ping(context.TODO(), nil); err != nil {
-		return nil, err
-	}
-	return &MongoClient{conn: conn}, nil
+func NewMongoClient(conn *mongo.Client) *MongoClient {
+	return &MongoClient{conn: conn}
 }
 
 // InsertOne inserts one data point into the mongo database for a given db name and

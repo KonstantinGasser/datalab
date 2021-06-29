@@ -15,23 +15,37 @@ import (
 type CtxKey string
 
 const (
-	secretUser        = "super_secure"
-	atuhCtxKey CtxKey = "user"
+	secretUser           = "super_secure"
+	secretService        = "super_secure"
+	atuhCtxKey    CtxKey = "user"
 )
 
 var (
-	ErrNotAuthenticated = fmt.Errorf("user is not authenticated")
+	ErrNotAuthenticated = fmt.Errorf("caller is not authenticated")
 	ErrJWTParse         = fmt.Errorf("could not parse jwt token")
 	ErrCorruptJWT       = fmt.Errorf("jwt could not be parsed (JWT might be corrupted)")
 	ErrExpiredJWT       = fmt.Errorf("provided JWT has expired")
 )
 
-func WithUnary(middleware grpc.UnaryServerInterceptor) grpc.ServerOption {
-	return grpc.UnaryInterceptor(middleware)
+func WithUnary(interceptor, next grpc.UnaryServerInterceptor) grpc.ServerOption {
+	// return grpc.UnaryInterceptor(middleware)
+	return grpc.UnaryInterceptor(func(
+		ctx context.Context,
+		req interface{},
+		info *grpc.UnaryServerInfo,
+		handler grpc.UnaryHandler) (interface{}, error) {
+		return interceptor(ctx, req, info,
+			func(nextCtx context.Context, nextReq interface{}) (interface{}, error) {
+				return next(nextCtx, nextReq, info, handler)
+			})
+	})
 }
 
-func WithJwtAuth(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-	logrus.Info("[intercepter.WithJwtAuth] receiced request\n")
+func WithUserJwtAuth(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+	if info.FullMethod == "/config_proto.AppConfiguration/GetForClient" {
+		return handler(ctx, req)
+	}
+	logrus.Info("[intercepter.WithUserJwtAuth] receiced request\n")
 
 	authedUser, err := validateJWT(ctx)
 	if err != nil {
@@ -41,6 +55,27 @@ func WithJwtAuth(ctx context.Context, req interface{}, info *grpc.UnaryServerInf
 	resp, err := handler(authCtx, req)
 
 	return resp, err
+}
+
+func WithSvcJwtAuth(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+	if info.FullMethod != "/config_proto.AppConfiguration/GetForClient" {
+		return handler(ctx, req)
+	}
+	logrus.Info("[intercepter.WithSvcJwtAuth] receiced request\n")
+
+	meta, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return nil, fmt.Errorf("could not find correct context details")
+	}
+	serviceToken, ok := meta["datalab-service-token"]
+	if !ok {
+		return nil, ErrNotAuthenticated
+	}
+
+	if _, err := verifyToken(serviceToken[0], secretService); err != nil {
+		return nil, err
+	}
+	return handler(ctx, req)
 }
 
 func validateJWT(ctx context.Context) (*common.AuthedUser, error) {

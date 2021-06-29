@@ -25,6 +25,7 @@ type AppConfigurationClient interface {
 	RollbackAppendPermission(ctx context.Context, in *RollbackAppendPermissionRequest, opts ...grpc.CallOption) (*RollbackAppendPermissionResponse, error)
 	LockConfig(ctx context.Context, in *LockConfigRequest, opts ...grpc.CallOption) (*LockConfigResponse, error)
 	UnlockConfig(ctx context.Context, in *UnlockConfigRequest, opts ...grpc.CallOption) (*UnlockConfigResponse, error)
+	GetForClient(ctx context.Context, in *GetForClientRequest, opts ...grpc.CallOption) (*GetForClientResponse, error)
 }
 
 type appConfigurationClient struct {
@@ -98,6 +99,15 @@ func (c *appConfigurationClient) UnlockConfig(ctx context.Context, in *UnlockCon
 	return out, nil
 }
 
+func (c *appConfigurationClient) GetForClient(ctx context.Context, in *GetForClientRequest, opts ...grpc.CallOption) (*GetForClientResponse, error) {
+	out := new(GetForClientResponse)
+	err := c.cc.Invoke(ctx, "/config_proto.AppConfiguration/GetForClient", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AppConfigurationServer is the server API for AppConfiguration service.
 // All implementations must embed UnimplementedAppConfigurationServer
 // for forward compatibility
@@ -109,6 +119,7 @@ type AppConfigurationServer interface {
 	RollbackAppendPermission(context.Context, *RollbackAppendPermissionRequest) (*RollbackAppendPermissionResponse, error)
 	LockConfig(context.Context, *LockConfigRequest) (*LockConfigResponse, error)
 	UnlockConfig(context.Context, *UnlockConfigRequest) (*UnlockConfigResponse, error)
+	GetForClient(context.Context, *GetForClientRequest) (*GetForClientResponse, error)
 	mustEmbedUnimplementedAppConfigurationServer()
 }
 
@@ -136,6 +147,9 @@ func (UnimplementedAppConfigurationServer) LockConfig(context.Context, *LockConf
 }
 func (UnimplementedAppConfigurationServer) UnlockConfig(context.Context, *UnlockConfigRequest) (*UnlockConfigResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UnlockConfig not implemented")
+}
+func (UnimplementedAppConfigurationServer) GetForClient(context.Context, *GetForClientRequest) (*GetForClientResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetForClient not implemented")
 }
 func (UnimplementedAppConfigurationServer) mustEmbedUnimplementedAppConfigurationServer() {}
 
@@ -276,6 +290,24 @@ func _AppConfiguration_UnlockConfig_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AppConfiguration_GetForClient_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetForClientRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppConfigurationServer).GetForClient(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/config_proto.AppConfiguration/GetForClient",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppConfigurationServer).GetForClient(ctx, req.(*GetForClientRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AppConfiguration_ServiceDesc is the grpc.ServiceDesc for AppConfiguration service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -310,6 +342,10 @@ var AppConfiguration_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UnlockConfig",
 			Handler:    _AppConfiguration_UnlockConfig_Handler,
+		},
+		{
+			MethodName: "GetForClient",
+			Handler:    _AppConfiguration_GetForClient_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

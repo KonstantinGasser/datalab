@@ -16,8 +16,32 @@ service AppConfiguration {
 
     rpc LockConfig(LockConfigRequest) returns (LockConfigResponse) {}
     rpc UnlockConfig(UnlockConfigRequest) returns (UnlockConfigResponse) {}
+
+    rpc GetForClient(GetForClientRequest) returns (GetForClientResponse) {}
 }
 
+message GetForClientRequest {
+    string app_uuid = 1;
+}
+message GetForClientResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    ClientConfig  config = 3;
+}
+message ClientConfig {
+    repeated ClientStage stages = 1;
+    repeated ClientBtnDef btn_defs = 2;
+}
+
+message ClientStage {
+    int32 type = 1;
+    string transition = 2;
+    string regex = 3;
+}
+
+message ClientBtnDef {
+    string name = 1;
+}
 
 message AppendPermissionRequest {
     string tracing_ID = 1;

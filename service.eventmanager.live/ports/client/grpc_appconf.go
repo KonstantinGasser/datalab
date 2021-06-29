@@ -4,9 +4,8 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/KonstantinGasser/datalab/common"
-	"github.com/KonstantinGasser/datalab/library/utils/ctx_value"
 	grpcAppConfig "github.com/KonstantinGasser/datalab/service.app.config.agent/cmd/grpcserver/proto"
+	"github.com/KonstantinGasser/datalab/service.eventmanager.live/ports/client/intercepter"
 	"google.golang.org/grpc"
 )
 
@@ -15,7 +14,8 @@ type ClientAppConfig struct {
 }
 
 func NewClientAppConfig(clientAddr string) (*ClientAppConfig, error) {
-	conn, err := grpc.Dial(clientAddr, grpc.WithInsecure())
+	conn, err := grpc.Dial(clientAddr, grpc.WithInsecure(),
+		intercepter.WithUnary(intercepter.WithServiceAuth))
 	if err != nil {
 		return nil, err
 	}
@@ -25,11 +25,9 @@ func NewClientAppConfig(clientAddr string) (*ClientAppConfig, error) {
 	}, nil
 }
 
-func (client ClientAppConfig) GetAppConfig(ctx context.Context, appUuid string, authedUser *common.AuthedUser) (*common.AppConfigurations, error) {
-	resp, err := client.Conn.Get(ctx, &grpcAppConfig.GetRequest{
-		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
-		AuthedUser: authedUser,
-		AppUuid:    appUuid,
+func (client ClientAppConfig) GetAppConfig(ctx context.Context, appUuid string) (*grpcAppConfig.ClientConfig, error) {
+	resp, err := client.Conn.GetForClient(ctx, &grpcAppConfig.GetForClientRequest{
+		AppUuid: appUuid,
 	})
 	if err != nil {
 		return nil, err
@@ -37,5 +35,5 @@ func (client ClientAppConfig) GetAppConfig(ctx context.Context, appUuid string, 
 	if resp.GetStatusCode() != http.StatusOK {
 		return nil, err
 	}
-	return resp.GetConfigs(), nil
+	return resp.GetConfig(), nil
 }

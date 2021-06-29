@@ -81,11 +81,12 @@ type Server struct {
 	// content-type will always be application/json
 	onSuccess func(w http.ResponseWriter, status int32, data interface{})
 	// *** Server dependencies ***
-	appTokenClient client.ClientAppToken
-	eventBus       *bus.PubSub
+	appTokenClient  client.ClientAppToken
+	appConfigClient client.ClientAppConfig
+	eventBus        *bus.PubSub
 }
 
-func NewDefault(appTokenClient client.ClientAppToken) *Server {
+func NewDefault(appTokenClient client.ClientAppToken, appConfigClient client.ClientAppConfig) *Server {
 	srv := &Server{
 		// *** CORS-Configurations ***
 		allowedOrigins:   []string{"*"},
@@ -95,8 +96,9 @@ func NewDefault(appTokenClient client.ClientAppToken) *Server {
 		onErr:            onErr,
 		onSuccess:        onSuccess,
 		// *** service dependencies ***
-		appTokenClient: appTokenClient,
-		eventBus:       bus.NewPubSub(),
+		appTokenClient:  appTokenClient,
+		appConfigClient: appConfigClient,
+		eventBus:        bus.NewPubSub(),
 	}
 	return srv
 }

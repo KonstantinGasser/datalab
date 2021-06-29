@@ -10,20 +10,20 @@ import (
 
 func main() {
 	host := flag.String("host", "localhost:8004", "address to run the server on")
-	apptokenAddr := flag.String("apptoken-srv", "192.168.0.177:8006", "address to connect to app-token-service")
-	// appconfigAddr := flag.String("config-srv", "192.168.0.177:8005", "address to connect to app-config-service")
+	apptokenAddr := flag.String("apptoken-srv", "localhost:8006", "address to connect to app-token-service")
+	appconfigAddr := flag.String("config-srv", "localhost:8005", "address to connect to app-config-service")
 	flag.Parse()
 
 	grpcAppToken, err := client.NewClientAppToken(*apptokenAddr)
 	if err != nil {
 		logrus.Fatal(err)
 	}
-	// grpcAppConfig, err := client.NewClientAppConfig(*appconfigAddr)
-	// if err != nil {
-	// 	logrus.Fatal(err)
-	// }
+	grpcAppConfig, err := client.NewClientAppConfig(*appconfigAddr)
+	if err != nil {
+		logrus.Fatal(err)
+	}
 
-	server := httpserver.NewDefault(*grpcAppToken)
+	server := httpserver.NewDefault(*grpcAppToken, *grpcAppConfig)
 	server.Apply(
 		httpserver.WithAllowedOrgins("*"),
 		httpserver.WithAllowedHeaders("x-datalab-token", "content-type"),
