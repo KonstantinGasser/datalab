@@ -42,6 +42,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.DataKraken = void 0;
 var platform_1 = __importDefault(require("platform"));
 var axios_1 = __importDefault(require("axios"));
+var jquery_1 = __importDefault(require("jquery"));
 var EVENT;
 (function (EVENT) {
     EVENT[EVENT["HOVER_THEN_CLICK"] = 0] = "HOVER_THEN_CLICK";
@@ -59,7 +60,7 @@ var DataKraken = /** @class */ (function () {
     // the event listener
     function DataKraken(app_token) {
         var _this = this;
-        this.API_WS = "ws://localhost:8004/api/v1/open?";
+        this.API_WS = "ws://192.168.0.177:8004/api/v1/open?";
         this.URL_TIMEOUT_RATE = 1000;
         this.URL_TIME = new Date().getTime();
         this.CURRENT_URL = history.state.current;
@@ -97,7 +98,7 @@ var DataKraken = /** @class */ (function () {
                             },
                             // withCredentials: true,
                         };
-                        return [4 /*yield*/, axios_1.default.get("http://localhost:8004/api/v1/hello", opts)];
+                        return [4 /*yield*/, axios_1.default.get("http://192.168.0.177:8004/api/v1/hello", opts)];
                     case 1:
                         resp = _b.sent();
                         if (resp.status != 200)
@@ -188,9 +189,11 @@ var DataKraken = /** @class */ (function () {
     //     "current_url": "string" // URL clicked happened
     // }
     DataKraken.prototype.onClick = function (event) {
-        var target = event.target.name;
-        if (target === undefined || target === "")
+        var target = this.buildXPath(event.srcElement);
+        if (target === undefined || target === "") {
+            console.log("Target undefined", event);
             return;
+        }
         var elapsed = DataKraken.elapsed(new Date().getTime(), this.LAST_CLICK);
         var URL = history.state.current;
         var data_point = {
@@ -269,6 +272,15 @@ var DataKraken = /** @class */ (function () {
             OS: OS,
             device: device,
         };
+    };
+    DataKraken.prototype.buildXPath = function (element) {
+        var xpath = '';
+        for (; element && element.nodeType == 1; element = element.parentNode) {
+            var id = jquery_1.default(element.parentNode).children(element.tagName).index(element) + 1;
+            id > 1 ? (id = '[' + id + ']') : (id = '');
+            xpath = '/' + element.tagName.toLowerCase() + id + xpath;
+        }
+        return xpath;
     };
     // Event builds the event as it will be send to the web-socket
     DataKraken.Event = function (type, data) {

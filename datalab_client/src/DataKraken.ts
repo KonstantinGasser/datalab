@@ -1,5 +1,6 @@
 import platform from 'platform';
 import axios from 'axios';
+import $ from 'jquery';
 
 enum EVENT {
     HOVER_THEN_CLICK = 0,
@@ -14,7 +15,7 @@ enum LISTENER {
 }
 
 export class DataKraken {   
-    private API_WS = "ws://localhost:8004/api/v1/open?" 
+    private API_WS = "ws://192.168.0.177:8004/api/v1/open?" 
     private URL_TIMEOUT_RATE: number = 1000
     private URL_TIME: number = new Date().getTime()
     private CURRENT_URL: string = history.state.current
@@ -58,7 +59,7 @@ export class DataKraken {
             },
             // withCredentials: true,
         }
-        const resp: any = await axios.get("http://localhost:8004/api/v1/hello", opts)
+        const resp: any = await axios.get("http://192.168.0.177:8004/api/v1/hello", opts)
         
         if (resp.status != 200)
             return false
@@ -152,9 +153,11 @@ export class DataKraken {
     //     "current_url": "string" // URL clicked happened
     // }
     private onClick(event: any) {
-        const target: string = event.target.name
-        if (target === undefined || target === "")
+        const target: string = this.buildXPath(event.srcElement)
+        if (target === undefined || target === "") {
+            console.log("Target undefined", event)
             return
+        }
         const elapsed: number = DataKraken.elapsed(new Date().getTime(), this.LAST_CLICK)
         const URL: string = history.state.current
         const data_point: any = {
@@ -243,6 +246,17 @@ export class DataKraken {
         }
     }
 
+
+    private  buildXPath(element: any) {
+        let xpath = '';
+        for ( ; element && element.nodeType == 1; element = element.parentNode )
+        {
+            let id:any = $(element.parentNode).children(element.tagName).index(element) + 1;
+            id > 1 ? (id = '[' + id + ']') : (id = '');
+            xpath = '/' + element.tagName.toLowerCase() + id + xpath;
+        }
+        return xpath;
+    }
 
     // Event builds the event as it will be send to the web-socket
     private static Event(type: number, data: any): any {

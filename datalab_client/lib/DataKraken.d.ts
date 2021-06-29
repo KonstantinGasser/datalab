@@ -17,6 +17,7 @@ export declare class DataKraken {
     private onClick;
     private onHover;
     private getDevice;
+    private buildXPath;
     private static Event;
     private static elapsed;
 }
