@@ -32,7 +32,7 @@ type AppsRepository interface {
 	Store(ctx context.Context, app App) error
 	CompensateCreate(ctx context.Context, appUuid string) error
 	GetById(ctx context.Context, uuid string, stored interface{}) error
-	GetAll(ctx context.Context, userUuid string, stored interface{}) error
+	GetAll(ctx context.Context, userUuid, userOrgn string, stored interface{}) error
 	SetAppLock(ctx context.Context, uuid string, lock bool) error
 	AddMember(ctx context.Context, appUuid string, invitedMember Member) error
 	MemberStatus(ctx context.Context, appUuid string, openInvite Member, with InviteStatus) error
@@ -50,6 +50,7 @@ type App struct {
 	Members     []Member `bson:"member"`
 	Hash        string   `bson:"hash" required:"yes"`
 	Locked      bool     `bson:"locked"`
+	IsPrivate   bool     `bson:"is_private"`
 }
 
 // Member refers to a user added to an app
@@ -67,7 +68,7 @@ type AppSubset struct {
 
 // NewDefault creates a new App with its default values and initialized the App with
 // a UUID and App Hash (hash of orgn/name)
-func NewDefault(name, URL, ownerUuid, ownerOrgn, desc string) (*App, error) {
+func NewDefault(name, URL, ownerUuid, ownerOrgn, desc string, isPrivate bool) (*App, error) {
 	app := App{
 		Name:        name,
 		URL:         URL,
@@ -80,7 +81,8 @@ func NewDefault(name, URL, ownerUuid, ownerOrgn, desc string) (*App, error) {
 				Status: InviteAccepted,
 			},
 		},
-		Locked: false,
+		Locked:    false,
+		IsPrivate: isPrivate,
 	}
 	app.Init()
 	if err := required.Atomic(&app); err != nil {
@@ -134,7 +136,14 @@ func (app App) InviteReminderOk(userUuid string) bool {
 	return false
 }
 
-func (app App) HasReadAccess(userUuid string) error {
+func (app App) HasReadAccess(userUuid string, userOrgn string) error {
+	// account for public apps visible for the whole organization
+	if !app.IsPrivate {
+		if app.OwnerOrgn != userOrgn {
+			return ErrReadAccess
+		}
+		return nil
+	}
 	errO := app.IsOwner(userUuid)
 	errM := app.IsMember(userUuid, InviteAccepted)
 	if errM != nil && errO != nil {

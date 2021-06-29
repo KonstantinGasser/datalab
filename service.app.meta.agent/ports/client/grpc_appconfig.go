@@ -35,6 +35,8 @@ func (client ClientAppConfig) EmitInit(ctx context.Context, event *ports.InitEve
 		Tracing_ID: ctx_value.GetString(ctx, "tracingID"),
 		AppRefUuid: event.App.Uuid,
 		AppOwner:   event.App.OwnerUuid,
+		OwnerOrgn:  event.App.OwnerOrgn,
+		IsPrivate:  event.App.IsPrivate,
 	})
 	if err != nil {
 		errC <- err

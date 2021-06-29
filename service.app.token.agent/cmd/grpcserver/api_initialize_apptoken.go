@@ -16,7 +16,9 @@ func (server AppTokenServer) Initialize(ctx context.Context, in *proto.Initializ
 		in.GetAppRefUuid(),
 		in.GetAppHash(),
 		in.GetAppOwner(),
+		in.GetOwnerOrgn(),
 		in.GetAppOrigin(),
+		in.GetIsPrivate(),
 	)
 	if err != nil {
 		logrus.Errorf("[%v][server.Initialize] could not init app token: %v\n", err.Error(), tracingId)

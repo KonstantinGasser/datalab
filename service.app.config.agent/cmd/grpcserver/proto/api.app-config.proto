@@ -43,6 +43,8 @@ message InitRequest {
     string tracing_ID = 1;
     string app_ref_uuid = 2;
     string app_owner = 3;
+    bool is_private = 4;
+    string owner_orgn = 5;
 }
 message InitResponse {
     int32 status_code = 1;

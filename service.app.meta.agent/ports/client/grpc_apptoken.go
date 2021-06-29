@@ -37,6 +37,8 @@ func (client ClientAppToken) EmitInit(ctx context.Context, event *ports.InitEven
 		AppOwner:   event.App.OwnerUuid,
 		AppHash:    event.App.Hash,
 		AppOrigin:  event.App.URL,
+		OwnerOrgn:  event.App.OwnerOrgn,
+		IsPrivate:  event.App.IsPrivate,
 	})
 	if err != nil {
 		errC <- err

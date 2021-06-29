@@ -18,6 +18,7 @@ func (server AppMetaServer) Create(ctx context.Context, in *proto.CreateRequest)
 		in.GetOwnerUuid(),
 		in.GetOrganization(),
 		in.GetDescription(),
+		in.GetIsPrivate(),
 	)
 	if err != nil {
 		logrus.Errorf("[%v][server.Create] could not create app: %v\n", tracingId, err.Error())

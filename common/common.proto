@@ -16,6 +16,7 @@ message AppInfo {
     string owner = 5;
     repeated AppMember member = 6;
     bool locked = 7;
+    bool is_private = 8;
 }
 message AppMember {
     string uuid = 1;

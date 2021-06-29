@@ -37,7 +37,7 @@ func (s service) GetById(ctx context.Context, uuid string) (*appconfigs.AppConfi
 		return nil, errors.New(http.StatusInternalServerError, err, "Could not get App Config")
 	}
 
-	if err := storedAppConfig.HasReadOrWrite(authedUser.Uuid); err != nil {
+	if err := storedAppConfig.HasReadOrWrite(authedUser.Uuid, authedUser.Organization); err != nil {
 		return nil, errors.New(http.StatusUnauthorized, err, "User hat no permissions to get App Config")
 	}
 

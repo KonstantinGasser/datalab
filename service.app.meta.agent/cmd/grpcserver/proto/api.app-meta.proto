@@ -29,6 +29,7 @@ message CreateRequest {
     string organization = 4;
     string description = 5;
     string app_url = 6;
+    bool is_private = 7;
 }
 message CreateResponse {
     int32 status_code = 1;

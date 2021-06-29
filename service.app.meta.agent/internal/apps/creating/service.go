@@ -11,7 +11,7 @@ import (
 )
 
 type Service interface {
-	CreateDefaultApp(ctx context.Context, name, URL, ownerUuid, ownerOrgn, desc string) (string, errors.Api)
+	CreateDefaultApp(ctx context.Context, name, URL, ownerUuid, ownerOrgn, desc string, isPrivate bool) (string, errors.Api)
 }
 
 type service struct {
@@ -30,8 +30,8 @@ func NewService(repo apps.AppsRepository, emitterAppToken ports.EventEmitter,
 	}
 }
 
-func (s service) CreateDefaultApp(ctx context.Context, name, URL, ownerUuid, ownerOrgn, desc string) (string, errors.Api) {
-	app, err := apps.NewDefault(name, URL, ownerUuid, ownerOrgn, desc)
+func (s service) CreateDefaultApp(ctx context.Context, name, URL, ownerUuid, ownerOrgn, desc string, isPrivate bool) (string, errors.Api) {
+	app, err := apps.NewDefault(name, URL, ownerUuid, ownerOrgn, desc, isPrivate)
 	if err != nil {
 		return "", errors.New(http.StatusBadRequest, err, "App is missing fields")
 	}

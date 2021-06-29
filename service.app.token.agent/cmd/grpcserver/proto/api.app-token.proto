@@ -44,6 +44,8 @@ message InitializeRequest {
     string app_owner = 3;
     string app_hash = 4;
     string app_origin = 5;
+    string owner_orgn = 6;
+    bool is_private = 7;
 }
 
 message InitializeResponse {

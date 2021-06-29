@@ -77,7 +77,7 @@ func (client MongoClient) GetById(ctx context.Context, uuid string, result inter
 }
 
 // GetAll collects all Apps which uuid is in the slice of uuids
-func (client MongoClient) GetAll(ctx context.Context, userUuid string, stored interface{}) error {
+func (client MongoClient) GetAll(ctx context.Context, userUuid, userOrgn string, stored interface{}) error {
 	// filter all apps where the user is either the owner of the app or listed as member
 	// where its status is on InviteAccepted
 	filter := bson.D{
@@ -85,6 +85,15 @@ func (client MongoClient) GetAll(ctx context.Context, userUuid string, stored in
 			Key: "$or",
 			Value: bson.A{
 				bson.M{"owner_uuid": userUuid},
+				bson.D{
+					{
+						Key: "$and",
+						Value: bson.A{
+							bson.M{"is_private": false},
+							bson.M{"owner_orgn": userOrgn},
+						},
+					},
+				},
 				bson.D{
 					{
 						Key: "member",

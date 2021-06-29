@@ -9,7 +9,7 @@ import (
 )
 
 type Service interface {
-	InitializeAppToken(ctx context.Context, appUuid, appHash, appOwner, appOrigin string) errors.Api
+	InitializeAppToken(ctx context.Context, appUuid, appHash, appOwner, ownerOrgn, appOrigin string, isPrivate bool) errors.Api
 }
 
 type service struct {
@@ -22,8 +22,8 @@ func NewService(repo apptokens.ApptokenRepo) Service {
 
 // InitializeAppToken creates the core data object to represent an AppToken and stores it in the
 // database
-func (s *service) InitializeAppToken(ctx context.Context, appRefUuid, appHash, appOwner, appOrigin string) errors.Api {
-	appToken, err := apptokens.NewDefault(appRefUuid, appHash, appOwner, appOrigin)
+func (s *service) InitializeAppToken(ctx context.Context, appRefUuid, appHash, appOwner, ownerOrgn, appOrigin string, isPrivate bool) errors.Api {
+	appToken, err := apptokens.NewDefault(appRefUuid, appHash, appOwner, ownerOrgn, appOrigin, isPrivate)
 	if err != nil {
 		return errors.New(http.StatusBadRequest, err, "Could not create App Token")
 	}

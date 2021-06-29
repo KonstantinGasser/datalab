@@ -39,7 +39,9 @@ type ApptokenRepo interface {
 // AppToken represents the token data as it will be stored in the datbase
 type AppToken struct {
 	AppRefUuid   string   `bson:"_id" required:"yes"`
+	OwnerOrgn    string   `bson:"owner_orgn"`
 	Locked       bool     `bson:"locked"`
+	IsPrivate    bool     `bson:"is_private"`
 	AppHash      string   `bson:"app_hash" required:"yes"`
 	AppOwner     string   `bson:"app_owner" required:"yes"`
 	AppOrigin    string   `bson:"app_origin"`
@@ -51,11 +53,13 @@ type AppToken struct {
 
 // NewDefault creates a new default AppToken with only the meta data but no valid
 // Jwt nor Expiration time
-func NewDefault(AppRefUuid, appHash, appOwner, appOrigin string) (*AppToken, error) {
+func NewDefault(AppRefUuid, appHash, appOwner, ownerOrgn, appOrigin string, isPrivate bool) (*AppToken, error) {
 	appToken := AppToken{
 		AppRefUuid:   AppRefUuid,
 		AppHash:      appHash,
 		AppOwner:     appOwner,
+		OwnerOrgn:    ownerOrgn,
+		IsPrivate:    isPrivate,
 		AppOrigin:    appOrigin,
 		Member:       make([]string, 0),
 		Locked:       false,
@@ -201,18 +205,27 @@ func (appToken AppToken) HasReadWrite(userUuid string) error {
 }
 
 // HasRead checks if the user has read access on the AppToken
-func (appToken AppToken) HasRead(userUuid string) error {
-	for _, member := range appToken.Member {
-		if member == userUuid {
-			return nil
+func (appToken AppToken) HasRead(userUuid string, userOrgn string) error {
+	// account if app is private
+	if appToken.IsPrivate {
+		for _, member := range appToken.Member {
+			if member == userUuid {
+				return nil
+			}
 		}
+		return ErrNoReadAccess
 	}
-	return ErrNoReadAccess
+	// account if app is public
+	if appToken.OwnerOrgn != userOrgn {
+		return ErrNoReadAccess
+	}
+	return nil
+
 }
 
 // HasReadOrWrite checks if the user has either read or write acces on the AppToken
-func (appToken AppToken) HasReadOrWrite(userUuid string) error {
-	rErr := appToken.HasRead(userUuid)
+func (appToken AppToken) HasReadOrWrite(userUuid string, userOrgn string) error {
+	rErr := appToken.HasRead(userUuid, userOrgn)
 
 	rwErr := appToken.HasReadWrite(userUuid)
 	if rErr != nil && rwErr != nil {

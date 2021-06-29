@@ -12,9 +12,6 @@
                     <span class="dots medium-font" >{{ app.name }}</span>
                 </div>
                 <button @click="modeCreateApp()" class="btn btn-standard w-100">Create App <span class="">🙌</span></button>
-                <!-- <div class="app-name d-flex justify-start align-center">
-                    <button @click="modeCreateApp()" class="btn btn-standard">Create App <span class="">🙌</span></button>
-                </div> -->
             </div>
         </div>
         <div>
@@ -53,7 +50,7 @@
                     @setdoc="setdoc" 
                     @appchange="markUnsaved"/>
 
-                <InviteMember v-if="activeTab == 'Invite'" 
+                <InviteMember v-if="activeTab == 'Invite' && activeApp?.app?.is_private" 
                     :app_uuid="activeApp?.app?.uuid" 
                     :member="activeApp?.app?.member" 
                     :app_owner="activeApp?.owner" 

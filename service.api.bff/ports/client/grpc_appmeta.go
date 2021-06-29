@@ -37,6 +37,7 @@ func (client ClientAppMeta) CreateApp(ctx context.Context, r *apps.CreateAppRequ
 		Organization: r.Organization,
 		Description:  r.AppDesc,
 		AppUrl:       r.AppUrl,
+		IsPrivate:    r.IsPrivate,
 	})
 	if err != nil {
 		return "", errors.New(http.StatusInternalServerError,
@@ -68,6 +69,7 @@ func (client ClientAppMeta) GetApp(ctx context.Context, r *apps.GetAppRequest) (
 			fmt.Errorf(resp.GetMsg()),
 			resp.GetMsg())
 	}
+
 	return resp.GetApp(), nil
 }
 

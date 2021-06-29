@@ -15,7 +15,6 @@ func (server AppMetaServer) Get(ctx context.Context, in *proto.GetRequest) (*pro
 
 	app, err := server.fechtService.FetchAppByID(ctx,
 		in.GetAppUuid(),
-		// in.GetAuthedUser(),
 	)
 	if err != nil {
 		logrus.Errorf("[%v][server.Get] could not get App: %v\n", tracingId, err.Error())
@@ -40,6 +39,7 @@ func (server AppMetaServer) Get(ctx context.Context, in *proto.GetRequest) (*pro
 		App: &common.AppInfo{
 			Uuid:        app.Uuid,
 			Locked:      app.Locked,
+			IsPrivate:   app.IsPrivate,
 			Name:        app.Name,
 			URL:         app.URL,
 			Description: app.Description,

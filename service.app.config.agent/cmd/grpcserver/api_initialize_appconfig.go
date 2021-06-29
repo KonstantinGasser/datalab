@@ -12,7 +12,11 @@ func (server AppConfigServer) Initialize(ctx context.Context, in *proto.InitRequ
 	tracingId := in.GetTracing_ID()
 	logrus.Infof("[%v][server.Initialize] received request\n", tracingId)
 
-	err := server.initService.InitializeAppConfig(ctx, in.GetAppRefUuid(), in.GetAppOwner())
+	err := server.initService.InitializeAppConfig(ctx,
+		in.GetAppRefUuid(),
+		in.GetAppOwner(),
+		in.GetOwnerOrgn(),
+		in.GetIsPrivate())
 	if err != nil {
 		logrus.Errorf("[%v][server.Initialize] could not init App Config: %v\n", tracingId, err.Error())
 		return &proto.InitResponse{

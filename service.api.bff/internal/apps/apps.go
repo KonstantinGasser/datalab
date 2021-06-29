@@ -7,6 +7,7 @@ type CreateAppRequest struct {
 	Organization string `json:"organization"`
 	AppUrl       string `json:"app_url" required:"yes"`
 	AppDesc      string `json:"app_desc" required:"yes"`
+	IsPrivate    bool   `json:"is_private"`
 	OwnerUuid    string
 }
 type CreateAppResponse struct {

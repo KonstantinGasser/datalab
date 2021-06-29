@@ -57,7 +57,7 @@ func (s *service) UpdateFunnel(ctx context.Context, appRefUuid string, stages []
 			"App is locked and cannot be changed")
 	}
 	// check user permissions
-	if err := storedAppConfig.HasReadOrWrite(authedUser.Uuid); err != nil {
+	if err := storedAppConfig.HasReadOrWrite(authedUser.Uuid, authedUser.Organization); err != nil {
 		return errors.New(http.StatusUnauthorized,
 			err,
 			"User has no rights to change App Config")
@@ -96,7 +96,7 @@ func (s *service) UpdateCampaign(ctx context.Context, appRefUuid string, records
 			"App is locked and cannot be changed")
 	}
 	// check user permissions
-	if err := storedAppConfig.HasReadOrWrite(authedUser.Uuid); err != nil {
+	if err := storedAppConfig.HasReadOrWrite(authedUser.Uuid, authedUser.Organization); err != nil {
 		return errors.New(http.StatusUnauthorized, err, "User has no rights to change App Config")
 	}
 	// update config
@@ -127,7 +127,7 @@ func (s *service) UpdateBtnTime(ctx context.Context, appRefUuid string, btnDefs 
 			"App is locked and cannot be changed")
 	}
 	// check user permissions
-	if err := storedAppConfig.HasReadOrWrite(authedUser.Uuid); err != nil {
+	if err := storedAppConfig.HasReadOrWrite(authedUser.Uuid, authedUser.Organization); err != nil {
 		return errors.New(http.StatusUnauthorized, err, "User has no rights to change App Config")
 	}
 	// update config

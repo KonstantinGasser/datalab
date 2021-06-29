@@ -34,6 +34,8 @@ type AppconfigRepo interface {
 type AppConfig struct {
 	AppUuid     string   `bson:"_id"`
 	ConfigOwner string   `bson:"config_owner"`
+	OwnerOrgn   string   `bson:"owner_orgn"`
+	IsPrivate   bool     `bson:"is_private"`
 	Member      []string `bson:"member"`
 	Locked      bool     `bson:"locked"`
 	Funnel      []Stage  `bson:"funnel"`
@@ -62,10 +64,12 @@ type BtnDef struct {
 }
 
 // NewDefault creates a new AppConfig with only meta data
-func NewDefault(appRefUuid, configOwner string) *AppConfig {
+func NewDefault(appRefUuid, configOwner, ownerOrgn string, isPrivate bool) *AppConfig {
 	return &AppConfig{
 		AppUuid:     appRefUuid,
 		ConfigOwner: configOwner,
+		OwnerOrgn:   ownerOrgn,
+		IsPrivate:   isPrivate,
 		Member:      make([]string, 0),
 		Funnel:      make([]Stage, 0),
 		Campaign:    make([]Record, 0),
@@ -114,18 +118,26 @@ func (appConfig AppConfig) HasReadWrite(userUuid string) error {
 }
 
 // HasRead checks if the user has read access on the AppToken
-func (appConfig AppConfig) HasRead(userUuid string) error {
-	for _, member := range appConfig.Member {
-		if member == userUuid {
-			return nil
+func (appConfig AppConfig) HasRead(userUuid string, userOrgn string) error {
+	// account for private apps
+	if appConfig.IsPrivate {
+		for _, member := range appConfig.Member {
+			if member == userUuid {
+				return nil
+			}
 		}
+		return ErrNoReadAccess
 	}
-	return ErrNoReadAccess
+	// account for public apps
+	if appConfig.OwnerOrgn != userOrgn {
+		return ErrNoReadAccess
+	}
+	return nil
 }
 
 // HasReadOrWrite checks if the user has either read or write acces on the AppToken
-func (appConfig AppConfig) HasReadOrWrite(userUuid string) error {
-	readErr := appConfig.HasRead(userUuid)
+func (appConfig AppConfig) HasReadOrWrite(userUuid string, userOrgn string) error {
+	readErr := appConfig.HasRead(userUuid, userOrgn)
 	rwErr := appConfig.HasReadWrite(userUuid)
 	if readErr != nil && rwErr != nil {
 		return ErrNoReadAccess

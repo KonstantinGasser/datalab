@@ -41,7 +41,7 @@ func (s service) FetchAppByID(ctx context.Context, appUuid string) (*apps.App, e
 		return nil, errors.New(http.StatusInternalServerError, err, "Could not get App data")
 	}
 	// check for permissions
-	if err := app.HasReadAccess(authedUser.Uuid); err != nil {
+	if err := app.HasReadAccess(authedUser.Uuid, authedUser.Organization); err != nil {
 		return nil, errors.New(http.StatusUnauthorized, err, "User has no permissions to read App")
 	}
 	return &app, nil
@@ -55,7 +55,7 @@ func (s service) FetchAppSubsets(ctx context.Context) ([]apps.AppSubset, errors.
 	}
 
 	var storedApps []apps.App
-	err := s.repo.GetAll(ctx, authedUser.Uuid, &storedApps)
+	err := s.repo.GetAll(ctx, authedUser.Uuid, authedUser.Organization, &storedApps)
 	if err != nil {
 		return nil, errors.New(http.StatusInternalServerError, err, "Could not get Apps")
 	}

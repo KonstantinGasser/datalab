@@ -35,7 +35,7 @@ func (s *service) FetchById(ctx context.Context, appUuid string) (*apptokens.App
 	}
 
 	// check if user is allowed to read or write AppToken
-	if err := storedAppToken.HasReadOrWrite(authedUser.Uuid); err != nil {
+	if err := storedAppToken.HasReadOrWrite(authedUser.Uuid, authedUser.Organization); err != nil {
 		return nil, errors.New(http.StatusUnauthorized, err, "User is not allowed to access App Token")
 	}
 	return &storedAppToken, nil

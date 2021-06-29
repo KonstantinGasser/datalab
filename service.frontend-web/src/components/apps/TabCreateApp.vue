@@ -1,6 +1,7 @@
 <template>
     <h1 class="super-lg">{{orgn_domain}}/{{appName}}</h1>
     <div class="view_component">
+        <h2>General</h2>
         <div class="d-flex justify-end align-center mt-2">
             <button class="btn btn-standard" @click="createNewApp()">Create App</button>
         </div>
@@ -19,6 +20,28 @@
             <div class="form-group col">
                 <label for="">App Description</label>
                <textarea v-model="appDesc" class="form-control" name="" id="app_desc" rows="2" placeholder="what is the app about?"></textarea>
+            </div>
+        </div>
+    </div>
+    <div class="view_component">
+        <h2>Visibility <small>(default is public for Organization)</small></h2>
+        <div class="form-row">
+            <div class="form-group col">
+                <div class="d-flex justify-center align-center">
+                    <div class="custom-control custom-switch">
+                        <input v-model="private_app" type="checkbox" class="custom-control-input" id="customSwitch1">
+                        <label class="custom-control-label" for="customSwitch1"></label>
+                    </div>
+                    <span class="ml-1 icon icon-lock" style="font-size:20px"></span>
+                </div>
+                <hr>
+                <div>
+                    <p>
+                        If you set the <strong>Visibility</strong> to public - any one from your organization can see and contribute to the <strong>App</strong>.
+                        The obligation to <strong>create an App-Token</strong>, <strong>delete the App</strong> and to <strong>unlock the App</strong> remains only for the
+                        <strong>App-Owner</strong>
+                    </p>
+                </div>
             </div>
         </div>
     </div>
@@ -47,6 +70,7 @@
                 appName: null,
                 appURL: null,
                 appDesc: null,
+                private_app: false,
                 appMember: [],
                 appCfgs: [],
             };
@@ -100,6 +124,7 @@
                             app_name: this.appName,
                             app_desc: this.appDesc,
                             app_url: this.appURL,
+                            is_private: this.private_app,
                         }, options
                     ).then((resp) => {
                         this.$moshaToast("App " + this.appName + " has been created", {type: 'success',position: 'top-center', timeout: 3000})
