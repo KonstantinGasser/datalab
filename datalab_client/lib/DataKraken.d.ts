@@ -5,6 +5,7 @@ export declare class DataKraken {
     private CURRENT_URL;
     private LAST_CLICK;
     private BTN_DEFS;
+    private STAGES;
     private WS_TICKET;
     private WEB_SOCKET;
     constructor(app_token: string);
@@ -16,6 +17,8 @@ export declare class DataKraken {
     private urlListener;
     private onClick;
     private onHover;
+    private isStageRelevant;
+    private regexMatch;
     private getDevice;
     private buildXPath;
     private static Event;

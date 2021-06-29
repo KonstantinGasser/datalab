@@ -66,6 +66,7 @@ var DataKraken = /** @class */ (function () {
         this.CURRENT_URL = history.state.current;
         this.LAST_CLICK = new Date().getTime();
         this.BTN_DEFS = [];
+        this.STAGES = [];
         this.WS_TICKET = "";
         this.sayHello(app_token).then(function (ok) {
             if (!ok)
@@ -83,14 +84,14 @@ var DataKraken = /** @class */ (function () {
     // assigns a new cookie (also indicating that the client is new). The session start is handled
     // server-side. If the authentication succeeds the response will hole the web-socket ticket to establish 
     // the web-socket connection further, the response holds meat-data such as button-definitions.
-    // If the authentication fails or the server fails respond (including re-tries) the function returns a -1
+    // If the authentication fails or the server fails respond (including re-tries) the function returns a false
     // indicating to not do anything further.
     DataKraken.prototype.sayHello = function (token) {
-        var _a;
+        var _a, _b, _c, _d, _e;
         return __awaiter(this, void 0, void 0, function () {
             var opts, resp;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
+            return __generator(this, function (_f) {
+                switch (_f.label) {
                     case 0:
                         opts = {
                             headers: {
@@ -100,10 +101,12 @@ var DataKraken = /** @class */ (function () {
                         };
                         return [4 /*yield*/, axios_1.default.get("http://localhost:8004/api/v1/hello", opts)];
                     case 1:
-                        resp = _b.sent();
+                        resp = _f.sent();
                         if (resp.status != 200)
                             return [2 /*return*/, false];
                         this.WS_TICKET = (_a = resp === null || resp === void 0 ? void 0 : resp.data) === null || _a === void 0 ? void 0 : _a.ticket;
+                        this.STAGES = (_c = (_b = resp === null || resp === void 0 ? void 0 : resp.data) === null || _b === void 0 ? void 0 : _b.meta) === null || _c === void 0 ? void 0 : _c.stages;
+                        this.BTN_DEFS = (_e = (_d = resp === null || resp === void 0 ? void 0 : resp.data) === null || _d === void 0 ? void 0 : _d.meta) === null || _e === void 0 ? void 0 : _e.btn_defs;
                         return [2 /*return*/, true];
                 }
             });
@@ -161,6 +164,7 @@ var DataKraken = /** @class */ (function () {
     //     "to": "string", // URL jumped to
     //     "elapsed_time": "int64", // passed time on "from" URL
     // }
+    // TODO: check fort stage change -> including regex if found
     DataKraken.prototype.urlListener = function () {
         var _this = this;
         setInterval(function () {
@@ -176,6 +180,8 @@ var DataKraken = /** @class */ (function () {
                 elapsed_time: elapsed,
             };
             console.log(data_point);
+            var isStage = _this.isStageRelevant(1, null);
+            console.log("URL-CHANGE: ", isStage);
             _this.WEB_SOCKET.send(JSON.stringify(data_point));
             _this.CURRENT_URL = history.state.current;
         }, this.URL_TIMEOUT_RATE);
@@ -188,6 +194,7 @@ var DataKraken = /** @class */ (function () {
     //     "elapsed_time": "int64", // passed time since last click
     //     "current_url": "string" // URL clicked happened
     // }
+    // TODO: check for state change -> including regex if found
     DataKraken.prototype.onClick = function (event) {
         var target = this.buildXPath(event.srcElement);
         if (target === undefined || target === "") {
@@ -203,6 +210,8 @@ var DataKraken = /** @class */ (function () {
             elapsed_time: elapsed,
             current_url: URL,
         };
+        var isStage = this.isStageRelevant(2, event);
+        console.log("CLICK-CHANGE: ", isStage);
         console.log("Clicked: ", data_point, event);
         this.WEB_SOCKET.send(JSON.stringify(data_point));
         this.LAST_CLICK = new Date().getTime();
@@ -214,8 +223,17 @@ var DataKraken = /** @class */ (function () {
     //     elapsed
     // }
     DataKraken.prototype.onHover = function (event) {
+        var _a, _b;
         // lookup if target is listed as watcher
-        if (!this.BTN_DEFS.includes(event.target.name))
+        var xpath = this.buildXPath(event.srcElement);
+        var match = false;
+        for (var i = 0; i < this.BTN_DEFS.length; i++) {
+            if (((_a = this.BTN_DEFS[i]) === null || _a === void 0 ? void 0 : _a.name) === xpath) {
+                console.log("want: " + xpath + " have: " + ((_b = this.BTN_DEFS[i]) === null || _b === void 0 ? void 0 : _b.name));
+                match = true;
+            }
+        }
+        if (!match)
             return;
         var event_start = new Date().getTime();
         // only one follow-up event must be satisfied. After the "click" event
@@ -254,6 +272,43 @@ var DataKraken = /** @class */ (function () {
             });
             console.log("left: ", data_point);
         });
+    };
+    // isStageRelevant checks if an event matches the stage critieria
+    DataKraken.prototype.isStageRelevant = function (type, evt) {
+        var _a, _b, _c, _d, _e, _f;
+        for (var i = 0; i < this.STAGES.length; i++) {
+            if (((_a = this.STAGES[i]) === null || _a === void 0 ? void 0 : _a.type) === type && type === 1) { // match url pattern
+                var url = history.state.current;
+                if (((_b = this.STAGES[i]) === null || _b === void 0 ? void 0 : _b.transition) === url) {
+                    if ((_c = this.STAGES[i]) === null || _c === void 0 ? void 0 : _c.regex) {
+                        if (!this.regexMatch(url, (_d = this.STAGES[i]) === null || _d === void 0 ? void 0 : _d.regex))
+                            return false;
+                        return true;
+                    }
+                    return true;
+                }
+            }
+            if (((_e = this.STAGES[i]) === null || _e === void 0 ? void 0 : _e.type) === type && type === 2) { // element xpath match
+                var xpath = this.buildXPath(evt === null || evt === void 0 ? void 0 : evt.srcElement);
+                if (((_f = this.STAGES[i]) === null || _f === void 0 ? void 0 : _f.transition) !== xpath)
+                    continue;
+                return true;
+            }
+        }
+        return false;
+    };
+    DataKraken.prototype.regexMatch = function (str, regex) {
+        try {
+            var re = new RegExp(regex);
+            var res = re.exec(str);
+            if ((res === null || res === void 0 ? void 0 : res.length) === 0) {
+                return false;
+            }
+        }
+        catch (err) {
+            return false;
+        }
+        return true;
     };
     // getDevice captures the device information of the user
     // if device not mobile device will be "laptop/PC"

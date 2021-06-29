@@ -126,6 +126,7 @@ export class DataKraken {
     //     "to": "string", // URL jumped to
     //     "elapsed_time": "int64", // passed time on "from" URL
     // }
+    // TODO: check fort stage change -> including regex if found
     private urlListener() {
         setInterval(()=>{
             if (this.CURRENT_URL == history.state.current) 
@@ -142,6 +143,8 @@ export class DataKraken {
     
             }
             console.log(data_point)
+            const isStage: boolean = this.isStageRelevant(1, null)
+            console.log("URL-CHANGE: ", isStage)
             this.WEB_SOCKET.send(JSON.stringify(data_point))
             this.CURRENT_URL = history.state.current
         }, this.URL_TIMEOUT_RATE)
@@ -155,6 +158,7 @@ export class DataKraken {
     //     "elapsed_time": "int64", // passed time since last click
     //     "current_url": "string" // URL clicked happened
     // }
+    // TODO: check for state change -> including regex if found
     private onClick(event: any) {
         const target: string = this.buildXPath(event.srcElement)
         if (target === undefined || target === "") {
@@ -171,6 +175,9 @@ export class DataKraken {
             current_url: URL,
 
         }
+        const isStage: boolean = this.isStageRelevant(2, event)
+        console.log("CLICK-CHANGE: ", isStage)
+
         console.log("Clicked: ", data_point, event)
         this.WEB_SOCKET.send(JSON.stringify(data_point))
         this.LAST_CLICK = new Date().getTime()
@@ -184,8 +191,18 @@ export class DataKraken {
     // }
     private onHover(event: any) {
         // lookup if target is listed as watcher
-        if (!this.BTN_DEFS.includes(event.target.name))
+        const xpath: string = this.buildXPath(event.srcElement)
+        let match: boolean = false
+        for (let i = 0; i < this.BTN_DEFS.length; i++) {   
+            if (this.BTN_DEFS[i]?.name === xpath) {
+                console.log("want: " + xpath + " have: "+ this.BTN_DEFS[i]?.name)
+                match = true
+            }     
+        }
+        if (!match)
             return
+        
+        
         const event_start: number = new Date().getTime()
         // only one follow-up event must be satisfied. After the "click" event
         // the "mouseleave" event must be ignored and vice-versa
@@ -230,7 +247,43 @@ export class DataKraken {
         })
     } 
 
+    // isStageRelevant checks if an event matches the stage critieria
+    private isStageRelevant(type: number, evt: any): boolean {
+        for (let i = 0; i < this.STAGES.length; i++) {
+            if (this.STAGES[i]?.type === type && type === 1) { // match url pattern
+                const url: string = history.state.current
+                if (this.STAGES[i]?.transition === url) {
+                    if (this.STAGES[i]?.regex) {
+                        if (!this.regexMatch(url, this.STAGES[i]?.regex))
+                            return false
+                        return true 
+                    }
+                    return true
+                }
+            }
+            if (this.STAGES[i]?.type === type && type === 2) { // element xpath match
+                const xpath: string = this.buildXPath(evt?.srcElement)
+                if (this.STAGES[i]?.transition !== xpath)
+                    continue
+                return true
 
+            }
+        }
+        return false
+    }
+
+    private regexMatch(str:string, regex:string): boolean {
+        try {
+            let re = new RegExp(regex)
+            const res: any = re.exec(str)
+            if (res?.length === 0) {
+                return false
+            }
+        } catch(err) {
+            return false
+        }
+        return true
+    }
     // getDevice captures the device information of the user
     // if device not mobile device will be "laptop/PC"
     // data-point: {
