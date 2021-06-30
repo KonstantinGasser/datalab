@@ -143,7 +143,8 @@ export class DataKraken {
             }
             console.log(data_point)
             const isStage: boolean = this.isStageRelevant(1, null)
-            console.log("URL-CHANGE: ", isStage)
+            if (isStage)
+                console.log("!!!Stage-Change!!!: ")
             // create url-change event
 
             this.WEB_SOCKET.send(JSON.stringify(data_point))
@@ -162,7 +163,6 @@ export class DataKraken {
     private onClick(event: any) {
         const target: string = this.buildXPath(event.srcElement)
         if (target === undefined || target === "") {
-            console.log("Target undefined", event)
             return
         }
         const elapsed: number = DataKraken.elapsed(new Date().getTime(), this.LAST_CLICK)
@@ -176,10 +176,11 @@ export class DataKraken {
 
         }
         const isStage: boolean = this.isStageRelevant(2, event)
-        console.log("CLICK-CHANGE: ", isStage)
+        if (isStage)
+            console.log("!!!Stage-Change!!!: ")
         // create stage change event
 
-        console.log("Clicked: ", data_point, event)
+        console.log("Element-Clicked: ", data_point, event)
         this.WEB_SOCKET.send(JSON.stringify(data_point))
         this.LAST_CLICK = new Date().getTime()
     }
@@ -223,7 +224,7 @@ export class DataKraken {
                     target: target,
                     elapsed: elapsed
                 })
-            console.log("clicked: ", data_point)
+            console.log("hover-then-clicked: ", data_point)
             this.WEB_SOCKET.send(JSON.stringify(data_point))
         })
 
@@ -243,6 +244,7 @@ export class DataKraken {
                     target: target,
                     elapsed: elapsed
                 })
+            console.log("hover-then-left: ", data_point)
             this.WEB_SOCKET.send(JSON.stringify(data_point))
         })
     } 
@@ -267,7 +269,6 @@ export class DataKraken {
                 if (this.STAGES[i]?.transition !== xpath)
                     continue
                 return true
-
             }
         }
         return false
@@ -277,12 +278,10 @@ export class DataKraken {
         try {
             let re = new RegExp(stage_url+regex)
             const res: any = re.exec(str)
-            console.log("Regex Res: ", res)
             if (res === null || res?.length === 0) {
                 return false
             }
         } catch(err) {
-            console.log("Regex Err: ", err)
             return false
         }
         return true

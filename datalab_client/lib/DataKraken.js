@@ -164,7 +164,6 @@ var DataKraken = /** @class */ (function () {
     //     "to": "string", // URL jumped to
     //     "elapsed_time": "int64", // passed time on "from" URL
     // }
-    // TODO: check fort stage change -> including regex if found
     DataKraken.prototype.urlListener = function () {
         var _this = this;
         setInterval(function () {
@@ -181,7 +180,9 @@ var DataKraken = /** @class */ (function () {
             };
             console.log(data_point);
             var isStage = _this.isStageRelevant(1, null);
-            console.log("URL-CHANGE: ", isStage);
+            if (isStage)
+                console.log("!!!Stage-Change!!!: ");
+            // create url-change event
             _this.WEB_SOCKET.send(JSON.stringify(data_point));
             _this.CURRENT_URL = history.state.current;
         }, this.URL_TIMEOUT_RATE);
@@ -194,11 +195,9 @@ var DataKraken = /** @class */ (function () {
     //     "elapsed_time": "int64", // passed time since last click
     //     "current_url": "string" // URL clicked happened
     // }
-    // TODO: check for state change -> including regex if found
     DataKraken.prototype.onClick = function (event) {
         var target = this.buildXPath(event.srcElement);
         if (target === undefined || target === "") {
-            console.log("Target undefined", event);
             return;
         }
         var elapsed = DataKraken.elapsed(new Date().getTime(), this.LAST_CLICK);
@@ -211,8 +210,10 @@ var DataKraken = /** @class */ (function () {
             current_url: URL,
         };
         var isStage = this.isStageRelevant(2, event);
-        console.log("CLICK-CHANGE: ", isStage);
-        console.log("Clicked: ", data_point, event);
+        if (isStage)
+            console.log("!!!Stage-Change!!!: ");
+        // create stage change event
+        console.log("Element-Clicked: ", data_point, event);
         this.WEB_SOCKET.send(JSON.stringify(data_point));
         this.LAST_CLICK = new Date().getTime();
     };
@@ -223,13 +224,13 @@ var DataKraken = /** @class */ (function () {
     //     elapsed
     // }
     DataKraken.prototype.onHover = function (event) {
-        var _a, _b;
+        var _this = this;
+        var _a;
         // lookup if target is listed as watcher
         var xpath = this.buildXPath(event.srcElement);
         var match = false;
         for (var i = 0; i < this.BTN_DEFS.length; i++) {
             if (((_a = this.BTN_DEFS[i]) === null || _a === void 0 ? void 0 : _a.name) === xpath) {
-                console.log("want: " + xpath + " have: " + ((_b = this.BTN_DEFS[i]) === null || _b === void 0 ? void 0 : _b.name));
                 match = true;
             }
         }
@@ -254,7 +255,8 @@ var DataKraken = /** @class */ (function () {
                 target: target,
                 elapsed: elapsed
             });
-            console.log("clicked: ", data_point);
+            console.log("hover-then-clicked: ", data_point);
+            _this.WEB_SOCKET.send(JSON.stringify(data_point));
         });
         event.target.addEventListener("mouseleave", function (evt) {
             // TODO: what does a leave mean in data flow language
@@ -270,7 +272,8 @@ var DataKraken = /** @class */ (function () {
                 target: target,
                 elapsed: elapsed
             });
-            console.log("left: ", data_point);
+            console.log("hover-then-left: ", data_point);
+            _this.WEB_SOCKET.send(JSON.stringify(data_point));
         });
     };
     // isStageRelevant checks if an event matches the stage critieria
@@ -279,10 +282,6 @@ var DataKraken = /** @class */ (function () {
         for (var i = 0; i < this.STAGES.length; i++) {
             if (((_a = this.STAGES[i]) === null || _a === void 0 ? void 0 : _a.type) === type && type === 1) { // match url pattern
                 var url = history.state.current;
-                console.log("Stage: ", this.STAGES[i]);
-                console.log("Curr URL: ", url);
-                // /bask{regex} -> url != curr BUT regex => must check if url+regex === curr
-                // /about -> url != curr NO regex => continue
                 if (url === ((_b = this.STAGES[i]) === null || _b === void 0 ? void 0 : _b.transition) && !((_c = this.STAGES[i]) === null || _c === void 0 ? void 0 : _c.regex)) {
                     return true;
                 }
@@ -291,19 +290,6 @@ var DataKraken = /** @class */ (function () {
                     var match = this.regexMatch(url, (_f = this.STAGES[i]) === null || _f === void 0 ? void 0 : _f.transition, (_g = this.STAGES[i]) === null || _g === void 0 ? void 0 : _g.regex);
                     return match;
                 }
-                console.log("===========");
-                // // if (this.STAGES[i]?.transition !== url && !this.STAGES[i]?.regex) 
-                // //    continue
-                // console.log("Match: ", this.STAGES[i]?.transition === url)
-                // console.log("Regex: ", this.STAGES[i].regex)
-                // if (this.STAGES[i]?.regex) {
-                //     const match: boolean = this.regexMatch(url, this.STAGES[i]?.transition, this.STAGES[i]?.regex)
-                //     console.log("Regex Match: ", match)
-                //     if (!match)
-                //         return false
-                //     return true 
-                // }
-                // return true
             }
             if (((_h = this.STAGES[i]) === null || _h === void 0 ? void 0 : _h.type) === type && type === 2) { // element xpath match
                 var xpath = this.buildXPath(evt === null || evt === void 0 ? void 0 : evt.srcElement);
@@ -318,13 +304,11 @@ var DataKraken = /** @class */ (function () {
         try {
             var re = new RegExp(stage_url + regex);
             var res = re.exec(str);
-            console.log("Regex Res: ", res);
             if (res === null || (res === null || res === void 0 ? void 0 : res.length) === 0) {
                 return false;
             }
         }
         catch (err) {
-            console.log("Regex Err: ", err);
             return false;
         }
         return true;

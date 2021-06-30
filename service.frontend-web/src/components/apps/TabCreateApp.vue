@@ -136,6 +136,12 @@
                 }
             },
             validURL(str) {
+                const re = new RegExp("http://(localhost|127.0.0.1):[0-9]+")
+                const matches = re.exec(str)
+                console.log("matches: ", matches)
+                if (matches && matches?.length > 0) {
+                    return true
+                }
                 var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
                     '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
                     '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address

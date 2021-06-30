@@ -63,6 +63,38 @@
             </div>
         </div>
         <br>
+        <h1>Interesting Buttons</h1>
+        <small><span class="link" @click="showCfg('btn_time')">how does it work?</span></small>
+        <div class="view_component table-height">
+            <div class="d-flex align-center justify-end">
+                <button v-if="app_locked === undefined || !app_locked" class="btn btn-standard" @click="updateBtnTime">Save</button>
+            </div>
+            <table class="table table-borderless">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Button Name</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="item in app_config?.btn_time" :key="item.id">
+                    <th>{{item.id}}</th>
+                    <th>{{item.name}}</th>
+                    <th>{{item.btn_name}}</th>
+                    <th><span v-if="app_locked === undefined || !app_locked" class="icon icon-trash-2 hover" @click="removeBtnTime(item.id)"></span></th>
+                </tr>
+                <tr v-if="app_locked === undefined || !app_locked">
+                    <th class="v-center"></th>
+                    <td><input v-model="button_name" type="text" placeholder="Name (ex. Btn-Order)" class="form-control border" :class="{'border-danger': button_invalid}" ></td>
+                    <td><input v-model="button_btn" type="text" placeholder="Btn (ex. btn_order)" class="form-control border" :class="{'border-danger': button_invalid}" ></td>
+                    <td class="v-center"><span v-if="app_locked === undefined || !app_locked" class="icon icon-plus hover" @click="addBtnTime"></span></td>
+                </tr> 
+            </tbody>
+            </table>
+        </div>
+        <br>
         <h1>Campaign Tracking</h1>
         <small> <span class="link" @click="showCfg('campaign')">how does it work?</span></small>
         <div class="view_component table-height">
@@ -98,38 +130,6 @@
                         
                     </td>
                     <td class="v-center"><span v-if="app_locked === undefined || !app_locked" class="icon icon-plus hover" @click="addCampaign"></span></td>
-                </tr> 
-            </tbody>
-            </table>
-        </div>
-        <br>
-        <h1>Interesting Buttons</h1>
-        <small><span class="link" @click="showCfg('btn_time')">how does it work?</span></small>
-        <div class="view_component table-height">
-            <div class="d-flex align-center justify-end">
-                <button v-if="app_locked === undefined || !app_locked" class="btn btn-standard" @click="updateBtnTime">Save</button>
-            </div>
-            <table class="table table-borderless">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Button Name</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="item in app_config?.btn_time" :key="item.id">
-                    <th>{{item.id}}</th>
-                    <th>{{item.name}}</th>
-                    <th>{{item.btn_name}}</th>
-                    <th><span v-if="app_locked === undefined || !app_locked" class="icon icon-trash-2 hover" @click="removeBtnTime(item.id)"></span></th>
-                </tr>
-                <tr v-if="app_locked === undefined || !app_locked">
-                    <th class="v-center"></th>
-                    <td><input v-model="button_name" type="text" placeholder="Name (ex. Btn-Order)" class="form-control border" :class="{'border-danger': button_invalid}" ></td>
-                    <td><input v-model="button_btn" type="text" placeholder="Btn (ex. btn_order)" class="form-control border" :class="{'border-danger': button_invalid}" ></td>
-                    <td class="v-center"><span v-if="app_locked === undefined || !app_locked" class="icon icon-plus hover" @click="addBtnTime"></span></td>
                 </tr> 
             </tbody>
             </table>
