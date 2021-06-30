@@ -15,7 +15,7 @@ enum LISTENER {
 }
 
 export class DataKraken {   
-    private API_WS = "ws://localhost:8004/api/v1/open?" 
+    private API_WS = "ws://192.168.0.177:8004/api/v1/open?" 
     private URL_TIMEOUT_RATE: number = 1000
     private URL_TIME: number = new Date().getTime()
     private CURRENT_URL: string = history.state.current
@@ -60,7 +60,7 @@ export class DataKraken {
             },
             // withCredentials: true,
         }
-        const resp: any = await axios.get("http://localhost:8004/api/v1/hello", opts)
+        const resp: any = await axios.get("http://192.168.0.177:8004/api/v1/hello", opts)
         
         if (resp.status != 200)
             return false
@@ -126,7 +126,6 @@ export class DataKraken {
     //     "to": "string", // URL jumped to
     //     "elapsed_time": "int64", // passed time on "from" URL
     // }
-    // TODO: check fort stage change -> including regex if found
     private urlListener() {
         setInterval(()=>{
             if (this.CURRENT_URL == history.state.current) 
@@ -145,6 +144,8 @@ export class DataKraken {
             console.log(data_point)
             const isStage: boolean = this.isStageRelevant(1, null)
             console.log("URL-CHANGE: ", isStage)
+            // create url-change event
+
             this.WEB_SOCKET.send(JSON.stringify(data_point))
             this.CURRENT_URL = history.state.current
         }, this.URL_TIMEOUT_RATE)
@@ -158,7 +159,6 @@ export class DataKraken {
     //     "elapsed_time": "int64", // passed time since last click
     //     "current_url": "string" // URL clicked happened
     // }
-    // TODO: check for state change -> including regex if found
     private onClick(event: any) {
         const target: string = this.buildXPath(event.srcElement)
         if (target === undefined || target === "") {
@@ -177,6 +177,7 @@ export class DataKraken {
         }
         const isStage: boolean = this.isStageRelevant(2, event)
         console.log("CLICK-CHANGE: ", isStage)
+        // create stage change event
 
         console.log("Clicked: ", data_point, event)
         this.WEB_SOCKET.send(JSON.stringify(data_point))
@@ -195,13 +196,11 @@ export class DataKraken {
         let match: boolean = false
         for (let i = 0; i < this.BTN_DEFS.length; i++) {   
             if (this.BTN_DEFS[i]?.name === xpath) {
-                console.log("want: " + xpath + " have: "+ this.BTN_DEFS[i]?.name)
                 match = true
             }     
         }
         if (!match)
             return
-        
         
         const event_start: number = new Date().getTime()
         // only one follow-up event must be satisfied. After the "click" event
@@ -225,6 +224,7 @@ export class DataKraken {
                     elapsed: elapsed
                 })
             console.log("clicked: ", data_point)
+            this.WEB_SOCKET.send(JSON.stringify(data_point))
         })
 
         event.target.addEventListener("mouseleave", (evt: any) => {
@@ -243,7 +243,7 @@ export class DataKraken {
                     target: target,
                     elapsed: elapsed
                 })
-            console.log("left: ", data_point)
+            this.WEB_SOCKET.send(JSON.stringify(data_point))
         })
     } 
 
@@ -252,13 +252,14 @@ export class DataKraken {
         for (let i = 0; i < this.STAGES.length; i++) {
             if (this.STAGES[i]?.type === type && type === 1) { // match url pattern
                 const url: string = history.state.current
-                if (this.STAGES[i]?.transition === url) {
-                    if (this.STAGES[i]?.regex) {
-                        if (!this.regexMatch(url, this.STAGES[i]?.regex))
-                            return false
-                        return true 
-                    }
+        
+                if (url === this.STAGES[i]?.transition && !this.STAGES[i]?.regex) {
                     return true
+                }
+                if (url.search(this.STAGES[i]?.transition) == 0 && this.STAGES[i]?.regex) {
+                    // match partial url with  regex
+                    const match: boolean = this.regexMatch(url, this.STAGES[i]?.transition, this.STAGES[i]?.regex)
+                    return match
                 }
             }
             if (this.STAGES[i]?.type === type && type === 2) { // element xpath match
@@ -272,14 +273,16 @@ export class DataKraken {
         return false
     }
 
-    private regexMatch(str:string, regex:string): boolean {
+    private regexMatch(str: string, stage_url: string, regex: string): boolean {
         try {
-            let re = new RegExp(regex)
+            let re = new RegExp(stage_url+regex)
             const res: any = re.exec(str)
-            if (res?.length === 0) {
+            console.log("Regex Res: ", res)
+            if (res === null || res?.length === 0) {
                 return false
             }
         } catch(err) {
+            console.log("Regex Err: ", err)
             return false
         }
         return true

@@ -60,7 +60,7 @@ var DataKraken = /** @class */ (function () {
     // the event listener
     function DataKraken(app_token) {
         var _this = this;
-        this.API_WS = "ws://localhost:8004/api/v1/open?";
+        this.API_WS = "ws://192.168.0.177:8004/api/v1/open?";
         this.URL_TIMEOUT_RATE = 1000;
         this.URL_TIME = new Date().getTime();
         this.CURRENT_URL = history.state.current;
@@ -99,7 +99,7 @@ var DataKraken = /** @class */ (function () {
                             },
                             // withCredentials: true,
                         };
-                        return [4 /*yield*/, axios_1.default.get("http://localhost:8004/api/v1/hello", opts)];
+                        return [4 /*yield*/, axios_1.default.get("http://192.168.0.177:8004/api/v1/hello", opts)];
                     case 1:
                         resp = _f.sent();
                         if (resp.status != 200)
@@ -275,37 +275,56 @@ var DataKraken = /** @class */ (function () {
     };
     // isStageRelevant checks if an event matches the stage critieria
     DataKraken.prototype.isStageRelevant = function (type, evt) {
-        var _a, _b, _c, _d, _e, _f;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j;
         for (var i = 0; i < this.STAGES.length; i++) {
             if (((_a = this.STAGES[i]) === null || _a === void 0 ? void 0 : _a.type) === type && type === 1) { // match url pattern
                 var url = history.state.current;
-                if (((_b = this.STAGES[i]) === null || _b === void 0 ? void 0 : _b.transition) === url) {
-                    if ((_c = this.STAGES[i]) === null || _c === void 0 ? void 0 : _c.regex) {
-                        if (!this.regexMatch(url, (_d = this.STAGES[i]) === null || _d === void 0 ? void 0 : _d.regex))
-                            return false;
-                        return true;
-                    }
+                console.log("Stage: ", this.STAGES[i]);
+                console.log("Curr URL: ", url);
+                // /bask{regex} -> url != curr BUT regex => must check if url+regex === curr
+                // /about -> url != curr NO regex => continue
+                if (url === ((_b = this.STAGES[i]) === null || _b === void 0 ? void 0 : _b.transition) && !((_c = this.STAGES[i]) === null || _c === void 0 ? void 0 : _c.regex)) {
                     return true;
                 }
+                if (url.search((_d = this.STAGES[i]) === null || _d === void 0 ? void 0 : _d.transition) == 0 && ((_e = this.STAGES[i]) === null || _e === void 0 ? void 0 : _e.regex)) {
+                    // match partial url with  regex
+                    var match = this.regexMatch(url, (_f = this.STAGES[i]) === null || _f === void 0 ? void 0 : _f.transition, (_g = this.STAGES[i]) === null || _g === void 0 ? void 0 : _g.regex);
+                    return match;
+                }
+                console.log("===========");
+                // // if (this.STAGES[i]?.transition !== url && !this.STAGES[i]?.regex) 
+                // //    continue
+                // console.log("Match: ", this.STAGES[i]?.transition === url)
+                // console.log("Regex: ", this.STAGES[i].regex)
+                // if (this.STAGES[i]?.regex) {
+                //     const match: boolean = this.regexMatch(url, this.STAGES[i]?.transition, this.STAGES[i]?.regex)
+                //     console.log("Regex Match: ", match)
+                //     if (!match)
+                //         return false
+                //     return true 
+                // }
+                // return true
             }
-            if (((_e = this.STAGES[i]) === null || _e === void 0 ? void 0 : _e.type) === type && type === 2) { // element xpath match
+            if (((_h = this.STAGES[i]) === null || _h === void 0 ? void 0 : _h.type) === type && type === 2) { // element xpath match
                 var xpath = this.buildXPath(evt === null || evt === void 0 ? void 0 : evt.srcElement);
-                if (((_f = this.STAGES[i]) === null || _f === void 0 ? void 0 : _f.transition) !== xpath)
+                if (((_j = this.STAGES[i]) === null || _j === void 0 ? void 0 : _j.transition) !== xpath)
                     continue;
                 return true;
             }
         }
         return false;
     };
-    DataKraken.prototype.regexMatch = function (str, regex) {
+    DataKraken.prototype.regexMatch = function (str, stage_url, regex) {
         try {
-            var re = new RegExp(regex);
+            var re = new RegExp(stage_url + regex);
             var res = re.exec(str);
-            if ((res === null || res === void 0 ? void 0 : res.length) === 0) {
+            console.log("Regex Res: ", res);
+            if (res === null || (res === null || res === void 0 ? void 0 : res.length) === 0) {
                 return false;
             }
         }
         catch (err) {
+            console.log("Regex Err: ", err);
             return false;
         }
         return true;
