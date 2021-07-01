@@ -1,7 +1,7 @@
 <template>
     <div style="width: 60%;margin-left:auto;margin-right:auto;">
         <ul style="display:flex;justify-content:space-evenly;">
-            <li><router-link to="/basket">Shoping Basket</router-link></li>
+            <li><router-link to="/basket">Shopping Basket</router-link></li>
         </ul>
         <h1>Sales</h1>
         <div v-for="p in products" :key="p.id" style="border:1px solid;padding:15px;margin:25px 0;">
