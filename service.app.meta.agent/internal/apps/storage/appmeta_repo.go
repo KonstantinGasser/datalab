@@ -1,14 +1,12 @@
-package mongo
+package storage
 
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/KonstantinGasser/datalab/service.app.meta.agent/internal/apps"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 const (
@@ -21,18 +19,7 @@ type MongoClient struct {
 	conn *mongo.Client
 }
 
-func NewMongoClient(addr string) (*MongoClient, error) {
-	opts := options.Client().ApplyURI(addr)
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
-	defer cancel()
-	conn, err := mongo.Connect(ctx, opts)
-	if err != nil {
-		return nil, err
-	}
-	if err := conn.Ping(context.TODO(), nil); err != nil {
-		return nil, err
-	}
+func NewMongoClient(conn *mongo.Client) (*MongoClient, error) {
 	return &MongoClient{conn: conn}, nil
 }
 

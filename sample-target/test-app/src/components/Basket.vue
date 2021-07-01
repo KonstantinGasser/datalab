@@ -8,7 +8,7 @@
             </li>
         </ul>
         <div>
-            <button name="btn_buy">Buy NOW</button>
+            <button>Buy NOW</button>
         </div>
     </div>
 </template>

@@ -1,8 +1,10 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"net"
+	"time"
 
 	"github.com/KonstantinGasser/datalab/service.app.token.agent/cmd/grpcserver"
 	"github.com/KonstantinGasser/datalab/service.app.token.agent/cmd/grpcserver/intercepter"
@@ -10,9 +12,11 @@ import (
 	"github.com/KonstantinGasser/datalab/service.app.token.agent/internal/apptokens/fetching"
 	"github.com/KonstantinGasser/datalab/service.app.token.agent/internal/apptokens/initializing"
 	"github.com/KonstantinGasser/datalab/service.app.token.agent/internal/apptokens/modifying"
-	"github.com/KonstantinGasser/datalab/service.app.token.agent/internal/apptokens/storage/mongo"
+	"github.com/KonstantinGasser/datalab/service.app.token.agent/internal/apptokens/storage"
 	"github.com/KonstantinGasser/datalab/service.app.token.agent/internal/apptokens/validating"
 	"github.com/sirupsen/logrus"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"google.golang.org/grpc"
 )
 
@@ -32,7 +36,18 @@ func main() {
 	}
 	logrus.Infof("[grpcserver.Listen] listening on: %s\n", *host)
 	// create stroage dependency
-	apptokenRepo, err := mongo.NewMongoClient(*dbAddr)
+	opts := options.Client().ApplyURI(*dbAddr)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+	conn, err := mongo.Connect(ctx, opts)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+	if err := conn.Ping(context.TODO(), nil); err != nil {
+		logrus.Fatal(err)
+	}
+	apptokenRepo, err := storage.NewMongoClient(conn)
 	if err != nil {
 		logrus.Fatal(err)
 	}

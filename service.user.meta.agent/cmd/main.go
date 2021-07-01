@@ -1,17 +1,21 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"net"
+	"time"
 
 	"github.com/KonstantinGasser/datalab/service.user.meta.agent/cmd/grpcserver"
 	"github.com/KonstantinGasser/datalab/service.user.meta.agent/cmd/grpcserver/intercepter"
 	"github.com/KonstantinGasser/datalab/service.user.meta.agent/cmd/grpcserver/proto"
 	"github.com/KonstantinGasser/datalab/service.user.meta.agent/internal/users/creating"
 	"github.com/KonstantinGasser/datalab/service.user.meta.agent/internal/users/fetching"
-	"github.com/KonstantinGasser/datalab/service.user.meta.agent/internal/users/storage/mongo"
+	"github.com/KonstantinGasser/datalab/service.user.meta.agent/internal/users/storage"
 	"github.com/KonstantinGasser/datalab/service.user.meta.agent/internal/users/updating"
 	"github.com/sirupsen/logrus"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"google.golang.org/grpc"
 )
 
@@ -31,7 +35,18 @@ func main() {
 	logrus.Infof("[grpcserver.Listen] listening on: %s\n", *host)
 
 	// create repository dependency
-	usermetaRepo, err := mongo.NewMongoClient(*dbAddr)
+	opts := options.Client().ApplyURI(*dbAddr)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+	conn, err := mongo.Connect(ctx, opts)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+	if err := conn.Ping(context.TODO(), nil); err != nil {
+		logrus.Fatal(err)
+	}
+	usermetaRepo, err := storage.NewMongoClient(conn)
 	if err != nil {
 		logrus.Fatal(err)
 	}

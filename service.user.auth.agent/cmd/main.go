@@ -1,18 +1,22 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"net"
+	"time"
 
 	"github.com/KonstantinGasser/datalab/service.user.auth.agent/cmd/grpcserver"
 	"github.com/KonstantinGasser/datalab/service.user.auth.agent/cmd/grpcserver/proto"
 	"github.com/KonstantinGasser/datalab/service.user.auth.agent/internal/permissions/adding"
 	"github.com/KonstantinGasser/datalab/service.user.auth.agent/internal/permissions/fetching"
 	"github.com/KonstantinGasser/datalab/service.user.auth.agent/internal/permissions/initializing"
-	mongoPermissions "github.com/KonstantinGasser/datalab/service.user.auth.agent/internal/permissions/storage/mongo"
+	mongoPermissions "github.com/KonstantinGasser/datalab/service.user.auth.agent/internal/permissions/storage"
 	"github.com/KonstantinGasser/datalab/service.user.auth.agent/internal/users/authenticating"
-	mongoUser "github.com/KonstantinGasser/datalab/service.user.auth.agent/internal/users/storage/mongo"
+	mongoUser "github.com/KonstantinGasser/datalab/service.user.auth.agent/internal/users/storage"
 	"github.com/sirupsen/logrus"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"google.golang.org/grpc"
 )
 
@@ -29,11 +33,22 @@ func main() {
 	logrus.Infof("[grpcserver.Listen] listening on: %s\n", *host)
 
 	// create storage dependency
-	userRepo, err := mongoUser.NewMongoClient(*dbAddr)
+	opts := options.Client().ApplyURI(*dbAddr)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+	conn, err := mongo.Connect(ctx, opts)
 	if err != nil {
 		logrus.Fatal(err)
 	}
-	permissionRepo, err := mongoPermissions.NewMongoClient(*dbAddr)
+	if err := conn.Ping(context.TODO(), nil); err != nil {
+		logrus.Fatal(err)
+	}
+	userRepo, err := mongoUser.NewMongoClient(conn)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+	permissionRepo, err := mongoPermissions.NewMongoClient(conn)
 	if err != nil {
 		logrus.Fatal(err)
 	}
