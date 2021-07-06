@@ -3,10 +3,10 @@ import axios from 'axios';
 import $ from 'jquery';
 
 enum EVENT {
-    HOVER_THEN_CLICK = 0,
-    HOVER_THEN_LEFT,
-    URL_CHANGE,
-    ELEMENT_CLICK,
+    RAW_CLICK = 0,
+    RAW_URL,
+    BTN_TIME,
+    FUNNEL_CHANGE,
 }
 
 enum LISTENER {
@@ -24,6 +24,8 @@ export class DataKraken {
     private BTN_DEFS: Array<any> = []
     private STAGES: Array<any> = []
 
+    private CURRENT_STAGE: string = ""
+
     private WS_TICKET: string = ""
 
     private WEB_SOCKET: any
@@ -39,9 +41,11 @@ export class DataKraken {
             if (this.WEB_SOCKET === null)
                 return
 
+            this.CURRENT_STAGE = history.state.current
             this.attach(LISTENER.HOVER, this.onHover)
             this.attach(LISTENER.CLICK, this.onClick)
             this.urlListener()
+
         })
 
     }
@@ -119,32 +123,48 @@ export class DataKraken {
 
     // urlListener periodically checks if the url has changed. If so it captures the
     // prevues URL and the current URL along with the time passed in-between.
-    // {   
-    //     "type": "int", // indicates what type of event
-    //     "timestamp": "int64", 
-    //     "from": "string", // URL jumped from
-    //     "to": "string", // URL jumped to
-    //     "elapsed_time": "int64", // passed time on "from" URL
+    // raw-url => data_point: any = {
+    //     type: EVENT.RAW_URL,
+    //     timestamp: int64,
+    //     from: history.state.back,
+    //     to: history.state.current,
+    //     elapsed_time: elapsed,
+    // }
+    // funnel-change => data_point: any = {
+    //     type: EVENT.FUNNEL_CHANGE,
+    //     timestamp: int64,
+    //     leaving: this.CURRENT_STAGE,
+    //     entered: history.state.current,
+    //     elapsed_time: elapsed,
     // }
     private urlListener() {
         setInterval(()=>{
             if (this.CURRENT_URL == history.state.current) 
                 return
             
-             const elapsed: number = DataKraken.elapsed(new Date().getTime(), this.URL_TIME)
-             this.URL_TIME = new Date().getTime()
-             const data_point: any = {
-                type: 1,
+            const elapsed: number = DataKraken.elapsed(new Date().getTime(), this.URL_TIME)
+            this.URL_TIME = new Date().getTime()
+            const data_point: any = {
+                type: EVENT.RAW_URL,
                 timestamp: new Date().getTime(),
                 from: history.state.back,
                 to: history.state.current,
                 elapsed_time: elapsed,
-    
             }
-            console.log(data_point)
-            const isStage: boolean = this.isStageRelevant(1, null)
-            if (isStage)
-                console.log("!!!Stage-Change!!!: ")
+
+            if (this.isStageRelevant(1, null)) {
+                console.log("!!!Stage-Change!!!")
+                const data_point: any = {
+                    type: EVENT.FUNNEL_CHANGE,
+                    timestamp: new Date().getTime(),
+                    leaving: this.CURRENT_STAGE,
+                    entered: history.state.current,
+                    elapsed_time: elapsed,
+                }
+                this.WEB_SOCKET.send(JSON.stringify(data_point))
+                this.CURRENT_STAGE = history.state.current
+            }
+                
             // create url-change event
 
             this.WEB_SOCKET.send(JSON.stringify(data_point))
@@ -153,12 +173,19 @@ export class DataKraken {
     }
 
     // onClick captures any click event
-    // {   
-    //     "type": "int", // indicates what type of event
-    //     "timestamp": "int64", 
-    //     "target": "string", // clicked HTML element - if given HTML-Name-Tag else whatever if find lol
-    //     "elapsed_time": "int64", // passed time since last click
-    //     "current_url": "string" // URL clicked happened
+    // raw-click => data_point: any = {
+    //     type: EVENT.RAW_CLICK,
+    //     timestamp: int64,
+    //     target: target,
+    //     elapsed_time: elapsed,
+    //     current_url: URL,
+    // }
+    // funnel change => data_point: any = {
+    //     type: EVENT.FUNNEL_CHANGE,
+    //     timestamp: int64,
+    //     leaving: this.CURRENT_STAGE,
+    //     entered: target,
+    //     elapsed_time: elapsed,
     // }
     private onClick(event: any) {
         const target: string = this.buildXPath(event.srcElement)
@@ -168,16 +195,26 @@ export class DataKraken {
         const elapsed: number = DataKraken.elapsed(new Date().getTime(), this.LAST_CLICK)
         const URL: string = history.state.current
         const data_point: any = {
-            type: 0,
+            type: EVENT.RAW_CLICK,
             timestamp: new Date().getTime(),
             target: target,
             elapsed_time: elapsed,
             current_url: URL,
-
         }
-        const isStage: boolean = this.isStageRelevant(2, event)
-        if (isStage)
-            console.log("!!!Stage-Change!!!: ")
+        // send funnel change
+        if (this.isStageRelevant(2, event)) {
+            console.log("!!!Stage-Change!!!")
+            const data_point: any = {
+                type: EVENT.FUNNEL_CHANGE,
+                timestamp: new Date().getTime(),
+                leaving: this.CURRENT_STAGE,
+                entered: target,
+                elapsed_time: elapsed,
+            }
+            this.WEB_SOCKET.send(JSON.stringify(data_point))
+            this.CURRENT_STAGE = target
+        }
+            
         // create stage change event
 
         console.log("Element-Clicked: ", data_point, event)
@@ -187,9 +224,12 @@ export class DataKraken {
 
     // onHover tracks the time a user hovers of a specified element (set in config in datalab app)
     // it attaches a follow-up event (onClick and onLeave) to denote the results of the user action
-    // data-point: {
-    //     target,
-    //     elapsed
+    // data_point: any = {
+    //     type: EVENT.BTN_TIME,
+    //     timestamp: int64,
+    //     target: xpath,
+    //     action: "hover-leave" || "hover-click",
+    //     elapsed_time: elapsed,
     // }
     private onHover(event: any) {
         // lookup if target is listed as watcher
@@ -217,13 +257,13 @@ export class DataKraken {
             // ignore noise events
             if (elapsed <= 0)
                 return
-            const target: string = evt.target.name
-            const data_point: any = DataKraken.Event(
-                EVENT.HOVER_THEN_CLICK,
-                {
-                    target: target,
-                    elapsed: elapsed
-                })
+            const data_point: any = {
+                type: EVENT.BTN_TIME,
+                timestamp: new Date().getTime(),
+                target: xpath,
+                action: "hover-click",
+                elapsed_time: elapsed,
+            }
             console.log("hover-then-clicked: ", data_point)
             this.WEB_SOCKET.send(JSON.stringify(data_point))
         })
@@ -237,13 +277,13 @@ export class DataKraken {
             // ignore noise events
             if (elapsed <= 0)
                 return
-            const target: string = evt.target.name
-            const data_point: any = DataKraken.Event(
-                EVENT.HOVER_THEN_LEFT, 
-                {
-                    target: target,
-                    elapsed: elapsed
-                })
+            const data_point: any = {
+                type: EVENT.BTN_TIME,
+                timestamp: new Date().getTime(),
+                target: xpath,
+                action: "hover-leave",
+                elapsed_time: elapsed,
+            }
             console.log("hover-then-left: ", data_point)
             this.WEB_SOCKET.send(JSON.stringify(data_point))
         })

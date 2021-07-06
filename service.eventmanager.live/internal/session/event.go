@@ -31,6 +31,7 @@ type Event interface {
 
 // RawClickEvent holds meta data about triggered click events
 type RawClickEvent struct {
+	AppUuid     string
 	DeviceIP    string
 	Type        EventType `json:"type"`
 	CurrentURL  string    `json:"current_url"`
@@ -45,6 +46,7 @@ func (evt RawClickEvent) Json() ([]byte, error) {
 
 // RawURLEvent holds meta data about triggered URL changes
 type RawURLEvent struct {
+	AppUuid     string
 	DeviceIP    string
 	Type        EventType `json:"type"`
 	From        string    `json:"from"`
@@ -59,6 +61,7 @@ func (evt RawURLEvent) Json() ([]byte, error) {
 
 // RawURLEvent holds meta data about triggered URL changes
 type BtnTimeEvent struct {
+	AppUuid     string
 	DeviceIP    string
 	Type        EventType `json:"type"`
 	Target      string    `json:"target"`
@@ -73,10 +76,13 @@ func (evt BtnTimeEvent) Json() ([]byte, error) {
 
 // RawURLEvent holds meta data about triggered URL changes
 type FunnelChangeEvent struct {
+	AppUuid     string
 	DeviceIP    string
 	Type        EventType `json:"type"`
 	Action      string    `json:"action"`
-	Entered     int       `json:"entered"`
+	Leaving     string    `json:"leaving"`
+	Entered     string    `json:"entered"`
+	Timestamp   int64     `json:"timestamp"`
 	ElapsedTime int64     `json:"elapsed_time"`
 }
 

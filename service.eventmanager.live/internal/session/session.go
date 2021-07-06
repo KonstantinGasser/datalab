@@ -107,24 +107,32 @@ func (u User) Event(bytes []byte) (Event, error) {
 		if err := json.Unmarshal(bytes, &evt); err != nil {
 			return nil, err
 		}
+		evt.DeviceIP = u.DeviceIP
+		evt.AppUuid = u.AppUuid
 		return evt, nil
 	case RawURL:
 		var evt RawURLEvent
 		if err := json.Unmarshal(bytes, &evt); err != nil {
 			return nil, err
 		}
+		evt.DeviceIP = u.DeviceIP
+		evt.AppUuid = u.AppUuid
 		return evt, nil
 	case BtnTime:
 		var evt BtnTimeEvent
 		if err := json.Unmarshal(bytes, &evt); err != nil {
 			return nil, err
 		}
+		evt.DeviceIP = u.DeviceIP
+		evt.AppUuid = u.AppUuid
 		return evt, nil
 	case FunnelChange:
 		var evt FunnelChangeEvent
 		if err := json.Unmarshal(bytes, &evt); err != nil {
 			return nil, err
 		}
+		evt.DeviceIP = u.DeviceIP
+		evt.AppUuid = u.AppUuid
 		return evt, nil
 	default:
 		return nil, ErrNoSuchType

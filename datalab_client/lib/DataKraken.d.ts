@@ -6,6 +6,7 @@ export declare class DataKraken {
     private LAST_CLICK;
     private BTN_DEFS;
     private STAGES;
+    private CURRENT_STAGE;
     private WS_TICKET;
     private WEB_SOCKET;
     constructor(app_token: string);
