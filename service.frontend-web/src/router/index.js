@@ -9,13 +9,13 @@ const routes = [
     path: '/',
     name: 'dashboard',
     component: Dashboard,
-    beforeEnter: (to, from, next) => {
-      if (localStorage.getItem('token') === null) {
-        next('/login');
-      } else {
-        next();
-      }
-    },
+    // beforeEnter: (to, from, next) => {
+    //   if (localStorage.getItem('token') === null) {
+    //     next('/login');
+    //   } else {
+    //     next();
+    //   }
+    // },
   },
   {
     path: '/login',

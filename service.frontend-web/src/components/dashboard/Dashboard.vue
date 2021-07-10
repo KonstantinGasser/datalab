@@ -1,8 +1,7 @@
 <template>
-  <div class="app-layout">
-    
-    <SideMenu class="app-menu" @setActive="showView"/>
-    <div class="app-header"></div>
+<SideMenu class="app-menu" @setActive="showView"/>
+  <div class="app-layout"> 
+    <!-- <SideMenu class="app-menu" @setActive="showView"/> -->
     <ViewApp v-if="active_view === 'view_app'" class="app-view" :use_uuid="selected_uuid"/>
     <ViewAccount v-if="active_view === 'view_account'" class="app-view"/>
     <ViewOverview v-if="active_view === 'view_dashboard'" class="app-view" @openApp="openApp"/>
@@ -68,33 +67,16 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .app-layout {
-  display: grid;
-  grid-template-columns: 200px minmax(auto, 1100px);
-  grid-template-rows: auto 1fr;
   align-items: center;
   justify-content: center;
   margin: 0 auto;
 
-  width: 90%;
+  width: 100%;
   min-width: 750px;
+  max-width: 1250px;
   height: 100%;
-  padding-bottom: 25px;
-  padding-top: 45px;
-}
+  padding: 65px 25px 0px 25px;
 
-.app-menu {
-  grid-column: 1;
-  grid-row: 2 / 4;
-}
-
-.app-header {
-  display: flex;
-  justify-content: center;
-  align-content: center;
-  grid-column: 2;
-  grid-row: 1;
-  height: 30px;
-  /* background: linear-gradient(270deg, #50e3c2 0%,#10d574 100%); */
 }
 
 .app-view {

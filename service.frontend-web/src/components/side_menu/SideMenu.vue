@@ -1,43 +1,60 @@
 <template>
-  <div class="side_menu">
-      <div class="menu">
-        <!-- <h4>Analysis Functions</h4> -->
-        <!-- <a href="http://192.168.0.177:8080">Checkout referrer link</a> -->
-        <!-- <MenuItem @click="setActive('view_dashboard')" :tabName="'view_dashboard'" :item="'Dashboard'" /> -->
-        <MenuItem @click="setActive('view_queries')" :tabName="'view_queries'" :item="'Queries'" />
-        <MenuItem @click="setActive('view_app')" :tabName="'view_app'" :item="'Apps'" />
-        <MenuItem @click="setActive('view_docs')" :tabName="'view_docs'" :item="'Docs'" />
-        <MenuItem @click="setActive('view_account')" :tabName="'view_account'" :item="'Account'" />
-        <MenuItem @click="setActive('view_notify')" :tabName="'view_notify'" :item="'Notification'" :bubble="true"/>
-
-        <!-- <MenuItem @click="setActive('view_settings')" :tabName="'view_settings'" :item="'Settings'" /> -->
+<div class="sidebar" :class="{'active': active}">
+    <div class="logo_content">
+      <div class="logo">
+        <!-- <i class='bx bxl-c-plus-plus'></i> -->
+        <div class="logo_name">datalab.dev</div>
       </div>
-      <div class="divider github-mark d-flex justify-end">
-        
-      </div>
-      <div class="menu">
-          <MenuItem @click="setActive('view_logout')" :item="'Logout 👋'" />
-          <div class="d-flex justify-center">
+      <i class='bx bx-menu' id="btn" @click="ellapse()"></i>
+    </div>
+    <ul class="nav_list">
+      <li @click="setActive('view_queries')">
+          <i class='bx bx-grid-alt' ></i>
+          <span class="links_name">Dashboard</span>
+      </li>
+      <li @click="setActive('view_app')">
+          <i class='bx bx-package' ></i>
+          <span class="links_name">Apps</span>
+      </li>
+      <li @click="setActive('view_account')">
+          <i class='bx bx-user' ></i>
+          <span class="links_name">User</span>
+      </li>
+      <li @click="setActive('view_notify')">
+          <i class='bx bx-chat' ></i>
+          <span class="links_name">Notifications</span>
+      </li>
+      <li @click="setActive('view_logout')">
+          <i class="icon hover">👋</i>
+          <span class="links_name">Logout</span>
+      </li>
+      <li class="no-mode justify-center">
+        <div class="">
             <input id="toggle" class="toggle" type="checkbox" @change="setMode($event)">
-          </div>
         </div>
+      </li>
+    </ul>
   </div>
 </template>
 
 <script>
 import MenuItem from '@/components/side_menu/MenuItem.vue';
+import jwt_decode from "jwt-decode";
 
 export default {
   name: 'SideMenu',
   data() {
     return {
       mode: "light",
+      active: true,
+      loggedInUser: {},
     };
   },
   components: {
       MenuItem,
   },
   created() {
+    this.loggedInUser = jwt_decode(localStorage.getItem("token"))
     this.mode = localStorage.getItem("theme");
     if (this.mode === undefined || this.mode === null) {
       localStorage.setItem("theme", "light");
@@ -46,6 +63,9 @@ export default {
     this.setMode();
   },
   methods: {
+    ellapse() {
+      this.active = !this.active;
+    },
       setActive(value) {
           this.$store.commit('setActiveTab', value);
           this.$emit('setActive', value);
@@ -95,25 +115,182 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 
-h4 {
-    font-size: 20px;
-    margin: 5px 0px;
-    color: #000;
+
+::selection{
+  color: #fff;
+  background: linear-gradient(0deg, #50e3c2 0%,#10d574 100%);;
 }
-.side_menu {
-    display: grid;
-    grid-template-rows: min-content min-content;
-    display: grid;
-    justify-content: flex-start;
-    height: 100%;
-    align-content: flex-start;
-    border-radius: 8px 0 0 8px;
+.sidebar{
+  grid-column: 1;
+  grid-row: 1 / 4;
+  /* position: fixed; */
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 78px;
+  background: linear-gradient(0deg, #50e3c2 0%,#10d574 100%);;
+  padding: 6px 14px;
+  z-index: 99;
+  transition: all 0.5s ease;
+}
+.sidebar.active{
+  width: 240px
+}
+.sidebar .logo_content .logo{
+  color: #fff;
+  display: flex;
+  height: 50px;
+  width: 100%;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.5s ease;
+}
+.sidebar.active .logo_content .logo{
+  opacity: 1;
+  pointer-events: none;
+}
+.logo_content .logo i{
+  font-size: 28px;
+  margin-right: 5px;
+}
+.logo_content .logo .logo_name{
+  font-size: 20px;
+  font-weight: 400;
+}
+.sidebar #btn{
+  position: absolute;
+  color: #fff;
+  top: 6px;
+  left: 38px;
+  font-size: 22px;
+  height: 50px;
+  width: 50px;
+  text-align: center;
+  line-height: 50px;
+  transform: translateX(-50%);
+  cursor: pointer;
+}
+.sidebar.active #btn{
+  left: 200px;
+}
+.sidebar ul{
+  margin-top: 20px;
+}
+.sidebar ul li{
+  position: relative;
+  height: 50px;
+  width: 100%;
+  margin: 0 5px;
+  list-style: none;
+  line-height: 50px;
+  margin: 5px 0;
+}
+.sidebar ul li .tooltip{
+  position: absolute;
+  left: 125px;
+  top: 0;
+  transform: translate(-50% , -50%);
+  border-radius: 6px;
+  height: 35px;
+  width: 120px;
+  background: #fff;
+  line-height: 35px;
+  text-align: center;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  transition: 0s;
+  opacity: 0;
+  pointer-events: none;
+  display: block;
+}
+.sidebar.active ul li .tooltip{
+  display: none;
+}
+.sidebar ul li:hover .tooltip{
+  transition: all 0.5s ease;
+  opacity: 1;
+  top: 50%
+}
+
+.sidebar ul li{
+  color: #fff;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  border-radius: 12px;
+  white-space: nowrap;
+  transition: all 0.4s ease;
+}
+
+.no-mode:hover {
+  background: none !important;
+}
+.sidebar ul li:hover{
+  color: #11101d;
+  background: #fff;
+  cursor: pointer;
+}
+.sidebar ul li i{
+  font-size: 18px;
+  font-weight: 400;
+  height: 50px;
+  min-width: 50px;
+  border-radius: 12px;
+  line-height: 50px;
+  text-align: center;
+}
+.sidebar .links_name{
+  font-size: 18px;
+  font-weight: 400;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+.sidebar.active .links_name{
+  transition: 0s;
+  opacity: 1;
+  pointer-events: auto
+}
+
+.sidebar.active #log_out{
+  position: relative;
+  top: 75%;
+  left: 75%;
+  background: none;
+  font-size: 25px;
+  /* width: 50px; */
+}
+.sidebar #log_out{
+  position: relative;
+  top: 75%;
+  background: none;
+  font-size: 25px;
+  /* width: 50px; */
+}
+.home_content{
+  position: absolute;
+  height: 100%;
+  width: calc(100% - 78px);
+  left: 78px;
+  background: #E4E9F7;
+  box-shadow: 0 5px 10px rgba(0,0,0,0.2px);
+  transition: all 0.5s ease;
+}
+.sidebar.active ~ .home_content{
+  z-index: 100;
+}
+.home_content .text{
+  font-size: 25px;
+  font-weight: 500;
+  color: #10d574;
+  margin: 12px;
+}
+.sidebar.active ~ .home_content{
+  width: calc(100% - 240px);
+  left: 240px;
 }
 
 
-.divider {
-  height: 100px;
-}
 .toggle {
   --size: 1.5rem;
   -webkit-appearance: none;
@@ -136,7 +313,6 @@ h4 {
   color: #ffaa00;
   box-shadow: inset 0 0 0 var(--size), calc(var(--offset-orthogonal) * -1) 0 0 var(--ray-size), var(--offset-orthogonal) 0 0 var(--ray-size), 0 calc(var(--offset-orthogonal) * -1) 0 var(--ray-size), 0 var(--offset-orthogonal) 0 var(--ray-size), calc(var(--offset-diagonal) * -1) calc(var(--offset-diagonal) * -1) 0 var(--ray-size), var(--offset-diagonal) var(--offset-diagonal) 0 var(--ray-size), calc(var(--offset-diagonal) * -1) var(--offset-diagonal) 0 var(--ray-size), var(--offset-diagonal) calc(var(--offset-diagonal) * -1) 0 var(--ray-size);
 }
-
 .toggle {
   z-index: 1;
 }
