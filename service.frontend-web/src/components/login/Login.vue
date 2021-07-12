@@ -171,6 +171,7 @@ input {
 }
 
 .container {
+  grid-column: 1/4;
   position: relative;
   width: 100%;
   background-color: var(--main-bg);

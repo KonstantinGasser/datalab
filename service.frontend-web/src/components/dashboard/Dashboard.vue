@@ -75,7 +75,7 @@ export default {
   min-width: 750px;
   max-width: 1250px;
   height: 100%;
-  padding: 65px 25px 0px 25px;
+  padding: 65px 25px 25px 25px;
 
 }
 
