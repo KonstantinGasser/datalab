@@ -10,7 +10,7 @@ Um `datalab` in Projekte zu integrieren, wird für jeder erstellte `App` ein uni
 
 
 ## Manage Applications you want to monitor
-![](git-resources/datalab_app.png)
+![](git-resources/datalab_general.png)
 
 ## Customize what you want to monitor
 ![](git-resources/datalab_config.png)

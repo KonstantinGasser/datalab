@@ -366,7 +366,7 @@ input {
   margin-top: 0;
   color: #42b983;
 }
-x
+
 .modal-body {
   margin: 20px 0;
 }

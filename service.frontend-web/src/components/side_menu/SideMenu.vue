@@ -2,7 +2,6 @@
 <div class="sidebar" :class="{'active': active}">
     <div class="logo_content">
       <div class="logo">
-        <!-- <i class='bx bxl-c-plus-plus'></i> -->
         <div class="logo_name">datalab.dev</div>
       </div>
       <i class='bx bx-menu' id="btn" @click="ellapse()"></i>
@@ -21,6 +20,7 @@
           <span class="links_name">User</span>
       </li>
       <li @click="setActive('view_notify')">
+          <span v-if="notifications > 0" class="bubble"></span>
           <i class='bx bx-chat' ></i>
           <span class="links_name">Notifications</span>
       </li>
@@ -105,9 +105,9 @@ export default {
       },
   },
   computed: {
-      checkActive(value) {
-          return this.items[value];
-      }
+    notifications() {
+        return this.$store.state.notifications?.length;
+      },
   }
 };
 </script>
@@ -225,6 +225,10 @@ export default {
 .no-mode:hover {
   background: none !important;
 }
+.no-mode div {
+  position: absolute;
+  left: 15px;
+}
 .sidebar ul li:hover{
   color: #11101d;
   background: #fff;
@@ -292,7 +296,7 @@ export default {
 
 
 .toggle {
-  --size: 1.5rem;
+  --size: 1.4rem;
   -webkit-appearance: none;
      -moz-appearance: none;
           appearance: none;
@@ -320,6 +324,14 @@ export default {
   --bg: white;
 }
 
-
+.bubble {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #5465ff;
+  position: absolute;
+  right: -5px;
+  top: -5px;
+}
 
 </style>
