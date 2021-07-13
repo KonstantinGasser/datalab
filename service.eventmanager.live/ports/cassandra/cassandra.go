@@ -3,6 +3,6 @@ package cassandra
 type Client struct {
 }
 
-func NewClient() *Client {
+func New() *Client {
 	return &Client{}
 }

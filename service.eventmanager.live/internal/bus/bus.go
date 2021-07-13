@@ -65,7 +65,7 @@ func (hub *PubSub) run(workerID int) {
 	for {
 		select {
 		case event := <-hub.publish:
-			fmt.Printf("EVENT: %v\n", event)
+			fmt.Printf("EVENT: %+v\n", event)
 		case <-ticker.C:
 			logrus.Infof("[event-bus.run-%d] goroutines: %d\n", workerID, runtime.NumGoroutine())
 		}
