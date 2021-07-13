@@ -63,166 +63,31 @@ Als Ersteller einen ***App*** ist auch nur dieser User Admin der ***App*** und h
 
 
 
+# Data modeling for Funnel Aggregation with Cassandra
+A `funnel` can consist out of `N` stages, where each `stage` represents one state in the `funnel`. 
+The objective is it to understand how many users (unique users) are in each `stage`.
+
+## Approach #1
+For the first approach I am using a simple data schema where all extra meta-data (for the column family) has been ignored
+but only focuses on the `partition key` and `clustering key`. 
+
+### ***Table Schema***
+
+![](git-resources/cassandra_approach_1_table.png)
+
+Here the `partition key` is defined by the `stage-name` and the `clustering key` is defined by a users ***UUID***.
+This allows to `insert` users entering a given `stage` in a distinct way. Hence, a user will not be two times in the same `stage`.
+
+### ***Query: get distinct count for stage X***
+![](git-resources/cassandra_approach_1_query_1.png)
+
+The result of this query shows that in `stage == "/home"` are three distinct users.
+
+### ***Query: get distinct count for all stages with GROUP BY***
+![](git-resources/cassandra_approach_1_query_2.png)
+
+With this query all `stages` and their `distinct count` can be queried. However, as stated by the console output (`"Aggregation query used without partition key"`) we get an indication that the query might not perofm good on scale
 
 
-<!-- # Thoughts and Ideas
-
-## Using Event Sourcing for Client-Events
-
-Idea: each client event can be treated as a trigger for a state change - if a client clicks a button, the customer journey for `App` changes, the `Meta Data` for `btn-click-count` updates. Rather than just storing the data and
-later on-demand perform complex and time-consuming queries, the event could not just be persisted by directly applied at an `aggregate`. Furthermore, this would allow doing more complex real-time computations while serving the data for the
-dashboard from memory lighting fast. On a service, failure events could be loaded from the database into the `aggregate` recreating the last state of the system.
-
-![Aggregate Example](git-resources/aggregate_model.jpg)
-might have multiple `aggregates` depending on the context and domain - for simplicity, I will only use one to make my point.
-
-`Aggregate A` is responsible for maintaining the state of the `page meta data` (page views today, last 30 days see figure). If an event occurs the event will be persisted but also consumed by the `aggregate`. Lets say the event triggered reflects a `URL-Change Event`, following the logic, the `aggregate` consumes the event and updates its local state for `page views per URL` and so on. 
-
-Questions:
-
-- Scalability of `aggregate service`: since the service must maintain the current state - horizontal scalability needs to be figured out. 
-- does the `aggregate need to be aware of unique connections? Yes for internal logic. How to handle this in a performant fashion? -->
-
-
-
-
-
-<!-- # datalab analysis platform for user activity data
-
-
-# Client Library: Data Flow
-The idea of this `README` is to explain how the data collection on the client-side works. Further, the session and data life-cycle will be explained as well as the data format.
-
-## Session Life-Cycle
-
-STATE: INIT <br>
-- call to `/api/hello` to indicate session start with following data:
-``` json
-{   
-    "session_start": "UNIX time-stamp",
-    "referrer": "page current page was called from",
-    "browser": "Chrome",
-    "OS": "MacOS",
-}
-```
-- pass `cookie` if present else server sets new cookie
-- call-back returns `web-socket ticket` to connect to socket
-- attach `Event-Listener` to document
-
-STATE: CONNECT <br>
-- connect with Web-Socket
-
-STATE: LISTEN <br>
-- `listen for events` -> `process event` -> `send to web-socket` -> `start over`
-
-STATE: CLOSING <br>
-- graceful: send `goodbye` to server
-- forceful: conn interrupt -> server terminates session
-
-## Client data we get
-- `referrer` | #1, #3
-- `device info` | #4
-- `click` of element | #2, #1
-- `X,Y` of mouse-movement (needs more thinking - what to do with the data??)
-- `elpased time` mouse hovered over specific element | #4
-- `URL change` | #1, #2
-- `time on URL` | #4
-
-## What to visualize?
-- `Customer Journey` [1]
-- `Funnel (conversion rate)` [2]
-- `Compaign Tracking` [3]
-- `Audience Info` [4]
-
-
-## Data by event
-
-DATA: SESSION_RECORD<br>
-```json
-{
-    "type": "start",
-    "meta": {
-        "device": {"os": "Macintosh", "browser": "Chrome"},
-        "referrer": "https://www.google.com",
-    }
-}
-```
-EVENT: MOUSECLICK<br>
-```json
-{
-    "type": 0,
-    "timestamp" unix-timestamp,
-    "event": {
-        "X": pos-mouse-x,
-        "Y": pos-mouse-y,
-        "target": "css class | id | name"
-    }
-}
-```
-EVENT: URLCHANGE<br>
-```json
-{
-    "type": 0,
-    "timestamp" unix-timestamp,
-    "event": {
-        "elapsed" time-in-seconds,
-        "next": "http://awesome.dev/next"
-    }
-}
-```
-EVENT: MOUSEHOVER<br>
-```json
-{
-    "type": 0,
-    "timestamp" unix-timestamp,
-    "event": {
-        "elapsed": duration of no-pos-change,
-        "target": "css class | id | name"
-    }
-}
-```
-EVENT: MOUSEMOVE<br>
-```json
-{
-    "type": 1,
-    "timestamp" unix-timestamp,
-    "event": {
-        "X": pos-mouse-x,
-        "Y": pos-mouse-y,
-        "elapsed": duration of no-pos-change
-    }
-}
-```
-
-## Docker-Swarm deployment
-### CI/CD Pipe
-<!-- The swarm lives on a Raspberry-PI4 (linux/arm64) consisting out of one node.
-Each service (api,app,user,token,frontend) have their own `Makefile` with the `deploy` target. `make deploy` cross-compilies the executable for `linux/arm64` and builds a docker image also with cross-compilation for `linux/arm64`. Docker cross-compilation is achieved with the `docker buildx build` tool from docker which allows to build images on your local machine for a different OS/Arch. After the build `deploy` pushes the image to the `datalab-registry.dev:5000/<image-name>:<git-commit-hash>` which lives within the `swarm`. From their services can pull the latest images. -->
-
-<!--
-
-## Service - DNS Table (some say they can see a pattern..not sure where??)
-| Service               | swarm-name                  | port in:out | credentials                |
-|-----------------------|-----------------------------|-------------|----------------------------|
-| gateway               | api-bff                     | 8080:8080   |                            |
-| app                   | app-meta-agent              | 8003:8003   |                            |
-| user                  | user-meta-agent             | 8001:8001   |                            |
-| userauth              | user-auth-agent             | 8002:8002   |                            |
-| config                | app-config-agent            | 8005:8005   |                            |
-| apptoken              | app-token-agent             | 8006:8006   |                            |
-| frontend              | frontend-web                | 80:80       |                            |
-| mongo-app             | app-meta-agent-db           | 270121:27017 | app-meta-agent:secure     |
-| monog-user            | user-meta-agent-db          | 27018:27017 | user-meta-agent:secure     |
-| monog-config          | app-config-agent-db         | 27019:27017 | app-config-agent:secure    |
-| monog-apptoken        | app-token-agent-db          | 27020:27017 | app-token-agent:secure     |
-| monog-userauth        | user-auth-agent-db          | 27018:27017 | user-auth-agent:secure     |
-| monog-notify          | notify-live-agent-db        | 27022:27017 | notify-live-agent:secure   |
-
--->
-
-<!--
-# So fare...
-
-![](git-resources/demo_img_1.png)
-
-![](git-resources/demo_img_2.png) -->
+### Challenges 
+Even-though this example represents a use-case from the problem statement it ignores important things. Firstly, the table will hold more then one `funnel definition` either from different `Apps` of the same organization or `Apps` from other organizations. This will lead to a bottleneck and performance issues eventually.

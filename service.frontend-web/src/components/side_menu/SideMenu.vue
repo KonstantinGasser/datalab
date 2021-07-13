@@ -24,7 +24,7 @@
           <i class='bx bx-chat' ></i>
           <span class="links_name">Notifications</span>
       </li>
-      <li @click="setActive('view_logout')">
+      <li class="no-bg" @click="setActive('view_logout')">
           <i class="icon hover">👋</i>
           <span class="links_name">Logout</span>
       </li>
@@ -228,6 +228,15 @@ export default {
 .no-mode div {
   position: absolute;
   left: 15px;
+  position: absolute;
+  bottom: 30px;
+}
+.no-bg {
+  position: absolute;
+  bottom: 0px;
+}
+.no-bg:hover {
+  background: none !important;
 }
 .sidebar ul li:hover{
   color: #11101d;
