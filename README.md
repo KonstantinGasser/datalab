@@ -86,7 +86,7 @@ The result of this query shows that in `stage == "/home"` are three distinct use
 ### ***Query: get distinct count for all stages with GROUP BY***
 ![](git-resources/cassandra_approach_1_query_2.png)
 
-With this query all `stages` and their `distinct count` can be queried. However, as stated by the console output (`"Aggregation query used without partition key"`) we get an indication that the query might not perofm good on scale
+With this query all `stages` and their `distinct count` can be queried. However, as stated by the console output (`"Aggregation query used without partition key"`) we get an indication that the query might not perform good at scale
 
 
 ### Challenges 
