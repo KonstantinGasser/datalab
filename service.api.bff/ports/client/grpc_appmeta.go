@@ -35,7 +35,7 @@ func (client ClientAppMeta) CreateApp(ctx context.Context, r *apps.CreateAppRequ
 		OwnerUuid:    r.OwnerUuid,
 		Name:         r.AppName,
 		Organization: r.Organization,
-		Description:  r.AppDesc,
+		Tags:         r.AppTags,
 		AppUrl:       r.AppUrl,
 		IsPrivate:    r.IsPrivate,
 	})

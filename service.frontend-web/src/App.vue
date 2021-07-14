@@ -78,7 +78,7 @@ a {
 }
 
 .app-tag {
-  margin: 5px 5px;
+  margin: 5px 2px;
   padding: 1px 20px;
   width: max-content;
   border-radius: 15px;

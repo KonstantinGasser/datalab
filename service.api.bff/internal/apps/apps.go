@@ -3,11 +3,11 @@ package apps
 import "github.com/KonstantinGasser/datalab/common"
 
 type CreateAppRequest struct {
-	AppName      string `json:"app_name" required:"yes"`
-	Organization string `json:"organization"`
-	AppUrl       string `json:"app_url" required:"yes"`
-	AppDesc      string `json:"app_desc" required:"yes"`
-	IsPrivate    bool   `json:"is_private"`
+	AppName      string   `json:"app_name" required:"yes"`
+	Organization string   `json:"organization"`
+	AppUrl       string   `json:"app_url" required:"yes"`
+	AppTags      []string `json:"tags" required:"yes"`
+	IsPrivate    bool     `json:"is_private"`
 	OwnerUuid    string
 }
 type CreateAppResponse struct {

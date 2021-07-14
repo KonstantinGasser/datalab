@@ -8,8 +8,10 @@
                 <p class="info-text" v-if="apps == null || apps.length === 0">
                     Mhm looks like you do not have any apps yet - <a @click="modeCreateApp()">go create one!</a>
                 </p>
-                <div :class="{selected: selectedApp===app.uuid}" class="app-name d-flex justify-start align-center" v-for="app in apps" :key="app.uuid" @click="loadApp(app.uuid)">
+                <div :class="{selected: selectedApp===app.uuid}" class="app-name d-flex justify-between align-center" v-for="app in apps" :key="app.uuid" @click="loadApp(app.uuid)">
                     <span class="dots medium-font" >{{ app.name }}</span>
+                    <span v-if="app.private" class="icon icon-lock"></span> 
+                    <span v-if="app.private === undefined" class="icon icon-unlock"></span>
                 </div>
                 <button @click="modeCreateApp()" class="btn btn-standard w-100">Create App <span class="">🙌</span></button>
             </div>
@@ -33,14 +35,12 @@
                     </div>
                 </h1>
                 <div class="desc_test">
-                    <span v-if="activeApp?.app?.is_private" class="app-tag green">private</span> 
-                    <span v-if="activeApp?.app?.is_private === undefined" class="app-tag green">public</span>
-                    <span class="app-tag blue">
-                        {{activeApp.app?.description}}
+                    <span class="app-tag blue" v-for="tag in activeApp?.app?.tags" :key="tag">
+                        #{{tag}}
                     </span>
-                    </div>
+                </div>
                 <!-- <hr> -->
-                <Tabs class="mt-3 mb-4" ref="Tabs" :update="activeTab" :initTab="activeTab" :tabs="tabs" @tabChange="tabChange"/>
+                <Tabs class="mt-3 mb-4" ref="Tabs" :update="activeTab" :initTab="activeTab" :tabs="getTabs" @tabChange="tabChange"/>
                 <General v-if="activeTab === 'Overview'" 
                     :app_locked="activeApp?.app?.locked === true" 
                     :app_token="activeApp?.token" 
@@ -56,11 +56,12 @@
                     @setdoc="setdoc" 
                     @appchange="markUnsaved"/>
 
-                <InviteMember v-if="activeTab == 'Invite' && activeApp?.app?.is_private" 
+                <InviteMember v-if="activeTab == 'Invite'" 
                     :app_uuid="activeApp?.app?.uuid" 
                     :member="activeApp?.app?.member" 
                     :app_owner="activeApp?.owner" 
                     :app_name="activeApp?.app?.name"/>
+
             </div>
         </div>
     </div>
@@ -86,6 +87,21 @@
             InviteMember,
         },
         computed: {
+            getTabs() {
+                console.log(this.activeApp?.app?.is_private === undefined)
+                if ((this.activeApp?.app?.is_private === undefined) === true) {
+                    console.log("no invite")
+                    return [
+                        {name:'Overview', emoji: "icon-package"},
+                        {name:'Configuration', emoji: "icon-sliders"},
+                    ]
+                }
+                return [
+                        {name:'Overview', emoji: "icon-package"},
+                        {name:'Configuration', emoji: "icon-sliders"},
+                        {name:'Invite', emoji: "icon-users"},
+                    ]
+            },
             sync_app() {
                 return this.$store.state.sync_app
             },
@@ -138,7 +154,7 @@
                 this.activeApp = init_app;
                 this.selectedApp = this.activeApp?.app?.uuid;
                 this.isInCreateMode = false;
-            }    
+            }
         },
         methods: {
             async syncAppChanges(uuid){

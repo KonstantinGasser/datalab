@@ -18,8 +18,20 @@
                 </div>
             </div>
             <div class="form-group col">
-                <label for="">App Description</label>
-               <textarea v-model="appDesc" class="form-control" name="" id="app_desc" rows="2" placeholder="what is the app about?"></textarea>
+                <label for="">App Tags</label>
+                <div class="tag-input">
+                    <input class="form-control" v-model="newTag" type="text"
+                        placeholder="#awesome"
+                        @keydown.enter="addTag(newTag)" 
+                        @keydown.prevent.tab="addTag(newTag)"/>
+                    <ul class="tags">
+                        <li v-for="(tag, index) in tags" :key="tag" class="tag">
+                        {{ tag }}
+                        <button class="delete" @click="removeTag(index)">x</button>
+                        </li>
+                    </ul>
+                </div>
+               <!-- <textarea v-model="appDesc" class="form-control" name="" id="app_desc" rows="2" placeholder="what is the app about?"></textarea> -->
             </div>
         </div>
     </div>
@@ -60,12 +72,14 @@
 <script>
 
     import axios from 'axios';
+    import {ref} from 'vue';
 
     export default {
         name: 'TabCreateApp',
         components: {},
         data() {
             return {
+                tags: [],
                 isEdit: false,
                 appName: null,
                 appURL: null,
@@ -75,8 +89,22 @@
                 appCfgs: [],
             };
         },
+         setup(){
+            const addTag = (tag) => {
+                tags.value.push(tag); // add the new tag to the tags array
+                newTag.value = ""; // reset newTag
+            };
+            
+            const tags = ref([]);
+            const newTag = ref('') //keep up with new tag
+            return { tags, newTag, addTag }
+        },
         props: ["orgn_domain"],
         methods: {
+            removeTag(index) {
+                console.log(this.tags)
+                this.tags.splice(index, 1);
+            },
             setConfig(event) {
                 if(!event.checked) {
                     this.appCfgs.filter(item => {item !== event.defaultValue});
@@ -108,8 +136,8 @@
                     this.$moshaToast('App Name is required', {type: 'danger',position: 'top-center', timeout: 3000})
                     formValid = false;
                 }
-                if (this.appDesc === null || this.appDesc === '') {
-                    this.$moshaToast('App Description is required', {type: 'danger',position: 'top-center', timeout: 3000})
+                if (this.tags.length <= 0) {
+                    this.$moshaToast('App Tags are required', {type: 'danger',position: 'top-center', timeout: 3000})
                     formValid = false;
                 }
                 
@@ -122,7 +150,7 @@
                     };
                     await axios.post("http://192.168.0.177:8080/api/v1/app/create", {
                             app_name: this.appName,
-                            app_desc: this.appDesc,
+                            tags: this.tags,
                             app_url: this.appURL,
                             is_private: this.private_app,
                         }, options
@@ -184,9 +212,35 @@ h2 {
 .selected_member_list {
 
 }
-.selected_member {
-    padding: 2px 5px;
-    border-radius: 8px;
-    background: rgba(0,0,0,0.1);
+
+
+ul {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+}
+/* .tag-input > input {
+  width: 100%;
+  padding: 10px;
+} */
+.tag {
+    margin-top: 5px;
+    border: 1px solid #5465ff;
+    background: #5465ff54;
+    padding: 2px 10px;
+    border-radius: 15px;
+    color: #5465ff;
+    white-space: nowrap;
+    transition: 0.1s ease background;
+}
+.delete {
+  color: white;
+  background: none;
+  outline: none;
+  border: none;
+  cursor: pointer;
 }
 </style>

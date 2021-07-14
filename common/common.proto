@@ -12,7 +12,7 @@ message AppInfo {
     string uuid = 1;
     string name = 2;
     string URL = 3;
-    string description = 4;
+    repeated string tags = 4;
     string owner = 5;
     repeated AppMember member = 6;
     bool locked = 7;
@@ -98,6 +98,7 @@ message AppPermission {
 message AppSubset {
     string uuid = 1;
     string name = 2;
+    bool private = 3;
 }
 
 message AuthedUser {
