@@ -12,27 +12,48 @@ but only focuses on the `partition key` and `clustering key`.
 
 ### ***Table Schema***
 
-![](git-resources/cassandra_approach_1_table.png)
+![](../git-resources/cassandra_approach_1_table.png)
 
 Here the `partition key` is defined by the `stage-name`. The `clustering key` is defined by users ***UUID***.
 This allows to `insert` users entering a given `stage` in a distinct way. Hence, a user will not be two times in the same `stage`.
 
 ### ***Query: get distinct count for stage X***
-![](git-resources/cassandra_approach_1_query_1.png)
+![](../git-resources/cassandra_approach_1_query_1.png)
 
 The result of this query shows that in `stage == "/home"` are three distinct users.
 
 ### ***Query: get distinct count for all stages with GROUP BY***
-![](git-resources/cassandra_approach_1_query_2.png)
+![](../git-resources/cassandra_approach_1_query_2.png)
 
 With this query all `stages` and their `distinct count` can be queried. However, as stated by the console output (`"Aggregation query used without partition key"`) we get an indication that the query might not perform good at scale
 
 
 ### Challenges 
-Even-though this example represents a use-case from the problem statement, it ignores some relevant points. Firstly, the table will hold more than one `funnel definition` either from different `Apps` of the same organization or `Apps` from other organizations. However, by using the `stage` and `app-uuid` as `partition key` the query can still be efficient
+Even though this example represents a use-case from the problem statement, it ignores some relevant points. Firstly, the table will hold more than one `funnel definition` either from different `Apps` of the same organization or `Apps` from other organizations. However, by using the `stage` and `app-uuid` as `partition key` the query can still be efficient
 
 
-## Event Definitions
+## Approach #2
+With this approach, the objective is to account for different funnels in the same table (as mentioned in the [challenges-approach-1](###Challenges))
+
+### ***Table Schema***
+
+![](../git-resources/cassandra_approach_2_table.png)
+
+To address the issue of multiple funnels in the same table, this approach uses a combination of the `stage` and `app reference` for the `partition key` (the `clustering key` stays the same)
+
+### ***Query get distinct count for all stages with GROUP BY***
+
+![](../git-resources/cassandra_approach_2_query_2.png)
+
+This does not differ from the ***query from approach #1*** in terms of performance issues.
+
+### ***Query distinct count per partition key(stage,app)***
+![](../git-resources/cassandra_approach_2_query_1.png)
+
+With this query we would need to perform `N` queries for each stage of an application - however since it is using the `partition key` as part of the query it will be more performant then using the `GROUP BY` option
+
+
+# Event Definitions
 ### Raw-Event: Click
 ```json
 {   
