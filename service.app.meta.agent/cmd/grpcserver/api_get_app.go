@@ -37,14 +37,14 @@ func (server AppMetaServer) Get(ctx context.Context, in *proto.GetRequest) (*pro
 		StatusCode: http.StatusOK,
 		Msg:        "App found",
 		App: &common.AppInfo{
-			Uuid:        app.Uuid,
-			Locked:      app.Locked,
-			IsPrivate:   app.IsPrivate,
-			Name:        app.Name,
-			URL:         app.URL,
-			Description: app.Description,
-			Owner:       app.OwnerUuid,
-			Member:      members,
+			Uuid:      app.Uuid,
+			Locked:    app.Locked,
+			IsPrivate: app.IsPrivate,
+			Name:      app.Name,
+			URL:       app.URL,
+			Tags:      app.Tags,
+			Owner:     app.OwnerUuid,
+			Member:    members,
 		},
 	}, nil
 }
@@ -67,8 +67,9 @@ func (server AppMetaServer) GetList(ctx context.Context, in *proto.GetListReques
 	var appSubsets = make([]*common.AppSubset, len(apps))
 	for i, app := range apps {
 		appSubsets[i] = &common.AppSubset{
-			Uuid: app.Uuid,
-			Name: app.Name,
+			Uuid:    app.Uuid,
+			Name:    app.Name,
+			Private: app.Private,
 		}
 	}
 	return &proto.GetListResponse{

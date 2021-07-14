@@ -17,7 +17,7 @@ func (server AppMetaServer) Create(ctx context.Context, in *proto.CreateRequest)
 		in.GetAppUrl(),
 		in.GetOwnerUuid(),
 		in.GetOrganization(),
-		in.GetDescription(),
+		in.GetTags(),
 		in.GetIsPrivate(),
 	)
 	if err != nil {

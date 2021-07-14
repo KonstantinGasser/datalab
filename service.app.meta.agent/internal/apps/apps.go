@@ -41,16 +41,16 @@ type AppsRepository interface {
 
 type App struct {
 	// mongoDB pk (document key)
-	Uuid        string   `bson:"_id" required:"yes"`
-	Name        string   `bson:"name" required:"yes"`
-	URL         string   `bson:"url" required:"yes"`
-	OwnerUuid   string   `bson:"owner_uuid" required:"yes"`
-	OwnerOrgn   string   `bson:"owner_orgn" required:"yes"`
-	Description string   `bson:"description" required:"yes"`
-	Members     []Member `bson:"member"`
-	Hash        string   `bson:"hash" required:"yes"`
-	Locked      bool     `bson:"locked"`
-	IsPrivate   bool     `bson:"is_private"`
+	Uuid      string   `bson:"_id" required:"yes"`
+	Name      string   `bson:"name" required:"yes"`
+	URL       string   `bson:"url" required:"yes"`
+	OwnerUuid string   `bson:"owner_uuid" required:"yes"`
+	OwnerOrgn string   `bson:"owner_orgn" required:"yes"`
+	Tags      []string `bson:"tags" required:"yes"`
+	Members   []Member `bson:"member"`
+	Hash      string   `bson:"hash" required:"yes"`
+	Locked    bool     `bson:"locked"`
+	IsPrivate bool     `bson:"is_private"`
 }
 
 // Member refers to a user added to an app
@@ -62,19 +62,20 @@ type Member struct {
 // AppSubset is a light weighted representation
 // of the app
 type AppSubset struct {
-	Uuid string
-	Name string
+	Uuid    string
+	Name    string
+	Private bool
 }
 
 // NewDefault creates a new App with its default values and initialized the App with
 // a UUID and App Hash (hash of orgn/name)
-func NewDefault(name, URL, ownerUuid, ownerOrgn, desc string, isPrivate bool) (*App, error) {
+func NewDefault(name, URL, ownerUuid, ownerOrgn string, tags []string, isPrivate bool) (*App, error) {
 	app := App{
-		Name:        name,
-		URL:         URL,
-		OwnerUuid:   ownerUuid,
-		OwnerOrgn:   ownerOrgn,
-		Description: desc,
+		Name:      name,
+		URL:       URL,
+		OwnerUuid: ownerUuid,
+		OwnerOrgn: ownerOrgn,
+		Tags:      tags,
 		Members: []Member{ // Owner is listed as member per default
 			{
 				Uuid:   ownerUuid,
@@ -97,8 +98,9 @@ func SubsetOf(apps ...App) []AppSubset {
 	var appSubsets = make([]AppSubset, len(apps))
 	for i, app := range apps {
 		appSubsets[i] = AppSubset{
-			Uuid: app.Uuid,
-			Name: app.Name,
+			Uuid:    app.Uuid,
+			Name:    app.Name,
+			Private: app.IsPrivate,
 		}
 	}
 	return appSubsets

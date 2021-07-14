@@ -27,7 +27,7 @@ message CreateRequest {
     string owner_uuid = 2;
     string name = 3;
     string organization = 4;
-    string description = 5;
+    repeated string tags = 5;
     string app_url = 6;
     bool is_private = 7;
 }
