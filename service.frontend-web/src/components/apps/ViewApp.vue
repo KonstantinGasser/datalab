@@ -18,9 +18,9 @@
             <TabCreateApp v-if="isInCreateMode" @createdApp="updateState" :orgn_domain="activeApp.owner?.orgn_domain" />
             <div v-if="!isInCreateMode">
                 <h1 class="super-lg d-flex align-center">
-                    {{activeApp.owner?.orgn_domain}}/{{activeApp.app?.name}}
+                     {{activeApp.owner?.orgn_domain}}/{{activeApp.app?.name}}
                     <div v-if="activeApp?.app?.locked" class="locked d-flex align-center justify-center">
-                        <div><span class="icon icon-lock"></span>Locked</div>
+                        <div>locked</div>
                     </div>
                     <div  v-if="!app_unsaved && !activeApp?.app?.locked" class="saved d-flex align-center justify-center">
                         <div>Saved</div>
@@ -32,7 +32,13 @@
                         <div>sync data</div>
                     </div>
                 </h1>
-                <div class="desc_test">{{activeApp.app?.description}}</div>
+                <div class="desc_test">
+                    <span v-if="activeApp?.app?.is_private" class="app-tag green">private</span> 
+                    <span v-if="activeApp?.app?.is_private === undefined" class="app-tag green">public</span>
+                    <span class="app-tag blue">
+                        {{activeApp.app?.description}}
+                    </span>
+                    </div>
                 <!-- <hr> -->
                 <Tabs class="mt-3 mb-4" ref="Tabs" :update="activeTab" :initTab="activeTab" :tabs="tabs" @tabChange="tabChange"/>
                 <General v-if="activeTab === 'Overview'" 

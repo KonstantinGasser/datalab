@@ -124,9 +124,6 @@
         },
         computed: {
             jwt(){
-                if (this.$props.app_token?.jwt === undefined || this.$props.app_token?.jwt === null) {
-                    return this.token_string
-                }
                 return this.$props.app_token?.jwt
             },
             exp(){

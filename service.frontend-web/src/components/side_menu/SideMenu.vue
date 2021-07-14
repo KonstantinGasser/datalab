@@ -228,8 +228,8 @@ export default {
 .no-mode div {
   position: absolute;
   left: 15px;
-  position: absolute;
   bottom: 30px;
+  top: 0;
 }
 .no-bg {
   position: absolute;

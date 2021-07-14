@@ -77,6 +77,25 @@ a {
   background-position: left bottom; */
 }
 
+.app-tag {
+  margin: 5px 5px;
+  padding: 1px 20px;
+  width: max-content;
+  border-radius: 15px;
+}
+
+.app-tag.green {
+  color: #10d574;
+  border: 1px solid #10d574;
+  background: #10d57425;
+}
+
+.app-tag.blue {
+  color: #5465ff;
+  border: 1px solid #5465ff;
+  background: #5465ff25;
+}
+
 .view_component {
   background: var(--sub-bg);
   border: 1px solid var(--sub-border);
