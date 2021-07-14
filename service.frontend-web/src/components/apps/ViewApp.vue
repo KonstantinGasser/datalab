@@ -150,7 +150,6 @@
                 this.$store.commit("UNSYNC_APP")
             },
             async loadApp(uuid) {
-                console.log("UUID: ", uuid)
                 this.isInCreateMode = false;
                 const data = await this.getApp(uuid);
                 if (data.app === undefined || data.app == null) {
@@ -174,7 +173,6 @@
                 return resp
             },
             async getApp(uuid) {
-                console.log("fetching for: ", uuid)
                 let options = {
                     headers: {
                         'Authorization': localStorage.getItem("token"),

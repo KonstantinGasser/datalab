@@ -119,8 +119,6 @@
                 this.token_string = this.$props.app_token?.jwt
                 this.token_exp = this.$props.app_token?.expiration
             }
-            console.log(this.token_string)
-            console.log(this.token_exp)
         },
         computed: {
             jwt(){
@@ -166,7 +164,6 @@
                     orgn_domain: appOrgn[0],
                     // app_origin: this.$props.app?.app?.URL,
                 }, options).then(res => {
-                    console.log("Status: ", res.status)
                     this.token_string = res.data.app_token?.jwt;
                     this.token_exp = res.data.app_token?.expiration;
                     this.$emit("loadApp", this.$props.app_uuid);

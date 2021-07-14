@@ -46,7 +46,7 @@ Was die einzelnen Services machen, kann in deren `README` nachgelesen werden.
 - [readme -> Service-App-Token (not there yet...)](https://github.com/KonstantinGasser/datalab/tree/main/service.app.token.agent)
 
 - [readme -> Service-Notification-Live (not there yet...)](https://github.com/KonstantinGasser/datalab/tree/main/service.notification-live)
-- [readme -> Service-Eventmanager-Live (not there yet...)](https://github.com/KonstantinGasser/datalab/tree/main/service.eventmananger.live)
+- [readme -> Service-Eventmanager-Live (not there yet...)](https://github.com/KonstantinGasser/datalab/tree/main/service.eventmanager.live)
 
 
 

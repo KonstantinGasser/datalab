@@ -138,7 +138,6 @@
             validURL(str) {
                 const re = new RegExp("http://(localhost|127.0.0.1):[0-9]+")
                 const matches = re.exec(str)
-                console.log("matches: ", matches)
                 if (matches && matches?.length > 0) {
                     return true
                 }
