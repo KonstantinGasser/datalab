@@ -8,6 +8,7 @@ import (
 
 	"github.com/KonstantinGasser/datalab/library/utils/ctx_value"
 	"github.com/KonstantinGasser/datalab/service.eventmanager.live/internal/session"
+	"github.com/KonstantinGasser/datalab/service.eventmanager.live/ports/cassandra"
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
 )
@@ -31,7 +32,8 @@ type PubSub struct {
 	// sub creates a new active session based on the session.Record
 	// sub chan *session.User
 	// publish publishlishes an incoming event, distributing it to the right sink
-	publish chan session.Event
+	publish    chan session.Event
+	csqlClient *cassandra.Client
 	// drop deletes lost or droped connections, finishing a session
 	// drop chan session.User // ip:port
 	// // mu garudes session map
@@ -40,10 +42,11 @@ type PubSub struct {
 }
 
 // NewPubSub returns a new instance of a PubSub
-func NewPubSub() *PubSub {
+func NewPubSub(csqlClient *cassandra.Client) *PubSub {
 	return &PubSub{
 		// sub:  make(chan *session.User),
-		publish: make(chan session.Event),
+		publish:    make(chan session.Event),
+		csqlClient: csqlClient,
 		// drop: make(chan session.User),
 
 		// session: make(map[string]*session.User),

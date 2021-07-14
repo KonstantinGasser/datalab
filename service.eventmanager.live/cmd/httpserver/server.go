@@ -7,6 +7,7 @@ import (
 	_ "net/http/pprof"
 
 	"github.com/KonstantinGasser/datalab/service.eventmanager.live/internal/bus"
+	"github.com/KonstantinGasser/datalab/service.eventmanager.live/ports/cassandra"
 	"github.com/KonstantinGasser/datalab/service.eventmanager.live/ports/client"
 	"github.com/sirupsen/logrus"
 )
@@ -86,7 +87,10 @@ type Server struct {
 	eventBus        *bus.PubSub
 }
 
-func NewDefault(appTokenClient client.ClientAppToken, appConfigClient client.ClientAppConfig) *Server {
+func NewDefault(
+	appTokenClient client.ClientAppToken,
+	appConfigClient client.ClientAppConfig,
+	csqlClient *cassandra.Client) *Server {
 	srv := &Server{
 		// *** CORS-Configurations ***
 		allowedOrigins:   []string{"*"},
@@ -98,7 +102,7 @@ func NewDefault(appTokenClient client.ClientAppToken, appConfigClient client.Cli
 		// *** service dependencies ***
 		appTokenClient:  appTokenClient,
 		appConfigClient: appConfigClient,
-		eventBus:        bus.NewPubSub(),
+		eventBus:        bus.NewPubSub(csqlClient),
 	}
 	return srv
 }
