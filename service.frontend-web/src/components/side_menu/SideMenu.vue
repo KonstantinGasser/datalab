@@ -87,20 +87,22 @@ export default {
           root.style.setProperty("--font-blue", "#00000075");
           root.style.setProperty("--font-green", "#00000075");
           root.style.setProperty("--font-yellow", "#00000075");
+          root.style.setProperty("--input-bg", "#ffffff");
         } else {
           localStorage.setItem("theme", this.mode)
           this.mode = "light"
-          root.style.setProperty("--main-bg", "#1E1E1E");
-          root.style.setProperty("--sub-bg", "#2F2F2F");
+          root.style.setProperty("--main-bg", "#171717");
+          root.style.setProperty("--sub-bg", "#171717");
           root.style.setProperty("--btn-font-hover", "#121212");
           root.style.setProperty("--tab-font-selected", "#121212");
-          root.style.setProperty("--tab-bg", "#666666");
+          root.style.setProperty("--tab-bg", "#171717");
           root.style.setProperty("--h-color", "#ccc");
           root.style.setProperty("--txt-small", "#FFFFFFAA");
           root.style.setProperty("--main-color", "#FFFFFFAA");
           root.style.setProperty("--font-blue", "#58A6FF");
           root.style.setProperty("--font-green", "#10d574");
           root.style.setProperty("--font-yellow", "#f7fd04");
+          root.style.setProperty("--input-bg", "#171717");
         }
       },
   },

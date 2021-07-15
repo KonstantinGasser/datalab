@@ -34,6 +34,8 @@
   --gradient-green: linear-gradient(0deg, #50e3c2 0%,#10d574 100%);
   --h-color: #666666;
   --txt-small: #666666AA;
+
+  --input-bg: #ffffff;
 }
 
 
@@ -62,6 +64,10 @@ a {
   background: linear-gradient(135deg, #50e3c2 0%,#10d574 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+.form-control {
+  background-color: var(--input-bg) !important;
 }
 
 #app {

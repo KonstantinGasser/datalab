@@ -1,8 +1,34 @@
 # service.eventmanager.live
 
+# Query Driven Design
+The objective for this section is to get a better understanding of the queries we need. The queries are only concerning the `platform dashboard` showing the collected user data.
 
+## 1. Funnel Data
+### 1.1 Conversion Rate
+The conversion rate is calculated as followed: `distinct user count per stage` divided by `count of all users (in a time-frame)`.
+Here-fore, the total count for users from one `App` must be queried as well as each stage in its distinct user count.
 
-# Data modeling for Funnel Aggregation with Cassandra
+## 2. "interesting buttons"
+`interesting buttons` are specific `HTML-Elements` that get tracked. About the elements, we know how long a user hovered over the element and then either clicked or left the element. Therefore, we have to interesting pieces of data; 1) the duration the user spent on the element, 2) the action performed on the element (`clicked` or `left`)
+### 2.1 Average duration on the element
+to compute the average duration spent on the element, the data needs to be aggregated. 
+### 2.2 Percentage of both actions
+select all actions of both types plus the total count of actions. Divide `type` by `total`.
+
+### 2.3 Correlation between duration and action
+would be cool - however, not my concern rn
+
+## 3. Meta data aggregation
+### 3.1 Most common device, 3.2 Most common browser
+select the distinct total count of users and divide the count `type` by `total user count`
+
+### 3.3 Views per page
+here a `Cassandra counter` could be used for each `page`, which gets increased each time a page hit happens.
+
+## 4. Customer Journey
+well good question...
+
+# Data modeling for Funnel Aggregation with Cassandra (testing out things)
 A `funnel` can consist out of `N` stages, where each `stage` represents one state in the `funnel`. 
 The objective is to understand how many users (unique users) are in each `stage`.
 
