@@ -60,7 +60,7 @@ var DataKraken = /** @class */ (function () {
     // the event listener
     function DataKraken(app_token) {
         var _this = this;
-        this.API_WS = "ws://192.168.0.177:8004/api/v1/open?";
+        this.API_WS = "ws://192.168.0.232:8004/api/v1/open?";
         this.URL_TIMEOUT_RATE = 1000;
         this.URL_TIME = new Date().getTime();
         this.CURRENT_URL = history.state.current;
@@ -101,7 +101,7 @@ var DataKraken = /** @class */ (function () {
                             },
                             // withCredentials: true,
                         };
-                        return [4 /*yield*/, axios_1.default.get("http://192.168.0.177:8004/api/v1/hello", opts)];
+                        return [4 /*yield*/, axios_1.default.get("http://192.168.0.232:8004/api/v1/hello", opts)];
                     case 1:
                         resp = _f.sent();
                         if (resp.status != 200)

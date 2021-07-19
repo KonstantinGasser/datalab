@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/KonstantinGasser/datalab/library/utils/ctx_value"
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
 )
@@ -48,11 +49,17 @@ type User struct {
 }
 
 func NewUser(req *http.Request, conn *websocket.Conn, pub chan<- Event) (*User, error) {
+	fmt.Println(req)
 	if !isIpPort(req.RemoteAddr) {
 		return nil, ErrNoIpPort
 	}
+	appUuid := ctx_value.GetString(req.Context(), "app.uuid") //req.Context().Value("app.uuid").(string)
+	if len(appUuid) == 0 {
+		return nil, fmt.Errorf("app.uuid not found in r.Context")
+	}
 	user := User{
 		DeviceIP:   fromRemoteAddr(req.RemoteAddr),
+		AppUuid:    appUuid,
 		connection: conn,
 		publish:    pub,
 		Record:     recordFromURL(req.URL),

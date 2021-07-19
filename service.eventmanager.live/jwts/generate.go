@@ -23,10 +23,11 @@ type AppClaims struct {
 	AppUuid, AppOrigin string
 }
 
-func WebSocketTicket(sub, origin interface{}) (string, error) {
+func WebSocketTicket(sub, origin, app interface{}) (string, error) {
 	claims := jwt.MapClaims{
 		"sub":    sub,
 		"origin": origin,
+		"app":    app,
 		"iss":    issuerService,
 		"iat":    time.Now().Unix(),
 		"exp":    time.Now().Add(ticketExp).Unix(),

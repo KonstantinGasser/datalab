@@ -31,7 +31,8 @@ func (server *Server) Hello(w http.ResponseWriter, r *http.Request) {
 		server.onErr(w, http.StatusUnauthorized, "app-token tamppered")
 		return
 	}
-	wsTicket, errTicket := jwts.WebSocketTicket(r.Context().Value(typeKeyIP(keyIP)), origin)
+
+	wsTicket, errTicket := jwts.WebSocketTicket(r.Context().Value(typeKeyIP(keyIP)), origin, uuid)
 	if errTicket != nil {
 		logrus.Errorf("<%v>[service.StartSession] could not issue ws ticket\n", r.Host)
 		server.onErr(w, http.StatusInternalServerError, "could not issue ws ticket")

@@ -15,7 +15,7 @@ enum LISTENER {
 }
 
 export class DataKraken {   
-    private API_WS = "ws://192.168.0.177:8004/api/v1/open?" 
+    private API_WS = "ws://192.168.0.232:8004/api/v1/open?" 
     private URL_TIMEOUT_RATE: number = 1000
     private URL_TIME: number = new Date().getTime()
     private CURRENT_URL: string = history.state.current
@@ -64,7 +64,7 @@ export class DataKraken {
             },
             // withCredentials: true,
         }
-        const resp: any = await axios.get("http://192.168.0.177:8004/api/v1/hello", opts)
+        const resp: any = await axios.get("http://192.168.0.232:8004/api/v1/hello", opts)
         
         if (resp.status != 200)
             return false

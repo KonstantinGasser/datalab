@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	host := flag.String("host", "localhost:8004", "address to run the server on")
+	host := flag.String("host", "192.168.0.232:8004", "address to run the server on")
 	apptokenAddr := flag.String("apptoken-srv", "192.168.0.177:8006", "address to connect to app-token-service")
 	appconfigAddr := flag.String("config-srv", "192.168.0.177:8005", "address to connect to app-config-service")
 	cassandraHost := flag.String("cassandra-host", "192.168.0.177", "cassandra host address")

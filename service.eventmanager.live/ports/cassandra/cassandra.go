@@ -1,6 +1,8 @@
 package cassandra
 
 import (
+	"context"
+
 	"github.com/gocql/gocql"
 )
 
@@ -35,4 +37,26 @@ func New(host string, port int, opts ...func(*gocql.ClusterConfig)) (*Client, er
 	return &Client{
 		session: s,
 	}, nil
+}
+
+func (c Client) Close() {
+	c.session.Close()
+}
+
+const (
+	InsertFunnelChange = `
+		INSERT INTO funnel_count_by_user(
+			stage,
+			app,
+			user,
+			action,
+			leaving,
+			elapsed,
+			timestamp
+		) values(?,?,?,?,?,?,?);
+	`
+)
+
+func (c Client) InsertEvent(ctx context.Context, query string, args ...interface{}) error {
+	return c.session.Query(query, args...).Exec()
 }

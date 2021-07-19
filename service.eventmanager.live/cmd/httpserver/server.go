@@ -109,7 +109,7 @@ func NewDefault(
 
 func (s Server) Start(host string) error {
 	// start pub-sub server
-	s.eventBus.Start(1)
+	s.eventBus.Start(2)
 
 	listener, err := net.Listen("tcp", host)
 	if err != nil {

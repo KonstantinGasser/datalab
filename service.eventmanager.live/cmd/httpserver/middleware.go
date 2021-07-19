@@ -61,7 +61,7 @@ func (s *Server) WithTraceIP(next http.HandlerFunc) http.HandlerFunc {
 			s.onErr(w, http.StatusBadRequest, "not sufficiant information provided")
 			return
 		}
-		ipCtx := context.WithValue(r.Context(), typeKeyIP(keyIP), deviceIP[1])
+		ipCtx := context.WithValue(r.Context(), typeKeyIP(keyIP), deviceIP[0])
 
 		next(w, r.WithContext(ipCtx))
 	}
@@ -85,6 +85,7 @@ func (s *Server) WithTicketAuth(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 		ctx := ctx_value.AddValue(r.Context(), keyOrigin, claims["origin"])
+		ctx = ctx_value.AddValue(ctx, keyAppUuid, claims["app"])
 		next(w, r.WithContext(ctx))
 	}
 }
