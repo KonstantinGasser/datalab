@@ -2,7 +2,10 @@
 <div class="sidebar" :class="{'active': active}">
     <div class="logo_content">
       <div class="logo">
-        <div class="logo_name">datalab.dev</div>
+        <div class="logo_name">
+          
+          <img src="../../assets/logo_white.png" width="150px" alt="">
+        </div>
       </div>
       <i class='bx bx-menu' id="btn" @click="ellapse()"></i>
     </div>

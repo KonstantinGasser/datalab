@@ -49,7 +49,6 @@ type User struct {
 }
 
 func NewUser(req *http.Request, conn *websocket.Conn, pub chan<- Event) (*User, error) {
-	fmt.Println(req)
 	if !isIpPort(req.RemoteAddr) {
 		return nil, ErrNoIpPort
 	}
