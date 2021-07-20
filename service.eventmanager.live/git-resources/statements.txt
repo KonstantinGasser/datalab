@@ -1,0 +1,10 @@
+create table user_per_stage(app text, stage text, user text, leaving text, timestamp timestamp, primary key((app, stage), user));
+
+create table avg_time_per_stage(app text, stage text, elapsed counter, hit counter, primary key(app,stage));
+
+create table action_per_interesting_element(app text, xpath text, action text, timestamp timestamp, primary key((app, xpath), action));
+create table avg_time_per_interesting_element(app text, xpath text, elapsed counter, hit counter, primary key(app, xpath));
+
+create table views_per_page(app text, url text, hit counter, primary key(app, url));
+
+create table avg_time_per_interesting_element(app text, xpath text, action text, elapsed counter, hit counter, primary key((app,xpath), action));

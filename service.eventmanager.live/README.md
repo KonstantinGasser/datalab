@@ -1,5 +1,61 @@
 # service.eventmanager.live
 
+
+# Database schema for MVP
+
+## Queries for ***funnel data***
+### Unique users per stage
+As a first table, we have the information about how many unique users entered the given stages from a funnel definition.
+
+![](git-resources/images/table_user_per_stage.png)
+1. `partition key`: app, stage -> the app-uuid and the unique stage name form the partition key.
+2. `clustering key`: user -> to only insert a unique user who has not yet entered the stage, the use-uuid (IP) is used as a clustering key.
+ 
+### Average time per stage
+To compute the average time users spend on a given stage, the following table utilizes Cassandras `counter data type` for direct aggregations.
+
+![](git-resources/images/table_avg_time_per_stage.png)
+1. `partition key`: app
+2. `clustering key`: stage 
+
+By increasing the `elapsed` time captured in a `FunnelChangeEvent` and increasing the `hit` by one, we can later query for a stage and divide the `elapsed time` by the `hit` count to get the `avg. time` for a stage
+
+
+### Actions performed on interesting elements
+If configured an `App` can have multiple `interesting elements`. On this element two actions can happen. Firstly, `hover-then-leave` which indicates, that the element was hovered on for a certain time and then left. Secondly, `hover-then-click` which indicated, that after a certain time the element was hovered on it also was clicked. Interesting is the percentage of the `actions` in combination with the `avg. time`.
+
+![](git-resources/images/table_action_per_interesting_element.png)
+
+1. `partition key`: app, xpath (of the HTML-Element)
+2. `clustering key`: action -> to get the unique count of actions
+
+As for the `elapsed time` we require another table using the Cassandra `counter type` again.
+
+![](git-resources/images/table_avg_time_per_interesting_element.png)
+
+1. `partition key`: app, xpath
+2. `clustering key`: action 
+
+This allows us to get two values per element. One for the `hover-then-leave` action and one for the `hover-then-click` action.
+
+By increasing the `elapsed` time captured in an `InterestingElementEvent` and increasing the `hit` by one, we can later query for an `element` and divide the `elapsed time` by the `hit` count to get the `avg. time` for a stage
+ 
+### Example for the meta data
+There will be more tables taking care of meta data such as `most common (browser, OS, device)`. However, I will only cover `views per page` as of now until the main data schema has been implemented.
+
+![](git-resources/images/table_views_per_page.png)
+
+1. `partition key`: app
+2. `clustering key`: url
+
+Using a Cassandra `counter` for the `hits` of an URL will be relatively straight forward and therefore does not need further explanations
+
+
+
+
+
+
+
 # Query Driven Design
 The objective for this section is to get a better understanding of the queries we need. The queries are only concerning the `platform dashboard` showing the collected user data.
 
@@ -28,7 +84,7 @@ here a `Cassandra counter` could be used for each `page`, which gets increased e
 ## 4. Customer Journey
 well good question...
 
-# Data modeling for Funnel Aggregation with Cassandra (testing out things)
+<!-- # Data modeling for Funnel Aggregation with Cassandra (testing out things)
 A `funnel` can consist out of `N` stages, where each `stage` represents one state in the `funnel`. 
 The objective is to understand how many users (unique users) are in each `stage`.
 
@@ -76,7 +132,7 @@ This does not differ from the ***query from approach #1*** in terms of performan
 ### ***Query distinct count per partition key(stage,app)***
 ![](../git-resources/cassandra_approach_2_query_1.png)
 
-With this query we would need to perform `N` queries for each stage of an application - however since it is using the `partition key` as part of the query it will be more performant then using the `GROUP BY` option
+With this query we would need to perform `N` queries for each stage of an application - however since it is using the `partition key` as part of the query it will be more performant then using the `GROUP BY` option -->
 
 
 # Event Definitions
