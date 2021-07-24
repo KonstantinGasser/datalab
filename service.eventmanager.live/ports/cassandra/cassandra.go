@@ -45,15 +45,15 @@ func (c Client) Close() {
 
 const (
 	InsertFunnelChange = `
-		INSERT INTO funnel_count_by_user(
-			stage,
+		INSERT INTO stage_graph_by_time(
 			app,
+			time,
 			user,
-			action,
-			leaving,
-			elapsed,
-			timestamp
-		) values(?,?,?,?,?,?,?);
+			from_stage,
+			from_stage_label,
+			to_stage,
+			to_stage_label
+		) values(?,?,?,?,?,?,?)
 	`
 )
 

@@ -34,13 +34,15 @@ message ClientConfig {
 }
 
 message ClientStage {
-    int32 type = 1;
-    string transition = 2;
-    string regex = 3;
+    int32 id = 1;
+    int32 type = 2;
+    string transition = 3;
+    string regex = 4;
 }
 
 message ClientBtnDef {
-    string name = 1;
+    int32 id = 1;
+    string name = 2;
 }
 
 message AppendPermissionRequest {

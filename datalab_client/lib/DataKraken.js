@@ -67,7 +67,8 @@ var DataKraken = /** @class */ (function () {
         this.LAST_CLICK = new Date().getTime();
         this.BTN_DEFS = [];
         this.STAGES = [];
-        this.CURRENT_STAGE = "";
+        this.CURRENT_STAGE_LABEL = "";
+        this.CURRENT_STAGE_ID = -1;
         this.WS_TICKET = "";
         this.sayHello(app_token).then(function (ok) {
             if (!ok)
@@ -75,7 +76,7 @@ var DataKraken = /** @class */ (function () {
             _this.WEB_SOCKET = _this.open(_this.WS_TICKET);
             if (_this.WEB_SOCKET === null)
                 return;
-            _this.CURRENT_STAGE = history.state.current;
+            _this.CURRENT_STAGE_LABEL = history.state.current;
             _this.attach(LISTENER.HOVER, _this.onHover);
             _this.attach(LISTENER.CLICK, _this.onClick);
             _this.urlListener();
@@ -169,7 +170,7 @@ var DataKraken = /** @class */ (function () {
     // funnel-change => data_point: any = {
     //     type: EVENT.FUNNEL_CHANGE,
     //     timestamp: int64,
-    //     leaving: this.CURRENT_STAGE,
+    //     leaving: this.CURRENT_STAGE_LABEL,
     //     entered: history.state.current,
     //     elapsed_time: elapsed,
     // }
@@ -187,17 +188,21 @@ var DataKraken = /** @class */ (function () {
                 to: history.state.current,
                 elapsed_time: elapsed,
             };
-            if (_this.isStageRelevant(1, null)) {
+            var id_if_stage = _this.isStageRelevant(1, null);
+            if (id_if_stage !== -1) {
                 console.log("!!!Stage-Change!!!");
                 var data_point_1 = {
                     type: EVENT.FUNNEL_CHANGE,
                     timestamp: new Date().getTime(),
-                    leaving: _this.CURRENT_STAGE,
-                    entered: history.state.current,
+                    from_stage_label: _this.CURRENT_STAGE_LABEL,
+                    from_stage: "" + _this.CURRENT_STAGE_ID + "",
+                    to_stage_label: history.state.current,
+                    to_stage: "" + id_if_stage + "",
                     elapsed_time: elapsed,
                 };
                 _this.WEB_SOCKET.send(JSON.stringify(data_point_1));
-                _this.CURRENT_STAGE = history.state.current;
+                _this.CURRENT_STAGE_LABEL = history.state.current;
+                _this.CURRENT_STAGE_ID = id_if_stage;
             }
             // create url-change event
             _this.WEB_SOCKET.send(JSON.stringify(data_point));
@@ -215,7 +220,7 @@ var DataKraken = /** @class */ (function () {
     // funnel change => data_point: any = {
     //     type: EVENT.FUNNEL_CHANGE,
     //     timestamp: int64,
-    //     leaving: this.CURRENT_STAGE,
+    //     leaving: this.CURRENT_STAGE_LABEL,
     //     entered: target,
     //     elapsed_time: elapsed,
     // }
@@ -234,17 +239,21 @@ var DataKraken = /** @class */ (function () {
             current_url: URL,
         };
         // send funnel change
-        if (this.isStageRelevant(2, event)) {
+        var id_if_stage = this.isStageRelevant(2, event);
+        if (id_if_stage !== -1) {
             console.log("!!!Stage-Change!!!");
             var data_point_2 = {
                 type: EVENT.FUNNEL_CHANGE,
                 timestamp: new Date().getTime(),
-                leaving: this.CURRENT_STAGE,
-                entered: target,
+                from_stage_label: this.CURRENT_STAGE_LABEL,
+                from_stage: "" + this.CURRENT_STAGE_ID + "",
+                to_stage_label: target,
+                to_stage: "" + id_if_stage + "",
                 elapsed_time: elapsed,
             };
             this.WEB_SOCKET.send(JSON.stringify(data_point_2));
-            this.CURRENT_STAGE = target;
+            this.CURRENT_STAGE_LABEL = target;
+            this.CURRENT_STAGE_ID = id_if_stage;
         }
         // create stage change event
         console.log("Element-Clicked: ", data_point, event);
@@ -319,27 +328,30 @@ var DataKraken = /** @class */ (function () {
     };
     // isStageRelevant checks if an event matches the stage critieria
     DataKraken.prototype.isStageRelevant = function (type, evt) {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
         for (var i = 0; i < this.STAGES.length; i++) {
             if (((_a = this.STAGES[i]) === null || _a === void 0 ? void 0 : _a.type) === type && type === 1) { // match url pattern
                 var url = history.state.current;
                 if (url === ((_b = this.STAGES[i]) === null || _b === void 0 ? void 0 : _b.transition) && !((_c = this.STAGES[i]) === null || _c === void 0 ? void 0 : _c.regex)) {
-                    return true;
+                    return (_d = this.STAGES[i]) === null || _d === void 0 ? void 0 : _d.id;
                 }
-                if (url.search((_d = this.STAGES[i]) === null || _d === void 0 ? void 0 : _d.transition) == 0 && ((_e = this.STAGES[i]) === null || _e === void 0 ? void 0 : _e.regex)) {
+                if (url.search((_e = this.STAGES[i]) === null || _e === void 0 ? void 0 : _e.transition) == 0 && ((_f = this.STAGES[i]) === null || _f === void 0 ? void 0 : _f.regex)) {
                     // match partial url with  regex
-                    var match = this.regexMatch(url, (_f = this.STAGES[i]) === null || _f === void 0 ? void 0 : _f.transition, (_g = this.STAGES[i]) === null || _g === void 0 ? void 0 : _g.regex);
-                    return match;
+                    var match = this.regexMatch(url, (_g = this.STAGES[i]) === null || _g === void 0 ? void 0 : _g.transition, (_h = this.STAGES[i]) === null || _h === void 0 ? void 0 : _h.regex);
+                    if (match) {
+                        return (_j = this.STAGES[i]) === null || _j === void 0 ? void 0 : _j.id;
+                    }
+                    return -1;
                 }
             }
-            if (((_h = this.STAGES[i]) === null || _h === void 0 ? void 0 : _h.type) === type && type === 2) { // element xpath match
+            if (((_k = this.STAGES[i]) === null || _k === void 0 ? void 0 : _k.type) === type && type === 2) { // element xpath match
                 var xpath = this.buildXPath(evt === null || evt === void 0 ? void 0 : evt.srcElement);
-                if (((_j = this.STAGES[i]) === null || _j === void 0 ? void 0 : _j.transition) !== xpath)
+                if (((_l = this.STAGES[i]) === null || _l === void 0 ? void 0 : _l.transition) !== xpath)
                     continue;
-                return true;
+                return (_m = this.STAGES[i]) === null || _m === void 0 ? void 0 : _m.id;
             }
         }
-        return false;
+        return -1;
     };
     DataKraken.prototype.regexMatch = function (str, stage_url, regex) {
         try {

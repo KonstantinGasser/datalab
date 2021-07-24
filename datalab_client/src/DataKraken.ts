@@ -24,7 +24,8 @@ export class DataKraken {
     private BTN_DEFS: Array<any> = []
     private STAGES: Array<any> = []
 
-    private CURRENT_STAGE: string = ""
+    private CURRENT_STAGE_LABEL: string = ""
+    private CURRENT_STAGE_ID: number = -1
 
     private WS_TICKET: string = ""
 
@@ -41,7 +42,7 @@ export class DataKraken {
             if (this.WEB_SOCKET === null)
                 return
 
-            this.CURRENT_STAGE = history.state.current
+            this.CURRENT_STAGE_LABEL = history.state.current
             this.attach(LISTENER.HOVER, this.onHover)
             this.attach(LISTENER.CLICK, this.onClick)
             this.urlListener()
@@ -133,7 +134,7 @@ export class DataKraken {
     // funnel-change => data_point: any = {
     //     type: EVENT.FUNNEL_CHANGE,
     //     timestamp: int64,
-    //     leaving: this.CURRENT_STAGE,
+    //     leaving: this.CURRENT_STAGE_LABEL,
     //     entered: history.state.current,
     //     elapsed_time: elapsed,
     // }
@@ -152,17 +153,21 @@ export class DataKraken {
                 elapsed_time: elapsed,
             }
 
-            if (this.isStageRelevant(1, null)) {
+            const id_if_stage: number = this.isStageRelevant(1, null)
+            if (id_if_stage !== -1) {
                 console.log("!!!Stage-Change!!!")
                 const data_point: any = {
                     type: EVENT.FUNNEL_CHANGE,
                     timestamp: new Date().getTime(),
-                    leaving: this.CURRENT_STAGE,
-                    entered: history.state.current,
+                    from_stage_label: this.CURRENT_STAGE_LABEL,
+                    from_stage: "" + this.CURRENT_STAGE_ID + "",
+                    to_stage_label: history.state.current,
+                    to_stage: "" + id_if_stage + "",
                     elapsed_time: elapsed,
                 }
                 this.WEB_SOCKET.send(JSON.stringify(data_point))
-                this.CURRENT_STAGE = history.state.current
+                this.CURRENT_STAGE_LABEL = history.state.current
+                this.CURRENT_STAGE_ID = id_if_stage
             }
                 
             // create url-change event
@@ -183,7 +188,7 @@ export class DataKraken {
     // funnel change => data_point: any = {
     //     type: EVENT.FUNNEL_CHANGE,
     //     timestamp: int64,
-    //     leaving: this.CURRENT_STAGE,
+    //     leaving: this.CURRENT_STAGE_LABEL,
     //     entered: target,
     //     elapsed_time: elapsed,
     // }
@@ -202,17 +207,21 @@ export class DataKraken {
             current_url: URL,
         }
         // send funnel change
-        if (this.isStageRelevant(2, event)) {
+        const id_if_stage: number = this.isStageRelevant(2, event)
+        if (id_if_stage !== -1) {
             console.log("!!!Stage-Change!!!")
             const data_point: any = {
                 type: EVENT.FUNNEL_CHANGE,
                 timestamp: new Date().getTime(),
-                leaving: this.CURRENT_STAGE,
-                entered: target,
+                from_stage_label: this.CURRENT_STAGE_LABEL,
+                from_stage: "" + this.CURRENT_STAGE_ID + "",
+                to_stage_label: target,
+                to_stage: "" + id_if_stage + "",
                 elapsed_time: elapsed,
             }
             this.WEB_SOCKET.send(JSON.stringify(data_point))
-            this.CURRENT_STAGE = target
+            this.CURRENT_STAGE_LABEL = target
+            this.CURRENT_STAGE_ID = id_if_stage
         }
             
         // create stage change event
@@ -290,28 +299,31 @@ export class DataKraken {
     } 
 
     // isStageRelevant checks if an event matches the stage critieria
-    private isStageRelevant(type: number, evt: any): boolean {
+    private isStageRelevant(type: number, evt: any): number {
         for (let i = 0; i < this.STAGES.length; i++) {
             if (this.STAGES[i]?.type === type && type === 1) { // match url pattern
                 const url: string = history.state.current
         
                 if (url === this.STAGES[i]?.transition && !this.STAGES[i]?.regex) {
-                    return true
+                    return this.STAGES[i]?.id
                 }
                 if (url.search(this.STAGES[i]?.transition) == 0 && this.STAGES[i]?.regex) {
                     // match partial url with  regex
                     const match: boolean = this.regexMatch(url, this.STAGES[i]?.transition, this.STAGES[i]?.regex)
-                    return match
+                    if (match) {
+                        return this.STAGES[i]?.id
+                    }
+                    return -1
                 }
             }
             if (this.STAGES[i]?.type === type && type === 2) { // element xpath match
                 const xpath: string = this.buildXPath(evt?.srcElement)
                 if (this.STAGES[i]?.transition !== xpath)
                     continue
-                return true
+                return this.STAGES[i]?.id
             }
         }
-        return false
+        return -1
     }
 
     private regexMatch(str: string, stage_url: string, regex: string): boolean {

@@ -19,11 +19,13 @@ type Config struct {
 }
 
 type Stage struct {
+	ID         int32     `bson:"id"`
 	Type       StageType `bson:"trigger"`
 	Transition string    `bson:"transition"`
 	Regex      string    `bson:"regex"`
 }
 
 type BtnDef struct {
+	ID   int32  `bson:"id"`
 	Name string `bson:"btn_name"`
 }

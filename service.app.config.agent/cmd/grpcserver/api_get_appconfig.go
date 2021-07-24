@@ -62,11 +62,11 @@ func (server AppConfigServer) GetForClient(ctx context.Context, in *proto.GetFor
 
 	var stages = make([]*proto.ClientStage, len(config.Stages))
 	for i, item := range config.Stages {
-		stages[i] = &proto.ClientStage{Type: int32(item.Type), Transition: item.Transition, Regex: item.Regex}
+		stages[i] = &proto.ClientStage{Id: item.ID, Type: int32(item.Type), Transition: item.Transition, Regex: item.Regex}
 	}
 	var btnDefs = make([]*proto.ClientBtnDef, len(config.BtnDefs))
 	for i, item := range config.BtnDefs {
-		btnDefs[i] = &proto.ClientBtnDef{Name: item.Name}
+		btnDefs[i] = &proto.ClientBtnDef{Id: item.ID, Name: item.Name}
 	}
 
 	return &proto.GetForClientResponse{

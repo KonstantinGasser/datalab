@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.19.0/cytoscape.min.js" integrity="sha512-TOWs340KHbJjY/a2SCtsUcXYBg7/xPX72NKpJ3VITogkHJTy2yMyoJE0pxJjumMGHCg46ud89KO5q1Toe3Aeaw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=Promise,fetch"></script>
+    <title>Document</title>
+
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #cy {
+            width: 900px;
+            height: 900px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="cy"></div>
+    
+</body>
+<script>
+    var cy = cytoscape({
+
+        container: document.getElementById('cy'), // container to render in
+        group: "nodes",
+
+        elements: { // list of graph elements to start with
+            nodes: [
+                { // node a
+                    data: { id: 'a' }
+                },
+                { // node b
+                    data: { id: 'b' }
+                },
+            ],
+            edges: [
+            { // edge ab
+                data: { id: 'ab', source: 'a', target: 'b',  arrow: "triangle"}
+            },
+            { // edge ab
+                data: { id: 'ba', source: 'b', target: 'a', weight: '3' }
+            }
+            ]
+        },
+
+        style: [ // the stylesheet for the graph
+        {
+            selector: 'node',
+            style: {
+            'background-color': '#666',
+            'label': 'data(id)'
+            }
+        },
+
+        {
+            selector: 'edge',
+            style: {
+            'width': 3,
+            'line-color': '#ccc',
+            'target-arrow-color': '#ccc',
+            'target-arrow-shape': 'triangle',
+            'curve-style': 'bezier'
+            }
+        }
+        ],
+
+        layout: {
+        name: 'grid',
+        rows: 1
+        }
+
+    });
+</script>
+</html>

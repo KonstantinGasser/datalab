@@ -76,14 +76,16 @@ func (evt BtnTimeEvent) Json() ([]byte, error) {
 
 // RawURLEvent holds meta data about triggered URL changes
 type FunnelChangeEvent struct {
-	AppUuid     string    `cql:"app"`
-	DeviceIP    string    `cql:"ip"`
-	Type        EventType `json:"type"`
-	Action      string    `json:"action" cql:"action"`
-	Leaving     string    `json:"leaving" cql:"leaving"`
-	Entered     string    `json:"entered" cql:"stage"`
-	Timestamp   int64     `json:"timestamp" cql:"timestamp"`
-	ElapsedTime int64     `json:"elapsed_time" cql:"elapsed"`
+	AppUuid        string    `cql:"app"`
+	DeviceIP       string    `cql:"ip"`
+	Type           EventType `json:"type"`
+	Action         string    `json:"action" cql:"action"`
+	FromStageLabel string    `json:"from_stage_label" cql:"from_stage_label"`
+	FromStageID    string    `json:"from_stage" cql:"from_stage"`
+	ToStageLabel   string    `json:"to_stage_label" cql:"to_stage_label"`
+	ToStageID      string    `json:"to_stage" cql:"to_stage"`
+	Timestamp      int64     `json:"timestamp" cql:"timestamp"`
+	ElapsedTime    int64     `json:"elapsed_time" cql:"elapsed"`
 }
 
 func (evt FunnelChangeEvent) Json() ([]byte, error) {

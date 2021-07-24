@@ -4,6 +4,16 @@
 # Database schema for MVP
 
 ## Queries for ***funnel data***
+
+### using cassandra as graph database
+![](git-resources/images/table_stage_as_graph.png)
+1. `partition key`: app, stage -> the app-uuid and the unique stage name form the partition key.
+2. `clustering key`: from_stage, to_stage 
+
+By using this table schema we are able to represent any funnel action performed by users as a graph. Where each row represents an edge from A -> B with a given weight (weight is the length of the users set (a set in Cassandra is a list of unique elements)).
+Hence, to get a detailed view on how users jump from stage to stage a simple query like this one `SELECT * from stage_graph_3 where app = 'uuid';`
+would return all hit edges (A->B) and its weights.
+ 
 ### Unique users per stage
 As a first table, we have the information about how many unique users entered the given stages from a funnel definition.
 

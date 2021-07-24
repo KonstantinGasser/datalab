@@ -75,13 +75,13 @@ func (hub *PubSub) run(workerID int) {
 				err := hub.cqlC.InsertEvent(
 					context.Background(),
 					cassandra.InsertFunnelChange,
-					evt.Entered,
 					evt.AppUuid,
-					evt.DeviceIP,
-					evt.Action,
-					evt.Leaving,
-					evt.ElapsedTime,
 					evt.Timestamp,
+					evt.DeviceIP,
+					evt.FromStageID,
+					evt.FromStageLabel,
+					evt.ToStageID,
+					evt.ToStageLabel,
 				)
 				if err != nil {
 					logrus.Errorf("[event-bus.run] could not persist event: %v\n", err)
