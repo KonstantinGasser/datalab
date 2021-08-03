@@ -127,25 +127,30 @@ func (hub *PubSub) run(workerID int) {
 					deltaElapsedLeave,
 					deltaHoverClick,
 					deltaHoverLeave,
+					evt.AppUuid,
+					evt.Target,
 				)
 				if err != nil {
 					logrus.Errorf("[event-bus.run] could not persist UpsertInterestingBtn: %v\n", err)
 				}
 			case session.FunnelChangeEvent:
-				err := hub.cqlC.InsertEvent(
+				if err := hub.cqlC.InsertEvent(
 					context.Background(),
 					cassandra.InsertFunnelChange,
 					evt.AppUuid,
 					evt.Timestamp,
 					evt.ToStageLabel,
 					evt.DeviceIP,
-					// evt.FromStageID,
-					// evt.FromStageLabel,
-					// evt.ToStageID,
-					// evt.ToStageLabel,
-				)
-				if err != nil {
-					logrus.Errorf("[event-bus.run] could not persist FunnelChangeEvent: %v\n", err)
+				); err != nil {
+					logrus.Errorf("[event-bus.run] could not persist InsertFunnelChange: %v\n", err)
+				}
+				if err := hub.cqlC.InsertEvent(context.Background(),
+					cassandra.UpsertAvgTimeStage,
+					evt.ElapsedTime,
+					evt.AppUuid,
+					evt.FromStageLabel,
+				); err != nil {
+					logrus.Errorf("[event-bus.run] could not persist UpsertAvgTimeStage: %v\n", err)
 				}
 			}
 		case <-ticker.C:
