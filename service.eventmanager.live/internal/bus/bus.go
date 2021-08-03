@@ -36,7 +36,7 @@ type PubSub struct {
 	publish chan session.Event
 	cqlC    *cassandra.Client
 	// drop deletes lost or droped connections, finishing a session
-	// drop chan session.User // ip:port
+	drop chan *session.User // ip:port
 	// // mu garudes session map
 	// mu      sync.RWMutex
 	// session map[string]*session.User
@@ -47,8 +47,8 @@ func NewPubSub(cqlC *cassandra.Client) *PubSub {
 	return &PubSub{
 		// sub:  make(chan *session.User),
 		publish: make(chan session.Event),
+		drop:    make(chan *session.User),
 		cqlC:    cqlC,
-		// drop: make(chan session.User),
 
 		// session: make(map[string]*session.User),
 	}
@@ -64,27 +64,88 @@ func (hub *PubSub) Start(scaler int) {
 // run runs the event-loop in its own goroutine handling incoming events
 func (hub *PubSub) run(workerID int) {
 	// ticker for health logs
-	var ticker = time.NewTicker(15 * time.Second)
+	var ticker = time.NewTicker(30 * time.Second)
 
 	for {
 		select {
+		case user := <-hub.drop:
+			err := hub.cqlC.InsertEvent(
+				context.Background(),
+				cassandra.InsertSession,
+				user.AppUuid,
+				time.Now(),
+				user.DeviceIP,
+				user.Start,
+				user.Duration,
+				user.Record.Referrer,
+			)
+			if err != nil {
+				logrus.Errorf("[event-bus.run] could not persist InsertSession: %v\n", err)
+			}
 		case event := <-hub.publish:
 			fmt.Printf("EVENT: %T, %+v\n", event, event)
 			switch evt := event.(type) {
+			case session.SessionStart:
+				err := hub.cqlC.InsertEvent(
+					context.Background(),
+					cassandra.InsertBatchStart,
+					evt.AppUuid,
+					evt.Session.Device,
+					evt.AppUuid,
+					evt.Session.Browser,
+					evt.AppUuid,
+					time.Now(),
+				)
+				if err != nil {
+					logrus.Errorf("[event-bus.run] could not persist InsertBatchStart: %v\n", err)
+				}
+			case session.RawURLEvent:
+				err := hub.cqlC.InsertEvent(context.Background(),
+					cassandra.UpsertPageHit,
+					evt.ElapsedTime,
+					evt.AppUuid,
+					evt.From,
+					evt.Timestamp,
+				)
+				if err != nil {
+					logrus.Errorf("[event-bus.run] could not persist UpsertPageHit: %v\n", err)
+				}
+			case session.BtnTimeEvent:
+				var deltaElapsedClick, deltaElapsedLeave, deltaHoverClick, deltaHoverLeave int
+				deltaElapsedClick = int(evt.ElapsedTime)
+				deltaHoverClick = 1
+				if evt.Action == "hover-leave" {
+					deltaElapsedClick = 0
+					deltaHoverClick = 0
+
+					deltaElapsedLeave = int(evt.ElapsedTime)
+					deltaHoverLeave = 1
+				}
+				err := hub.cqlC.InsertEvent(context.Background(),
+					cassandra.UpsertInterestingBtn,
+					deltaElapsedClick,
+					deltaElapsedLeave,
+					deltaHoverClick,
+					deltaHoverLeave,
+				)
+				if err != nil {
+					logrus.Errorf("[event-bus.run] could not persist UpsertInterestingBtn: %v\n", err)
+				}
 			case session.FunnelChangeEvent:
 				err := hub.cqlC.InsertEvent(
 					context.Background(),
 					cassandra.InsertFunnelChange,
 					evt.AppUuid,
 					evt.Timestamp,
-					evt.DeviceIP,
-					evt.FromStageID,
-					evt.FromStageLabel,
-					evt.ToStageID,
 					evt.ToStageLabel,
+					evt.DeviceIP,
+					// evt.FromStageID,
+					// evt.FromStageLabel,
+					// evt.ToStageID,
+					// evt.ToStageLabel,
 				)
 				if err != nil {
-					logrus.Errorf("[event-bus.run] could not persist event: %v\n", err)
+					logrus.Errorf("[event-bus.run] could not persist FunnelChangeEvent: %v\n", err)
 				}
 			}
 		case <-ticker.C:
@@ -100,9 +161,14 @@ func (hub *PubSub) UpgradeProtocoll(w http.ResponseWriter, r *http.Request) erro
 	if err != nil {
 		return err
 	}
-	user, err := session.NewUser(r, conn, hub.publish)
+	user, err := session.NewUser(r, conn, hub.publish, hub.drop)
 	if err != nil {
 		return err
+	}
+	hub.publish <- session.SessionStart{
+		AppUuid:  user.AppUuid,
+		DeviceIP: user.DeviceIP,
+		Session:  user.Record,
 	}
 	go user.Listen()
 	return nil

@@ -3,12 +3,52 @@
 
 # Database schema for MVP
 
-## Queries for ***funnel data***
+## Find unique user per stage sortable by time
+
+| app | date  | stage     | user |
+|-----|-------|-----------|------|
+| 007 | today | /home     | u1   |
+| 007 | today | /home     | u2   |
+| 007 | today | /products | u1   |
+
+For this table the `partition key is: app`. The `date, stage` and `user` fields serve as `clustering key`. 
+With the keys set like so one can use the following query to retrieve the information of unique users per stage: `select app, date, stage, count(user) from table where app = '007' and date = 'today' group by date, stage;`. Since the `partition keys` are referenced in the query, the group by and the count will still be performant.
+
+![Unique user per stage](git-resources/images/table_user_stage_by_date.png)
+
+## Find avg time users spend per stage
+
+| app | stage     | elapsed | hit |
+|-----|-----------|---------|-----|
+| 007 | /home     | 24      | 4   |
+| 007 | /products | 12      | 2   |
+
+Here the `app` serves as the `partition key` (data will not be well balanced, in prod might need to use some hash along the `app` to distribute the data evenly). `stage` is the `clustering key` and both `elapsed` and `hit` are `Cassandra counter types`. To query the data: `select * from table where app = '007' and stage = '/home';`. Finally, divide `elapsed` by `hit` to get the avg time. (elapsed is in seconds)
+
+
+## Find total hits per action for an interesting button
+
+| app | xpath          | hover_leave | elapsed_leave | hover_click | elapsed_click | hit |
+|-----|----------------|-------------|---------------|-------------|---------------|-----|
+| 007 | div/button     | 16          | 24            | 4           | 10            | 20  |
+| 007 | div/div/button | 12          | 5             | 2           | 4             | 14  |
+
+`partition key` is the `app uuid` (might need an extra field to be better distributed across a cluster but YOLO for now). `xapth` forms the `clustering key`. `hover/elapsed_leave, hover/elapsed_click, hit` are all `counter types`
+
+Query would simply query for one app/xpath and compute the percents of both actions
+
+
+
+
+<!-- ## Queries for ***funnel data***
 
 ### using cassandra as graph database
 ![](git-resources/images/table_stage_as_graph.png)
+
 1. `partition key`: app, stage -> the app-uuid and the unique stage name form the partition key.
 2. `clustering key`: from_stage, to_stage 
+
+(app, stage, date,), user -> count of rows is number of unique users in stage at date x
 
 By using this table schema we are able to represent any funnel action performed by users as a graph. Where each row represents an edge from A -> B with a given weight (weight is the length of the users set (a set in Cassandra is a list of unique elements)).
 Hence, to get a detailed view on how users jump from stage to stage a simple query like this one `SELECT * from stage_graph_3 where app = 'uuid';`
@@ -49,7 +89,7 @@ As for the `elapsed time` we require another table using the Cassandra `counter 
 This allows us to get two values per element. One for the `hover-then-leave` action and one for the `hover-then-click` action.
 
 By increasing the `elapsed` time captured in an `InterestingElementEvent` and increasing the `hit` by one, we can later query for an `element` and divide the `elapsed time` by the `hit` count to get the `avg. time` for a stage
- 
+
 ### Example for the meta data
 There will be more tables taking care of meta data such as `most common (browser, OS, device)`. However, I will only cover `views per page` as of now until the main data schema has been implemented.
 

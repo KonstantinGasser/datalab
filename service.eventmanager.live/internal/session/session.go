@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/KonstantinGasser/datalab/library/utils/ctx_value"
 	"github.com/gorilla/websocket"
@@ -42,13 +43,16 @@ type User struct {
 	MappedOrgn string
 	Record     Record
 
+	Start    time.Time
+	Duration time.Duration
+
 	connection *websocket.Conn
 
 	publish chan<- Event
-	drop    chan<- User
+	drop    chan<- *User
 }
 
-func NewUser(req *http.Request, conn *websocket.Conn, pub chan<- Event) (*User, error) {
+func NewUser(req *http.Request, conn *websocket.Conn, pub chan<- Event, drop chan<- *User) (*User, error) {
 	if !isIpPort(req.RemoteAddr) {
 		return nil, ErrNoIpPort
 	}
@@ -60,7 +64,10 @@ func NewUser(req *http.Request, conn *websocket.Conn, pub chan<- Event) (*User, 
 		DeviceIP:   fromRemoteAddr(req.RemoteAddr),
 		AppUuid:    appUuid,
 		connection: conn,
+		Start:      time.Now(),
+		Duration:   time.Duration(0),
 		publish:    pub,
+		drop:       drop,
 		Record:     recordFromURL(req.URL),
 	}
 
@@ -157,7 +164,8 @@ func recordFromURL(url *url.URL) Record {
 }
 
 // finish: not yet sure what it needs to do but pretty sure I will need it
-func (u User) finish() User {
+func (u *User) finish() *User {
+	u.Duration = time.Since(u.Start)
 	return u
 }
 
@@ -169,9 +177,9 @@ func isIpPort(ipPort string) bool {
 
 // fromRemoteAddr returns the IP address of a IP:Port pair
 func fromRemoteAddr(ipPort string) string {
-	pair := strings.Split(ipPort, ":")
-	if len(pair) != 2 {
+	addr := strings.Split(ipPort, ":")
+	if len(addr) != 2 {
 		return ""
 	}
-	return pair[0]
+	return addr[0]
 }

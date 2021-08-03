@@ -20,7 +20,7 @@
             <div class="form-group col">
                 <label for="">App Tags</label>
                 <div class="tag-input">
-                    <input class="form-control" v-model="newTag" type="text"
+                    <input class="form-control" v-model="newTag" type="text" :disabled="tags?.length >= 5"
                         placeholder="#awesome"
                         @keydown.enter="addTag(newTag)" 
                         @keydown.prevent.tab="addTag(newTag)"/>

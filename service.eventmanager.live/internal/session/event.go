@@ -21,6 +21,7 @@ const (
 	BtnTime
 	// FunnelChange for when the stage changes
 	FunnelChange
+	StartSession
 )
 
 // Event defines any incoming event send by a client
@@ -89,5 +90,15 @@ type FunnelChangeEvent struct {
 }
 
 func (evt FunnelChangeEvent) Json() ([]byte, error) {
+	return json.Marshal(evt)
+}
+
+type SessionStart struct {
+	AppUuid  string
+	DeviceIP string
+	Session  Record
+}
+
+func (evt SessionStart) Json() ([]byte, error) {
 	return json.Marshal(evt)
 }

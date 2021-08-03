@@ -19,7 +19,7 @@ func main() {
 	flag.Parse()
 
 	cqlClient, err := cassandra.New(*cassandraHost, *cassandraPort,
-		cassandra.WithKeySpace("testing"),
+		cassandra.WithKeySpace("datalab"),
 		cassandra.WithConsistency(gocql.Quorum),
 	)
 	if err != nil {

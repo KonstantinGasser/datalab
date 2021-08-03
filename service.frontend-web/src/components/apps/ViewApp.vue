@@ -287,6 +287,13 @@
 h2 {
     margin: 5px 0px;
 }
+
+.desc_test {
+    display: flex;
+    flex-wrap: wrap;
+    max-width: 500px;
+}
+
 .pos_1_1 {
     grid-row: 1;
 }

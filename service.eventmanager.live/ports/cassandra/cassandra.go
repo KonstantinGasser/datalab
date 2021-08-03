@@ -45,15 +45,53 @@ func (c Client) Close() {
 
 const (
 	InsertFunnelChange = `
-		INSERT INTO stage_graph_by_time(
+		INSERT INTO users_per_stage_by_date(
 			app,
-			time,
+			date,
+			stage,
+			user
+		) values(?,?,?,?)
+	`
+	UpsertAvgTimeStage = `
+		UPDATE avg_time_per_stage 
+			SET elapsed = elapsed + ?, hit = hit+1
+		WHERE app = ? and stage = ?
+	`
+	UpsertPageHit = `
+		UPDATE page_view_per_url_by_date
+			SET 
+				hit = hit + 1,
+				avg_duration = avg_duration + ?
+		WHERE app = ? and url = ? and date = ?
+	`
+
+	UpsertInterestingBtn = `
+			UPDATE action_count_interesting_btn
+				SET 
+					elapsed_click = elapsed_click + ?,
+					elapsed_leave = elapsed_leave + ?,
+					hover_click = hover_click + ?,
+					hover_leave = hover_leave + ?,
+					hit = hit + 1
+			WHERE app = ? and xpath = ?
+	`
+	InsertSession = `
+		INSERT INTO session(
+			app,
+			date,
 			user,
-			from_stage,
-			from_stage_label,
-			to_stage,
-			to_stage_label
-		) values(?,?,?,?,?,?,?)
+			start,
+			duration,
+			referrer
+		) values(?,?,?,?,?,?)
+	`
+
+	InsertBatchStart = `
+		BEGIN COUNTER BATCH
+			UPDATE used_device set count = count+1 where app = ? and device_type = ?;
+			UPDATE used_browser set count = count+1 where app = ? and browser = ?;
+			UPDATE views_per_date set views = views+1 where app = ? and date = ?;
+		APPLY BATCH
 	`
 )
 
