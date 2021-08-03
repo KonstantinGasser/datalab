@@ -10,3 +10,16 @@ deploy:
 	sudo docker push datalab-registry.dev:5000/service.api.bff:$(VERSION)_$(tag)
 	echo '* BUILD DONE FOR\n\tcreated on: $(shell date)\n\tversion:    $(VERSION)_$(tag)\n' >> build/version
 	# ============ Deployment <$(VERSION)_$(tag)> DONE ============
+
+
+go = $(shell which go)
+docker = $(shell which docker)
+
+deploy-stack:
+	${go} version
+	GOOS=linux GOARCH=arm64 ${go} build -o build/service cmd/main.go
+	${docker} build -t api-bff:latest  .
+	
+
+
+

@@ -12,3 +12,11 @@ deploy:
 	rm -r dist
 	echo '* BUILD DONE FOR\n\tcreated on: $(shell date)\n\tversion:    $(VERSION)_$(tag)\n' >> version
 	# ============ Deployment <$(VERSION)_$(tag)> DONE ============
+
+npm = $(shell which npm)
+docker = $(shell which docker)
+
+deploy-stack:
+	${npm} -v
+	${npm} run build
+	${docker} build -t frontend.web:latest  .
