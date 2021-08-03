@@ -1,3 +1,23 @@
 version: '3.5'
 services: 
-    
+    # mongo-db for all micro-services
+    # each however will use a seperate database within the container
+    # TODO: volume mount for data
+    dev-mongo-central:
+        image: mongo:latest
+        environment: 
+            - MONGO_INITDB_ROOT_USERNAME=mongo-datalab-user
+            - MONGO_INITDB_ROOT_PASSWORD=secure
+        ports: 
+            - 27017:27017
+        networks: 
+            - default
+    user-auth-agent:
+        image: user.auth.agent:latest
+        ports: 
+            - 8002:8002
+        networks: 
+            - default
+networks: 
+    default:
+        name: datalab_default

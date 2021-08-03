@@ -26,18 +26,20 @@ user-auth:
 #################################
 
 
+dockerCompose = ${shell which docker-compose}
 start-stack:
 	echo 'STARTING TO BUILD DOCKER IMAGES...'
-	cd ./service.api.bff && ${MAKE} deploy-stack
-	cd ./service.app.meta.agent && ${MAKE} deploy-stack
-	cd ./service.app.config.agent && ${MAKE} deploy-stack
-	cd ./service.app.token.agent && ${MAKE} deploy-stack
-	cd ./service.user.meta.agent && ${MAKE} deploy-stack
+	# cd ./service.api.bff && ${MAKE} deploy-stack
+	# cd ./service.app.meta.agent && ${MAKE} deploy-stack
+	# cd ./service.app.config.agent && ${MAKE} deploy-stack
+	# cd ./service.app.token.agent && ${MAKE} deploy-stack
+	# cd ./service.user.meta.agent && ${MAKE} deploy-stack
 	cd ./service.user.auth.agent && ${MAKE} deploy-stack
-	cd ./service.notification-live && ${MAKE} deploy-stack
-	cd ./service.eventmanager.live && ${MAKE} deploy-stack
+	# cd ./service.notification-live && ${MAKE} deploy-stack
+	# cd ./service.eventmanager.live && ${MAKE} deploy-stack
 	echo 'DOCKER IMAGES BUILD!'
 	echo '----------------------------------------------'
+	${dockerCompose} up --build 
 
 
 	
