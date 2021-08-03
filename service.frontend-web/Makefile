@@ -17,6 +17,7 @@ npm = $(shell which npm)
 docker = $(shell which docker)
 
 deploy-stack:
+	echo '====== BUILDING: SERVICE: FRONTEND-WEB ======'
 	${npm} -v
 	${npm} run build
 	${docker} build -t frontend.web:latest  .

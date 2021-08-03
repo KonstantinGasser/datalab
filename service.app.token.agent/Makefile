@@ -17,6 +17,7 @@ go = $(shell which go)
 docker = $(shell which docker)
 
 deploy-stack:
+	echo '====== BUILDING: SERVICE: APP-TOKEN-AGENT ======'
 	${go} version
 	GOOS=linux GOARCH=arm64 ${go} build -o build/service cmd/main.go
 	${docker} build -t app.token.agent:latest  .

@@ -12,10 +12,12 @@ deploy:
 	# ============ Deployment <$(VERSION)_$(tag)> DONE ============
 
 
+
 go = $(shell which go)
 docker = $(shell which docker)
 
 deploy-stack:
+	echo '====== BUILDING: SERVICE: APP-META-AGENT ======'
 	${go} version
 	GOOS=linux GOARCH=arm64 ${go} build -o build/service cmd/main.go
 	${docker} build -t app.meta.agent:latest  .

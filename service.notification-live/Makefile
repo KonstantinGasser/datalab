@@ -11,10 +11,13 @@ deploy:
 	echo '* BUILD DONE FOR\n\tcreated on: $(shell date)\n\tversion:    $(VERSION)_$(tag)\n' >> version
 	# ============ Deployment <$(VERSION)_$(tag)> DONE ============
 
+
+
 go = $(shell which go)
 docker = $(shell which docker)
 
 deploy-stack:
+	echo '====== BUILDING: SERVICE: NOTIFICATION-LIVE ======'
 	${go} version
 	GOOS=linux GOARCH=arm64 ${go} build -o bin/service cmd/main.go
 	${docker} build -t notification.live:latest  .

@@ -25,14 +25,19 @@ user-auth:
 
 #################################
 
-go = $(shell which go)
-docker = $(shell which docker)
-deploy-stack: $(version)
 
-	${go} version
-	# build all binaries for each service
-	${go} build -o ./service.api.bff/build/service ./service.api.bff/cmd/main.go 
-	${docker} build -t api-bff:build_${version} ./service.api.bff/Dockerfile
-	# build docker image
-	# deploy docker compose file
+start-stack:
+	echo 'STARTING TO BUILD DOCKER IMAGES...'
+	cd ./service.api.bff && ${MAKE} deploy-stack
+	cd ./service.app.meta.agent && ${MAKE} deploy-stack
+	cd ./service.app.config.agent && ${MAKE} deploy-stack
+	cd ./service.app.token.agent && ${MAKE} deploy-stack
+	cd ./service.user.meta.agent && ${MAKE} deploy-stack
+	cd ./service.user.auth.agent && ${MAKE} deploy-stack
+	cd ./service.notification-live && ${MAKE} deploy-stack
+	cd ./service.eventmanager.live && ${MAKE} deploy-stack
+	echo 'DOCKER IMAGES BUILD!'
+	echo '----------------------------------------------'
+
+
 	
