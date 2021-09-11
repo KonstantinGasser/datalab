@@ -1,0 +1,116 @@
+syntax = "proto3";
+
+package issuer_proto;
+
+option go_package = "github.com/KonstantinGasser/datalab/service.app.token.agent/cmd/grpcserver/proto";
+import "common/common.proto";
+
+service AppToken {
+    rpc Initialize(InitializeRequest) returns (InitializeResponse) {}
+    rpc Issue(IssueRequest) returns (IssueResponse) {}
+    rpc Validate(ValidateRequest) returns (ValidateResponse) {}
+    rpc InValidate(InValidateRequest) returns (InValidateResponse) {}
+    rpc Get(GetRequest) returns (GetResponse) {}
+
+    rpc AppendPermission(AppendPermissionRequest) returns (AppendPermissionResponse) {}
+    rpc RollbackAppendPermission(RollbackAppendPermissionRequest) returns (RollbackAppendPermissionResponse) {}
+
+    rpc UnlockAppToken(UnlockAppTokenRequest) returns (UnlockAppTokenResponse) {}
+}
+
+message AppendPermissionRequest {
+    string tracing_ID = 1;
+    string app_uuid = 2;
+    string user_uuid = 3;
+}
+message AppendPermissionResponse {
+    int32 status_code = 1;
+    string msg = 2;
+}
+
+message RollbackAppendPermissionRequest {
+    string tracing_ID = 1;
+    string app_uuid = 2;
+    string user_uuid = 3;
+}
+message RollbackAppendPermissionResponse {
+    int32 status_code = 1;
+    string msg = 2;
+}
+
+message InitializeRequest {
+    string tracing_ID = 1;
+    string app_ref_uuid = 2;
+    string app_owner = 3;
+    string app_hash = 4;
+    string app_origin = 5;
+    string owner_orgn = 6;
+    bool is_private = 7;
+}
+
+message InitializeResponse {
+    int32 status_code = 1;
+    string msg = 2;
+}
+
+message IssueRequest {
+    string tracing_ID = 1;
+    string caller_uuid = 2; 
+    string app_uuid = 3;
+    string app_name = 4;
+    string organization = 5;
+}
+
+message IssueResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    common.AppAccessToken token = 3;
+}
+
+message UnlockAppTokenRequest {
+    string tracing_ID = 1;
+    string app_uuid = 2;
+    common.AuthedUser authed_user = 3;
+}
+message UnlockAppTokenResponse {
+    int32 status_code = 1;
+    string msg = 2;
+}
+
+message GetRequest {
+    string tracing_ID = 1;
+    common.AuthedUser authed_user = 2;
+    string app_uuid = 3;
+}
+
+message GetResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    common.AppAccessToken token = 3;
+}
+
+message ValidateRequest {
+    string tracing_ID = 1;
+    common.AuthedUser authed_user = 2;
+    string app_token = 3;
+}
+
+message ValidateResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    string app_uuid = 3;
+    string app_origin = 4;
+}
+
+message InValidateRequest {
+    string tracing_ID = 1;
+    common.AuthedUser authed_user = 2;
+    string app_token = 3;
+}
+
+message InValidateResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    string app_uuid = 3;
+    string app_origin = 4;
+}

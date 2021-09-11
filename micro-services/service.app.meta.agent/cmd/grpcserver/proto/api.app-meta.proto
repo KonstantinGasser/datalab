@@ -1,0 +1,134 @@
+syntax = "proto3";
+
+
+package app_proto;
+option go_package = "github.com/KonstantinGasser/datalab/service.app.meta.agent/cmd/grpcserver/proto";
+
+import "common/common.proto";
+
+service AppMeta {
+    rpc Create(CreateRequest) returns (CreateResponse) {}
+    rpc Delete(DeleteRequest) returns (DeleteResponse) {}
+    rpc Get(GetRequest) returns (GetResponse) {}
+    rpc GetList(GetListRequest) returns (GetListResponse) {}
+
+    rpc Invite(InviteRequest) returns (InviteResponse) {}
+    rpc InviteReminderOK(InviteReminderOKRequest) returns (InviteReminderOKResponse) {}
+    rpc AcceptInvite(AcceptInviteRequest) returns (AcceptInviteResponse) {}
+
+    rpc LockApp(LockAppRequest) returns (LockAppResponse) {}
+    rpc UnlockApp(UnlockAppRequest) returns (UnlockAppResponse) {}
+}
+
+
+// RPC CREATE APP
+message CreateRequest {
+    string tracing_ID = 1;
+    string owner_uuid = 2;
+    string name = 3;
+    string organization = 4;
+    repeated string tags = 5;
+    string app_url = 6;
+    bool is_private = 7;
+}
+message CreateResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    string app_uuid = 3;
+}
+
+
+message LockAppRequest {
+    string tracing_ID = 1;
+    string app_uuid = 2;
+    common.AuthedUser authed_user = 3;
+}
+message LockAppResponse {
+    int32 status_code = 1;
+    string msg = 2;
+}
+
+message UnlockAppRequest {
+    string tracing_ID = 1;
+    string app_uuid = 2;
+    common.AuthedUser authed_user = 3;
+}
+message UnlockAppResponse {
+    int32 status_code = 1;
+    string msg = 2;
+}
+// ***************************
+
+// RPC DELETE APP
+message DeleteRequest {
+    string tracing_ID = 1;
+    common.AuthedUser authed_user = 2;
+    string app_uuid = 3;
+    string app_name = 4;
+    string orgn_name = 5;
+}
+
+message DeleteResponse {
+    int32 status_code = 1;
+    string msg = 2;
+}
+// ***************************
+
+// RPC GET APP LIST
+message GetListRequest {
+    string tracing_ID = 1;
+    common.AuthedUser authed_user = 2;
+}
+message GetListResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    repeated common.AppSubset app_list = 3;
+}
+// ***************************
+
+message InviteReminderOKRequest {
+    string tracing_ID = 1;
+    string app_uuid = 2;
+    string user_uuid = 3;
+}
+message InviteReminderOKResponse {
+    int32 status_code = 1;
+    string msg = 2;
+}
+// RPC GET APP
+message GetRequest {
+    string tracing_ID = 1;
+    common.AuthedUser authed_user = 2;
+    string app_uuid = 3;
+    
+}
+
+message GetResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    common.AppInfo app = 3;
+}
+
+message InviteRequest {
+    string tracing_ID = 1;
+    common.AuthedUser authed_user = 2;
+    string app_uuid = 3;
+    string user_uuid = 4;
+}
+message InviteResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    string app_name =3;
+    string owner_uuid = 4;
+}
+
+message AcceptInviteRequest {
+    string tracing_ID = 1;
+    common.AuthedUser authed_user = 2;
+    string app_uuid = 3;
+}
+
+message AcceptInviteResponse {
+    int32 status_code = 1;
+    string msg = 2;
+}

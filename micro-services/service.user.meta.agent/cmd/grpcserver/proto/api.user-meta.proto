@@ -1,0 +1,83 @@
+syntax = "proto3";
+
+package user_proto;
+
+option go_package = "github.com/KonstantinGasser/datalab/service.user.meta.agent/cmd/grpcserver/proto";
+import "common/common.proto";
+
+
+service UserMeta {
+    rpc Create(CreateRequest) returns (CreateResponse) {}
+    rpc Update(UpdateRequest) returns (UpdateResponse) {}
+    rpc Get(GetRequest) returns (GetResponse) {}
+    rpc GetById(GetByIdRequest) returns (GetByIdResponse) {}
+    rpc GetColleagues(GetColleaguesRequest) returns (GetColleaguesResponse) {}
+    // rpc GetList(GetListRequest) returns (GetListResponse) {}
+}
+
+
+// RPC CREATE USER
+message CreateRequest {
+    string tracing_ID = 1;
+    common.UserInfo user = 2;
+}
+message CreateResponse {
+    int32 status_code = 1;
+    string msg = 2;    
+}
+// ***************************
+
+
+message UpdateRequest {
+    string tracing_ID = 1;
+    string caller_uuid = 2;
+    UpdatableUser user = 3;
+}
+message UpdateResponse {
+    int32 status_code = 1; 
+    string msg = 2;
+}
+
+
+message GetRequest {
+    string tracing_ID = 1;
+    string caller_uuid = 2;
+    string for_uuid = 3;
+}
+
+message GetResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    common.UserInfo user = 3;
+}
+
+message GetByIdRequest {
+    string tracing_ID = 1;
+    string user_uuid = 2;
+}
+
+message GetByIdResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    common.UserInfo user = 3;
+}
+
+message GetColleaguesRequest {
+    string tracing_ID = 1;
+    string user_uuid = 2;
+    string organization = 3;
+}
+
+message GetColleaguesResponse {
+    int32 status_code = 1;
+    string msg = 2;
+    repeated common.UserInfo colleagues = 3;
+}
+
+
+message UpdatableUser {
+    string first_name = 1; 
+    string last_name = 2;
+    string orgn_position = 3;
+    string profile_img_url = 4;
+}
