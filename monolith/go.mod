@@ -3,6 +3,11 @@ module github.com/KonstantinGasser/datalab/monolith
 go 1.17
 
 require (
-	github.com/KonstantinGasser/bugsbunny/service_a v0.0.0-20210902190415-54ab7e00c609
+	github.com/KonstantinGasser/required v1.0.0
+	github.com/gofrs/uuid v4.0.0+incompatible
 	github.com/gorilla/mux v1.8.0
+	github.com/pkg/errors v0.9.1
+	github.com/sirupsen/logrus v1.8.1
 )
+
+require golang.org/x/sys v0.0.0-20191026070338-33540a1f6037 // indirect
