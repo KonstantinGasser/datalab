@@ -5,6 +5,7 @@ go 1.17
 require (
 	github.com/KonstantinGasser/required v1.0.0
 	github.com/gofrs/uuid v4.0.0+incompatible
+	github.com/google/uuid v1.3.0
 	github.com/gorilla/mux v1.8.0
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.8.1

@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/KonstantinGasser/required"
-	"github.com/gofrs/uuid"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 )
@@ -37,7 +36,7 @@ func NewDefault(username, firstname, lastname, organization, position string) (U
 	timeNow := strconv.FormatInt(time.Now().Unix(), 10)
 	urlSeed := strings.Join([]string{timeNow, "svg"}, ".") // timetamp.svg
 	avatarUrl := strings.Join([]string{defaultAvatarApi, urlSeed}, "/")
-	uuid, err := uuid.NewV4()
+	uuid, err := uuid.NewUUID()
 	if err != nil {
 		return User{}, errors.Wrap(err, "unable to create UUID")
 	}

@@ -59,14 +59,14 @@ func WithTracing(next http.Handler) http.Handler {
 		}
 		// add tracing ID to request context for other function involved in the request
 		// to have access to it
-		ctx := context.WithValue(r.Context(), ctxkey.Str("tracingID"), tracingID)
+		ctx := context.WithValue(r.Context(), ctxkey.Str("tracingID"), tracingID.String()[:8])
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
 
 func WithLogging(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		logrus.Printf("[%s] -> incoming request from: %v\n",
+		logrus.Infof("[%s] incoming request from: %v\n",
 			r.Context().Value(ctxkey.Str("tracingID")),
 			r.RemoteAddr,
 		)

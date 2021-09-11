@@ -5,12 +5,16 @@ import (
 	"net/http"
 
 	middelware "github.com/KonstantinGasser/datalab/monolith/internal/api/middleware"
+	userSvc "github.com/KonstantinGasser/datalab/monolith/internal/domain/user/svc"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 )
 
 type ApiServer struct {
 	router *mux.Router
+
+	// server dependencies
+	usersvc userSvc.Service
 }
 
 func (api ApiServer) Serve(addr string) {
@@ -21,14 +25,15 @@ func (api ApiServer) Serve(addr string) {
 	defer listner.Close()
 	logrus.Infof("[api-server] serving on %s\n", addr)
 
-	if err := http.Serve(listner, nil); err != nil {
+	if err := http.Serve(listner, api.router); err != nil {
 		logrus.Fatal(err)
 	}
 }
 
-func New(router *mux.Router) *ApiServer {
+func New(router *mux.Router, usersvc userSvc.Service) *ApiServer {
 	api := ApiServer{
-		router: router,
+		router:  router,
+		usersvc: usersvc,
 	}
 	api.setUp()
 	return &api
@@ -53,7 +58,6 @@ func (api ApiServer) setUp() {
 	api.router.HandleFunc("/api/v1/app/invite/accept", nil).Methods("POST")
 
 	api.router.HandleFunc("/api/v1/app/unlock", nil).Methods("POST")
-	api.router.HandleFunc("", nil).Methods("")
 
 	api.router.Use(
 		middelware.WithTracing,
