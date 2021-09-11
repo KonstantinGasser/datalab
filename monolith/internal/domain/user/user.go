@@ -6,16 +6,19 @@ import (
 	"time"
 
 	"github.com/KonstantinGasser/required"
+	"github.com/gofrs/uuid"
+	"github.com/google/uuid"
+	"github.com/pkg/errors"
 )
 
 type User struct {
-	Uuid         string `bson:"_id"`
-	Username     string `bson:"username" required:"yes" min:"5"`
-	FirstName    string `bson:"first_name" required:"yes"`
-	LastName     string `bson:"last_name" required:"yes"`
-	Organization string `bson:"organization" required:"yes"`
-	Position     string `bson:"position" required:"yes"`
-	Avatar       string `bson:"avatar"`
+	Uuid         uuid.UUID `bson:"_id"`
+	Username     string    `bson:"username" required:"yes" min:"5"`
+	FirstName    string    `bson:"first_name" required:"yes"`
+	LastName     string    `bson:"last_name" required:"yes"`
+	Organization string    `bson:"organization" required:"yes"`
+	Position     string    `bson:"position" required:"yes"`
+	Avatar       string    `bson:"avatar"`
 }
 
 var (
@@ -29,12 +32,17 @@ type UpdatableUser struct {
 	FirstName, LastName, Position string
 }
 
-func NewDefault(uuid, username, firstname, lastname, organization, position string) (*User, error) {
+func NewDefault(username, firstname, lastname, organization, position string) (User, error) {
 	// build random user avatar
 	timeNow := strconv.FormatInt(time.Now().Unix(), 10)
 	urlSeed := strings.Join([]string{timeNow, "svg"}, ".") // timetamp.svg
 	avatarUrl := strings.Join([]string{defaultAvatarApi, urlSeed}, "/")
-	user := &User{
+	uuid, err := uuid.NewV4()
+	if err != nil {
+		return User{}, errors.Wrap(err, "unable to create UUID")
+	}
+
+	user := User{
 		Uuid:         uuid,
 		Username:     username,
 		FirstName:    firstname,
@@ -43,8 +51,12 @@ func NewDefault(uuid, username, firstname, lastname, organization, position stri
 		Position:     position,
 		Avatar:       avatarUrl,
 	}
-	if err := required.Atomic(user); err != nil {
-		return nil, err
+	if err := required.Atomic(&user); err != nil {
+		return User{}, err
 	}
 	return user, nil
+}
+
+func (u *User) NewPosition(pos string) {
+	u.Position = pos
 }
