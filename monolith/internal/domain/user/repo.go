@@ -8,7 +8,8 @@ import (
 )
 
 var (
-	ErrNotFound = fmt.Errorf("could not find user")
+	ErrNotFound        = fmt.Errorf("could not find user")
+	ErrDuplicatedEntry = fmt.Errorf("user already exists")
 )
 
 type Repository interface {

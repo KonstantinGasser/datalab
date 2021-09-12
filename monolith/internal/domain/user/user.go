@@ -27,7 +27,7 @@ var (
 
 // UpdatableUser defins the fields of a User that can be changed
 type UpdatableUser struct {
-	Uuid                          string
+	Uuid                          uuid.UUID
 	FirstName, LastName, Position string
 }
 
